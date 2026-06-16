@@ -1,0 +1,39 @@
+# Binaries
+nats-ui
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go build cache
+*.test
+*.out
+go.work
+
+# Node modules
+node_modules/
+web/node_modules/
+
+# Frontend build
+web/dist/
+web/.env/
+web/.env.local
+web/.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local

@@ -1,0 +1,97 @@
+import { LucideIcon } from "lucide-react";
+import { formatNumber } from "../../utils/formatters";
+
+interface StatCardProps {
+  /**
+   * Icon to display
+   */
+  icon: LucideIcon;
+
+  /**
+   * Main value to display
+   */
+  value: number | string;
+
+  /**
+   * Label for the stat
+   */
+  label: string;
+
+  /**
+   * Background color class for icon container
+   * @default "bg-primary-500/20"
+   */
+  iconBg?: string;
+
+  /**
+   * Icon color class
+   * @default "text-primary-400"
+   */
+  iconColor?: string;
+
+  /**
+   * Size variant
+   * @default "normal"
+   */
+  size?: "normal" | "small";
+
+  /**
+   * Whether to format number with locale
+   * @default true
+   */
+  formatValue?: boolean;
+
+  /**
+   * Optional click handler
+   */
+  onClick?: () => void;
+}
+
+/**
+ * StatCard displays a statistic with icon, value, and label
+ * Used extensively in dashboard and stats grids
+ */
+export default function StatCard({
+  icon: Icon,
+  value,
+  label,
+  iconBg = "bg-primary-500/20",
+  iconColor = "text-primary-400",
+  size = "normal",
+  formatValue = true,
+  onClick,
+}: StatCardProps) {
+  const displayValue =
+    typeof value === "number" && formatValue ? formatNumber(value) : value;
+
+  const iconSize = size === "small" ? "w-5 h-5" : "w-6 h-6";
+  const valueSize = size === "small" ? "text-xl" : "text-3xl";
+  const labelSize = size === "small" ? "text-xs" : "text-sm";
+  const containerSize = size === "small" ? "w-10 h-10" : "w-12 h-12";
+
+  const card = (
+    <div className="card">
+      <div className="flex items-center gap-3">
+        <div
+          className={`${containerSize} rounded-xl ${iconBg} flex items-center justify-center`}
+        >
+          <Icon className={`${iconSize} ${iconColor}`} />
+        </div>
+        <div>
+          <p className={`${valueSize} font-bold`}>{displayValue}</p>
+          <p className={`${labelSize} text-dark-muted`}>{label}</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} className="w-full">
+        {card}
+      </button>
+    );
+  }
+
+  return card;
+}

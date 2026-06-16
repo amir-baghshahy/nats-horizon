@@ -1,0 +1,327 @@
+package handlers
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"sync"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/nats-io/nats.go"
+)
+
+// ConnectionConfig represents a NATS connection configuration
+type ConnectionConfig struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	URL         string    `json:"url"`
+	Description string    `json:"description"`
+	Enabled     bool      `json:"enabled"`
+	IsDefault   bool      `json:"is_default"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+// ConnectionStatus represents the status of a connection
+type ConnectionStatus struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Connected   bool   `json:"connected"`
+	Healthy     bool   `json:"healthy"`
+	Latency     string `json:"latency,omitempty"`
+	Error       string `json:"error,omitempty"`
+	LastChecked string `json:"last_checked"`
+}
+
+// TenancyHandler manages multi-tenancy connections
+type TenancyHandler struct {
+	connections map[string]*ConnectionConfig
+	mu          sync.RWMutex
+	nc          *nats.Conn
+	// Map to track active NATS connections
+	// In a real implementation, you'd maintain actual connection pools
+}
+
+// NewTenancyHandler creates a new tenancy handler
+func NewTenancyHandler(natsURL string, nc *nats.Conn) *TenancyHandler {
+	h := &TenancyHandler{
+		connections: make(map[string]*ConnectionConfig),
+		nc: nc,
+	}
+
+	// Add default connection from environment
+	// Extract server name from URL for better UX
+	serverName := "NATS Server"
+	if nc != nil && nc.IsConnected() {
+		if msg, err := nc.Request("$SYS.REQ.SERVER.PING", []byte("{}"), 1*time.Second); err == nil && msg != nil {
+			var serverResp struct {
+				Name string `json:"server_name"`
+			}
+			if json.Unmarshal(msg.Data, &serverResp) == nil && serverResp.Name != "" {
+				serverName = serverResp.Name
+			}
+		}
+	}
+
+	h.connections["default"] = &ConnectionConfig{
+		ID:          "default",
+		Name:        serverName,
+		URL:         natsURL,
+		Description: fmt.Sprintf("Default NATS connection (%s)", serverName),
+		Enabled:     true,
+		IsDefault:   true,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	return h
+}
+
+// ListConnections returns all configured connections
+func (h *TenancyHandler) ListConnections(c *gin.Context) {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	connections := make([]*ConnectionConfig, 0, len(h.connections))
+	for _, conn := range h.connections {
+		connections = append(connections, conn)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"connections": connections,
+		"count":       len(connections),
+	})
+}
+
+// GetConnection returns a specific connection
+func (h *TenancyHandler) GetConnection(c *gin.Context) {
+	id := c.Param("id")
+
+	h.mu.RLock()
+	conn, exists := h.connections[id]
+	h.mu.RUnlock()
+
+	if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "connection not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, conn)
+}
+
+// CreateConnection creates a new connection
+func (h *TenancyHandler) CreateConnection(c *gin.Context) {
+	var req ConnectionConfig
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if req.Name == "" || req.URL == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "name and url are required"})
+		return
+	}
+
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	// Generate ID
+	req.ID = fmt.Sprintf("%d", time.Now().UnixNano())
+	req.CreatedAt = time.Now()
+	req.UpdatedAt = time.Now()
+
+	h.connections[req.ID] = &req
+
+	c.JSON(http.StatusCreated, req)
+}
+
+// UpdateConnection updates a connection
+func (h *TenancyHandler) UpdateConnection(c *gin.Context) {
+	id := c.Param("id")
+
+	var req ConnectionConfig
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	existing, exists := h.connections[id]
+	if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "connection not found"})
+		return
+	}
+
+	// Update fields
+	if req.Name != "" {
+		existing.Name = req.Name
+	}
+	if req.URL != "" {
+		existing.URL = req.URL
+	}
+	if req.Description != "" {
+		existing.Description = req.Description
+	}
+	existing.Enabled = req.Enabled
+	existing.UpdatedAt = time.Now()
+
+	c.JSON(http.StatusOK, existing)
+}
+
+// DeleteConnection deletes a connection
+func (h *TenancyHandler) DeleteConnection(c *gin.Context) {
+	id := c.Param("id")
+
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	conn, exists := h.connections[id]
+	if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "connection not found"})
+		return
+	}
+
+	// Prevent deleting default connection
+	if conn.IsDefault {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot delete default connection"})
+		return
+	}
+
+	delete(h.connections, id)
+
+	c.JSON(http.StatusOK, gin.H{"message": "connection deleted"})
+}
+
+// TestConnection tests a connection configuration
+func (h *TenancyHandler) TestConnection(c *gin.Context) {
+	var req struct {
+		URL string `json:"url" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Try to connect
+	start := time.Now()
+	nc, err := nats.Connect(req.URL,
+		nats.Timeout(5*time.Second),
+		nats.MaxReconnects(0),
+	)
+	latency := time.Since(start)
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"connected": false,
+			"healthy":   false,
+			"error":     err.Error(),
+			"latency":   latency.String(),
+		})
+		return
+	}
+	defer nc.Close()
+
+	// Test with a ping
+	if !nc.IsConnected() {
+		c.JSON(http.StatusOK, gin.H{
+			"connected": false,
+			"healthy":   false,
+			"error":     "connection established but not responsive",
+		})
+		return
+	}
+
+	// Try to get server info
+	msg, err := nc.Request("$SYS.REQ.SERVER.PING", []byte("{}"), 2*time.Second)
+	serverInfo := make(map[string]interface{})
+	if err == nil {
+		json.Unmarshal(msg.Data, &serverInfo)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"connected": true,
+		"healthy":   true,
+		"latency":   latency.String(),
+		"server":    serverInfo,
+	})
+}
+
+// GetConnectionStatus returns status of all connections
+func (h *TenancyHandler) GetConnectionStatus(c *gin.Context) {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	statuses := make([]ConnectionStatus, 0)
+
+	for _, conn := range h.connections {
+		if !conn.Enabled {
+			statuses = append(statuses, ConnectionStatus{
+				ID:          conn.ID,
+				Name:        conn.Name,
+				Connected:   false,
+				Healthy:     false,
+				Error:       "disabled",
+				LastChecked: time.Now().Format(time.RFC3339),
+			})
+			continue
+		}
+
+		start := time.Now()
+		nc, err := nats.Connect(conn.URL,
+			nats.Timeout(3*time.Second),
+			nats.MaxReconnects(0),
+		)
+		latency := time.Since(start)
+
+		status := ConnectionStatus{
+			ID:          conn.ID,
+			Name:        conn.Name,
+			LastChecked: time.Now().Format(time.RFC3339),
+		}
+
+		if err != nil {
+			status.Connected = false
+			status.Healthy = false
+			status.Error = err.Error()
+		} else {
+			status.Connected = nc.IsConnected()
+			status.Healthy = nc.IsConnected()
+			status.Latency = latency.String()
+			nc.Close()
+		}
+
+		statuses = append(statuses, status)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"statuses": statuses,
+		"count":    len(statuses),
+	})
+}
+
+// SetDefaultConnection sets a connection as default
+func (h *TenancyHandler) SetDefaultConnection(c *gin.Context) {
+	id := c.Param("id")
+
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	conn, exists := h.connections[id]
+	if !exists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "connection not found"})
+		return
+	}
+
+	// Remove default from others
+	for key := range h.connections {
+		h.connections[key].IsDefault = false
+	}
+
+	conn.IsDefault = true
+
+	c.JSON(http.StatusOK, conn)
+}

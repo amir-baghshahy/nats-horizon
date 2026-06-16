@@ -1,0 +1,260 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles inspired by Grafana/Linear/Redpanda Console */
+@layer base {
+  * {
+    @apply border-dark-border;
+  }
+
+  body {
+    @apply bg-dark-bg text-dark-text antialiased;
+  }
+
+  /* Smooth transitions everywhere */
+  * {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer components {
+  /* Card component with glass effect */
+  .card {
+    @apply bg-dark-card/80 backdrop-blur-xl border border-dark-border/50 rounded-xl p-6;
+    @apply shadow-lg shadow-dark-bg/20;
+  }
+
+  /* Button variants with hover effects */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600;
+    @apply text-white px-4 py-2 rounded-lg transition-all duration-300;
+    @apply shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40;
+    @apply hover:scale-105 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-dark-card hover:bg-dark-border text-dark-text px-4 py-2 rounded-lg;
+    @apply border border-dark-border transition-all duration-300;
+    @apply hover:scale-105 active:scale-95;
+  }
+
+  /* Status indicators with glow */
+  .status-success {
+    @apply text-emerald-400;
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+  }
+
+  .status-warning {
+    @apply text-amber-400;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  }
+
+  .status-error {
+    @apply text-red-400;
+    text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+  }
+
+  .status-info {
+    @apply text-blue-400;
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+  }
+
+  /* Primary brand color */
+  .text-primary-400 {
+    @apply text-violet-400;
+  }
+
+  .bg-primary-500 {
+    @apply bg-violet-500;
+  }
+
+  .bg-primary-600 {
+    @apply bg-violet-600;
+  }
+
+  .from-primary-500 {
+    @apply from-violet-500;
+  }
+
+  .to-primary-600 {
+    @apply to-violet-600;
+  }
+
+  .border-primary-500 {
+    @apply border-violet-500;
+  }
+
+  .text-cyan-500 {
+    @apply text-cyan-400;
+  }
+
+  /* Input styles */
+  .input {
+    @apply bg-dark-bg/50 backdrop-blur border border-dark-border rounded-lg px-4 py-2;
+    @apply text-dark-text placeholder-dark-muted;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500;
+    @apply transition-all duration-300;
+  }
+
+  /* Table styles */
+  .table {
+    @apply w-full border-collapse;
+  }
+
+  .table th {
+    @apply text-left p-3 border-b border-dark-border text-dark-muted text-sm font-medium uppercase tracking-wider;
+  }
+
+  .table td {
+    @apply p-3 border-b border-dark-border;
+  }
+
+  .table tr {
+    @apply transition-colors duration-200;
+  }
+
+  .table tr:hover {
+    @apply bg-dark-bg/50;
+  }
+
+  /* Scroll indicator pulse */
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+      box-shadow: 0 0 5px currentColor;
+    }
+    50% {
+      opacity: 0.7;
+      box-shadow: 0 0 20px currentColor;
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 bg-clip-text text-transparent;
+  }
+
+  /* Glass card variant */
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6;
+    @apply shadow-xl shadow-black/20;
+  }
+
+  /* Shimmer loading effect */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .skeleton {
+    @apply animate-pulse bg-dark-border/50;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Custom scrollbar */
+  .scrollbar-thin::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-dark-bg/50;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-dark-border/50 rounded-full;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-dark-muted;
+  }
+}
+
+@layer utilities {
+  /* Glow effect utilities */
+  .glow-success {
+    box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
+  }
+
+  .glow-warning {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+  }
+
+  .glow-error {
+    box-shadow: 0 0 20px rgba(248, 113, 113, 0.3);
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+
+  /* Glass morphism backgrounds */
+  .glass-bg {
+    background: rgba(17, 24, 39, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Responsive grid helpers */
+  .grid-responsive {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+  }
+
+  /* Safe area for mobile */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Text truncation */
+  .truncate-2-lines {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .truncate-3-lines {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Recharts tooltip customization */
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+.recharts-tooltip-content {
+  background: rgba(17, 24, 39, 0.95) !important;
+  border: 1px solid rgba(55, 65, 81, 0.5) !important;
+  border-radius: 8px !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+/* Toast animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out;
+}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -176,6 +177,13 @@ func (h *CoreNATShandler) Subscribe(c *gin.Context) {
 		return
 	}
 
+	if strings.HasPrefix(subject, "$SYS.") || strings.HasPrefix(subject, "$JS.") {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: "subscription to internal system subjects is not allowed",
+		})
+		return
+	}
+
 	c.Writer.Header().Set("Content-Type", "text/event-stream")
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")
@@ -229,7 +237,7 @@ func (h *CoreNATShandler) Subscribe(c *gin.Context) {
 	flusher.Flush()
 
 	notify := c.Writer.CloseNotify()
-	ticker := time.NewTicker(time.Duration(constants.SSEKeepaliveInterval) * time.Nanosecond)
+	ticker := time.NewTicker(time.Duration(constants.SSEKeepaliveInterval))
 	defer ticker.Stop()
 
 	for {
@@ -372,7 +380,7 @@ func (h *CoreNATShandler) MonitorTraffic(c *gin.Context) {
 	flusher.Flush()
 
 	notify := c.Writer.CloseNotify()
-	ticker := time.NewTicker(time.Duration(constants.SSEStatsInterval) * time.Nanosecond)
+	ticker := time.NewTicker(time.Duration(constants.SSEStatsInterval))
 	defer ticker.Stop()
 
 	for {

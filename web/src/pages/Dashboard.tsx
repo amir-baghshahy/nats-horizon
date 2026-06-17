@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSSE } from "../hooks/useSSE";
 import { SystemMetrics } from "../components/MetricsGraph";
@@ -15,6 +16,16 @@ import { Database, AlertCircle, Loader2 } from "lucide-react";
 
 export default function Dashboard() {
   const { connected: sseConnected } = useSSE("dashboard");
+  const isTabVisibleRef = useRef(true);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      isTabVisibleRef.current = !document.hidden;
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
   const {
     data: stats,

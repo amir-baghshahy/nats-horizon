@@ -49,3 +49,8 @@ const (
 	ReplayPolicyInstant  = "instant"
 	ReplayPolicyOriginal = "original"
 )
+
+// PauseSentinel is the MaxDeliver value used to mark a paused consumer.
+// -2 is chosen because NATS uses -1 for unlimited and 0 is the Go zero-value default,
+// so -2 cannot be confused with either a default or an unlimited consumer.
+const PauseSentinel = -2

@@ -12,6 +12,7 @@ type Stream struct {
 	Messages  uint64    `json:"messages"`
 	Bytes     uint64    `json:"bytes"`
 	Consumers int       `json:"consumers"`
+	NumPending uint64   `json:"num_pending"`
 	FirstSeq  uint64    `json:"first_seq"`
 	LastSeq   uint64    `json:"last_seq"`
 	FirstTs   time.Time `json:"first_ts"`
@@ -63,11 +64,14 @@ func (s *Stream) ToStreamWithConfig() *StreamWithConfig {
 			Messages:   s.Messages,
 			Bytes:      s.Bytes,
 			Consumers:  s.Consumers,
+			NumPending: s.NumPending,
 			FirstSeq:   s.FirstSeq,
 			LastSeq:    s.LastSeq,
 			FirstTs:    s.FirstTs,
 			LastTs:     s.LastTs,
-			NumPending: s.FirstSeq, // Using FirstSeq as placeholder
+			DeleteMarks: 0,
+			MaxAge: "",
+			MaxBytes: 0,
 		},
 	}
 }

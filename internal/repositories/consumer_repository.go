@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/nats-io/nats.go"
+	"nats-monitoring/internal/constants"
 	"nats-monitoring/internal/models"
+	"nats-monitoring/internal/utils"
 )
 
 // NATSConsumerRepository implements ConsumerRepository using NATS JetStream
@@ -37,43 +39,6 @@ type consumerListResponse struct {
 	} `json:"consumers"`
 }
 
-func policyToString(policy int) string {
-	switch policy {
-	case 0:
-		return "none"
-	case 1:
-		return "all"
-	case 2:
-		return "explicit"
-	default:
-		return fmt.Sprintf("%d", policy)
-	}
-}
-
-func deliverPolicyToString(policy int) string {
-	switch policy {
-	case 0:
-		return "all"
-	case 1:
-		return "last"
-	case 2:
-		return "new"
-	default:
-		return fmt.Sprintf("%d", policy)
-	}
-}
-
-func replayPolicyToString(policy int) string {
-	switch policy {
-	case 0:
-		return "instant"
-	case 1:
-		return "original"
-	default:
-		return fmt.Sprintf("%d", policy)
-	}
-}
-
 func (r *NATSConsumerRepository) List(ctx context.Context, streamName string) ([]*models.Consumer, error) {
 	subject := fmt.Sprintf("$JS.API.CONSUMER.LIST.%s", streamName)
 	msg, err := r.nc.Request(subject, []byte{}, 2*time.Second)
@@ -94,11 +59,11 @@ func (r *NATSConsumerRepository) List(ctx context.Context, streamName string) ([
 			Status:        "active",
 			NumPending:    c.State.NumPending,
 			Durable:       c.Config.Durable != "",
-			AckPolicy:     policyToString(c.Config.AckPolicy),
-			DeliverPolicy: deliverPolicyToString(c.Config.DeliverPolicy),
-			ReplayPolicy:  replayPolicyToString(c.Config.ReplayPolicy),
+			AckPolicy:     utils.AckPolicyToString(c.Config.AckPolicy),
+			DeliverPolicy: utils.DeliverPolicyToString(c.Config.DeliverPolicy),
+			ReplayPolicy:  utils.ReplayPolicyToString(c.Config.ReplayPolicy),
 			MaxDeliver:    c.Config.MaxDeliver,
-			Paused:        c.Config.MaxDeliver == 0,
+			Paused:        c.Config.MaxDeliver == constants.PauseSentinel,
 		}
 	}
 
@@ -153,7 +118,7 @@ func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *models.LagRe
 		return fmt.Errorf("failed to delete consumer: %w", err)
 	}
 
-	info.Config.DeliverPolicy = nats.DeliverAllPolicy
+	info.Config.DeliverPolicy = nats.DeliverByStartSequencePolicy
 
 	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {
@@ -195,10 +160,12 @@ func (r *NATSConsumerRepository) Pause(ctx context.Context, req *models.PauseReq
 		return fmt.Errorf("failed to get consumer info: %w", err)
 	}
 
-	info.Config.MaxDeliver = 0
+	originalMaxDeliver := info.Config.MaxDeliver
+	info.Config.MaxDeliver = constants.PauseSentinel
 
 	_, err = r.js.UpdateConsumer(req.StreamName, &info.Config)
 	if err != nil {
+		info.Config.MaxDeliver = originalMaxDeliver
 		return fmt.Errorf("failed to pause consumer: %w", err)
 	}
 
@@ -228,11 +195,11 @@ func (r *NATSConsumerRepository) toDomainConsumer(info *nats.ConsumerInfo, strea
 		Status:        "active",
 		NumPending:    info.NumPending,
 		Durable:       info.Config.Durable != "",
-		AckPolicy:     policyToString(int(info.Config.AckPolicy)),
-		DeliverPolicy: deliverPolicyToString(int(info.Config.DeliverPolicy)),
-		ReplayPolicy:  replayPolicyToString(int(info.Config.ReplayPolicy)),
+		AckPolicy:     utils.AckPolicyToString(int(info.Config.AckPolicy)),
+		DeliverPolicy: utils.DeliverPolicyToString(int(info.Config.DeliverPolicy)),
+		ReplayPolicy:  utils.ReplayPolicyToString(int(info.Config.ReplayPolicy)),
 		MaxDeliver:    int(info.Config.MaxDeliver),
-		Paused:        info.Config.MaxDeliver == 0,
+		Paused:        info.Config.MaxDeliver == constants.PauseSentinel,
 	}
 }
 

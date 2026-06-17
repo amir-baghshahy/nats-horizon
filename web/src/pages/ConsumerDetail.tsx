@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { ConsumersService } from "../types";
@@ -46,7 +46,19 @@ export default function ConsumerDetail() {
     "overview" | "messages" | "config"
   >("overview");
   const [isPaused, setIsPaused] = useState(false);
+  const [isTabHidden, setIsTabHidden] = useState(false);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsTabHidden(document.hidden);
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -55,7 +67,8 @@ export default function ConsumerDetail() {
   const { data: consumer, refetch } = useQuery({
     queryKey: ["consumer", name],
     queryFn: () => ConsumersService.getConsumers1(name || ""),
-    refetchInterval: isPaused ? false : 2000,
+    refetchInterval: isPaused || isTabHidden ? false : 5000,
+    refetchOnWindowFocus: false,
     enabled: !!name,
   });
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ConsumersService, StreamsService } from "../types";
 import type {
@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSSE } from "../hooks/useSSE";
+import { useSelection, useExpansion } from "../hooks";
 import {
   deleteConsumer,
   setConsumerState,
@@ -41,13 +42,18 @@ export default function Consumers() {
   const [filterStatus, setFilterStatus] = useState<
     "all" | "active" | "stuck" | "idle"
   >("all");
-  const [selectedConsumers, setSelectedConsumers] = useState<Set<string>>(
-    new Set(),
-  );
-  const [expandedConsumers, setExpandedConsumers] = useState<Set<string>>(
-    new Set(),
-  );
   const [showMoreFilters, setShowMoreFilters] = useState(false);
+
+  const {
+    selected: selectedConsumers,
+    toggleSelection: toggleConsumerSelection,
+    clearSelection: clearConsumerSelection,
+    selectAll: selectAllConsumers,
+  } = useSelection<string>();
+
+  const { toggleExpansion: toggleExpand, isExpanded: isConsumerExpanded } =
+    useExpansion<string>();
+
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -71,59 +77,68 @@ export default function Consumers() {
   });
 
   // Filter consumers
-  const filteredConsumers =
-    consumers?.filter((consumer: Consumer) => {
-      const matchesSearch =
-        (consumer.name || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (consumer.stream || "")
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
+  const filteredConsumers = useMemo(
+    () =>
+      consumers?.filter((consumer: Consumer) => {
+        const matchesSearch =
+          (consumer.name || "")
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          (consumer.stream || "")
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
 
-      const matchesStream =
-        selectedStream === "all" || consumer.stream === selectedStream;
+        const matchesStream =
+          selectedStream === "all" || consumer.stream === selectedStream;
 
-      let matchesStatus = true;
-      if (filterStatus === "active")
-        matchesStatus = consumer.status === "active";
-      else if (filterStatus === "stuck")
-        matchesStatus = consumer.status === "stuck";
-      else if (filterStatus === "idle")
-        matchesStatus = consumer.status === "idle";
+        let matchesStatus = true;
+        if (filterStatus === "active")
+          matchesStatus = consumer.status === "active";
+        else if (filterStatus === "stuck")
+          matchesStatus = consumer.status === "stuck";
+        else if (filterStatus === "idle")
+          matchesStatus = consumer.status === "idle";
 
-      return matchesSearch && matchesStream && matchesStatus;
-    }) || [];
+        return matchesSearch && matchesStream && matchesStatus;
+      }) || [],
+    [consumers, searchQuery, selectedStream, filterStatus],
+  );
 
   // Stats
-  const stats = {
-    total: filteredConsumers.length,
-    active: filteredConsumers.filter((c: Consumer) => c.status === "active")
-      .length,
-    stuck: filteredConsumers.filter((c: Consumer) => c.status === "stuck")
-      .length,
-    idle: filteredConsumers.filter((c: Consumer) => c.status === "idle").length,
-    totalLag: filteredConsumers.reduce(
-      (acc: number, c: Consumer) => acc + (c.lag || 0),
-      0,
-    ),
-    avgAckRate:
-      filteredConsumers.length > 0
-        ? filteredConsumers.reduce(
-            (acc: number, c: Consumer) =>
-              acc +
-              parseInt(String(c.ack_rate || "0").replace(/[^\d]/g, "") || "0"),
-            0,
-          ) / filteredConsumers.length
-        : 0,
-  };
+  const stats = useMemo(
+    () => ({
+      total: filteredConsumers.length,
+      active: filteredConsumers.filter((c: Consumer) => c.status === "active")
+        .length,
+      stuck: filteredConsumers.filter((c: Consumer) => c.status === "stuck")
+        .length,
+      idle: filteredConsumers.filter((c: Consumer) => c.status === "idle")
+        .length,
+      totalLag: filteredConsumers.reduce(
+        (acc: number, c: Consumer) => acc + (c.lag || 0),
+        0,
+      ),
+      avgAckRate:
+        filteredConsumers.length > 0
+          ? filteredConsumers.reduce(
+              (acc: number, c: Consumer) =>
+                acc +
+                parseInt(
+                  String(c.ack_rate || "0").replace(/[^\d]/g, "") || "0",
+                ),
+              0,
+            ) / filteredConsumers.length
+          : 0,
+    }),
+    [filteredConsumers],
+  );
 
   const deleteMutation = useMutation({
     mutationFn: ({ stream, name }: { stream: string; name: string }) =>
       deleteConsumer(stream, name),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["consumers"] });
-      setSelectedConsumers(new Set());
+      clearConsumerSelection();
       toast("success", "Consumer deleted");
     },
     onError: () => toast("error", "Failed to delete consumer"),
@@ -157,13 +172,10 @@ export default function Consumers() {
 
   const handleBulkResume = () => {
     if (confirm(`Resume ${selectedConsumers.size} selected consumers?`)) {
-      filteredConsumers.forEach((c: any) => {
+      filteredConsumers.forEach((c: Consumer) => {
+        if (!c.name || !c.stream) return;
         if (selectedConsumers.has(c.name) && c.status !== "active") {
-          pauseResumeMutation.mutate({
-            stream: c.stream,
-            name: c.name,
-            paused: false,
-          });
+          pauseResumeMutation.mutate({ stream: c.stream, name: c.name, paused: false });
         }
       });
     }
@@ -171,13 +183,10 @@ export default function Consumers() {
 
   const handleBulkPause = () => {
     if (confirm(`Pause ${selectedConsumers.size} selected consumers?`)) {
-      filteredConsumers.forEach((c: any) => {
+      filteredConsumers.forEach((c: Consumer) => {
+        if (!c.name || !c.stream) return;
         if (selectedConsumers.has(c.name) && c.status === "active") {
-          pauseResumeMutation.mutate({
-            stream: c.stream,
-            name: c.name,
-            paused: true,
-          });
+          pauseResumeMutation.mutate({ stream: c.stream, name: c.name, paused: true });
         }
       });
     }
@@ -185,7 +194,8 @@ export default function Consumers() {
 
   const handleBulkDelete = () => {
     if (confirm(`Delete ${selectedConsumers.size} selected consumers?`)) {
-      filteredConsumers.forEach((c: any) => {
+      filteredConsumers.forEach((c: Consumer) => {
+        if (!c.name || !c.stream) return;
         if (selectedConsumers.has(c.name)) {
           deleteMutation.mutate({ stream: c.stream, name: c.name });
         }
@@ -193,7 +203,7 @@ export default function Consumers() {
     }
   };
 
-  const getStatusIcon = (consumer: any) => {
+  const getStatusIcon = (consumer: Consumer) => {
     switch (consumer.status) {
       case "active":
         return <CheckCircle className="w-4 h-4 status-success" />;
@@ -225,31 +235,11 @@ export default function Consumers() {
     return "status-success";
   };
 
-  const toggleConsumerSelection = (consumerName: string) => {
-    const newSelected = new Set(selectedConsumers);
-    if (newSelected.has(consumerName)) {
-      newSelected.delete(consumerName);
-    } else {
-      newSelected.add(consumerName);
-    }
-    setSelectedConsumers(newSelected);
-  };
-
-  const toggleExpand = (consumerName: string) => {
-    const newExpanded = new Set(expandedConsumers);
-    if (newExpanded.has(consumerName)) {
-      newExpanded.delete(consumerName);
-    } else {
-      newExpanded.add(consumerName);
-    }
-    setExpandedConsumers(newExpanded);
-  };
-
   const toggleAll = () => {
     if (selectedConsumers.size === filteredConsumers.length) {
-      setSelectedConsumers(new Set());
+      clearConsumerSelection();
     } else {
-      setSelectedConsumers(new Set(filteredConsumers.map((c: any) => c.name)));
+      selectAllConsumers(filteredConsumers.map((c: Consumer) => c.name).filter((n): n is string => !!n));
     }
   };
 
@@ -481,7 +471,7 @@ export default function Consumers() {
             {filteredConsumers.map((consumer: any) => {
               const consumerName = consumer.name || "";
               if (!consumerName) return null;
-              const isExpanded = expandedConsumers.has(consumerName);
+              const isExpanded = isConsumerExpanded(consumerName);
               const isSelected = selectedConsumers.has(consumerName);
 
               return (

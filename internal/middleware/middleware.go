@@ -24,8 +24,9 @@ func PanicRecovery() gin.HandlerFunc {
 }
 
 type visitor struct {
-	requests int
-	lastSeen time.Time
+	requests    int
+	lastSeen    time.Time
+	windowStart time.Time
 }
 
 type RateLimiter struct {
@@ -50,13 +51,19 @@ func (rl *RateLimiter) Middleware() gin.HandlerFunc {
 		ip := c.ClientIP()
 
 		rl.mu.Lock()
+		now := time.Now()
 		v, exists := rl.visitors[ip]
 		if !exists {
-			v = &visitor{lastSeen: time.Now()}
+			v = &visitor{lastSeen: now, windowStart: now}
 			rl.visitors[ip] = v
 		}
+		// Reset counter if the current window has expired
+		if now.Sub(v.windowStart) > 1*time.Minute {
+			v.requests = 0
+			v.windowStart = now
+		}
 		v.requests++
-		v.lastSeen = time.Now()
+		v.lastSeen = now
 		count := v.requests
 		rl.mu.Unlock()
 
@@ -79,7 +86,6 @@ func (rl *RateLimiter) cleanup() {
 			if time.Since(v.lastSeen) > 1*time.Minute {
 				delete(rl.visitors, ip)
 			}
-			v.requests = 0
 		}
 		rl.mu.Unlock()
 	}

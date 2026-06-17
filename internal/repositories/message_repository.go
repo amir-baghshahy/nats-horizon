@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/nats-io/nats.go"
 	"nats-monitoring/internal/models"
@@ -82,26 +83,85 @@ func (r *NATSMessageRepository) List(ctx context.Context, streamName string, fil
 		limit = 25
 	}
 
-	count := 0
-	for i := startSeq; i <= lastSeq && count < limit; i++ {
-		msg, err := r.js.GetMsg(streamName, i)
-		if err != nil {
-			continue
-		}
+	// Determine the sequence range to fetch.
+	endSeq := startSeq + uint64(limit) - 1
+	if endSeq > lastSeq {
+		endSeq = lastSeq
+	}
 
-		headers := make(map[string][]string)
-		for k, v := range msg.Header {
-			headers[k] = v
-		}
+	type result struct {
+		seq uint64
+		msg *models.Message
+	}
 
-		messages = append(messages, &models.Message{
-			Subject:   msg.Subject,
-			Sequence:  msg.Sequence,
-			Data:      msg.Data,
-			Headers:   headers,
-			Timestamp: msg.Time,
-		})
-		count++
+	// Bounded goroutine pool: at most 8 concurrent NATS round-trips.
+	const maxWorkers = 8
+	seqCh := make(chan uint64, limit)
+	resCh := make(chan result, limit)
+
+	// Fill the work queue.
+	for seq := startSeq; seq <= endSeq; seq++ {
+		seqCh <- seq
+	}
+	close(seqCh)
+
+	var wg sync.WaitGroup
+	workers := maxWorkers
+	if int(endSeq-startSeq+1) < workers {
+		workers = int(endSeq - startSeq + 1)
+	}
+	for w := 0; w < workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for seq := range seqCh {
+				// Honour context cancellation before each round-trip.
+				if ctx.Err() != nil {
+					return
+				}
+				msg, err := r.js.GetMsg(streamName, seq)
+				if err != nil {
+					continue
+				}
+				headers := make(map[string][]string)
+				for k, v := range msg.Header {
+					headers[k] = v
+				}
+				resCh <- result{
+					seq: seq,
+					msg: &models.Message{
+						Subject:   msg.Subject,
+						Sequence:  msg.Sequence,
+						Data:      msg.Data,
+						Headers:   headers,
+						Timestamp: msg.Time,
+					},
+				}
+			}
+		}()
+	}
+
+	// Close resCh once all workers finish.
+	go func() {
+		wg.Wait()
+		close(resCh)
+	}()
+
+	// Collect results; preserve sequence order via a map then sort.
+	resultMap := make(map[uint64]*models.Message, limit)
+	for r := range resCh {
+		resultMap[r.seq] = r.msg
+	}
+
+	// If the context was cancelled, surface the error.
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+
+	for seq := startSeq; seq <= endSeq; seq++ {
+		if m, ok := resultMap[seq]; ok {
+			messages = append(messages, m)
+		}
 	}
 
 	return messages, nil

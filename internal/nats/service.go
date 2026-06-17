@@ -92,9 +92,17 @@ func (s *Service) GetStreams() ([]*nats.StreamInfo, error) {
 		return nil, fmt.Errorf("not connected to NATS")
 	}
 
-	// Use Streams() method to list all streams
+	// Use Streams() method to list all streams.
+	// The v1 JetStreamContext API does not expose per-page errors through the
+	// channel; nil entries signal an internal error. We collect all non-nil
+	// entries and report if the channel was nil (option error).
+	ch := s.js.Streams(nil)
+	if ch == nil {
+		return nil, fmt.Errorf("failed to start stream listing: invalid JetStream options")
+	}
+
 	var infos []*nats.StreamInfo
-	for stream := range s.js.Streams(nil) {
+	for stream := range ch {
 		if stream != nil {
 			infos = append(infos, stream)
 		}
@@ -233,8 +241,9 @@ func (s *Service) ResetConsumerLag(streamName, consumerName string, sequence uin
 		return fmt.Errorf("failed to delete consumer: %w", err)
 	}
 
-	// Set the deliver policy to start from sequence
-	info.Config.DeliverPolicy = nats.DeliverAllPolicy
+	// Set the deliver policy to start from the requested sequence
+	info.Config.DeliverPolicy = nats.DeliverByStartSequencePolicy
+	info.Config.OptStartSeq = sequence
 
 	// Recreate consumer
 	_, err = s.js.AddConsumer(streamName, &info.Config)
@@ -302,9 +311,11 @@ func (s *Service) PauseConsumer(streamName, consumerName string) error {
 		return fmt.Errorf("failed to get consumer info: %w", err)
 	}
 
-	// Pause by setting MaxDeliver to 0 temporarily
+	// Pause by setting MaxDeliver to -2 (sentinel).
+	// -1 means unlimited in NATS and 0 is the Go zero-value default,
+	// so -2 is the only value that unambiguously signals a paused consumer.
 	originalMaxDeliver := info.Config.MaxDeliver
-	info.Config.MaxDeliver = 0
+	info.Config.MaxDeliver = -2
 
 	_, err = s.js.UpdateConsumer(streamName, &info.Config)
 	if err != nil {
@@ -427,14 +438,26 @@ func (s *Service) WatchStream(ctx context.Context, streamName string, filterSubj
 		return nil, fmt.Errorf("failed to create subscription: %w", err)
 	}
 
+	key := fmt.Sprintf("%s-%s", streamName, filterSubject)
+
 	s.mu.Lock()
-	s.subscribers[fmt.Sprintf("%s-%s", streamName, filterSubject)] = sub
+	if existing, ok := s.subscribers[key]; ok {
+		if err := existing.Unsubscribe(); err != nil {
+			log.Printf("Error unsubscribing existing subscription for %s: %v", key, err)
+		}
+	}
+	s.subscribers[key] = sub
 	s.mu.Unlock()
 
 	// Start goroutine to forward messages
 	go func() {
 		defer close(msgChan)
-		defer sub.Unsubscribe()
+		defer func() {
+			sub.Unsubscribe()
+			s.mu.Lock()
+			delete(s.subscribers, key)
+			s.mu.Unlock()
+		}()
 
 		for {
 			select {
@@ -450,14 +473,12 @@ func (s *Service) WatchStream(ctx context.Context, streamName string, filterSubj
 					return
 				}
 
-				msg.Ack()
-
 				select {
 				case msgChan <- msg:
+					msg.Ack()
 				case <-ctx.Done():
+					msg.Nak()
 					return
-				default:
-					log.Printf("Channel full, dropping message")
 				}
 			}
 		}

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -129,90 +128,36 @@ func (h *SecurityHandler) GetSecurityInfo(c *gin.Context) {
 	})
 }
 
-// GetUsers returns list of users (placeholder for demo)
+// GetUsers is not implemented. NATS user management requires operator-level
+// JWT/NKey tooling that is outside the scope of this monitoring service.
 func (h *SecurityHandler) GetUsers(c *gin.Context) {
-	// Try to get actual account info from NATS
-	accountInfo, err := h.js.AccountInfo()
-	accountName := "default"
-	if err == nil && accountInfo.Domain != "" {
-		accountName = accountInfo.Domain
-	}
-
-	// For now, returning demo data with dynamic account name
-	users := []User{
-		{
-			Name:    "admin",
-			Account: accountName,
-			Enabled: true,
-			Permissions: UserPermissions{
-				Publish: map[string]string{
-					">": "allow",
-				},
-				Subscribe: map[string]string{
-					">": "allow",
-				},
-			},
-			CreatedAt: time.Now().Add(-30 * 24 * time.Hour),
-			UpdatedAt: time.Now(),
-		},
-		{
-			Name:    "service-user",
-			Account: accountName,
-			Enabled: true,
-			Permissions: UserPermissions{
-				Publish: map[string]string{
-					"orders.>": "allow",
-					"events.>": "allow",
-				},
-				Subscribe: map[string]string{
-					"responses.>": "allow",
-				},
-			},
-			CreatedAt: time.Now().Add(-15 * 24 * time.Hour),
-			UpdatedAt: time.Now(),
-		},
-	}
-
-	c.JSON(http.StatusOK, users)
+	c.JSON(http.StatusNotImplemented, gin.H{
+		"error": "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)",
+	})
 }
 
-// CreateUser creates a new user (placeholder for demo)
+// CreateUser is not implemented. NATS user management requires operator-level
+// JWT/NKey tooling that is outside the scope of this monitoring service.
 func (h *SecurityHandler) CreateUser(c *gin.Context) {
-	var req User
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	req.CreatedAt = time.Now()
-	req.UpdatedAt = time.Now()
-
-	// In a real implementation, this would create the user via NATS account API
-	c.JSON(http.StatusCreated, req)
+	c.JSON(http.StatusNotImplemented, gin.H{
+		"error": "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)",
+	})
 }
 
-// UpdateUser updates a user (placeholder for demo)
+// UpdateUser is not implemented. NATS user management requires operator-level
+// JWT/NKey tooling that is outside the scope of this monitoring service.
 func (h *SecurityHandler) UpdateUser(c *gin.Context) {
-	name := c.Param("name")
-
-	var req User
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	req.Name = name
-	req.UpdatedAt = time.Now()
-
-	c.JSON(http.StatusOK, req)
+	c.JSON(http.StatusNotImplemented, gin.H{
+		"error": "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)",
+	})
 }
 
-// DeleteUser deletes a user (placeholder for demo)
+// DeleteUser is not implemented. NATS user management requires operator-level
+// JWT/NKey tooling that is outside the scope of this monitoring service.
 func (h *SecurityHandler) DeleteUser(c *gin.Context) {
-	name := c.Param("name")
-
-	// In a real implementation, this would delete the user via NATS account API
-	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("User %s deleted", name)})
+	c.JSON(http.StatusNotImplemented, gin.H{
+		"error": "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)",
+	})
 }
 
 // GetAuditLogs returns audit logs (placeholder for demo)

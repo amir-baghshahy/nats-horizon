@@ -10,6 +10,7 @@ import (
 	"nats-monitoring/internal/utils"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -351,25 +352,20 @@ func (h *ConsumerHandler) Resume(c *gin.Context) {
 	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "Consumer resumed successfully"})
 }
 
-// ListAll handles GET /consumers without stream filter
-// @Summary List all consumers across all streams
-// @Tags consumers
-// @Accept json
-// @Produce json
-// @Success 200 {array} dto.ConsumerResponse
-// @Failure 500 {object} dto.ErrorResponse
-// @Router /consumers [get]
-func (h *ConsumerHandler) ListAll(c *gin.Context) {
+// pauseSentinel is the MaxDeliver value used to mark a paused consumer.
+// -2 is chosen because NATS uses -1 for unlimited and 0 as the Go zero-value
+// default, so -2 cannot be confused with either a default or an unlimited consumer.
+const pauseSentinel = -2
+
+// fetchStreamNames returns the list of stream names by querying NATS.
+func (h *ConsumerHandler) fetchStreamNames() ([]string, error) {
 	streamMsg, err := h.nc.Request(
 		constants.APIStreamList,
 		[]byte{},
 		constants.DefaultRequestTimeout,
 	)
 	if err != nil {
-		c.JSON(http.StatusServiceUnavailable, dto.ErrorResponse{
-			Error: "NATS unavailable",
-		})
-		return
+		return nil, fmt.Errorf("NATS unavailable: %w", err)
 	}
 
 	var streamResponse struct {
@@ -381,65 +377,107 @@ func (h *ConsumerHandler) ListAll(c *gin.Context) {
 	}
 
 	if err := json.Unmarshal(streamMsg.Data, &streamResponse); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to parse stream list",
-			Details: err.Error(),
-		})
+		return nil, fmt.Errorf("failed to parse stream list: %w", err)
+	}
+
+	names := make([]string, 0, len(streamResponse.Streams))
+	for _, s := range streamResponse.Streams {
+		names = append(names, s.Config.Name)
+	}
+	return names, nil
+}
+
+// ListAll handles GET /consumers without stream filter
+// @Summary List all consumers across all streams
+// @Tags consumers
+// @Accept json
+// @Produce json
+// @Success 200 {array} dto.ConsumerResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /consumers [get]
+func (h *ConsumerHandler) ListAll(c *gin.Context) {
+	streamNames, err := h.fetchStreamNames()
+	if err != nil {
+		status := http.StatusInternalServerError
+		if err.Error()[:16] == "NATS unavailable" {
+			status = http.StatusServiceUnavailable
+		}
+		c.JSON(status, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	allConsumers := []dto.ConsumerResponse{}
+	type consumerListResponse struct {
+		Consumers []struct {
+			Name   string `json:"name"`
+			Config struct {
+				Durable       string `json:"durable"`
+				AckPolicy     string `json:"ack_policy"`
+				DeliverPolicy string `json:"deliver_policy"`
+				ReplayPolicy  string `json:"replay_policy"`
+				MaxDeliver    int    `json:"max_deliver"`
+			} `json:"config"`
+			State struct {
+				NumPending uint64 `json:"num_pending"`
+			} `json:"state"`
+		} `json:"consumers"`
+	}
 
-	for _, stream := range streamResponse.Streams {
-		subject := fmt.Sprintf("%s.%s", constants.APIConsumerList, stream.Config.Name)
-		msg, err := h.nc.Request(subject, []byte{}, constants.DefaultRequestTimeout)
-		if err != nil {
-			continue
-		}
+	type streamResult struct {
+		streamName string
+		consumers  []dto.ConsumerResponse
+	}
 
-		var response struct {
-			Consumers []struct {
-				Name   string `json:"name"`
-				Config struct {
-					Durable       string `json:"durable"`
-					AckPolicy     string `json:"ack_policy"`
-					DeliverPolicy string `json:"deliver_policy"`
-					ReplayPolicy  string `json:"replay_policy"`
-					MaxDeliver    int    `json:"max_deliver"`
-				} `json:"config"`
-				State struct {
-					NumPending uint64 `json:"num_pending"`
-				} `json:"state"`
-			} `json:"consumers"`
-		}
+	results := make([]streamResult, len(streamNames))
+	var wg sync.WaitGroup
+	wg.Add(len(streamNames))
 
-		if err := json.Unmarshal(msg.Data, &response); err != nil {
-			continue
-		}
-
-		for _, consumer := range response.Consumers {
-			durable := consumer.Config.Durable
-			if durable == "" {
-				durable = consumer.Name
+	for i, name := range streamNames {
+		i, name := i, name
+		go func() {
+			defer wg.Done()
+			subject := fmt.Sprintf("%s.%s", constants.APIConsumerList, name)
+			msg, err := h.nc.Request(subject, []byte{}, constants.DefaultRequestTimeout)
+			if err != nil {
+				return
 			}
 
-			allConsumers = append(allConsumers, dto.ConsumerResponse{
-				Name:       consumer.Name,
-				Stream:     stream.Config.Name,
-				Status:     "active",
-				Lag:        consumer.State.NumPending,
-				AckRate:    "",
-				NumPending: consumer.State.NumPending,
-				Paused:     consumer.Config.MaxDeliver == 0,
-				Config: &dto.ConsumerConfigResponse{
-					Durable:       durable,
-					AckPolicy:     consumer.Config.AckPolicy,
-					DeliverPolicy: consumer.Config.DeliverPolicy,
-					ReplayPolicy:  consumer.Config.ReplayPolicy,
-					MaxDeliver:    int64(consumer.Config.MaxDeliver),
-				},
-			})
-		}
+			var response consumerListResponse
+			if err := json.Unmarshal(msg.Data, &response); err != nil {
+				return
+			}
+
+			consumers := make([]dto.ConsumerResponse, 0, len(response.Consumers))
+			for _, consumer := range response.Consumers {
+				durable := consumer.Config.Durable
+				if durable == "" {
+					durable = consumer.Name
+				}
+				consumers = append(consumers, dto.ConsumerResponse{
+					Name:       consumer.Name,
+					Stream:     name,
+					Status:     "active",
+					Lag:        consumer.State.NumPending,
+					AckRate:    "",
+					NumPending: consumer.State.NumPending,
+					Paused:     consumer.Config.MaxDeliver == pauseSentinel,
+					Config: &dto.ConsumerConfigResponse{
+						Durable:       durable,
+						AckPolicy:     consumer.Config.AckPolicy,
+						DeliverPolicy: consumer.Config.DeliverPolicy,
+						ReplayPolicy:  consumer.Config.ReplayPolicy,
+						MaxDeliver:    int64(consumer.Config.MaxDeliver),
+					},
+				})
+			}
+			results[i] = streamResult{streamName: name, consumers: consumers}
+		}()
+	}
+
+	wg.Wait()
+
+	allConsumers := []dto.ConsumerResponse{}
+	for _, r := range results {
+		allConsumers = append(allConsumers, r.consumers...)
 	}
 
 	c.JSON(http.StatusOK, allConsumers)
@@ -458,36 +496,18 @@ func (h *ConsumerHandler) ListAll(c *gin.Context) {
 func (h *ConsumerHandler) GetConsumerByName(c *gin.Context) {
 	name := c.Param("name")
 
-	streamMsg, err := h.nc.Request(
-		constants.APIStreamList,
-		[]byte{},
-		constants.DefaultRequestTimeout,
-	)
+	streamNames, err := h.fetchStreamNames()
 	if err != nil {
-		c.JSON(http.StatusServiceUnavailable, dto.ErrorResponse{
-			Error: "NATS unavailable",
-		})
+		status := http.StatusInternalServerError
+		if err.Error()[:16] == "NATS unavailable" {
+			status = http.StatusServiceUnavailable
+		}
+		c.JSON(status, dto.ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	var streamResponse struct {
-		Streams []struct {
-			Config struct {
-				Name string `json:"name"`
-			} `json:"config"`
-		} `json:"streams"`
-	}
-
-	if err := json.Unmarshal(streamMsg.Data, &streamResponse); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to parse stream list",
-			Details: err.Error(),
-		})
-		return
-	}
-
-	for _, stream := range streamResponse.Streams {
-		consumerInfo, err := h.js.ConsumerInfo(stream.Config.Name, name)
+	for _, streamName := range streamNames {
+		consumerInfo, err := h.js.ConsumerInfo(streamName, name)
 		if err == nil && consumerInfo != nil {
 			durable := consumerInfo.Config.Durable
 			if durable == "" {
@@ -496,12 +516,12 @@ func (h *ConsumerHandler) GetConsumerByName(c *gin.Context) {
 
 			c.JSON(http.StatusOK, dto.ConsumerResponse{
 				Name:       consumerInfo.Name,
-				Stream:     stream.Config.Name,
+				Stream:     streamName,
 				Status:     "active",
 				Lag:        consumerInfo.NumPending,
 				AckRate:    "",
 				NumPending: consumerInfo.NumPending,
-				Paused:     consumerInfo.Config.MaxDeliver == 0,
+				Paused:     consumerInfo.Config.MaxDeliver == pauseSentinel,
 				Config: &dto.ConsumerConfigResponse{
 					Durable:       durable,
 					AckPolicy:     utils.AckPolicyToString(int(consumerInfo.Config.AckPolicy)),

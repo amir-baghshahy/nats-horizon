@@ -88,24 +88,31 @@ func (h *SSEHub) RemoveClient(id string) {
 
 // Broadcast sends an event to all clients in a channel
 func (h *SSEHub) Broadcast(channel string, event SSEEvent) {
-	h.mu.RLock()
-	defer h.mu.RUnlock()
-
+	// Marshal JSON before acquiring the lock to avoid holding it during encoding.
 	data, err := json.Marshal(event)
 	if err != nil {
 		log.Printf("Failed to marshal SSE event: %v", err)
 		return
 	}
 
+	// Copy the relevant client pointers under the read lock, then release it
+	// before doing any I/O so that slow clients cannot stall AddClient/RemoveClient.
+	h.mu.RLock()
+	var targets []*SSEClient
 	for _, client := range h.clients {
 		if client.Channel == channel || client.Channel == "all" {
-			select {
-			case <-h.ctx.Done():
-				return
-			default:
-				fmt.Fprintf(client.Writer, "data: %s\n\n", data)
-				client.Flusher.Flush()
-			}
+			targets = append(targets, client)
+		}
+	}
+	h.mu.RUnlock()
+
+	for _, client := range targets {
+		select {
+		case <-h.ctx.Done():
+			return
+		default:
+			fmt.Fprintf(client.Writer, "data: %s\n\n", data)
+			client.Flusher.Flush()
 		}
 	}
 }
@@ -150,7 +157,7 @@ func (h *SSEHub) MonitorStreams() {
 						Data: gin.H{
 							"name":      name,
 							"messages":  msgCount,
-							"consumers": len(response.Streams),
+							"consumers": stream.State.Consumers,
 						},
 					})
 				}
@@ -161,7 +168,16 @@ func (h *SSEHub) MonitorStreams() {
 	}
 }
 
-// MonitorConsumers monitors consumer changes and broadcasts updates
+// consumerStateKey uniquely identifies a consumer within a stream.
+type consumerStateKey struct {
+	stream   string
+	consumer string
+}
+
+// MonitorConsumers monitors consumer changes and broadcasts updates.
+// CONSUMER.LIST requests for each stream are issued concurrently so that a
+// large number of streams does not cause the goroutine to block for
+// N * requestTimeout seconds per tick. Only changed state is broadcast.
 func (h *SSEHub) MonitorConsumers() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -171,6 +187,13 @@ func (h *SSEHub) MonitorConsumers() {
 
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
+
+	lastState := make(map[consumerStateKey]uint64)
+
+	type consumerResult struct {
+		streamName string
+		response   sseConsumerListResponse
+	}
 
 	for {
 		select {
@@ -187,28 +210,57 @@ func (h *SSEHub) MonitorConsumers() {
 				continue
 			}
 
+			// Fan out CONSUMER.LIST requests concurrently.
+			results := make(chan consumerResult, len(streamResponse.Streams))
+			var wg sync.WaitGroup
 			for _, stream := range streamResponse.Streams {
-				streamName := stream.Config.Name
-				subject := fmt.Sprintf("$JS.API.CONSUMER.LIST.%s", streamName)
-				consumerMsg, err := h.nc.Request(subject, []byte{}, 2*time.Second)
-				if err != nil {
-					continue
+				// Check for cancellation before spawning each goroutine.
+				select {
+				case <-h.ctx.Done():
+					return
+				default:
 				}
 
-				var consumerResponse sseConsumerListResponse
-				if err := json.Unmarshal(consumerMsg.Data, &consumerResponse); err != nil {
-					continue
-				}
+				wg.Add(1)
+				go func(streamName string) {
+					defer wg.Done()
+					subject := fmt.Sprintf("$JS.API.CONSUMER.LIST.%s", streamName)
+					consumerMsg, err := h.nc.Request(subject, []byte{}, 2*time.Second)
+					if err != nil {
+						return
+					}
+					var consumerResponse sseConsumerListResponse
+					if err := json.Unmarshal(consumerMsg.Data, &consumerResponse); err != nil {
+						return
+					}
+					results <- consumerResult{streamName: streamName, response: consumerResponse}
+				}(stream.Config.Name)
+			}
 
-				for _, consumer := range consumerResponse.Consumers {
+			// Close the results channel once all goroutines finish.
+			go func() {
+				wg.Wait()
+				close(results)
+			}()
+
+			// Collect results and broadcast only when state changed.
+			for res := range results {
+				for _, consumer := range res.response.Consumers {
+					key := consumerStateKey{stream: res.streamName, consumer: consumer.Config.Name}
+					pending := consumer.State.NumPending
+					if prev, seen := lastState[key]; seen && prev == pending {
+						continue
+					}
+					lastState[key] = pending
+
 					h.Broadcast("consumers", SSEEvent{
 						Type:      "consumer:update",
 						Timestamp: time.Now().Unix(),
 						Data: gin.H{
 							"name":        consumer.Config.Name,
-							"stream":      streamName,
-							"lag":         consumer.State.NumPending,
-							"num_pending": consumer.State.NumPending,
+							"stream":      res.streamName,
+							"lag":         pending,
+							"num_pending": pending,
 						},
 					})
 				}
@@ -228,7 +280,6 @@ func (h *SSEHub) HandleSSE(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "text/event-stream")
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 
 	// Get channel from query params
 	channel := c.Query("channel")

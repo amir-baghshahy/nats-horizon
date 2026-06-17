@@ -63,6 +63,17 @@ export function useNATSSubscription(
 ): UseNATSSubscriptionReturn {
   const { onMessage, onStatusChange, onError } = options;
 
+  // Store callbacks in refs so subscribe/unsubscribe never need to be
+  // recreated when the caller passes new function references each render.
+  const onMessageRef = useRef(onMessage);
+  const onStatusChangeRef = useRef(onStatusChange);
+  const onErrorRef = useRef(onError);
+
+  // Keep refs in sync with the latest props without causing re-renders.
+  onMessageRef.current = onMessage;
+  onStatusChangeRef.current = onStatusChange;
+  onErrorRef.current = onError;
+
   // Store EventSources in a ref to avoid re-renders
   const eventSourcesRef = useRef<Map<string, EventSource>>(new Map());
   const subscriptionsRef = useRef<Set<string>>(new Set());
@@ -89,7 +100,7 @@ export function useNATSSubscription(
         );
 
         eventSource.onopen = () => {
-          onStatusChange?.(true);
+          onStatusChangeRef.current?.(true);
         };
 
         eventSource.onmessage = (event) => {
@@ -102,15 +113,15 @@ export function useNATSSubscription(
             }
 
             const message: Message = data;
-            onMessage?.(message);
+            onMessageRef.current?.(message);
           } catch (err) {
             console.error("Failed to parse SSE message:", err);
           }
         };
 
         eventSource.onerror = (error) => {
-          onStatusChange?.(false);
-          onError?.(error);
+          onStatusChangeRef.current?.(false);
+          onErrorRef.current?.(error);
           eventSource.close();
           subscriptionsRef.current.delete(subject);
           eventSourcesRef.current.delete(subject);
@@ -120,25 +131,22 @@ export function useNATSSubscription(
         subscriptionsRef.current.add(subject);
       } catch (err) {
         console.error("Failed to create EventSource:", err);
-        onError?.(err as Event);
+        onErrorRef.current?.(err as Event);
       }
     },
-    [onMessage, onStatusChange, onError],
+    [],
   );
 
   // Unsubscribe from a subject
-  const unsubscribe = useCallback(
-    (subject: string) => {
-      const source = eventSourcesRef.current.get(subject);
-      if (source) {
-        source.close();
-        eventSourcesRef.current.delete(subject);
-        subscriptionsRef.current.delete(subject);
-        onStatusChange?.(false);
-      }
-    },
-    [onStatusChange],
-  );
+  const unsubscribe = useCallback((subject: string) => {
+    const source = eventSourcesRef.current.get(subject);
+    if (source) {
+      source.close();
+      eventSourcesRef.current.delete(subject);
+      subscriptionsRef.current.delete(subject);
+      onStatusChangeRef.current?.(false);
+    }
+  }, []);
 
   // Check if subscribed
   const isSubscribed = useCallback((subject: string): boolean => {

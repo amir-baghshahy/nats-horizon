@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { MessagesService, StreamsService } from "../types";
@@ -22,6 +22,20 @@ import {
 } from "lucide-react";
 import { deleteMessage } from "../utils/natsOperations";
 import { useToast } from "../components/Toast";
+import { useSSE } from "../hooks/useSSE";
+
+
+const MAX_DISPLAY_PAYLOAD_SIZE = 50 * 1024; // 50 KB
+
+const decoder = new TextDecoder();
+
+// Defined outside the component so it is not re-created on every render
+// and the decoder instance is reused instead of allocating one per message.
+const parseMessageData = (data: any): string => {
+  if (typeof data === "string") return data;
+  if (Array.isArray(data)) return decoder.decode(new Uint8Array(data));
+  return JSON.stringify(data, null, 2);
+};
 
 export default function Messages() {
   const [selectedStream, setSelectedStream] = useState<string>("");
@@ -39,6 +53,7 @@ export default function Messages() {
   const [copiedMessage, setCopiedMessage] = useState<number | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { connected: sseConnected } = useSSE("messages");
 
   const publishMutation = useMutation({
     mutationFn: (data: { stream: string; subject: string; data: string }) =>
@@ -74,6 +89,7 @@ export default function Messages() {
   };
 
   const deleteSelectedMessages = async () => {
+    if (!confirm(`Delete ${selectedMessages.size} message(s)?`)) return;
     for (const sequence of selectedMessages) {
       await deleteMutation.mutateAsync(sequence);
     }
@@ -85,23 +101,25 @@ export default function Messages() {
     queryFn: () => StreamsService.getStreams(),
   });
 
-  // Set default stream when streams are loaded
   const streamList = streams || [];
-  const defaultStream =
-    selectedStream || streamList[0]?.config?.name || "";
-  if (!selectedStream && defaultStream) {
-    setSelectedStream(defaultStream);
-  }
 
-  // Fetch messages from API
-  const { data: messages, refetch: refetchMessages } = useQuery({
+  // Set default stream when streams are loaded — must be in useEffect to avoid
+  // calling setState during render which causes an infinite re-render loop
+  useEffect(() => {
+    if (!selectedStream && streamList[0]?.config?.name) {
+      setSelectedStream(streamList[0].config.name);
+    }
+  }, [streamList, selectedStream]);
+
+  // Fetch messages from API — disable polling when SSE is active to avoid redundant requests
+  const { data: messages, refetch: refetchMessages, isLoading: isLoadingMessages } = useQuery({
     queryKey: ["messages", selectedStream],
     queryFn: () =>
       axios
         .get(`/api/messages?stream=${encodeURIComponent(selectedStream)}`)
         .then((res) => res.data),
     enabled: !!selectedStream,
-    refetchInterval: 5000,
+    refetchInterval: sseConnected ? false : 5000,
   });
 
   const displayMessages = messages || [];
@@ -134,13 +152,6 @@ export default function Messages() {
     }
   };
 
-  // Parse message data - handle both string and bytes
-  const parseMessageData = (data: any): string => {
-    if (typeof data === "string") return data;
-    if (Array.isArray(data))
-      return new TextDecoder().decode(new Uint8Array(data));
-    return JSON.stringify(data, null, 2);
-  };
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -320,6 +331,18 @@ export default function Messages() {
 
         {/* Messages */}
         <div className="divide-y divide-dark-border">
+          {isLoadingMessages ? (
+            <div className="p-8 text-center text-dark-muted">
+              <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
+              Loading messages...
+            </div>
+          ) : displayMessages.length === 0 ? (
+            <div className="p-8 text-center text-dark-muted">
+              {selectedStream
+                ? "No messages found for this stream."
+                : "Select a stream to browse messages."}
+            </div>
+          ) : null}
           {displayMessages.map((message: any) => {
             const sequence = message.sequence || message.id;
             const isExpanded = expandedMessages.has(sequence);
@@ -456,7 +479,12 @@ export default function Messages() {
                           </button>
                         </div>
                         <pre className="text-sm bg-dark-bg p-3 rounded overflow-x-auto">
-                          <code className="text-green-400">{messageData}</code>
+                          <code className="text-green-400">
+                            {messageData.length > MAX_DISPLAY_PAYLOAD_SIZE
+                              ? messageData.slice(0, MAX_DISPLAY_PAYLOAD_SIZE) +
+                                "\n... [truncated — payload too large to display fully]"
+                              : messageData}
+                          </code>
                         </pre>
                       </div>
 

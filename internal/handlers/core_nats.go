@@ -303,13 +303,15 @@ func (h *CoreNATShandler) GetServiceDiscovery(c *gin.Context) {
 func (h *CoreNATShandler) MonitorTraffic(c *gin.Context) {
 	subjects := c.QueryArray("subjects")
 	if len(subjects) == 0 {
-		subjects = []string{">"}
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error: "subjects parameter required; provide at least one subject to monitor",
+		})
+		return
 	}
 
 	c.Writer.Header().Set("Content-Type", "text/event-stream")
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 
 	flusher, ok := c.Writer.(http.Flusher)
 	if !ok {

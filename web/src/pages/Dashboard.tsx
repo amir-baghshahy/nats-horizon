@@ -11,34 +11,56 @@ import {
 import EmptyState from "../components/ui/EmptyState";
 import { ConsumersService, HealthService } from "../types";
 import type { nats_monitoring_internal_dto_DashboardStatsResponse as DashboardStatsResponse } from "../types";
-import { Database } from "lucide-react";
+import { Database, AlertCircle, Loader2 } from "lucide-react";
 
 export default function Dashboard() {
   const { connected: sseConnected } = useSSE("dashboard");
 
-  const { data: stats, refetch } = useQuery({
+  const {
+    data: stats,
+    refetch,
+    isLoading: statsLoading,
+    isError: statsError,
+  } = useQuery({
     queryKey: ["dashboardStats"],
     queryFn: () => HealthService.getDashboardStats(),
     refetchInterval: sseConnected ? false : 5000,
   });
 
-  const { data: accountInfo } = useQuery({
+  const {
+    data: accountInfo,
+    isLoading: accountLoading,
+    isError: accountError,
+  } = useQuery({
     queryKey: ["accountInfo"],
     queryFn: () => HealthService.getAccountInfo(),
     refetchInterval: sseConnected ? false : 5000,
   });
 
-  const { data: connections } = useQuery({
+  const {
+    data: connections,
+    isLoading: connectionsLoading,
+    isError: connectionsError,
+  } = useQuery({
     queryKey: ["connections"],
     queryFn: () => HealthService.getConnections(),
     refetchInterval: sseConnected ? false : 10000,
   });
 
-  const { data: consumers } = useQuery({
+  const {
+    data: consumers,
+    isLoading: consumersLoading,
+    isError: consumersError,
+  } = useQuery({
     queryKey: ["consumers"],
     queryFn: () => ConsumersService.getConsumers(),
     refetchInterval: sseConnected ? false : 5000,
   });
+
+  const isLoading =
+    statsLoading || accountLoading || connectionsLoading || consumersLoading;
+  const isError =
+    statsError || accountError || connectionsError || consumersError;
 
   const dashboardStats: DashboardStatsResponse = stats || {
     streams: 0,
@@ -58,6 +80,36 @@ export default function Dashboard() {
   };
 
   const hasData = consumers && consumers.length > 0;
+
+  if (isLoading) {
+    return (
+      <div className="p-4 md:p-8">
+        <DashboardHeader
+          sseConnected={sseConnected}
+          onRefresh={() => refetch()}
+        />
+        <div className="flex items-center justify-center min-h-64 text-muted-foreground">
+          <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+          <span>Loading dashboard data…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="p-4 md:p-8">
+        <DashboardHeader
+          sseConnected={sseConnected}
+          onRefresh={() => refetch()}
+        />
+        <div className="flex items-center justify-center min-h-64 text-destructive">
+          <AlertCircle className="mr-2 h-6 w-6" />
+          <span>Failed to load dashboard data. Please try refreshing.</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-8">

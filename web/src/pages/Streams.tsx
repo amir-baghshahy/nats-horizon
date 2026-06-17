@@ -1,5 +1,5 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Plus,
@@ -14,6 +14,7 @@ import {
   Wifi,
   WifiOff,
   Trash2,
+  X,
 } from "lucide-react";
 import { useSSE } from "../hooks/useSSE";
 import {
@@ -26,7 +27,7 @@ import { SearchBar, Pagination, BulkActions } from "../components/common";
 import { StatusBadge, EmptyState } from "../components/ui";
 import { StreamsService } from "../types";
 import type { nats_monitoring_internal_dto_StreamResponse as Stream } from "../types";
-
+import type { nats_monitoring_internal_dto_CreateStreamRequest } from "../types";
 import { formatBytes } from "../utils/formatters";
 
 interface StreamFilters {
@@ -50,7 +51,6 @@ interface StreamStats {
 
 type StreamHealthStatus = "all" | "healthy" | "warning" | "critical";
 
-// Default filter values
 const defaultFilters: StreamFilters = {
   search: "",
   storage: "all",
@@ -64,11 +64,9 @@ const defaultFilters: StreamFilters = {
 export default function Streams() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  // SSE connection
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const { connected: sseConnected } = useSSE("streams");
 
-  // Fetch streams
   const {
     data: streams = [],
     isLoading,
@@ -78,52 +76,50 @@ export default function Streams() {
     queryFn: () => StreamsService.getStreams(),
   });
 
-  // Stable filter function
-  const streamFilterFn = useCallback(
-    (stream: Stream, filters: StreamFilters) => {
-      const streamName = stream.config?.name || "";
-      const matchesSearch =
-        streamName.toLowerCase().includes(filters.search.toLowerCase()) ||
-        (stream.config?.subjects || []).some((s) =>
-          s.toLowerCase().includes(filters.search.toLowerCase()),
-        );
-
-      const matchesStorage =
-        filters.storage === "all" || stream.config?.storage === filters.storage;
-
-      const lag = stream.state?.num_pending || 0;
-      let matchesStatus = true;
-      if (filters.status === "healthy") matchesStatus = lag < 1000;
-      else if (filters.status === "warning")
-        matchesStatus = lag >= 1000 && lag < 10000;
-      else if (filters.status === "critical") matchesStatus = lag >= 10000;
-
-      const messages = stream.state?.messages || 0;
-      const matchesMinMessages = messages >= filters.minMessages;
-      const matchesMaxMessages =
-        filters.maxMessages === 0 || messages <= filters.maxMessages;
-      const matchesMinConsumers =
-        (stream.state?.consumers || 0) >= filters.minConsumers;
-      const matchesSubjectPattern =
-        filters.subjectPattern === "" ||
-        (stream.config?.subjects || []).some((s) =>
-          s.includes(filters.subjectPattern),
-        );
-
-      return (
-        matchesSearch &&
-        matchesStorage &&
-        matchesStatus &&
-        matchesMinMessages &&
-        matchesMaxMessages &&
-        matchesMinConsumers &&
-        matchesSubjectPattern
+  const streamFilterFn = (
+    stream: Stream,
+    filters: StreamFilters,
+  ) => {
+    const streamName = stream.config?.name || "";
+    const matchesSearch =
+      streamName.toLowerCase().includes(filters.search.toLowerCase()) ||
+      (stream.config?.subjects || []).some((s) =>
+        s.toLowerCase().includes(filters.search.toLowerCase()),
       );
-    },
-    [],
-  );
 
-  // Filter state
+    const matchesStorage =
+      filters.storage === "all" || stream.config?.storage === filters.storage;
+
+    const lag = stream.state?.num_pending || 0;
+    let matchesStatus = true;
+    if (filters.status === "healthy") matchesStatus = lag < 1000;
+    else if (filters.status === "warning")
+      matchesStatus = lag >= 1000 && lag < 10000;
+    else if (filters.status === "critical") matchesStatus = lag >= 10000;
+
+    const messages = stream.state?.messages || 0;
+    const matchesMinMessages = messages >= filters.minMessages;
+    const matchesMaxMessages =
+      filters.maxMessages === 0 || messages <= filters.maxMessages;
+    const matchesMinConsumers =
+      (stream.state?.consumers || 0) >= filters.minConsumers;
+    const matchesSubjectPattern =
+      filters.subjectPattern === "" ||
+      (stream.config?.subjects || []).some((s) =>
+        s.includes(filters.subjectPattern),
+      );
+
+    return (
+      matchesSearch &&
+      matchesStorage &&
+      matchesStatus &&
+      matchesMinMessages &&
+      matchesMaxMessages &&
+      matchesMinConsumers &&
+      matchesSubjectPattern
+    );
+  };
+
   const {
     filters,
     updateFilter,
@@ -135,23 +131,18 @@ export default function Streams() {
     filterFn: streamFilterFn,
   });
 
-  // Selection state
   const { selected, toggleSelection, clearSelection, selectAll, isSelected } =
     useSelection<string>();
 
-  // Expansion state
   const { toggleExpansion, isExpanded } = useExpansion<string>();
 
-  // Pagination
   const { page, goToPage, getPaginatedItems } = usePagination({
     perPage: 20,
   });
 
-  // Apply filters and pagination
   const filteredStreams = applyFilters(streams);
   const paginatedStreams = getPaginatedItems(filteredStreams);
 
-  // Mutations
   const deleteMutation = useMutation({
     mutationFn: (name: string) => StreamsService.deleteStreams(name),
     onSuccess: () => {
@@ -166,7 +157,15 @@ export default function Streams() {
     },
   });
 
-  // Stats calculations
+  const createMutation = useMutation({
+    mutationFn: (data: nats_monitoring_internal_dto_CreateStreamRequest) =>
+      StreamsService.postStreams(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["streams"] });
+      setShowCreateModal(false);
+    },
+  });
+
   const stats: StreamStats = {
     total: filteredStreams.length,
     fileStorage: filteredStreams.filter((s) => s.config?.storage === "file")
@@ -187,7 +186,6 @@ export default function Streams() {
     ),
   };
 
-  // Helper functions
   const getStreamHealthStatus = (stream: Stream): StreamHealthStatus => {
     const lag = stream.state?.num_pending || 0;
     if (lag > 10000) return "critical";
@@ -229,7 +227,7 @@ export default function Streams() {
 
   if (isLoading) {
     return (
-      <div className="p-8 flex items-center justify-center">
+      <div className="p-8 flex items-center justify-center min-h-[400px]">
         <RefreshCw className="w-8 h-8 animate-spin text-primary-400" />
       </div>
     );
@@ -237,7 +235,6 @@ export default function Streams() {
 
   return (
     <div className="p-4 md:p-8">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Streams</h1>
@@ -269,14 +266,16 @@ export default function Streams() {
             Refresh
           </button>
 
-          <button className="btn-primary flex items-center gap-2">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="btn-primary flex items-center gap-2"
+          >
             <Plus className="w-4 h-4" />
             Create Stream
           </button>
         </div>
       </div>
 
-      {/* Stats Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <div className="card">
           <div className="flex items-center gap-3">
@@ -341,7 +340,6 @@ export default function Streams() {
         </div>
       </div>
 
-      {/* Search and Filters */}
       <div className="card mb-6">
         <div className="flex items-center gap-4">
           <SearchBar
@@ -352,7 +350,7 @@ export default function Streams() {
 
           <select
             value={filters.storage}
-            onChange={(e) => updateFilter("storage", e.target.value as any)}
+            onChange={(e) => updateFilter("storage", e.target.value as StreamFilters["storage"])}
             className="input w-40"
           >
             <option value="all">All Storage</option>
@@ -362,7 +360,7 @@ export default function Streams() {
 
           <select
             value={filters.status}
-            onChange={(e) => updateFilter("status", e.target.value as any)}
+            onChange={(e) => updateFilter("status", e.target.value as StreamHealthStatus)}
             className="input w-40"
           >
             <option value="all">All Status</option>
@@ -382,7 +380,6 @@ export default function Streams() {
         </div>
       </div>
 
-      {/* Bulk Actions */}
       <BulkActions
         selectedCount={selected.size}
         totalCount={paginatedStreams.length}
@@ -398,7 +395,6 @@ export default function Streams() {
         ]}
       />
 
-      {/* Streams List */}
       {paginatedStreams.length === 0 ? (
         <EmptyState
           icon={Database}
@@ -425,7 +421,6 @@ export default function Streams() {
                 >
                   <div className="p-4 hover:bg-dark-bg/50 transition-colors">
                     <div className="flex items-center gap-4">
-                      {/* Checkbox */}
                       <input
                         type="checkbox"
                         checked={isItemSelected}
@@ -433,7 +428,6 @@ export default function Streams() {
                         className="w-4 h-4"
                       />
 
-                      {/* Expand button */}
                       <button
                         onClick={() => toggleExpansion(streamName)}
                         className="p-1 hover:bg-dark-bg rounded transition-colors"
@@ -445,7 +439,6 @@ export default function Streams() {
                         )}
                       </button>
 
-                      {/* Stream info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
                           <Link
@@ -481,16 +474,15 @@ export default function Streams() {
                           <span>{formatBytes(stream.state?.bytes || 0)}</span>
                           <span>{stream.state?.consumers || 0} consumers</span>
 
-                          {stream.state?.num_pending > 0 && (
+                          {(stream.state?.num_pending || 0) > 0 && (
                             <span className="text-yellow-400">
-                              {stream.state.num_pending.toLocaleString()}{" "}
+                              {stream.state?.num_pending?.toLocaleString()}{" "}
                               pending
                             </span>
                           )}
                         </div>
                       </div>
 
-                      {/* Actions */}
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() =>
@@ -522,7 +514,6 @@ export default function Streams() {
                       </div>
                     </div>
 
-                    {/* Expanded details */}
                     {isItemExpanded && (
                       <div className="mt-4 pl-10 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div className="bg-dark-bg/50 rounded-lg p-3">
@@ -556,11 +547,12 @@ export default function Streams() {
                           <p className="text-xs text-dark-muted mb-1">State</p>
                           <div className="space-y-1">
                             <p>
-                              Deleted:{" "}
-                              {stream.state?.num_deleted?.toLocaleString() || 0}
+                              First Seq:{" "}
+                              {stream.state?.first_seq?.toLocaleString() || 0}
                             </p>
                             <p>
-                              Last Error: {stream.state?.last_error || "None"}
+                              Last Seq:{" "}
+                              {stream.state?.last_seq?.toLocaleString() || 0}
                             </p>
                           </div>
                         </div>
@@ -572,7 +564,6 @@ export default function Streams() {
             })}
           </div>
 
-          {/* Pagination */}
           <div className="mt-6">
             <Pagination
               page={page}
@@ -583,6 +574,110 @@ export default function Streams() {
           </div>
         </>
       )}
+
+      {showCreateModal && (
+        <CreateStreamModal
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={(data) => createMutation.mutate(data)}
+          isPending={createMutation.isPending}
+        />
+      )}
+    </div>
+  );
+}
+
+function CreateStreamModal({
+  onClose,
+  onSubmit,
+  isPending,
+}: {
+  onClose: () => void;
+  onSubmit: (data: nats_monitoring_internal_dto_CreateStreamRequest) => void;
+  isPending: boolean;
+}) {
+  const [name, setName] = useState("");
+  const [subjects, setSubjects] = useState("");
+  const [storage, setStorage] = useState<"file" | "memory">("file");
+  const [replicas, setReplicas] = useState(1);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      name,
+      subjects: subjects.split(",").map((s) => s.trim()).filter(Boolean),
+      storage: storage as unknown as nats_monitoring_internal_dto_CreateStreamRequest.storage,
+      replicas,
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="card max-w-md w-full">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold">Create Stream</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-dark-bg rounded-lg"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Stream Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="my-stream"
+              className="input w-full"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Subjects</label>
+            <input
+              type="text"
+              value={subjects}
+              onChange={(e) => setSubjects(e.target.value)}
+              placeholder="orders.*, events.*"
+              className="input w-full"
+              required
+            />
+            <p className="text-xs text-dark-muted mt-1">Comma-separated list</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Storage</label>
+            <select
+              value={storage}
+              onChange={(e) => setStorage(e.target.value as "file" | "memory")}
+              className="input w-full"
+            >
+              <option value="file">File</option>
+              <option value="memory">Memory</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Replicas</label>
+            <input
+              type="number"
+              value={replicas}
+              onChange={(e) => setReplicas(Number(e.target.value))}
+              min={1}
+              max={5}
+              className="input w-full"
+            />
+          </div>
+          <div className="flex items-center gap-3 pt-4">
+            <button type="button" onClick={onClose} className="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" disabled={isPending} className="btn-primary">
+              {isPending ? "Creating..." : "Create Stream"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

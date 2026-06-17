@@ -5,6 +5,7 @@ import {
   Database, Plus, Trash2, Edit, Clock, Search, RefreshCw,
   FolderOpen, Key, History, X
 } from 'lucide-react'
+import { useToast } from '../components/Toast'
 
 interface Bucket {
   name: string
@@ -38,6 +39,7 @@ export default function KVStore() {
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
 
   const queryClient = useQueryClient()
+  const { toast } = useToast()
 
   const { data: buckets, refetch: refetchBuckets } = useQuery({
     queryKey: ['kvBuckets'],
@@ -62,10 +64,10 @@ export default function KVStore() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['kvBuckets'] })
       setShowCreateModal(false)
-      alert('Bucket created successfully!')
+      toast('success', 'Bucket created successfully!')
     },
     onError: (error: any) => {
-      alert(`Failed to create bucket: ${error.response?.data?.error || error.message}`)
+      toast('error', `Failed to create bucket: ${error.response?.data?.error || error.message}`)
     },
   })
 

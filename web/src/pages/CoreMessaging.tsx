@@ -18,6 +18,7 @@ import {
   PublishForm,
   RequestForm,
 } from "../components/messaging";
+import { useToast } from "../components/Toast";
 
 export interface Message {
   subject: string;
@@ -63,6 +64,7 @@ export default function CoreMessaging() {
 
   // SSE connection
   const { connected: sseConnected } = useSSE("core-messaging");
+  const { toast } = useToast();
 
   // Message list management
   const {
@@ -129,10 +131,9 @@ export default function CoreMessaging() {
         reply_to: publishForm.replyTo,
       });
       setPublishForm({ subject: "", payload: "", replyTo: "", headers: "{}" });
-      alert("Message published successfully!");
+      toast("success", "Message published successfully!");
     } catch (err: any) {
-      console.error("Failed to publish:", err);
-      alert(`Failed to publish: ${err.response?.data?.error || err.message}`);
+      toast("error", `Failed to publish: ${err.response?.data?.error || err.message}`);
     }
   };
 

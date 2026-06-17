@@ -80,6 +80,8 @@ export default function Security() {
       axios.put(`/api/security/users/${name}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['securityUsers'] })
+      setShowUserModal(false)
+      setSelectedUser(null)
     },
   })
 
@@ -434,7 +436,11 @@ export default function Security() {
                   },
                   enabled: formData.get('enabled') === 'on'
                 }
-                createUserMutation.mutate(data)
+                if (selectedUser) {
+                  updateUserMutation.mutate({ name: selectedUser.name, data })
+                } else {
+                  createUserMutation.mutate(data)
+                }
               }}
               className="space-y-4"
             >

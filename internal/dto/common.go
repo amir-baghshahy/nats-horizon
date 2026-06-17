@@ -25,6 +25,8 @@ type MessageResponse struct {
 }
 
 type PublishMessageRequest struct {
-	Subject string `json:"subject" binding:"required"`
-	Data    string `json:"data" binding:"required"`
+	Subject string              `json:"subject" binding:"required"`
+	Payload string              `json:"payload"`
+	Headers map[string][]string `json:"headers"`
+	ReplyTo string              `json:"reply_to"`
 }

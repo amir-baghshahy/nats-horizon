@@ -80,3 +80,61 @@ type RateMetricsResponse struct {
 	BytesSentPerSec    uint64  `json:"bytes_sent_per_sec"`
 	BytesRecvPerSec    uint64  `json:"bytes_recv_per_sec"`
 }
+
+
+// PublishMessageResponse represents a publish message response
+type PublishMessageResponse struct {
+	Success   bool   `json:"success"`
+	Subject   string `json:"subject"`
+	Size      int    `json:"size"`
+	Timestamp int64  `json:"timestamp"`
+}
+
+// RequestMessageRequest represents a request message request
+type RequestMessageRequest struct {
+	Subject string              `json:"subject" binding:"required"`
+	Payload string              `json:"payload"`
+	Headers map[string][]string `json:"headers"`
+	Timeout int                 `json:"timeout"`
+}
+
+// MessageInfo represents a NATS message with metadata
+type MessageInfo struct {
+	Subject    string              `json:"subject"`
+	Data       string              `json:"data"`
+	DataBase64 string              `json:"data_base64"`
+	Reply      string              `json:"reply,omitempty"`
+	Headers    map[string][]string `json:"headers,omitempty"`
+	Timestamp  int64               `json:"timestamp"`
+	Size       int                 `json:"size"`
+}
+
+// SSEConnectionMessage represents SSE connection message
+type SSEConnectionMessage struct {
+	Type      string `json:"type"`
+	Subject   string `json:"subject,omitempty"`
+	Timestamp int64  `json:"timestamp"`
+}
+
+// SubscriptionsResponse represents subscriptions info
+type SubscriptionsResponse struct {
+	Status    string `json:"status"`
+	Connected bool   `json:"connected"`
+	Server    string `json:"server"`
+	Count     int    `json:"count"`
+}
+
+// ServiceDiscoveryResponse represents service discovery info
+type ServiceDiscoveryResponse struct {
+	Connected     bool   `json:"connected"`
+	Status        string `json:"status"`
+	ServerURL     string `json:"server_url"`
+	ServerCount   int    `json:"server_count"`
+	ServerName    string `json:"server_name"`
+	Version       string `json:"version"`
+	Host          string `json:"host"`
+	Port          int    `json:"port"`
+	MaxPayload    int64  `json:"max_payload"`
+	AuthRequired  bool   `json:"auth_required"`
+	TLSRequired   bool   `json:"tls_required"`
+}

@@ -464,14 +464,14 @@ func (h *ConsumerHandler) PublishMessage(c *gin.Context) {
 		return
 	}
 
-	if len(req.Data) > constants.MaxMessageSize {
+	if len(req.Payload) > constants.MaxMessageSize {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Error: fmt.Sprintf("Message data exceeds maximum size of %d MB", constants.MaxMessageSize>>20),
 		})
 		return
 	}
 
-	if _, err := h.js.Publish(req.Subject, []byte(req.Data)); err != nil {
+	if _, err := h.js.Publish(req.Subject, []byte(req.Payload)); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 			Error:   "Failed to publish message",
 			Details: err.Error(),

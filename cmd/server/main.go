@@ -138,10 +138,11 @@ func main() {
 	streamUseCase := services.NewStreamUseCase(streamRepo)
 	consumerUseCase := services.NewConsumerUseCase(consumerRepo)
 	messageUseCase := services.NewMessageUseCase(messageRepo)
+	serverUseCase := services.NewServerUseCase(natsConn.nc, natsConn.js)
 
 	streamHandler := handlers.NewStreamHandler(streamUseCase)
 	consumerHandler := handlers.NewConsumerHandler(consumerUseCase, messageUseCase, natsConn.nc, natsConn.js)
-	serverHandler := handlers.NewServerHandler(natsConn.nc, natsConn.js)
+	serverHandler := handlers.NewServerHandler(serverUseCase)
 	coreNATSHandler := handlers.NewCoreNATShandler(natsConn.nc)
 	kvHandler := handlers.NewKVHandler(natsConn.nc, natsConn.js)
 	clusterHandler := handlers.NewClusterHandler(natsConn.nc, natsConn.js)
@@ -170,7 +171,7 @@ func main() {
 
 	apiGroup := r.Group("/api")
 	{
-		apiGroup.GET("/health", handlers.HealthCheck(natsConn.nc))
+		apiGroup.GET("/health", handlers.HealthCheck(serverUseCase))
 		apiGroup.GET("/server/info", handlers.GetServerInfo)
 		apiGroup.GET("/account/info", serverHandler.GetAccountInfo)
 		apiGroup.GET("/dashboard/stats", serverHandler.GetDashboardStats)

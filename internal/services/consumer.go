@@ -1,26 +1,26 @@
-package usecase
+package services
 
 import (
 	"context"
 	"fmt"
 
-	"nats-monitoring/internal/domain"
+	"nats-monitoring/internal/models"
 )
 
 // ConsumerUseCase handles consumer business logic
 type ConsumerUseCase struct {
-	consumerRepo domain.ConsumerRepository
+	consumerRepo models.ConsumerRepository
 }
 
 // NewConsumerUseCase creates a new consumer use case
-func NewConsumerUseCase(consumerRepo domain.ConsumerRepository) *ConsumerUseCase {
+func NewConsumerUseCase(consumerRepo models.ConsumerRepository) *ConsumerUseCase {
 	return &ConsumerUseCase{
 		consumerRepo: consumerRepo,
 	}
 }
 
 // ListConsumers returns all consumers for a stream
-func (uc *ConsumerUseCase) ListConsumers(ctx context.Context, streamName string) ([]*domain.Consumer, error) {
+func (uc *ConsumerUseCase) ListConsumers(ctx context.Context, streamName string) ([]*models.Consumer, error) {
 	if streamName == "" {
 		return nil, fmt.Errorf("stream name is required")
 	}
@@ -28,7 +28,7 @@ func (uc *ConsumerUseCase) ListConsumers(ctx context.Context, streamName string)
 }
 
 // GetConsumer returns a consumer by name
-func (uc *ConsumerUseCase) GetConsumer(ctx context.Context, streamName, name string) (*domain.Consumer, error) {
+func (uc *ConsumerUseCase) GetConsumer(ctx context.Context, streamName, name string) (*models.Consumer, error) {
 	if streamName == "" {
 		return nil, fmt.Errorf("stream name is required")
 	}
@@ -39,7 +39,7 @@ func (uc *ConsumerUseCase) GetConsumer(ctx context.Context, streamName, name str
 }
 
 // CreateConsumer creates a new consumer
-func (uc *ConsumerUseCase) CreateConsumer(ctx context.Context, streamName string, consumer *domain.Consumer) (*domain.Consumer, error) {
+func (uc *ConsumerUseCase) CreateConsumer(ctx context.Context, streamName string, consumer *models.Consumer) (*models.Consumer, error) {
 	if consumer == nil {
 		return nil, fmt.Errorf("consumer is required")
 	}
@@ -53,7 +53,7 @@ func (uc *ConsumerUseCase) CreateConsumer(ctx context.Context, streamName string
 }
 
 // UpdateConsumer updates an existing consumer
-func (uc *ConsumerUseCase) UpdateConsumer(ctx context.Context, streamName string, consumer *domain.Consumer) (*domain.Consumer, error) {
+func (uc *ConsumerUseCase) UpdateConsumer(ctx context.Context, streamName string, consumer *models.Consumer) (*models.Consumer, error) {
 	if consumer == nil {
 		return nil, fmt.Errorf("consumer is required")
 	}
@@ -75,7 +75,7 @@ func (uc *ConsumerUseCase) DeleteConsumer(ctx context.Context, streamName, name 
 }
 
 // ResetLag resets consumer lag
-func (uc *ConsumerUseCase) ResetLag(ctx context.Context, req *domain.LagResetRequest) error {
+func (uc *ConsumerUseCase) ResetLag(ctx context.Context, req *models.LagResetRequest) error {
 	if req == nil {
 		return fmt.Errorf("request is required")
 	}
@@ -83,7 +83,7 @@ func (uc *ConsumerUseCase) ResetLag(ctx context.Context, req *domain.LagResetReq
 }
 
 // ReplayMessages starts message replay
-func (uc *ConsumerUseCase) ReplayMessages(ctx context.Context, req *domain.ReplayRequest) (string, error) {
+func (uc *ConsumerUseCase) ReplayMessages(ctx context.Context, req *models.ReplayRequest) (string, error) {
 	if req == nil {
 		return "", fmt.Errorf("request is required")
 	}
@@ -91,7 +91,7 @@ func (uc *ConsumerUseCase) ReplayMessages(ctx context.Context, req *domain.Repla
 }
 
 // PauseConsumer pauses a consumer
-func (uc *ConsumerUseCase) PauseConsumer(ctx context.Context, req *domain.PauseRequest) error {
+func (uc *ConsumerUseCase) PauseConsumer(ctx context.Context, req *models.PauseRequest) error {
 	if req == nil {
 		return fmt.Errorf("request is required")
 	}
@@ -99,7 +99,7 @@ func (uc *ConsumerUseCase) PauseConsumer(ctx context.Context, req *domain.PauseR
 }
 
 // ResumeConsumer resumes a paused consumer
-func (uc *ConsumerUseCase) ResumeConsumer(ctx context.Context, req *domain.ResumeRequest) error {
+func (uc *ConsumerUseCase) ResumeConsumer(ctx context.Context, req *models.ResumeRequest) error {
 	if req == nil {
 		return fmt.Errorf("request is required")
 	}
@@ -140,7 +140,7 @@ func (uc *ConsumerUseCase) TerminateMessage(ctx context.Context, streamName, con
 }
 
 // GetPendingMessages returns pending messages for a consumer
-func (uc *ConsumerUseCase) GetPendingMessages(ctx context.Context, streamName, consumerName string, limit int) ([]*domain.Message, error) {
+func (uc *ConsumerUseCase) GetPendingMessages(ctx context.Context, streamName, consumerName string, limit int) ([]*models.Message, error) {
 	if streamName == "" {
 		return nil, fmt.Errorf("stream name is required")
 	}

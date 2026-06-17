@@ -1,19 +1,19 @@
-package usecase
+package services
 
 import (
 	"context"
 	"fmt"
 
-	"nats-monitoring/internal/domain"
+	"nats-monitoring/internal/models"
 )
 
 // MessageUseCase handles message business logic
 type MessageUseCase struct {
-	messageRepo domain.MessageRepository
+	messageRepo models.MessageRepository
 }
 
 // NewMessageUseCase creates a new message use case
-func NewMessageUseCase(messageRepo domain.MessageRepository) *MessageUseCase {
+func NewMessageUseCase(messageRepo models.MessageRepository) *MessageUseCase {
 	return &MessageUseCase{
 		messageRepo: messageRepo,
 	}
@@ -53,7 +53,7 @@ func (uc *MessageUseCase) DeleteMessage(ctx context.Context, streamName string, 
 }
 
 // GetMessage gets a message from a stream
-func (uc *MessageUseCase) GetMessage(ctx context.Context, streamName string, sequence uint64) (*domain.Message, error) {
+func (uc *MessageUseCase) GetMessage(ctx context.Context, streamName string, sequence uint64) (*models.Message, error) {
 	if streamName == "" {
 		return nil, fmt.Errorf("stream name is required")
 	}
@@ -64,7 +64,7 @@ func (uc *MessageUseCase) GetMessage(ctx context.Context, streamName string, seq
 }
 
 // ListMessages lists messages from a stream
-func (uc *MessageUseCase) ListMessages(ctx context.Context, streamName string, filter domain.MessageFilter) ([]*domain.Message, error) {
+func (uc *MessageUseCase) ListMessages(ctx context.Context, streamName string, filter models.MessageFilter) ([]*models.Message, error) {
 	if streamName == "" {
 		return nil, fmt.Errorf("stream name is required")
 	}

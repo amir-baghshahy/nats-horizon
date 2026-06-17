@@ -3,24 +3,24 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"nats-monitoring/internal/constants"
+	"nats-monitoring/internal/dto"
+	"nats-monitoring/internal/models"
+	usecase "nats-monitoring/internal/services"
+	"nats-monitoring/internal/utils"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/constants"
-	"nats-monitoring/internal/domain"
-	"nats-monitoring/internal/dto"
-	"nats-monitoring/internal/usecase"
-	"nats-monitoring/internal/utils"
 )
 
 // ConsumerHandler handles HTTP requests for consumers
 type ConsumerHandler struct {
 	useCase        *usecase.ConsumerUseCase
-	messageUseCase  *usecase.MessageUseCase
-	nc             *nats.Conn // For cross-stream operations (e.g., finding consumer by name across streams)
+	messageUseCase *usecase.MessageUseCase
+	nc             *nats.Conn            // For cross-stream operations (e.g., finding consumer by name across streams)
 	js             nats.JetStreamContext // For cross-stream operations
 }
 
@@ -32,16 +32,12 @@ func NewConsumerHandler(
 	js nats.JetStreamContext,
 ) *ConsumerHandler {
 	return &ConsumerHandler{
-		useCase:       useCase,
+		useCase:        useCase,
 		messageUseCase: messageUseCase,
-		nc:            nc,
-		js:            js,
+		nc:             nc,
+		js:             js,
 	}
 }
-
-// ============================================================================
-// Basic CRUD Operations
-// ============================================================================
 
 // ListConsumers handles GET /consumers
 func (h *ConsumerHandler) ListConsumers(c *gin.Context) {
@@ -94,7 +90,7 @@ func (h *ConsumerHandler) CreateConsumer(c *gin.Context) {
 		return
 	}
 
-	consumer := &domain.Consumer{
+	consumer := &models.Consumer{
 		Name:          req.Name,
 		AckPolicy:     req.AckPolicy,
 		DeliverPolicy: req.DeliverPolicy,
@@ -128,7 +124,7 @@ func (h *ConsumerHandler) UpdateConsumer(c *gin.Context) {
 		return
 	}
 
-	consumer := &domain.Consumer{
+	consumer := &models.Consumer{
 		Name:          name,
 		AckPolicy:     req.AckPolicy,
 		DeliverPolicy: req.DeliverPolicy,
@@ -179,7 +175,7 @@ func (h *ConsumerHandler) ResetLag(c *gin.Context) {
 		req.Sequence = 0 // Default to 0 if body is empty
 	}
 
-	resetReq := &domain.LagResetRequest{
+	resetReq := &models.LagResetRequest{
 		StreamName:   streamName,
 		ConsumerName: consumerName,
 		Sequence:     req.Sequence,
@@ -207,7 +203,7 @@ func (h *ConsumerHandler) Replay(c *gin.Context) {
 	var req dto.ReplayRequest
 	c.ShouldBindJSON(&req) // Don't fail if body is empty
 
-	replayReq := &domain.ReplayRequest{
+	replayReq := &models.ReplayRequest{
 		StreamName:    streamName,
 		ConsumerName:  consumerName,
 		StartSequence: req.StartSequence,
@@ -235,7 +231,7 @@ func (h *ConsumerHandler) Pause(c *gin.Context) {
 	streamName := c.Param("name")
 	consumerName := c.Param("consumer")
 
-	req := &domain.PauseRequest{
+	req := &models.PauseRequest{
 		StreamName:   streamName,
 		ConsumerName: consumerName,
 	}
@@ -256,7 +252,7 @@ func (h *ConsumerHandler) Resume(c *gin.Context) {
 	streamName := c.Param("name")
 	consumerName := c.Param("consumer")
 
-	req := &domain.ResumeRequest{
+	req := &models.ResumeRequest{
 		StreamName:   streamName,
 		ConsumerName: consumerName,
 	}
@@ -271,10 +267,6 @@ func (h *ConsumerHandler) Resume(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "Consumer resumed successfully"})
 }
-
-// ============================================================================
-// Cross-Stream Operations (Direct NATS Access)
-// ============================================================================
 
 // ListAll handles GET /consumers without stream filter
 func (h *ConsumerHandler) ListAll(c *gin.Context) {
@@ -428,10 +420,6 @@ func (h *ConsumerHandler) GetConsumerByName(c *gin.Context) {
 	})
 }
 
-// ============================================================================
-// Message Operations
-// ============================================================================
-
 // DeleteStreamMessage handles DELETE /streams/:name/messages/:sequence
 func (h *ConsumerHandler) DeleteStreamMessage(c *gin.Context) {
 	streamName := c.Param("name")
@@ -489,7 +477,7 @@ func (h *ConsumerHandler) PublishMessage(c *gin.Context) {
 func (h *ConsumerHandler) GetPendingMessages(c *gin.Context) {
 	streamName := c.Param("name")
 	consumerName := c.Param("consumer")
-	
+
 	limit := constants.MaxFetchCount
 	if l := c.Query("limit"); l != "" {
 		if parsed, err := strconv.Atoi(l); err == nil && parsed > 0 && parsed <= constants.MaxFetchCount {

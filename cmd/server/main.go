@@ -13,8 +13,9 @@ import (
 
 	"nats-monitoring/internal/config"
 	"nats-monitoring/internal/handlers"
-	"nats-monitoring/internal/infrastructure"
-	"nats-monitoring/internal/usecase"
+	"nats-monitoring/internal/middleware"
+	"nats-monitoring/internal/repositories"
+	"nats-monitoring/internal/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
@@ -130,13 +131,13 @@ func main() {
 	log.Println("Connected to NATS")
 	defer natsConn.Close()
 
-	streamRepo := infrastructure.NewNATSStreamRepository(natsConn.nc, natsConn.js)
-	consumerRepo := infrastructure.NewNATSConsumerRepository(natsConn.nc, natsConn.js)
-	messageRepo := infrastructure.NewNATSMessageRepository(natsConn.nc, natsConn.js)
+	streamRepo := repositories.NewNATSStreamRepository(natsConn.nc, natsConn.js)
+	consumerRepo := repositories.NewNATSConsumerRepository(natsConn.nc, natsConn.js)
+	messageRepo := repositories.NewNATSMessageRepository(natsConn.nc, natsConn.js)
 
-	streamUseCase := usecase.NewStreamUseCase(streamRepo)
-	consumerUseCase := usecase.NewConsumerUseCase(consumerRepo)
-	messageUseCase := usecase.NewMessageUseCase(messageRepo)
+	streamUseCase := services.NewStreamUseCase(streamRepo)
+	consumerUseCase := services.NewConsumerUseCase(consumerRepo)
+	messageUseCase := services.NewMessageUseCase(messageRepo)
 
 	streamHandler := handlers.NewStreamHandler(streamUseCase)
 	consumerHandler := handlers.NewConsumerHandler(consumerUseCase, messageUseCase, natsConn.nc, natsConn.js)
@@ -161,10 +162,10 @@ func main() {
 
 	r := gin.New()
 	r.Use(gin.Logger())
-	r.Use(handlers.PanicRecovery())
+	r.Use(middleware.PanicRecovery())
 	r.Use(CORSMiddleware(cfg.CORSAllowedOrigins))
 
-	rateLimiter := handlers.NewRateLimiter(100, 200)
+	rateLimiter := middleware.NewRateLimiter(100, 200)
 	r.Use(rateLimiter.Middleware())
 
 	apiGroup := r.Group("/api")

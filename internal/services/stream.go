@@ -1,10 +1,10 @@
-package usecase
+package services
 
 import (
 	"context"
 	"fmt"
 
-	"nats-monitoring/internal/domain"
+	"nats-monitoring/internal/models"
 )
 
 // DTOs for stream operations
@@ -28,23 +28,23 @@ type StreamUpdate struct {
 
 // StreamUseCase handles stream business logic
 type StreamUseCase struct {
-	streamRepo domain.StreamRepository
+	streamRepo models.StreamRepository
 }
 
 // NewStreamUseCase creates a new stream use case
-func NewStreamUseCase(streamRepo domain.StreamRepository) *StreamUseCase {
+func NewStreamUseCase(streamRepo models.StreamRepository) *StreamUseCase {
 	return &StreamUseCase{
 		streamRepo: streamRepo,
 	}
 }
 
 // ListStreams returns all streams
-func (uc *StreamUseCase) ListStreams(ctx context.Context) ([]*domain.Stream, error) {
+func (uc *StreamUseCase) ListStreams(ctx context.Context) ([]*models.Stream, error) {
 	return uc.streamRepo.List(ctx)
 }
 
 // GetStream returns a stream by name
-func (uc *StreamUseCase) GetStream(ctx context.Context, name string) (*domain.Stream, error) {
+func (uc *StreamUseCase) GetStream(ctx context.Context, name string) (*models.Stream, error) {
 	if name == "" {
 		return nil, fmt.Errorf("stream name is required")
 	}
@@ -52,7 +52,7 @@ func (uc *StreamUseCase) GetStream(ctx context.Context, name string) (*domain.St
 }
 
 // CreateStream creates a new stream
-func (uc *StreamUseCase) CreateStream(ctx context.Context, req *StreamCreate) (*domain.Stream, error) {
+func (uc *StreamUseCase) CreateStream(ctx context.Context, req *StreamCreate) (*models.Stream, error) {
 	if req == nil {
 		return nil, fmt.Errorf("request is required")
 	}
@@ -62,7 +62,7 @@ func (uc *StreamUseCase) CreateStream(ctx context.Context, req *StreamCreate) (*
 	if len(req.Subjects) == 0 {
 		return nil, fmt.Errorf("at least one subject is required")
 	}
-	stream := &domain.Stream{
+	stream := &models.Stream{
 		Name:      req.Name,
 		Subjects:  req.Subjects,
 		Storage:   req.Storage,
@@ -73,14 +73,14 @@ func (uc *StreamUseCase) CreateStream(ctx context.Context, req *StreamCreate) (*
 }
 
 // UpdateStream updates an existing stream
-func (uc *StreamUseCase) UpdateStream(ctx context.Context, req *StreamUpdate) (*domain.Stream, error) {
+func (uc *StreamUseCase) UpdateStream(ctx context.Context, req *StreamUpdate) (*models.Stream, error) {
 	if req == nil {
 		return nil, fmt.Errorf("request is required")
 	}
 	if req.Name == "" {
 		return nil, fmt.Errorf("stream name is required")
 	}
-	stream := &domain.Stream{
+	stream := &models.Stream{
 		Name:     req.Name,
 		Subjects: req.Subjects,
 		Replicas: req.Replicas,

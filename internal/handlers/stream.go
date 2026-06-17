@@ -5,17 +5,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"nats-monitoring/internal/dto"
-	"nats-monitoring/internal/usecase"
+	"nats-monitoring/internal/services"
 	"nats-monitoring/internal/utils"
 )
 
 // StreamHandler handles HTTP requests for streams
 type StreamHandler struct {
-	useCase *usecase.StreamUseCase
+	useCase *services.StreamUseCase
 }
 
 // NewStreamHandler creates a new stream handler
-func NewStreamHandler(useCase *usecase.StreamUseCase) *StreamHandler {
+func NewStreamHandler(useCase *services.StreamUseCase) *StreamHandler {
 	return &StreamHandler{useCase: useCase}
 }
 
@@ -57,7 +57,7 @@ func (h *StreamHandler) CreateStream(c *gin.Context) {
 		return
 	}
 
-	stream := &usecase.StreamCreate{
+	stream := &services.StreamCreate{
 		Name:     req.Name,
 		Subjects: req.Subjects,
 		Storage:  req.Storage,
@@ -91,7 +91,7 @@ func (h *StreamHandler) UpdateStream(c *gin.Context) {
 		return
 	}
 
-	stream := &usecase.StreamUpdate{
+	stream := &services.StreamUpdate{
 		Name:     name,
 		Subjects: req.Subjects,
 		Replicas: req.Replicas,

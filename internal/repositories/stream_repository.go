@@ -1,4 +1,4 @@
-package infrastructure
+package repositories
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"nats-monitoring/internal/domain"
+	"nats-monitoring/internal/models"
 
 	"github.com/nats-io/nats.go"
 )
@@ -54,7 +54,7 @@ func storageToString(storage int) string {
 	}
 }
 
-func (r *NATSStreamRepository) List(ctx context.Context) ([]*domain.Stream, error) {
+func (r *NATSStreamRepository) List(ctx context.Context) ([]*models.Stream, error) {
 	msg, err := r.nc.Request("$JS.API.STREAM.LIST", []byte(`{"subjects_filter":">"}`), 5*time.Second)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list streams: %w", err)
@@ -65,9 +65,9 @@ func (r *NATSStreamRepository) List(ctx context.Context) ([]*domain.Stream, erro
 		return nil, fmt.Errorf("failed to parse stream list: %w", err)
 	}
 
-	streams := make([]*domain.Stream, 0, len(response.Streams))
+	streams := make([]*models.Stream, 0, len(response.Streams))
 	for _, s := range response.Streams {
-		stream := &domain.Stream{
+		stream := &models.Stream{
 			Name:      s.Config.Name,
 			Subjects:  s.Config.Subjects,
 			Storage:   s.Config.Storage,
@@ -86,7 +86,7 @@ func (r *NATSStreamRepository) List(ctx context.Context) ([]*domain.Stream, erro
 	return streams, nil
 }
 
-func (r *NATSStreamRepository) Get(ctx context.Context, name string) (*domain.Stream, error) {
+func (r *NATSStreamRepository) Get(ctx context.Context, name string) (*models.Stream, error) {
 	info, err := r.js.StreamInfo(name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get stream: %w", err)
@@ -95,7 +95,7 @@ func (r *NATSStreamRepository) Get(ctx context.Context, name string) (*domain.St
 	return r.toDomainStream(info), nil
 }
 
-func (r *NATSStreamRepository) Create(ctx context.Context, stream *domain.Stream) (*domain.Stream, error) {
+func (r *NATSStreamRepository) Create(ctx context.Context, stream *models.Stream) (*models.Stream, error) {
 	cfg := r.toNATSStreamConfig(stream)
 
 	info, err := r.js.AddStream(cfg)
@@ -106,7 +106,7 @@ func (r *NATSStreamRepository) Create(ctx context.Context, stream *domain.Stream
 	return r.toDomainStream(info), nil
 }
 
-func (r *NATSStreamRepository) Update(ctx context.Context, stream *domain.Stream) (*domain.Stream, error) {
+func (r *NATSStreamRepository) Update(ctx context.Context, stream *models.Stream) (*models.Stream, error) {
 	cfg := r.toNATSStreamConfig(stream)
 
 	info, err := r.js.UpdateStream(cfg)
@@ -142,7 +142,7 @@ func (r *NATSStreamRepository) Purge(ctx context.Context, name string, subject s
 	return info.State.Msgs, nil
 }
 
-func (r *NATSStreamRepository) toDomainStream(info *nats.StreamInfo) *domain.Stream {
+func (r *NATSStreamRepository) toDomainStream(info *nats.StreamInfo) *models.Stream {
 	retention := "limits"
 	switch info.Config.Retention {
 	case nats.InterestPolicy:
@@ -150,7 +150,7 @@ func (r *NATSStreamRepository) toDomainStream(info *nats.StreamInfo) *domain.Str
 	case nats.WorkQueuePolicy:
 		retention = "workqueue"
 	}
-	return &domain.Stream{
+	return &models.Stream{
 		Name:      info.Config.Name,
 		Subjects:  info.Config.Subjects,
 		Storage:   storageToString(int(info.Config.Storage)),
@@ -165,7 +165,7 @@ func (r *NATSStreamRepository) toDomainStream(info *nats.StreamInfo) *domain.Str
 	}
 }
 
-func (r *NATSStreamRepository) toNATSStreamConfig(stream *domain.Stream) *nats.StreamConfig {
+func (r *NATSStreamRepository) toNATSStreamConfig(stream *models.Stream) *nats.StreamConfig {
 	var storage nats.StorageType
 	switch stream.Storage {
 	case "file":

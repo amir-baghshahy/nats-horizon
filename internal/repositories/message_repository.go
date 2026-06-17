@@ -1,11 +1,11 @@
-package infrastructure
+package repositories
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/domain"
+	"nats-monitoring/internal/models"
 )
 
 // NATSMessageRepository implements MessageRepository using NATS JetStream
@@ -36,7 +36,7 @@ func (r *NATSMessageRepository) Delete(ctx context.Context, streamName string, s
 }
 
 // Get gets a message from a stream
-func (r *NATSMessageRepository) Get(ctx context.Context, streamName string, sequence uint64) (*domain.Message, error) {
+func (r *NATSMessageRepository) Get(ctx context.Context, streamName string, sequence uint64) (*models.Message, error) {
 	msg, err := r.js.GetMsg(streamName, sequence)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (r *NATSMessageRepository) Get(ctx context.Context, streamName string, sequ
 		headers[k] = v
 	}
 
-	return &domain.Message{
+	return &models.Message{
 		Subject:   msg.Subject,
 		Sequence:  msg.Sequence,
 		Data:      msg.Data,
@@ -57,13 +57,13 @@ func (r *NATSMessageRepository) Get(ctx context.Context, streamName string, sequ
 }
 
 // List lists messages from a stream
-func (r *NATSMessageRepository) List(ctx context.Context, streamName string, filter domain.MessageFilter) ([]*domain.Message, error) {
+func (r *NATSMessageRepository) List(ctx context.Context, streamName string, filter models.MessageFilter) ([]*models.Message, error) {
 	streamInfo, err := r.js.StreamInfo(streamName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get stream info: %w", err)
 	}
 
-	messages := make([]*domain.Message, 0)
+	messages := make([]*models.Message, 0)
 	lastSeq := streamInfo.State.LastSeq
 
 	// Calculate start sequence
@@ -94,7 +94,7 @@ func (r *NATSMessageRepository) List(ctx context.Context, streamName string, fil
 			headers[k] = v
 		}
 
-		messages = append(messages, &domain.Message{
+		messages = append(messages, &models.Message{
 			Subject:   msg.Subject,
 			Sequence:  msg.Sequence,
 			Data:      msg.Data,

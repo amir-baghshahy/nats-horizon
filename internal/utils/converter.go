@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"nats-monitoring/internal/constants"
-	"nats-monitoring/internal/domain"
+	"nats-monitoring/internal/models"
 	"nats-monitoring/internal/dto"
 )
 
 // StreamToResponse converts a domain Stream to StreamResponse DTO
-func StreamToResponse(stream *domain.Stream) *dto.StreamResponse {
+func StreamToResponse(stream *models.Stream) *dto.StreamResponse {
 	if stream == nil {
 		return nil
 	}
@@ -38,7 +38,7 @@ func StreamToResponse(stream *domain.Stream) *dto.StreamResponse {
 }
 
 // StreamsToResponse converts a slice of domain Streams to StreamResponse DTOs
-func StreamsToResponse(streams []*domain.Stream) []*dto.StreamResponse {
+func StreamsToResponse(streams []*models.Stream) []*dto.StreamResponse {
 	responses := make([]*dto.StreamResponse, len(streams))
 	for i, stream := range streams {
 		responses[i] = StreamToResponse(stream)
@@ -47,7 +47,7 @@ func StreamsToResponse(streams []*domain.Stream) []*dto.StreamResponse {
 }
 
 // ConsumerToResponse converts a domain Consumer to ConsumerResponse DTO
-func ConsumerToResponse(consumer *domain.Consumer) *dto.ConsumerResponse {
+func ConsumerToResponse(consumer *models.Consumer) *dto.ConsumerResponse {
 	if consumer == nil {
 		return nil
 	}
@@ -76,7 +76,7 @@ func ConsumerToResponse(consumer *domain.Consumer) *dto.ConsumerResponse {
 }
 
 // ConsumersToResponse converts a slice of domain Consumers to ConsumerResponse DTOs
-func ConsumersToResponse(consumers []*domain.Consumer) []*dto.ConsumerResponse {
+func ConsumersToResponse(consumers []*models.Consumer) []*dto.ConsumerResponse {
 	responses := make([]*dto.ConsumerResponse, len(consumers))
 	for i, consumer := range consumers {
 		responses[i] = ConsumerToResponse(consumer)
@@ -85,7 +85,7 @@ func ConsumersToResponse(consumers []*domain.Consumer) []*dto.ConsumerResponse {
 }
 
 // GetDurableName returns the durable name for a consumer
-func GetDurableName(consumer *domain.Consumer) string {
+func GetDurableName(consumer *models.Consumer) string {
 	if consumer == nil || !consumer.Durable {
 		return ""
 	}
@@ -133,7 +133,7 @@ func ReplayPolicyToString(policy int) string {
 }
 
 // MessageToResponse converts a domain Message to MessageResponse DTO
-func MessageToResponse(msg *domain.Message) *dto.MessageResponse {
+func MessageToResponse(msg *models.Message) *dto.MessageResponse {
 	if msg == nil {
 		return nil
 	}
@@ -148,7 +148,7 @@ func MessageToResponse(msg *domain.Message) *dto.MessageResponse {
 }
 
 // MessagesToResponse converts a slice of domain Messages to MessageResponse DTOs
-func MessagesToResponse(messages []*domain.Message) []*dto.MessageResponse {
+func MessagesToResponse(messages []*models.Message) []*dto.MessageResponse {
 	responses := make([]*dto.MessageResponse, len(messages))
 	for i, msg := range messages {
 		responses[i] = MessageToResponse(msg)

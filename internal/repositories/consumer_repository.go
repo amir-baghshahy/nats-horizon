@@ -1,4 +1,4 @@
-package infrastructure
+package repositories
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/domain"
+	"nats-monitoring/internal/models"
 )
 
 // NATSConsumerRepository implements ConsumerRepository using NATS JetStream
@@ -74,7 +74,7 @@ func replayPolicyToString(policy int) string {
 	}
 }
 
-func (r *NATSConsumerRepository) List(ctx context.Context, streamName string) ([]*domain.Consumer, error) {
+func (r *NATSConsumerRepository) List(ctx context.Context, streamName string) ([]*models.Consumer, error) {
 	subject := fmt.Sprintf("$JS.API.CONSUMER.LIST.%s", streamName)
 	msg, err := r.nc.Request(subject, []byte{}, 2*time.Second)
 	if err != nil {
@@ -86,9 +86,9 @@ func (r *NATSConsumerRepository) List(ctx context.Context, streamName string) ([
 		return nil, fmt.Errorf("failed to parse consumer list: %w", err)
 	}
 
-	consumers := make([]*domain.Consumer, len(response.Consumers))
+	consumers := make([]*models.Consumer, len(response.Consumers))
 	for i, c := range response.Consumers {
-		consumers[i] = &domain.Consumer{
+		consumers[i] = &models.Consumer{
 			Name:          c.Name,
 			Stream:        streamName,
 			Status:        "active",
@@ -105,7 +105,7 @@ func (r *NATSConsumerRepository) List(ctx context.Context, streamName string) ([
 	return consumers, nil
 }
 
-func (r *NATSConsumerRepository) Get(ctx context.Context, streamName, name string) (*domain.Consumer, error) {
+func (r *NATSConsumerRepository) Get(ctx context.Context, streamName, name string) (*models.Consumer, error) {
 	info, err := r.js.ConsumerInfo(streamName, name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get consumer: %w", err)
@@ -114,7 +114,7 @@ func (r *NATSConsumerRepository) Get(ctx context.Context, streamName, name strin
 	return r.toDomainConsumer(info, streamName), nil
 }
 
-func (r *NATSConsumerRepository) Create(ctx context.Context, streamName string, consumer *domain.Consumer) (*domain.Consumer, error) {
+func (r *NATSConsumerRepository) Create(ctx context.Context, streamName string, consumer *models.Consumer) (*models.Consumer, error) {
 	cfg := r.toNATSConsumerConfig(consumer)
 
 	info, err := r.js.AddConsumer(streamName, cfg)
@@ -125,7 +125,7 @@ func (r *NATSConsumerRepository) Create(ctx context.Context, streamName string, 
 	return r.toDomainConsumer(info, streamName), nil
 }
 
-func (r *NATSConsumerRepository) Update(ctx context.Context, streamName string, consumer *domain.Consumer) (*domain.Consumer, error) {
+func (r *NATSConsumerRepository) Update(ctx context.Context, streamName string, consumer *models.Consumer) (*models.Consumer, error) {
 	cfg := r.toNATSConsumerConfig(consumer)
 
 	info, err := r.js.UpdateConsumer(streamName, cfg)
@@ -143,7 +143,7 @@ func (r *NATSConsumerRepository) Delete(ctx context.Context, streamName, name st
 	return nil
 }
 
-func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *domain.LagResetRequest) error {
+func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *models.LagResetRequest) error {
 	info, err := r.js.ConsumerInfo(req.StreamName, req.ConsumerName)
 	if err != nil {
 		return fmt.Errorf("failed to get consumer info: %w", err)
@@ -163,7 +163,7 @@ func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *domain.LagRe
 	return nil
 }
 
-func (r *NATSConsumerRepository) Replay(ctx context.Context, req *domain.ReplayRequest) (string, error) {
+func (r *NATSConsumerRepository) Replay(ctx context.Context, req *models.ReplayRequest) (string, error) {
 	replayID := fmt.Sprintf("replay-%s-%d", req.ConsumerName, time.Now().UnixNano())
 
 	replayCfg := &nats.ConsumerConfig{
@@ -189,7 +189,7 @@ func (r *NATSConsumerRepository) Replay(ctx context.Context, req *domain.ReplayR
 	return replayID, nil
 }
 
-func (r *NATSConsumerRepository) Pause(ctx context.Context, req *domain.PauseRequest) error {
+func (r *NATSConsumerRepository) Pause(ctx context.Context, req *models.PauseRequest) error {
 	info, err := r.js.ConsumerInfo(req.StreamName, req.ConsumerName)
 	if err != nil {
 		return fmt.Errorf("failed to get consumer info: %w", err)
@@ -205,7 +205,7 @@ func (r *NATSConsumerRepository) Pause(ctx context.Context, req *domain.PauseReq
 	return nil
 }
 
-func (r *NATSConsumerRepository) Resume(ctx context.Context, req *domain.ResumeRequest) error {
+func (r *NATSConsumerRepository) Resume(ctx context.Context, req *models.ResumeRequest) error {
 	info, err := r.js.ConsumerInfo(req.StreamName, req.ConsumerName)
 	if err != nil {
 		return fmt.Errorf("failed to get consumer info: %w", err)
@@ -221,8 +221,8 @@ func (r *NATSConsumerRepository) Resume(ctx context.Context, req *domain.ResumeR
 	return nil
 }
 
-func (r *NATSConsumerRepository) toDomainConsumer(info *nats.ConsumerInfo, streamName string) *domain.Consumer {
-	return &domain.Consumer{
+func (r *NATSConsumerRepository) toDomainConsumer(info *nats.ConsumerInfo, streamName string) *models.Consumer {
+	return &models.Consumer{
 		Name:          info.Name,
 		Stream:        streamName,
 		Status:        "active",
@@ -236,7 +236,7 @@ func (r *NATSConsumerRepository) toDomainConsumer(info *nats.ConsumerInfo, strea
 	}
 }
 
-func (r *NATSConsumerRepository) toNATSConsumerConfig(consumer *domain.Consumer) *nats.ConsumerConfig {
+func (r *NATSConsumerRepository) toNATSConsumerConfig(consumer *models.Consumer) *nats.ConsumerConfig {
 	var ackPolicy nats.AckPolicy
 	switch consumer.AckPolicy {
 	case "explicit":
@@ -288,7 +288,7 @@ func (r *NATSConsumerRepository) TerminateMessage(ctx context.Context, streamNam
 }
 
 // GetPendingMessages returns pending messages for a consumer
-func (r *NATSConsumerRepository) GetPendingMessages(ctx context.Context, streamName, consumerName string, limit int) ([]*domain.Message, error) {
+func (r *NATSConsumerRepository) GetPendingMessages(ctx context.Context, streamName, consumerName string, limit int) ([]*models.Message, error) {
 	info, err := r.js.ConsumerInfo(streamName, consumerName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get consumer info: %w", err)
@@ -306,7 +306,7 @@ func (r *NATSConsumerRepository) GetPendingMessages(ctx context.Context, streamN
 	}
 	defer sub.Unsubscribe()
 
-	messages := make([]*domain.Message, 0, limit)
+	messages := make([]*models.Message, 0, limit)
 	fetched := 0
 
 	for fetched < limit && fetched < int(info.NumPending) {
@@ -325,7 +325,7 @@ func (r *NATSConsumerRepository) GetPendingMessages(ctx context.Context, streamN
 			headers[k] = v
 		}
 
-		messages = append(messages, &domain.Message{
+		messages = append(messages, &models.Message{
 			Subject:   msg.Subject,
 			Sequence:  meta.Sequence.Stream,
 			Data:      msg.Data,

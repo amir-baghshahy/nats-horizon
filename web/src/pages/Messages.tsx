@@ -22,6 +22,7 @@ import {
 import { deleteMessage } from "../utils/natsOperations";
 import { ExportService } from "../types";
 import { useToast } from "../components/Toast";
+import { useConfirm } from "../components/ConfirmDialog";
 import { useSSE } from "../hooks/useSSE";
 import { CoreMessagingContent } from "./CoreMessaging";
 
@@ -57,6 +58,7 @@ export default function Messages() {
   const [copiedMessage, setCopiedMessage] = useState<number | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const { connected: sseConnected } = useSSE("messages");
 
   const publishMutation = useMutation({
@@ -112,7 +114,8 @@ export default function Messages() {
   };
 
   const deleteSelectedMessages = async () => {
-    if (!confirm(`Delete ${selectedMessages.size} message(s)?`)) return;
+    const ok = await confirm({ title: "Delete Messages", message: `Delete ${selectedMessages.size} message(s)?`, confirmLabel: "Delete", variant: "danger" });
+    if (!ok) return;
     for (const sequence of selectedMessages) {
       await deleteMutation.mutateAsync(sequence);
     }
@@ -511,10 +514,9 @@ export default function Messages() {
                         )}
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm(`Delete message #${sequence}?`)) {
-                            deleteMutation.mutate(sequence);
-                          }
+                        onClick={async () => {
+                          const ok = await confirm({ title: "Delete Message", message: `Delete message #${sequence}?`, confirmLabel: "Delete", variant: "danger" });
+                          if (ok) deleteMutation.mutate(sequence);
                         }}
                         disabled={deleteMutation.isPending}
                         className="p-2 hover:bg-dark-bg rounded-lg transition-colors text-status-error"
@@ -652,8 +654,9 @@ export default function Messages() {
                           View Raw
                         </button>
                         <button
-                          onClick={() => {
-                            if (confirm(`Delete message #${sequence}?`)) {
+                          onClick={async () => {
+                            const ok = await confirm({ title: "Delete Message", message: `Delete message #${sequence}?`, confirmLabel: "Delete", variant: "danger" });
+                            if (ok) {
                               deleteMutation.mutate(sequence);
                               setExpandedMessages((prev) => {
                                 const next = new Set(prev);

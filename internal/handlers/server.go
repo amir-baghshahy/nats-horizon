@@ -18,11 +18,12 @@ import (
 type ServerHandler struct {
 	useCase        *services.ServerUseCase
 	messageUseCase *services.MessageUseCase
+	streamUseCase  *services.StreamUseCase
 }
 
 // NewServerHandler creates a new server handler
-func NewServerHandler(useCase *services.ServerUseCase, messageUseCase *services.MessageUseCase) *ServerHandler {
-	return &ServerHandler{useCase: useCase, messageUseCase: messageUseCase}
+func NewServerHandler(useCase *services.ServerUseCase, messageUseCase *services.MessageUseCase, streamUseCase *services.StreamUseCase) *ServerHandler {
+	return &ServerHandler{useCase: useCase, messageUseCase: messageUseCase, streamUseCase: streamUseCase}
 }
 
 // GetDashboardStats returns dashboard statistics
@@ -249,8 +250,19 @@ func (h *ServerHandler) GetStreamMessagesByPage(c *gin.Context) {
 		pageSize = constants.MaxFetchCount
 	}
 
+	// Get stream info for total count and sequence bounds
+	streamInfo, err := h.streamUseCase.GetStream(c.Request.Context(), stream)
+	if err != nil {
+		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "Stream not found", Details: err.Error()})
+		return
+	}
+
+	total := streamInfo.Messages
+	startSeq := streamInfo.FirstSeq + uint64((page-1)*pageSize)
+
 	messages, err := h.messageUseCase.ListMessages(c.Request.Context(), stream, models.MessageFilter{
-		Limit: pageSize,
+		Limit:    pageSize,
+		Sequence: startSeq,
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
@@ -260,21 +272,11 @@ func (h *ServerHandler) GetStreamMessagesByPage(c *gin.Context) {
 		return
 	}
 
-	start := (page - 1) * pageSize
-	end := start + pageSize
-	if start > len(messages) {
-		messages = []*models.Message{}
-	} else if end > len(messages) {
-		messages = messages[start:]
-	} else {
-		messages = messages[start:end]
-	}
-
 	c.JSON(http.StatusOK, dto.PaginatedMessagesResponse{
 		Stream:   stream,
 		Page:     page,
 		PageSize: pageSize,
-		Total:    len(messages),
+		Total:    int(total),
 		Messages: toStreamMessages(messages),
 	})
 }

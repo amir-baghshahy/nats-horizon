@@ -68,6 +68,8 @@ func (uc *StreamUseCase) CreateStream(ctx context.Context, req *StreamCreate) (*
 		Storage:   req.Storage,
 		Retention: req.Retention,
 		Replicas:  req.Replicas,
+		MaxAge:    req.MaxAge,
+		MaxBytes:  int64(req.MaxBytes),
 	}
 	return uc.streamRepo.Create(ctx, stream)
 }
@@ -84,6 +86,8 @@ func (uc *StreamUseCase) UpdateStream(ctx context.Context, req *StreamUpdate) (*
 		Name:     req.Name,
 		Subjects: req.Subjects,
 		Replicas: req.Replicas,
+		MaxAge:   req.MaxAge,
+		MaxBytes: int64(req.MaxBytes),
 	}
 	return uc.streamRepo.Update(ctx, stream)
 }

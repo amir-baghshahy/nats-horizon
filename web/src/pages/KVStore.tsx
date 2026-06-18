@@ -17,9 +17,11 @@ import {
   Eye,
 } from "lucide-react";
 import { useToast } from "../components/Toast";
+import { useConfirm } from "../components/ConfirmDialog";
 import { PageError, PageLoading } from "../components/ui/PageState";
 
 export default function KVStore() {
+  const { confirm } = useConfirm();
   const [selectedBucket, setSelectedBucket] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -255,12 +257,11 @@ export default function KVStore() {
                       </p>
                     </div>
                     <button
-                      onClick={(event) => {
+                      onClick={async (event) => {
                         event.stopPropagation();
                         const name = bucket.name ?? bucket.bucket_name ?? "";
-                        if (confirm(`Delete bucket "${name}"?`)) {
-                          deleteBucketMutation.mutate(name);
-                        }
+                        const ok = await confirm({ title: "Delete Bucket", message: `Delete bucket "${name}"?`, confirmLabel: "Delete", variant: "danger" });
+                        if (ok) deleteBucketMutation.mutate(name);
                       }}
                       className="p-2 hover:bg-red-500/20 rounded-lg"
                       title="Delete bucket"
@@ -307,11 +308,10 @@ export default function KVStore() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (!selectedBucket) return;
-                      if (confirm(`Purge deleted-key tombstones from "${selectedBucket}"?`)) {
-                        purgeBucketMutation.mutate(selectedBucket);
-                      }
+                      const ok = await confirm({ title: "Purge Bucket", message: `Purge deleted-key tombstones from "${selectedBucket}"?`, confirmLabel: "Purge", variant: "warning" });
+                      if (ok) purgeBucketMutation.mutate(selectedBucket);
                     }}
                     className="btn-secondary flex items-center gap-2 text-sm py-2"
                   >
@@ -399,10 +399,9 @@ export default function KVStore() {
                           <History className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => {
-                            if (confirm(`Delete key "${kv.key ?? 'unknown-key'}"?`)) {
-                              deleteKeyMutation.mutate(kv.key ?? '')
-                            }
+                          onClick={async () => {
+                            const ok = await confirm({ title: "Delete Key", message: `Delete key "${kv.key ?? 'unknown-key'}"?`, confirmLabel: "Delete", variant: "danger" });
+                            if (ok) deleteKeyMutation.mutate(kv.key ?? '');
                           }}
                           className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg"
                           title="Delete"

@@ -22,6 +22,8 @@ func StreamToResponse(stream *models.Stream) *dto.StreamResponse {
 			Storage:   stream.Storage,
 			Retention: stream.Retention,
 			Replicas:  stream.Replicas,
+			MaxAge:    stream.MaxAge,
+			MaxBytes:  uint64(stream.MaxBytes),
 		},
 		State: &dto.StreamStateResponse{
 			Messages:    stream.Messages,
@@ -31,7 +33,7 @@ func StreamToResponse(stream *models.Stream) *dto.StreamResponse {
 			LastSeq:     stream.LastSeq,
 			FirstTs:     formatTime(stream.FirstTs),
 			LastTs:      formatTime(stream.LastTs),
-			NumPending:  0, // Calculated from actual state if available
+			NumPending:  stream.NumPending,
 			DeleteMarks: 0,
 		},
 	}

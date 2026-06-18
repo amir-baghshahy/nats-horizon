@@ -156,7 +156,7 @@ func main() {
 
 	streamHandler := handlers.NewStreamHandler(streamUseCase)
 	consumerHandler := handlers.NewConsumerHandler(consumerUseCase, messageUseCase, natsConn.nc, natsConn.js)
-	serverHandler := handlers.NewServerHandler(serverUseCase, messageUseCase)
+	serverHandler := handlers.NewServerHandler(serverUseCase, messageUseCase, streamUseCase)
 	coreNATSHandler := handlers.NewCoreNATShandler(natsConn.nc)
 	kvHandler := handlers.NewKVHandler(natsConn.nc, natsConn.js)
 	clusterHandler := handlers.NewClusterHandler(natsConn.nc, natsConn.js)

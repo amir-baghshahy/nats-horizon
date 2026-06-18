@@ -119,6 +119,15 @@ func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *models.LagRe
 	}
 
 	info.Config.DeliverPolicy = nats.DeliverByStartSequencePolicy
+	if req.Sequence > 0 {
+		info.Config.OptStartSeq = req.Sequence
+	} else {
+		// default: start from the latest sequence (skip all pending)
+		streamInfo, err := r.js.StreamInfo(req.StreamName)
+		if err == nil {
+			info.Config.OptStartSeq = streamInfo.State.LastSeq + 1
+		}
+	}
 
 	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {

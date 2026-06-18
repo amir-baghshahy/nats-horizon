@@ -35,6 +35,7 @@ import {
   resetConsumerLag,
 } from "../utils/natsOperations";
 import { useToast } from "../components/Toast";
+import { useConfirm } from "../components/ConfirmDialog";
 
 export default function Consumers() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,6 +59,7 @@ export default function Consumers() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   // SSE connection for real-time updates
   const { connected: sseConnected } = useSSE("consumers");
@@ -170,8 +172,14 @@ export default function Consumers() {
     onError: () => toast("error", "Failed to reset lag"),
   });
 
-  const handleBulkResume = () => {
-    if (confirm(`Resume ${selectedConsumers.size} selected consumers?`)) {
+  const handleBulkResume = async () => {
+    const ok = await confirm({
+      title: "Resume Consumers",
+      message: `Resume ${selectedConsumers.size} selected consumers?`,
+      confirmLabel: "Resume",
+      variant: "info",
+    });
+    if (ok) {
       filteredConsumers.forEach((c: Consumer) => {
         if (!c.name || !c.stream) return;
         if (selectedConsumers.has(c.name) && c.status !== "active") {
@@ -181,8 +189,14 @@ export default function Consumers() {
     }
   };
 
-  const handleBulkPause = () => {
-    if (confirm(`Pause ${selectedConsumers.size} selected consumers?`)) {
+  const handleBulkPause = async () => {
+    const ok = await confirm({
+      title: "Pause Consumers",
+      message: `Pause ${selectedConsumers.size} selected consumers?`,
+      confirmLabel: "Pause",
+      variant: "warning",
+    });
+    if (ok) {
       filteredConsumers.forEach((c: Consumer) => {
         if (!c.name || !c.stream) return;
         if (selectedConsumers.has(c.name) && c.status === "active") {
@@ -192,8 +206,14 @@ export default function Consumers() {
     }
   };
 
-  const handleBulkDelete = () => {
-    if (confirm(`Delete ${selectedConsumers.size} selected consumers?`)) {
+  const handleBulkDelete = async () => {
+    const ok = await confirm({
+      title: "Delete Consumers",
+      message: `Delete ${selectedConsumers.size} selected consumers? This action cannot be undone.`,
+      confirmLabel: "Delete All",
+      variant: "danger",
+    });
+    if (ok) {
       filteredConsumers.forEach((c: Consumer) => {
         if (!c.name || !c.stream) return;
         if (selectedConsumers.has(c.name)) {
@@ -773,15 +793,14 @@ export default function Consumers() {
                             Reset Lag
                           </button>
                           <button
-                            onClick={() => {
-                              if (
-                                confirm(`Delete consumer "${consumer.name}"?`)
-                              ) {
-                                deleteMutation.mutate({
-                                  stream: consumer.stream,
-                                  name: consumer.name,
-                                });
-                              }
+                            onClick={async () => {
+                              const ok = await confirm({
+                                title: "Delete Consumer",
+                                message: `Delete consumer "${consumer.name}"?`,
+                                confirmLabel: "Delete",
+                                variant: "danger",
+                              });
+                              if (ok) deleteMutation.mutate({ stream: consumer.stream, name: consumer.name });
                             }}
                             className="btn-secondary text-sm text-status-error"
                           >

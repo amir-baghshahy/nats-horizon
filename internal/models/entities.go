@@ -9,6 +9,8 @@ type Stream struct {
 	Storage    string    `json:"storage"`
 	Retention  string    `json:"retention"`
 	Replicas   int       `json:"replicas"`
+	MaxAge     string    `json:"max_age"`
+	MaxBytes   int64     `json:"max_bytes"`
 	Messages   uint64    `json:"messages"`
 	Bytes      uint64    `json:"bytes"`
 	Consumers  int       `json:"consumers"`

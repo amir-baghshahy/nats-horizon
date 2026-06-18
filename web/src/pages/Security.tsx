@@ -6,6 +6,7 @@ import {
   Clock, FileText, Server, Activity, ToggleLeft, ToggleRight
 } from 'lucide-react'
 import { PageError, PageLoading } from '../components/ui/PageState'
+import { useConfirm } from '../components/ConfirmDialog'
 
 interface User {
   name: string
@@ -32,6 +33,7 @@ export default function Security() {
   const [showUserModal, setShowUserModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const queryClient = useQueryClient()
+  const { confirm } = useConfirm()
 
   const getErrorMessage = (error: unknown) => {
     if (error instanceof Error) return error.message;
@@ -316,13 +318,9 @@ export default function Security() {
                   </div>
                    <div className="flex items-center gap-2">
                      <button
-                       onClick={() => {
-                         if (confirm(`Toggle user "${user.name}"?`)) {
-                           updateUserMutation.mutate({
-                             name: user.name,
-                             data: { enabled: !user.enabled }
-                           })
-                         }
+                       onClick={async () => {
+                         const ok = await confirm({ title: user.enabled ? "Disable User" : "Enable User", message: `Toggle user "${user.name}"?`, confirmLabel: user.enabled ? "Disable" : "Enable", variant: "warning" })
+                         if (ok) updateUserMutation.mutate({ name: user.name, data: { enabled: !user.enabled } })
                        }}
                        className="p-2 hover:bg-dark-border rounded-lg"
                      >
@@ -342,10 +340,9 @@ export default function Security() {
                        <Edit className="w-4 h-4" />
                      </button>
                     <button
-                      onClick={() => {
-                        if (confirm(`Delete user "${user.name}"?`)) {
-                          deleteUserMutation.mutate(user.name)
-                        }
+                      onClick={async () => {
+                        const ok = await confirm({ title: "Delete User", message: `Delete user "${user.name}"?`, confirmLabel: "Delete", variant: "danger" })
+                        if (ok) deleteUserMutation.mutate(user.name)
                       }}
                       className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg"
                     >

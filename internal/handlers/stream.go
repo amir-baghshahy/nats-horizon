@@ -130,6 +130,8 @@ func (h *StreamHandler) UpdateStream(c *gin.Context) {
 		Name:     name,
 		Subjects: req.Subjects,
 		Replicas: req.Replicas,
+		MaxAge:   req.MaxAge,
+		MaxBytes: req.MaxBytes,
 	}
 
 	result, err := h.useCase.UpdateStream(c.Request.Context(), stream)

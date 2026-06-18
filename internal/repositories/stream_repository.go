@@ -11,6 +11,33 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
+func parseDuration(s string) time.Duration {
+	if s == "" {
+		return 0
+	}
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		return 0
+	}
+	return d
+}
+
+// durationNsToString converts nanoseconds (NATS API format) to a human-readable duration string.
+func durationNsToString(ns int64) string {
+	if ns <= 0 {
+		return ""
+	}
+	return time.Duration(ns).String()
+}
+
+// normalizeMaxBytes converts NATS unlimited sentinel values (-1 or int64 max wrapped as uint64) to 0.
+func normalizeMaxBytes(v int64) int64 {
+	if v < 0 {
+		return 0
+	}
+	return v
+}
+
 // NATSStreamRepository implements StreamRepository using NATS JetStream
 type NATSStreamRepository struct {
 	nc *nats.Conn
@@ -30,6 +57,8 @@ type streamListResponse struct {
 			Retention string   `json:"retention"`
 			Storage   string   `json:"storage"`
 			Replicas  int      `json:"replicas"`
+			MaxAge    int64    `json:"max_age"`
+			MaxBytes  int64    `json:"max_bytes"`
 		} `json:"config"`
 		State struct {
 			Msgs      uint64 `json:"messages"`
@@ -67,17 +96,23 @@ func (r *NATSStreamRepository) List(ctx context.Context) ([]*models.Stream, erro
 
 	streams := make([]*models.Stream, 0, len(response.Streams))
 	for _, s := range response.Streams {
+		firstTs, _ := time.Parse(time.RFC3339Nano, s.State.FirstTs)
+		lastTs, _ := time.Parse(time.RFC3339Nano, s.State.LastTs)
 		stream := &models.Stream{
 			Name:      s.Config.Name,
 			Subjects:  s.Config.Subjects,
 			Storage:   s.Config.Storage,
 			Retention: s.Config.Retention,
 			Replicas:  s.Config.Replicas,
+			MaxAge:    durationNsToString(s.Config.MaxAge),
+			MaxBytes:  normalizeMaxBytes(s.Config.MaxBytes),
 			Messages:  s.State.Msgs,
 			Bytes:     s.State.Bytes,
 			Consumers: s.State.Consumers,
 			FirstSeq:  s.State.FirstSeq,
 			LastSeq:   s.State.LastSeq,
+			FirstTs:   firstTs,
+			LastTs:    lastTs,
 			CreatedAt: time.Now(),
 		}
 		streams = append(streams, stream)
@@ -150,17 +185,25 @@ func (r *NATSStreamRepository) toDomainStream(info *nats.StreamInfo) *models.Str
 	case nats.WorkQueuePolicy:
 		retention = "workqueue"
 	}
+	maxAge := ""
+	if info.Config.MaxAge > 0 {
+		maxAge = info.Config.MaxAge.String()
+	}
 	return &models.Stream{
 		Name:      info.Config.Name,
 		Subjects:  info.Config.Subjects,
 		Storage:   storageToString(int(info.Config.Storage)),
 		Retention: retention,
 		Replicas:  int(info.Config.Replicas),
+		MaxAge:    maxAge,
+		MaxBytes:  info.Config.MaxBytes,
 		Messages:  info.State.Msgs,
 		Bytes:     info.State.Bytes,
 		Consumers: int(info.State.Consumers),
 		FirstSeq:  info.State.FirstSeq,
 		LastSeq:   info.State.LastSeq,
+		FirstTs:   info.State.FirstTime,
+		LastTs:    info.State.LastTime,
 		CreatedAt: time.Now(),
 	}
 }
@@ -176,10 +219,25 @@ func (r *NATSStreamRepository) toNATSStreamConfig(stream *models.Stream) *nats.S
 		storage = nats.FileStorage
 	}
 
-	return &nats.StreamConfig{
-		Name:     stream.Name,
-		Subjects: stream.Subjects,
-		Storage:  storage,
-		Replicas: stream.Replicas,
+	var retention nats.RetentionPolicy
+	switch stream.Retention {
+	case "interest":
+		retention = nats.InterestPolicy
+	case "workqueue":
+		retention = nats.WorkQueuePolicy
+	default:
+		retention = nats.LimitsPolicy
 	}
+
+	cfg := &nats.StreamConfig{
+		Name:      stream.Name,
+		Subjects:  stream.Subjects,
+		Storage:   storage,
+		Replicas:  stream.Replicas,
+		Retention: retention,
+		MaxBytes:  stream.MaxBytes,
+		MaxAge:    parseDuration(stream.MaxAge),
+	}
+
+	return cfg
 }

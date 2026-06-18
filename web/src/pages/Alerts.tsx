@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { PageError, PageLoading } from "../components/ui/PageState";
 import { useToast } from "../components/Toast";
+import { useConfirm } from "../components/ConfirmDialog";
 
 const SEVERITY_COLORS = {
   info: "bg-blue-500/20 text-blue-400 border-blue-500/50",
@@ -35,6 +36,7 @@ export default function Alerts() {
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
 
   const getErrorMessage = (error: unknown) => {
     if (error instanceof Error) return error.message;
@@ -352,10 +354,9 @@ export default function Alerts() {
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => {
-                      if (confirm(`Delete alert "${alert.name}"?`)) {
-                        deleteAlertMutation.mutate(alert.id);
-                      }
+                    onClick={async () => {
+                      const ok = await confirm({ title: "Delete Alert", message: `Delete alert "${alert.name}"?`, confirmLabel: "Delete", variant: "danger" });
+                      if (ok) deleteAlertMutation.mutate(alert.id);
                     }}
                     className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg"
                     title="Delete"

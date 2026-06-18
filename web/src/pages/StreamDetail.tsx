@@ -26,11 +26,13 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { purgeStream, deleteStream } from "../utils/natsOperations";
+import { useConfirm } from "../components/ConfirmDialog";
 
 export default function StreamDetail() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { confirm } = useConfirm();
   const [activeTab, setActiveTab] = useState<
     "overview" | "messages" | "consumers" | "config"
   >("overview");
@@ -117,12 +119,8 @@ export default function StreamDetail() {
 
   const handlePurgeStream = async () => {
     if (!name) return;
-    if (
-      !confirm(
-        `Are you sure you want to purge all messages from stream "${name}"?`,
-      )
-    )
-      return;
+    const ok = await confirm({ title: "Purge Stream", message: `Purge all messages from stream "${name}"?`, confirmLabel: "Purge", variant: "warning" });
+    if (!ok) return;
     setLoadingAction("purge");
     const result = await purgeStream(name);
     if (result.success) {
@@ -136,12 +134,8 @@ export default function StreamDetail() {
 
   const handleDeleteStream = async () => {
     if (!name) return;
-    if (
-      !confirm(
-        `Are you sure you want to delete stream "${name}"? This action cannot be undone.`,
-      )
-    )
-      return;
+    const ok = await confirm({ title: "Delete Stream", message: `Delete stream "${name}"? This action cannot be undone.`, confirmLabel: "Delete", variant: "danger" });
+    if (!ok) return;
     setLoadingAction("delete");
     const result = await deleteStream(name);
     if (result.success) {

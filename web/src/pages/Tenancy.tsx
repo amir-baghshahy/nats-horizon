@@ -15,6 +15,7 @@ import {
   Star,
 } from "lucide-react";
 import { PageError, PageLoading } from "../components/ui/PageState";
+import { useConfirm } from "../components/ConfirmDialog";
 
 type ConnectionTestResult = {
   healthy?: boolean;
@@ -31,6 +32,7 @@ export default function Tenancy() {
     null,
   );
   const queryClient = useQueryClient();
+  const { confirm } = useConfirm();
 
   const getErrorMessage = (error: unknown) => {
     if (error instanceof Error) return error.message;
@@ -325,12 +327,9 @@ export default function Tenancy() {
                     </button>
                     {!conn.is_default && (
                       <button
-                        onClick={() => {
-                          if (
-                            confirm(`Delete connection "${connectionName}"?`)
-                          ) {
-                            deleteMutation.mutate(connectionId);
-                          }
+                        onClick={async () => {
+                          const ok = await confirm({ title: "Delete Connection", message: `Delete connection "${connectionName}"?`, confirmLabel: "Delete", variant: "danger" });
+                          if (ok) deleteMutation.mutate(connectionId);
                         }}
                         className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg"
                         title="Delete"

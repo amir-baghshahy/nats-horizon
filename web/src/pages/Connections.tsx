@@ -11,12 +11,14 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useToast } from "../components/Toast";
+import { useConfirm } from "../components/ConfirmDialog";
 import ConnectionFilters from "../components/connections/ConnectionFilters";
 import { HealthService } from "../types";
 import type { github_com_amir_nats_monitor_internal_dto_ConnectionInfo as ConnectionInfo } from "../types";
 
 export default function Connections() {
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterServer, setFilterServer] = useState<string>("all");
   const [expandedConnections, setExpandedConnections] = useState<Set<number>>(
@@ -296,12 +298,9 @@ export default function Connections() {
 
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => {
-                            if (
-                              confirm(
-                                `Terminate connection "${conn.cid}"? This action cannot be undone.`,
-                              )
-                            ) {
+                          onClick={async () => {
+                            const ok = await confirm({ title: "Terminate Connection", message: `Terminate connection "${conn.cid}"? This action cannot be undone.`, confirmLabel: "Terminate", variant: "danger" });
+                            if (ok) {
                               HealthService.deleteConnections(
                                 String(conn.cid || ""),
                               )

@@ -28,6 +28,7 @@ import { SearchBar, Pagination, BulkActions } from "../components/common";
 import { StatusBadge, EmptyState } from "../components/ui";
 import { StreamsService, ExportService } from "../types";
 import { useToast } from "../components/Toast";
+import { useConfirm } from "../components/ConfirmDialog";
 import type { github_com_amir_nats_monitor_internal_dto_StreamResponse as Stream } from "../types";
 import type { github_com_amir_nats_monitor_internal_dto_CreateStreamRequest } from "../types";
 import { formatBytes } from "../utils/formatters";
@@ -78,6 +79,7 @@ export default function Streams() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { connected: sseConnected } = useSSE("streams");
 
@@ -178,7 +180,7 @@ export default function Streams() {
       toast("success", "Streams export downloaded");
     },
     onError: (error: any) => {
-      toast("error", error.response?.data?.error || "Failed to export streams");
+      toast("error", error?.body?.error || "Failed to export streams");
     },
   });
 
@@ -197,7 +199,7 @@ export default function Streams() {
       toast("success", "Stream export downloaded");
     },
     onError: (error: any) => {
-      toast("error", error.response?.data?.error || "Failed to export stream");
+      toast("error", error?.body?.error || "Failed to export stream");
     },
   });
 
@@ -263,18 +265,24 @@ export default function Streams() {
   const getStreamName = (stream: Stream): string =>
     stream.config?.name || "";
 
-  const handleDelete = (streamName: string) => {
-    if (
-      confirm(`Delete stream "${streamName}"? This action cannot be undone.`)
-    ) {
-      deleteMutation.mutate(streamName);
-    }
+  const handleDelete = async (streamName: string) => {
+    const ok = await confirm({
+      title: "Delete Stream",
+      message: `Delete "${streamName}"? This action cannot be undone.`,
+      confirmLabel: "Delete",
+      variant: "danger",
+    });
+    if (ok) deleteMutation.mutate(streamName);
   };
 
-  const handlePurge = (streamName: string) => {
-    if (confirm(`Purge all messages from "${streamName}"?`)) {
-      purgeMutation.mutate(streamName);
-    }
+  const handlePurge = async (streamName: string) => {
+    const ok = await confirm({
+      title: "Purge Stream",
+      message: `Purge all messages from "${streamName}"?`,
+      confirmLabel: "Purge",
+      variant: "warning",
+    });
+    if (ok) purgeMutation.mutate(streamName);
   };
 
   const handleExportStream = (
@@ -288,12 +296,14 @@ export default function Streams() {
     exportMessagesMutation.mutate({ name: streamName, subject, limit: 1000 });
   };
 
-  const handleBulkDelete = () => {
-    if (
-      confirm(
-        `Delete ${selected.size} selected streams? This action cannot be undone.`,
-      )
-    ) {
+  const handleBulkDelete = async () => {
+    const ok = await confirm({
+      title: "Delete Streams",
+      message: `Delete ${selected.size} selected streams? This action cannot be undone.`,
+      confirmLabel: "Delete All",
+      variant: "danger",
+    });
+    if (ok) {
       selected.forEach((name) => deleteMutation.mutate(name));
       clearSelection();
     }

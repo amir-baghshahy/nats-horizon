@@ -37,11 +37,13 @@ import {
   setConsumerState,
   deleteConsumer,
 } from "../utils/natsOperations";
+import { useConfirm } from "../components/ConfirmDialog";
 
 export default function ConsumerDetail() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { confirm } = useConfirm();
   const [activeTab, setActiveTab] = useState<
     "overview" | "messages" | "config"
   >("overview");
@@ -264,7 +266,8 @@ export default function ConsumerDetail() {
 
   const handleDeleteConsumer = async () => {
     if (!name || !consumerData.stream) return;
-    if (!confirm(`Are you sure you want to delete consumer "${name}"?`)) return;
+    const ok = await confirm({ title: "Delete Consumer", message: `Delete consumer "${name}"? This action cannot be undone.`, confirmLabel: "Delete", variant: "danger" });
+    if (!ok) return;
     setLoadingAction("delete");
     const result = await deleteConsumer(consumerData.stream, name);
     if (result.success) {

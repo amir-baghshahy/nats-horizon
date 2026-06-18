@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.env.local
+tmp/
+web/node_modules/
+*.log
+*.md
+.air.toml
+.vscode/
+.idea/

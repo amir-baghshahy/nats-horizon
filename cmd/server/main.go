@@ -11,11 +11,11 @@ import (
 	"syscall"
 	"time"
 
-	"nats-monitoring/internal/config"
-	"nats-monitoring/internal/handlers"
-	"nats-monitoring/internal/middleware"
-	"nats-monitoring/internal/repositories"
-	"nats-monitoring/internal/services"
+	"github.com/amir/nats-monitor/internal/config"
+	"github.com/amir/nats-monitor/internal/handlers"
+	"github.com/amir/nats-monitor/internal/middleware"
+	"github.com/amir/nats-monitor/internal/repositories"
+	"github.com/amir/nats-monitor/internal/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"

@@ -16,9 +16,12 @@ web/node_modules/
 
 # Frontend build
 web/dist/
-web/.env/
+web/.env
 web/.env.local
 web/.env.*.local
+
+# Air hot-reload
+tmp/
 
 # IDE
 .vscode/

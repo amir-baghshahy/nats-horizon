@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"nats-monitoring/internal/models"
+	"github.com/amir/nats-monitor/internal/models"
 )
 
 // DTOs for stream operations

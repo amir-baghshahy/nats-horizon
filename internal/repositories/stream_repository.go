@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"nats-monitoring/internal/models"
+	"github.com/amir/nats-monitor/internal/models"
 
 	"github.com/nats-io/nats.go"
 )

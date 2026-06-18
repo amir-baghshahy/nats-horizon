@@ -4,13 +4,31 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/dto"
+	"github.com/amir/nats-monitor/internal/dto"
 )
+
+// validateNATSURL rejects schemes other than nats:// and tls:// to prevent SSRF.
+func validateNATSURL(raw string) error {
+	u, err := url.Parse(raw)
+	if err != nil {
+		return fmt.Errorf("invalid URL: %w", err)
+	}
+	scheme := strings.ToLower(u.Scheme)
+	if scheme != "nats" && scheme != "tls" {
+		return fmt.Errorf("URL scheme %q is not allowed; only nats:// and tls:// are permitted", u.Scheme)
+	}
+	if u.Host == "" {
+		return fmt.Errorf("URL must include a host")
+	}
+	return nil
+}
 
 // ConnectionConfig represents a NATS connection configuration
 type ConnectionConfig struct {
@@ -147,6 +165,11 @@ func (h *TenancyHandler) CreateConnection(c *gin.Context) {
 		return
 	}
 
+	if err := validateNATSURL(req.URL); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -255,6 +278,11 @@ func (h *TenancyHandler) TestConnection(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	if err := validateNATSURL(req.URL); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
 		return
 	}

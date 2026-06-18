@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"nats-monitoring/internal/constants"
-	"nats-monitoring/internal/dto"
+	"github.com/amir/nats-monitor/internal/constants"
+	"github.com/amir/nats-monitor/internal/dto"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
@@ -141,14 +141,12 @@ func (h *MetricsHandler) startCollector() {
 	}()
 }
 
-// collectMetrics collects metrics from NATS
+// collectMetrics collects metrics from NATS.
+// All NATS I/O is done without holding h.mu; only the final cache swap acquires the lock.
 func (h *MetricsHandler) collectMetrics() {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
 	now := time.Now()
 
-	// Get stream list
+	// --- I/O phase (no lock held) ---
 	msg, err := h.nc.Request("$JS.API.STREAM.LIST", []byte("{}"), 2*time.Second)
 	if err != nil {
 		return
@@ -170,80 +168,57 @@ func (h *MetricsHandler) collectMetrics() {
 		return
 	}
 
-	// Create/update stream series
-	streamNames := make(map[string]bool)
-	for _, stream := range streamList.Streams {
-		streamNames[stream.Config.Name] = true
-
-		// Find existing series or create new
-		var series *MetricSeries
-		for i, s := range h.metricsCache.Streams {
-			if s.Name == stream.Config.Name && s.Labels["type"] == "messages" {
-				series = &h.metricsCache.Streams[i]
-				break
-			}
-		}
-
-		if series == nil {
-			series = &MetricSeries{
-				Name:   stream.Config.Name,
-				Labels: map[string]string{"type": "messages"},
-				Data:   make([]MetricDataPoint, 0),
-			}
-			h.metricsCache.Streams = append(h.metricsCache.Streams, *series)
-			series = &h.metricsCache.Streams[len(h.metricsCache.Streams)-1]
-		}
-
-		// Add data point
-		point := MetricDataPoint{
-			Timestamp: now.Unix(),
-			Value:     float64(stream.State.Msgs),
-		}
-
-		// Keep only last 100 points
-		series.Data = append(series.Data, point)
-		if len(series.Data) > 100 {
-			series.Data = series.Data[len(series.Data)-100:]
-		}
-
-		// Add bytes series
-		var bytesSeries *MetricSeries
-		for i, s := range h.metricsCache.Streams {
-			if s.Name == stream.Config.Name && s.Labels["type"] == "bytes" {
-				bytesSeries = &h.metricsCache.Streams[i]
-				break
-			}
-		}
-
-		if bytesSeries == nil {
-			bytesSeries = &MetricSeries{
-				Name:   stream.Config.Name,
-				Labels: map[string]string{"type": "bytes"},
-				Data:   make([]MetricDataPoint, 0),
-			}
-			h.metricsCache.Streams = append(h.metricsCache.Streams, *bytesSeries)
-			bytesSeries = &h.metricsCache.Streams[len(h.metricsCache.Streams)-1]
-		}
-
-		bytesPoint := MetricDataPoint{
-			Timestamp: now.Unix(),
-			Value:     float64(stream.State.Bytes),
-		}
-
-		bytesSeries.Data = append(bytesSeries.Data, bytesPoint)
-		if len(bytesSeries.Data) > 100 {
-			bytesSeries.Data = bytesSeries.Data[len(bytesSeries.Data)-100:]
-		}
+	streamNames := make(map[string]bool, len(streamList.Streams))
+	for _, s := range streamList.Streams {
+		streamNames[s.Config.Name] = true
 	}
 
-	// Update timestamp
-	h.metricsCache.Timestamp = now.Unix()
+	// Build temp cache with all I/O done before acquiring the lock.
+	tmp := &MetricsResponse{
+		Streams:   make([]MetricSeries, 0),
+		Consumers: make([]MetricSeries, 0),
+		System:    make([]MetricSeries, 0),
+		Timestamp: now.Unix(),
+	}
 
-	h.collectConsumerMetrics(now, streamNames)
-	h.collectServerMetrics(now)
+	for _, stream := range streamList.Streams {
+		name := stream.Config.Name
+		tmp.Streams = appendDataPoint(tmp.Streams, name, "messages", now, float64(stream.State.Msgs))
+		tmp.Streams = appendDataPoint(tmp.Streams, name, "bytes", now, float64(stream.State.Bytes))
+	}
+
+	h.buildConsumerMetrics(tmp, now, streamNames)
+	h.buildServerMetrics(tmp, now)
+
+	// --- Write phase: lock only for the pointer swap ---
+	h.mu.Lock()
+	h.metricsCache.Streams = tmp.Streams
+	h.metricsCache.Consumers = tmp.Consumers
+	h.metricsCache.System = tmp.System
+	h.metricsCache.Timestamp = tmp.Timestamp
+	h.mu.Unlock()
 }
 
-func (h *MetricsHandler) collectConsumerMetrics(now time.Time, streamNames map[string]bool) {
+// appendDataPoint finds or creates a MetricSeries by name+type label and appends a point,
+// capping the series at 100 points.
+func appendDataPoint(series []MetricSeries, name, label string, t time.Time, value float64) []MetricSeries {
+	for i := range series {
+		if series[i].Name == name && series[i].Labels["type"] == label {
+			series[i].Data = append(series[i].Data, MetricDataPoint{Timestamp: t.Unix(), Value: value})
+			if len(series[i].Data) > 100 {
+				series[i].Data = series[i].Data[len(series[i].Data)-100:]
+			}
+			return series
+		}
+	}
+	return append(series, MetricSeries{
+		Name:   name,
+		Labels: map[string]string{"type": label},
+		Data:   []MetricDataPoint{{Timestamp: t.Unix(), Value: value}},
+	})
+}
+
+func (h *MetricsHandler) buildConsumerMetrics(cache *MetricsResponse, now time.Time, streamNames map[string]bool) {
 	for streamName := range streamNames {
 		msg, err := h.nc.Request(fmt.Sprintf("$JS.API.CONSUMER.LIST.%s", streamName), []byte("{}"), constants.LongRequestTimeout)
 		if err != nil {
@@ -265,24 +240,24 @@ func (h *MetricsHandler) collectConsumerMetrics(now time.Time, streamNames map[s
 			}
 
 			name := fmt.Sprintf("%s/%s", streamName, consumerName)
-			h.appendMetric(&h.metricsCache.Consumers, name, "lag", float64(consumer.State.NumPending), now)
-			h.appendMetric(&h.metricsCache.Consumers, name, "pending", float64(consumer.State.NumPending), now)
-			h.appendMetric(&h.metricsCache.Consumers, name, "ack_pending", float64(consumer.State.NumAckPending), now)
-			h.appendMetric(&h.metricsCache.Consumers, name, "redelivered", float64(consumer.State.NumRedelivered), now)
-			h.appendMetric(&h.metricsCache.Consumers, name, "delivered_stream", float64(consumer.State.Delivered.Stream), now)
-			h.appendMetric(&h.metricsCache.Consumers, name, "delivered_consumer", float64(consumer.State.Delivered.Consumer), now)
-			h.appendMetric(&h.metricsCache.Consumers, name, "ack_floor_stream", float64(consumer.State.AckFloor.Stream), now)
-			h.appendMetric(&h.metricsCache.Consumers, name, "ack_floor_consumer", float64(consumer.State.AckFloor.Consumer), now)
+			h.appendMetric(&cache.Consumers, name, "lag", float64(consumer.State.NumPending), now)
+			h.appendMetric(&cache.Consumers, name, "pending", float64(consumer.State.NumPending), now)
+			h.appendMetric(&cache.Consumers, name, "ack_pending", float64(consumer.State.NumAckPending), now)
+			h.appendMetric(&cache.Consumers, name, "redelivered", float64(consumer.State.NumRedelivered), now)
+			h.appendMetric(&cache.Consumers, name, "delivered_stream", float64(consumer.State.Delivered.Stream), now)
+			h.appendMetric(&cache.Consumers, name, "delivered_consumer", float64(consumer.State.Delivered.Consumer), now)
+			h.appendMetric(&cache.Consumers, name, "ack_floor_stream", float64(consumer.State.AckFloor.Stream), now)
+			h.appendMetric(&cache.Consumers, name, "ack_floor_consumer", float64(consumer.State.AckFloor.Consumer), now)
 		}
 	}
 }
 
-func (h *MetricsHandler) collectServerMetrics(now time.Time) {
-	h.collectVarzMetrics(now)
-	h.collectConnzMetrics(now)
+func (h *MetricsHandler) buildServerMetrics(cache *MetricsResponse, now time.Time) {
+	h.buildVarzMetrics(cache, now)
+	h.buildConnzMetrics(cache, now)
 }
 
-func (h *MetricsHandler) collectVarzMetrics(now time.Time) {
+func (h *MetricsHandler) buildVarzMetrics(cache *MetricsResponse, now time.Time) {
 	var response serverPingResponse
 	if err := h.requestServerMetric("$SYS.REQ.SERVER.PING.VARZ", map[string]any{}, &response); err != nil {
 		return
@@ -311,19 +286,19 @@ func (h *MetricsHandler) collectVarzMetrics(now time.Time) {
 		serverName = response.Server.ID
 	}
 
-	h.appendMetric(&h.metricsCache.System, serverName, "cpu_percent", varz.CPU, now)
-	h.appendMetric(&h.metricsCache.System, serverName, "memory_used", float64(varz.Memory), now)
-	h.appendMetric(&h.metricsCache.System, serverName, "connections", float64(varz.Connections), now)
-	h.appendMetric(&h.metricsCache.System, serverName, "subscriptions", float64(varz.Subscriptions), now)
-	h.appendMetric(&h.metricsCache.System, serverName, "routes", float64(varz.Routes), now)
-	h.appendMetric(&h.metricsCache.System, serverName, "sent_messages", float64(varz.SentMsgs), now)
-	h.appendMetric(&h.metricsCache.System, serverName, "received_messages", float64(varz.ReceivedMsgs), now)
-	h.appendMetric(&h.metricsCache.System, serverName, "sent_bytes", float64(varz.SentBytes), now)
-	h.appendMetric(&h.metricsCache.System, serverName, "received_bytes", float64(varz.ReceivedBytes), now)
-	h.appendMetric(&h.metricsCache.System, serverName, "slow_consumers", float64(varz.SlowConsumers), now)
+	h.appendMetric(&cache.System, serverName, "cpu_percent", varz.CPU, now)
+	h.appendMetric(&cache.System, serverName, "memory_used", float64(varz.Memory), now)
+	h.appendMetric(&cache.System, serverName, "connections", float64(varz.Connections), now)
+	h.appendMetric(&cache.System, serverName, "subscriptions", float64(varz.Subscriptions), now)
+	h.appendMetric(&cache.System, serverName, "routes", float64(varz.Routes), now)
+	h.appendMetric(&cache.System, serverName, "sent_messages", float64(varz.SentMsgs), now)
+	h.appendMetric(&cache.System, serverName, "received_messages", float64(varz.ReceivedMsgs), now)
+	h.appendMetric(&cache.System, serverName, "sent_bytes", float64(varz.SentBytes), now)
+	h.appendMetric(&cache.System, serverName, "received_bytes", float64(varz.ReceivedBytes), now)
+	h.appendMetric(&cache.System, serverName, "slow_consumers", float64(varz.SlowConsumers), now)
 }
 
-func (h *MetricsHandler) collectConnzMetrics(now time.Time) {
+func (h *MetricsHandler) buildConnzMetrics(cache *MetricsResponse, now time.Time) {
 	var response serverPingResponse
 	if err := h.requestServerMetric("$SYS.REQ.SERVER.PING.CONNZ", map[string]any{"subscriptions": false, "offset": 0, "limit": 1024}, &response); err != nil {
 		return
@@ -339,8 +314,8 @@ func (h *MetricsHandler) collectConnzMetrics(now time.Time) {
 		subscriptions += conn.Subscriptions
 	}
 
-	h.appendMetric(&h.metricsCache.System, "cluster", "connections", float64(connz.TotalConnections()), now)
-	h.appendMetric(&h.metricsCache.System, "cluster", "subscriptions", float64(subscriptions), now)
+	h.appendMetric(&cache.System, "cluster", "connections", float64(connz.TotalConnections()), now)
+	h.appendMetric(&cache.System, "cluster", "subscriptions", float64(subscriptions), now)
 }
 
 func (h *MetricsHandler) requestServerMetric(subject string, payload any, target any) error {

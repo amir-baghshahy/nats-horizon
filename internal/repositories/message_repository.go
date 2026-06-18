@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/models"
+	"github.com/amir/nats-monitor/internal/models"
 )
 
 // NATSMessageRepository implements MessageRepository using NATS JetStream

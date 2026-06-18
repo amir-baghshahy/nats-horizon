@@ -1,99 +1,60 @@
-# Contributing to Nebula
+# Contributing to nats-monitor
 
-Thank you for your interest in contributing to Nebula!
+Thank you for your interest in contributing!
 
-## Project Status
+## Getting Started
 
-🚧 **We are currently in the Research & Design phase.**
+```bash
+# Clone the repository
+git clone https://github.com/amir/nats-monitor.git
+cd nats-monitor
 
-While we're not yet ready for code contributions, we welcome:
-- Feedback on the design and architecture
-- Ideas for features
-- Questions about NATS operations
-- Interest in early testing
+# Install all dependencies (Go + Node)
+make install
 
-## How to Contribute (When Development Starts)
+# Copy env and start a local NATS server (requires Docker)
+cp .env.example .env
+docker run -d --name nats -p 4222:4222 nats:latest -js
 
-### Reporting Issues
+# Start both backend and frontend in dev mode
+make dev
+```
 
-When reporting issues, please include:
-- NATS server version
-- Nebula version (if applicable)
+The backend runs at `http://localhost:3000` and the frontend at `http://localhost:5173`.
+
+## Running Tests
+
+```bash
+make test        # Go tests
+make fmt         # Format Go code
+cd web && npm run lint  # Frontend lint (zero warnings policy)
+```
+
+## Reporting Issues
+
+Please include:
+- NATS server version (`nats-server -v`)
 - Steps to reproduce
 - Expected vs. actual behavior
 - Relevant logs or screenshots
 
-### Suggesting Features
+## Submitting Pull Requests
 
-Feature suggestions should include:
-- Use case description
-- Why the feature matters
-- Proposed implementation (if you have ideas)
-- Examples from similar tools
+1. Fork the repo and create a branch from `main`
+2. Make your changes with tests where applicable
+3. Ensure `make test` and `npm run lint` pass
+4. Open a PR with a clear description
 
-### Submitting Pull Requests
+## Code Style
 
-When development begins, PRs should:
-1. Include tests for new functionality
-2. Pass all existing tests
-3. Follow Go best practices
-4. Update documentation as needed
-5. Have a clear description of changes
+- **Go:** follow [Effective Go](https://go.dev/doc/effective_go); use `gofmt`
+- **TypeScript:** ESLint config is enforced (zero warnings)
+- No comments that describe *what* the code does — only *why* when non-obvious
 
-## Code of Conduct
+## Architecture
 
-- Be respectful and constructive
-- Assume good intentions
-- Focus on what is best for the community
-- Show empathy towards other community members
-
-## Getting Started (Future)
-
-When development begins:
-
-```bash
-# Clone the repository
-git clone https://github.com/nebula/nats-monitoring.git
-
-# Navigate to the project
-cd nats-monitoring
-
-# Build the project
-make build
-
-# Run tests
-make test
-
-# Run the application
-./bin/nebula
-```
-
-## Development Guidelines
-
-### Go Style Guide
-- Follow [Effective Go](https://go.dev/doc/effective_go)
-- Use `gofmt` for formatting
-- Write self-documenting code
-- Comment non-obvious behavior
-
-### Testing
-- Aim for >70% code coverage
-- Write tests alongside code
-- Use table-driven tests where appropriate
-- Mock external dependencies
-
-### Documentation
-- Update README for user-facing changes
-- Document exported functions
-- Add examples for complex features
+See [CLAUDE.md](./CLAUDE.md) for a full description of the backend and frontend architecture.
 
 ## Questions?
 
-Join our discussion at:
-- GitHub Discussions: [Link to be added]
-- Discord: [Link to be added]
-- NATS Slack: #nebula channel (TBD)
-
----
-
-Thank you for your interest in Nebula!
+Open a [GitHub Discussion](https://github.com/amir/nats-monitor/discussions) or file an issue.

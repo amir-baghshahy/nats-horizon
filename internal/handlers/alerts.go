@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/dto"
+	"github.com/amir/nats-monitor/internal/dto"
 )
 
 // AlertSeverity represents the severity level of an alert
@@ -117,11 +117,13 @@ type CheckAlertsResponse struct {
 
 // checkAlerts evaluates all enabled alerts
 func (h *AlertsHandler) checkAlerts() (int, int) {
+	// Copy alert values (not pointers) under the read lock so the background
+	// goroutine and concurrent HTTP handlers cannot race on the same fields.
 	h.mu.RLock()
-	alerts := make([]*Alert, 0, len(h.alerts))
+	snapshots := make([]Alert, 0, len(h.alerts))
 	for _, alert := range h.alerts {
 		if alert.Enabled {
-			alerts = append(alerts, alert)
+			snapshots = append(snapshots, *alert)
 		}
 	}
 	h.mu.RUnlock()
@@ -129,7 +131,8 @@ func (h *AlertsHandler) checkAlerts() (int, int) {
 	now := time.Now()
 	evaluated := 0
 	triggeredCount := 0
-	for _, alert := range alerts {
+	for i := range snapshots {
+		alert := &snapshots[i]
 		// Check cooldown
 		if !alert.LastTrigger.IsZero() && now.Sub(alert.LastTrigger) < alert.Cooldown {
 			continue

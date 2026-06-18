@@ -1,6 +1,6 @@
 package constants
 
-import "fmt"
+import "time"
 
 const (
 	APIStreamList   = "$JS.API.STREAM.LIST"
@@ -15,16 +15,9 @@ const (
 	APIConsumerCreate = "$JS.API.CONSUMER.CREATE"
 	APIConsumerUpdate = "$JS.API.CONSUMER.UPDATE"
 	APIConsumerDelete = "$JS.API.CONSUMER.DURABLE.DELETE"
-
-	APIAckPattern = "$JS.ACK.%s.%s.%d"
 )
 
-func GetAPIAckSubject(streamName, consumerName string, sequence uint64) string {
-	return fmt.Sprintf(APIAckPattern, streamName, consumerName, sequence)
-}
-
-// SSE intervals (values are in nanoseconds)
 const (
-	SSEKeepaliveInterval = 30 * Second
-	SSEStatsInterval     = 5 * Second
+	SSEKeepaliveInterval time.Duration = 30 * time.Second
+	SSEStatsInterval     time.Duration = 5 * time.Second
 )

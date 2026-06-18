@@ -11,7 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/dto"
+	"github.com/amir/nats-monitor/internal/dto"
 )
 
 // SSEEvent represents a Server-Sent Event
@@ -27,6 +27,7 @@ type SSEClient struct {
 	Channel string
 	Writer  http.ResponseWriter
 	Flusher http.Flusher
+	mu      sync.Mutex
 }
 
 // SSEHub manages SSE client connections
@@ -112,8 +113,10 @@ func (h *SSEHub) Broadcast(channel string, event SSEEvent) {
 		case <-h.ctx.Done():
 			return
 		default:
+			client.mu.Lock()
 			fmt.Fprintf(client.Writer, "data: %s\n\n", data)
 			client.Flusher.Flush()
+			client.mu.Unlock()
 		}
 	}
 }
@@ -332,13 +335,12 @@ func (h *SSEHub) HandleSSE(c *gin.Context) {
 	flusher.Flush()
 
 	// Send keepalive comments
-	notify := c.Writer.CloseNotify()
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
-		case <-notify:
+		case <-c.Request.Context().Done():
 			return
 		case <-h.ctx.Done():
 			return

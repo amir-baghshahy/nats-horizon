@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	"nats-monitoring/internal/constants"
-	"nats-monitoring/internal/models"
+	"github.com/amir/nats-monitor/internal/constants"
+	"github.com/amir/nats-monitor/internal/models"
 
 	"github.com/nats-io/nats.go"
 )

@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"nats-monitoring/internal/dto"
-	"nats-monitoring/internal/services"
-	"nats-monitoring/internal/utils"
+	"github.com/amir/nats-monitor/internal/dto"
+	"github.com/amir/nats-monitor/internal/services"
+	"github.com/amir/nats-monitor/internal/utils"
 )
 
 // StreamHandler handles HTTP requests for streams

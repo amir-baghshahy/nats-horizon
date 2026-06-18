@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/dto"
+	"github.com/amir/nats-monitor/internal/dto"
 )
 
 // KVHandler handles KV store operations

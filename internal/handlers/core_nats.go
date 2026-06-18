@@ -12,8 +12,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/constants"
-	"nats-monitoring/internal/dto"
+	"github.com/amir/nats-monitor/internal/constants"
+	"github.com/amir/nats-monitor/internal/dto"
 )
 
 // CoreNATShandler handles Core NATS (non-JetStream) operations

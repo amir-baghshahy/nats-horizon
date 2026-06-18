@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"nats-monitoring/internal/constants"
-	"nats-monitoring/internal/dto"
-	"nats-monitoring/internal/models"
-	"nats-monitoring/internal/services"
+	"github.com/amir/nats-monitor/internal/constants"
+	"github.com/amir/nats-monitor/internal/dto"
+	"github.com/amir/nats-monitor/internal/models"
+	"github.com/amir/nats-monitor/internal/services"
 
 	"github.com/gin-gonic/gin"
 )

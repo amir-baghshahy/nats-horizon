@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/nats-io/nats.go"
-	"nats-monitoring/internal/constants"
-	"nats-monitoring/internal/models"
-	"nats-monitoring/internal/utils"
+	"github.com/amir/nats-monitor/internal/constants"
+	"github.com/amir/nats-monitor/internal/models"
+	"github.com/amir/nats-monitor/internal/utils"
 )
 
 // NATSConsumerRepository implements ConsumerRepository using NATS JetStream
@@ -234,72 +234,94 @@ func (r *NATSConsumerRepository) toNATSConsumerConfig(consumer *models.Consumer)
 	}
 }
 
-// AckMessage acknowledges a message
+// AckMessage acknowledges a message by fetching it from the stream and sending
+// the ack to the real reply-to address embedded in the delivered message.
+// Constructing the ack subject manually from stream/consumer/seq does not work —
+// the real reply-to contains additional fields (delivery count, timestamps, domain).
 func (r *NATSConsumerRepository) AckMessage(ctx context.Context, streamName, consumerName string, sequence uint64) error {
-	ackSubject := fmt.Sprintf("$JS.ACK.%s.%s.%d", streamName, consumerName, sequence)
-	return r.nc.Publish(ackSubject, nil)
+	return r.sendAck(ctx, streamName, consumerName, sequence, nil)
 }
 
-// NackMessage negative acknowledges a message
+// NackMessage negative-acknowledges a message so NATS redelivers it.
 func (r *NATSConsumerRepository) NackMessage(ctx context.Context, streamName, consumerName string, sequence uint64) error {
-	// Negative acknowledgment is done by publishing -NA to the ack subject
-	ackSubject := fmt.Sprintf("$JS.ACK.%s.%s.%d", streamName, consumerName, sequence)
-	return r.nc.Publish(ackSubject, []byte("-NA"))
+	return r.sendAck(ctx, streamName, consumerName, sequence, []byte("-NA"))
 }
 
-// TerminateMessage terminates a message
+// TerminateMessage terminates a message so NATS stops redelivering it.
 func (r *NATSConsumerRepository) TerminateMessage(ctx context.Context, streamName, consumerName string, sequence uint64) error {
-	// Termination is done by publishing +TERM to the ack subject
-	ackSubject := fmt.Sprintf("$JS.ACK.%s.%s.%d", streamName, consumerName, sequence)
-	return r.nc.Publish(ackSubject, []byte("+TERM"))
+	return r.sendAck(ctx, streamName, consumerName, sequence, []byte("+TERM"))
 }
 
-// GetPendingMessages returns pending messages for a consumer
+// sendAck fetches the message at sequence from the stream, then publishes payload
+// to msg.Reply (the real JetStream ack subject embedded in the delivered message).
+func (r *NATSConsumerRepository) sendAck(ctx context.Context, streamName, consumerName string, sequence uint64, payload []byte) error {
+	// Create a temporary ephemeral consumer starting at the target sequence
+	// so we can retrieve the delivered message and its real reply-to address.
+	ephemeralCfg := &nats.ConsumerConfig{
+		DeliverPolicy: nats.DeliverByStartSequencePolicy,
+		OptStartSeq:   sequence,
+		AckPolicy:     nats.AckExplicitPolicy,
+		MaxDeliver:    1,
+	}
+	info, err := r.js.AddConsumer(streamName, ephemeralCfg)
+	if err != nil {
+		return fmt.Errorf("failed to create ephemeral consumer for ack: %w", err)
+	}
+	defer r.js.DeleteConsumer(streamName, info.Name)
+
+	sub, err := r.js.PullSubscribe("", info.Name, nats.Bind(streamName, info.Name))
+	if err != nil {
+		return fmt.Errorf("failed to subscribe to ephemeral consumer: %w", err)
+	}
+	defer sub.Unsubscribe()
+
+	msgs, err := sub.Fetch(1, nats.MaxWait(3*time.Second))
+	if err != nil || len(msgs) == 0 {
+		return fmt.Errorf("message sequence %d not found in stream %s", sequence, streamName)
+	}
+
+	msg := msgs[0]
+	if msg.Reply == "" {
+		return fmt.Errorf("message has no reply-to address; cannot ack")
+	}
+	return r.nc.Publish(msg.Reply, payload)
+}
+
+// GetPendingMessages returns pending messages for a consumer without affecting
+// the consumer's delivery state. It reads messages directly from the stream
+// using GetMsg, starting from the consumer's AckFloor sequence.
 func (r *NATSConsumerRepository) GetPendingMessages(ctx context.Context, streamName, consumerName string, limit int) ([]*models.Message, error) {
 	info, err := r.js.ConsumerInfo(streamName, consumerName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get consumer info: %w", err)
 	}
 
-	if info.Config.DeliverSubject != "" {
-		return nil, fmt.Errorf("cannot get pending messages for push consumers")
+	if limit <= 0 || limit > 100 {
+		limit = 100
 	}
 
-	// Get pending messages
-
-	sub, err := r.js.PullSubscribe(info.Config.FilterSubject, info.Name)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create pull subscription: %w", err)
-	}
-	defer sub.Unsubscribe()
+	startSeq := info.AckFloor.Stream + 1
+	lastSeq := info.NumPending + info.AckFloor.Stream
 
 	messages := make([]*models.Message, 0, limit)
-	fetched := 0
-
-	for fetched < limit && fetched < int(info.NumPending) {
-		msg, err := sub.NextMsg(2 * time.Second)
+	for seq := startSeq; seq <= lastSeq && len(messages) < limit; seq++ {
+		raw, err := r.js.GetMsg(streamName, seq)
 		if err != nil {
-			break // No more messages or timeout
-		}
-
-		meta, err := msg.Metadata()
-		if err != nil {
-			continue // Skip messages without metadata
+			continue
 		}
 
 		headers := make(map[string][]string)
-		for k, v := range msg.Header {
+		for k, v := range raw.Header {
 			headers[k] = v
 		}
 
 		messages = append(messages, &models.Message{
-			Subject:   msg.Subject,
-			Sequence:  meta.Sequence.Stream,
-			Data:      msg.Data,
+			Subject:   raw.Subject,
+			Sequence:  raw.Sequence,
+			Data:      raw.Data,
 			Headers:   headers,
-			Timestamp: meta.Timestamp,
+			Timestamp: raw.Time,
 		})
-		fetched++
 	}
 
 	return messages, nil

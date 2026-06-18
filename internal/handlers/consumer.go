@@ -3,11 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"nats-monitoring/internal/constants"
-	"nats-monitoring/internal/dto"
-	"nats-monitoring/internal/models"
-	usecase "nats-monitoring/internal/services"
-	"nats-monitoring/internal/utils"
+	"github.com/amir/nats-monitor/internal/constants"
+	"github.com/amir/nats-monitor/internal/dto"
+	"github.com/amir/nats-monitor/internal/models"
+	usecase "github.com/amir/nats-monitor/internal/services"
+	"github.com/amir/nats-monitor/internal/utils"
 	"net/http"
 	"strconv"
 	"sync"
@@ -688,10 +688,7 @@ func (h *ConsumerHandler) AckMessage(c *gin.Context) {
 		return
 	}
 
-	subject := fmt.Sprintf("$JS.ACK.%s.%s.%d", streamName, consumerName, req.Sequence)
-	ackPayload := fmt.Sprintf(`{"stream":"%s","consumer":"%s","seq":%d}`, streamName, consumerName, req.Sequence)
-
-	if err := h.nc.Publish(subject, []byte(ackPayload)); err != nil {
+	if err := h.useCase.AckMessage(c.Request.Context(), streamName, consumerName, req.Sequence); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 			Error:   "Failed to acknowledge message",
 			Details: err.Error(),
@@ -730,20 +727,7 @@ func (h *ConsumerHandler) NackMessage(c *gin.Context) {
 		return
 	}
 
-	nakPayload := map[string]interface{}{
-		"stream":   streamName,
-		"consumer": consumerName,
-		"seq":      req.Sequence,
-		"nak":      true,
-	}
-	if req.Delay > 0 {
-		nakPayload["delay"] = req.Delay * 1_000_000_000 // Convert to nanoseconds
-	}
-
-	subject := fmt.Sprintf("$JS.ACK.%s.%s.%d", streamName, consumerName, req.Sequence)
-	ackJSON, _ := json.Marshal(nakPayload)
-
-	if err := h.nc.Publish(subject, ackJSON); err != nil {
+	if err := h.useCase.NackMessage(c.Request.Context(), streamName, consumerName, req.Sequence); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 			Error:   "Failed to negatively acknowledge message",
 			Details: err.Error(),
@@ -779,17 +763,7 @@ func (h *ConsumerHandler) AckTermMessage(c *gin.Context) {
 		return
 	}
 
-	termPayload := map[string]interface{}{
-		"stream":   streamName,
-		"consumer": consumerName,
-		"seq":      req.Sequence,
-		"term":     true,
-	}
-
-	subject := fmt.Sprintf("$JS.ACK.%s.%s.%d", streamName, consumerName, req.Sequence)
-	ackJSON, _ := json.Marshal(termPayload)
-
-	if err := h.nc.Publish(subject, ackJSON); err != nil {
+	if err := h.useCase.TerminateMessage(c.Request.Context(), streamName, consumerName, req.Sequence); err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 			Error:   "Failed to terminate message",
 			Details: err.Error(),

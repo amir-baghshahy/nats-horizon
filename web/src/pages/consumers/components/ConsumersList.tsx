@@ -1,4 +1,4 @@
-import type { github_com_amir_nats_monitor_internal_dto_ConsumerResponse as Consumer } from "../../../types";
+import type { github_com_amir_baghshahy_nats_monitor_internal_dto_ConsumerResponse as Consumer } from "../../../types";
 import ConsumerRow from "./ConsumerRow";
 
 interface ConsumersListProps {

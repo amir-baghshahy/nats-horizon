@@ -6,9 +6,9 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query";
 import type {
-  github_com_amir_nats_monitor_internal_dto_CreateStreamRequest as CreateStreamRequest,
-  github_com_amir_nats_monitor_internal_dto_StreamResponse as Stream,
-  github_com_amir_nats_monitor_internal_dto_StreamResponse as StreamResponse,
+  github_com_amir_baghshahy_nats_monitor_internal_dto_CreateStreamRequest as CreateStreamRequest,
+  github_com_amir_baghshahy_nats_monitor_internal_dto_StreamResponse as Stream,
+  github_com_amir_baghshahy_nats_monitor_internal_dto_StreamResponse as StreamResponse,
 } from "../../../types";
 import { ExportService, StreamsService } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";

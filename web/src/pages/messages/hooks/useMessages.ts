@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MessagesService, StreamsService } from "../../../types";
-import type { github_com_amir_nats_monitor_internal_dto_StreamResponse as Stream } from "../../../types";
+import type { github_com_amir_baghshahy_nats_monitor_internal_dto_StreamResponse as Stream } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { useToast } from "../../../components/Toast";
 import { useSSE } from "../../../hooks/useSSE";
@@ -83,7 +83,7 @@ export function useMessages(): UseMessagesReturn {
   const { data: messagesData, isLoading, refetch } = useQuery({
     queryKey: ["messages", selectedStream, currentPage, messagesPerPage],
     queryFn: () =>
-      MessagesService.getMessagesPage(selectedStream, currentPage, messagesPerPage) as unknown as Promise<{ messages: any[]; total: number }>,
+      MessagesService.getMessagesPage(selectedStream, currentPage, messagesPerPage),
     enabled: !!selectedStream,
   });
 

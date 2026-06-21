@@ -5,7 +5,7 @@ import StreamsHeader from "./components/StreamsHeader";
 import StreamsList from "./components/StreamsList";
 import StreamsStats from "./components/StreamsStats";
 import CreateStreamModal from "./components/CreateStreamModal";
-import type { github_com_amir_nats_monitor_internal_dto_CreateStreamRequest as CreateStreamRequest } from "../../types";
+import type { github_com_amir_baghshahy_nats_monitor_internal_dto_CreateStreamRequest as CreateStreamRequest } from "../../types";
 
 export default function StreamsPage() {
   const navigate = useNavigate();

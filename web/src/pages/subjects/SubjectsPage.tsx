@@ -1,4 +1,4 @@
-import type { github_com_amir_nats_monitor_internal_dto_SubjectInfo as SubjectInfo } from '../../types'
+import type { github_com_amir_baghshahy_nats_monitor_internal_dto_SubjectInfo as SubjectInfo } from '../../types'
 import { UseSubjectsReturn } from './hooks/useSubjects'
 import {
   Search, RefreshCw, ChevronRight, ChevronDown,

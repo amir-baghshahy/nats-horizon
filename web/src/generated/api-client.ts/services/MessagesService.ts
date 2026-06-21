@@ -2,31 +2,36 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { github_com_amir_nats_monitor_internal_dto_PublishMessageRequest } from '../models/github_com_amir_nats_monitor_internal_dto_PublishMessageRequest';
-import type { github_com_amir_nats_monitor_internal_dto_SuccessResponse } from '../models/github_com_amir_nats_monitor_internal_dto_SuccessResponse';
+import type { github_com_amir_baghshahy_nats_monitor_internal_dto_PaginatedMessagesResponse } from '../models/github_com_amir_baghshahy_nats_monitor_internal_dto_PaginatedMessagesResponse';
+import type { github_com_amir_baghshahy_nats_monitor_internal_dto_PublishMessageRequest } from '../models/github_com_amir_baghshahy_nats_monitor_internal_dto_PublishMessageRequest';
+import type { github_com_amir_baghshahy_nats_monitor_internal_dto_StreamMessagesResponse } from '../models/github_com_amir_baghshahy_nats_monitor_internal_dto_StreamMessagesResponse';
+import type { github_com_amir_baghshahy_nats_monitor_internal_dto_SuccessResponse } from '../models/github_com_amir_baghshahy_nats_monitor_internal_dto_SuccessResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class MessagesService {
     /**
      * Get stream messages
-     * Lists messages from a stream. This endpoint currently returns 501 until message retrieval is implemented.
+     * Lists messages from a stream
      * @param stream Stream name
-     * @returns void
+     * @param limit Maximum number of messages to return
+     * @returns github_com_amir_baghshahy_nats_monitor_internal_dto_StreamMessagesResponse OK
      * @throws ApiError
      */
     public static getMessages(
         stream: string,
-    ): CancelablePromise<void> {
+        limit: number = 25,
+    ): CancelablePromise<github_com_amir_baghshahy_nats_monitor_internal_dto_StreamMessagesResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/messages',
             query: {
                 'stream': stream,
+                'limit': limit,
             },
             errors: {
                 400: `Bad Request`,
-                501: `Not Implemented`,
+                500: `Internal Server Error`,
             },
         });
     }
@@ -36,14 +41,14 @@ export class MessagesService {
      * @param stream Stream name
      * @param page Page number
      * @param pageSize Page size
-     * @returns void
+     * @returns github_com_amir_baghshahy_nats_monitor_internal_dto_PaginatedMessagesResponse OK
      * @throws ApiError
      */
     public static getMessagesPage(
         stream: string,
         page: number = 1,
         pageSize: number = 25,
-    ): CancelablePromise<void> {
+    ): CancelablePromise<github_com_amir_baghshahy_nats_monitor_internal_dto_PaginatedMessagesResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/messages/page',
@@ -54,6 +59,7 @@ export class MessagesService {
             },
             errors: {
                 400: `Bad Request`,
+                404: `Not Found`,
                 500: `Internal Server Error`,
             },
         });
@@ -62,13 +68,13 @@ export class MessagesService {
      * Publish a message to a stream
      * @param name Stream name
      * @param requestBody Message to publish
-     * @returns github_com_amir_nats_monitor_internal_dto_SuccessResponse OK
+     * @returns github_com_amir_baghshahy_nats_monitor_internal_dto_SuccessResponse OK
      * @throws ApiError
      */
     public static postStreamsMessagesPublish(
         name: string,
-        requestBody: github_com_amir_nats_monitor_internal_dto_PublishMessageRequest,
-    ): CancelablePromise<github_com_amir_nats_monitor_internal_dto_SuccessResponse> {
+        requestBody: github_com_amir_baghshahy_nats_monitor_internal_dto_PublishMessageRequest,
+    ): CancelablePromise<github_com_amir_baghshahy_nats_monitor_internal_dto_SuccessResponse> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/streams/{name}/messages/publish',
@@ -87,13 +93,13 @@ export class MessagesService {
      * Delete a message from a stream
      * @param name Stream name
      * @param sequence Message sequence number
-     * @returns github_com_amir_nats_monitor_internal_dto_SuccessResponse OK
+     * @returns github_com_amir_baghshahy_nats_monitor_internal_dto_SuccessResponse OK
      * @throws ApiError
      */
     public static deleteStreamsMessages(
         name: string,
         sequence: string,
-    ): CancelablePromise<github_com_amir_nats_monitor_internal_dto_SuccessResponse> {
+    ): CancelablePromise<github_com_amir_baghshahy_nats_monitor_internal_dto_SuccessResponse> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/streams/{name}/messages/{sequence}',

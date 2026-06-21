@@ -6,7 +6,7 @@ import {
   Pause,
   Play,
 } from "lucide-react";
-import type { github_com_amir_nats_monitor_internal_dto_ConsumerResponse as Consumer } from "../../../types";
+import type { github_com_amir_baghshahy_nats_monitor_internal_dto_ConsumerResponse as Consumer } from "../../../types";
 
 interface ConsumerRowProps {
   consumer: Consumer;

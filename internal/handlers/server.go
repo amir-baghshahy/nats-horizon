@@ -173,12 +173,14 @@ func (h *ServerHandler) GetSubjects(c *gin.Context) {
 
 // GetMessages returns messages from a stream
 // @Summary Get stream messages
-// @Description Lists messages from a stream. This endpoint currently returns 501 until message retrieval is implemented.
+// @Description Lists messages from a stream
 // @Tags messages
 // @Produce json
 // @Param stream query string true "Stream name"
+// @Param limit query int false "Maximum number of messages to return" default(25)
+// @Success 200 {object} dto.StreamMessagesResponse
 // @Failure 400 {object} dto.ErrorResponse
-// @Failure 501 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /messages [get]
 func (h *ServerHandler) GetMessages(c *gin.Context) {
 	stream := c.Query("stream")
@@ -223,7 +225,9 @@ func (h *ServerHandler) GetMessages(c *gin.Context) {
 // @Param stream query string true "Stream name"
 // @Param page query int false "Page number" default(1)
 // @Param page_size query int false "Page size" default(25)
+// @Success 200 {object} dto.PaginatedMessagesResponse
 // @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /messages/page [get]
 func (h *ServerHandler) GetStreamMessagesByPage(c *gin.Context) {
@@ -386,7 +390,7 @@ func (h *ServerHandler) GetRateMetrics(c *gin.Context) {
 // @Produce json
 // @Param id path string true "Connection ID"
 // @Success 200 {object} dto.SuccessResponse
-// @Failure 501 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
 // @Router /connections/{id} [delete]
 func (h *ServerHandler) TerminateConnection(c *gin.Context) {
 	id := c.Param("id")

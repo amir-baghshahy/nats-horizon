@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
-  github_com_amir_nats_monitor_internal_dto_ConsumerResponse as Consumer,
-  github_com_amir_nats_monitor_internal_dto_StreamResponse as Stream,
+  github_com_amir_baghshahy_nats_monitor_internal_dto_ConsumerResponse as Consumer,
+  github_com_amir_baghshahy_nats_monitor_internal_dto_StreamResponse as Stream,
 } from "../../../types";
 import { ConsumersService, StreamsService } from "../../../types";
 import { useSSE } from "../../../hooks/useSSE";

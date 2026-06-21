@@ -1,60 +1,86 @@
-# Contributing to nats-monitor
+# Contributing to nats-monitoring
 
-Thank you for your interest in contributing!
+Thank you for your interest in contributing! This document will help you get started.
 
-## Getting Started
+## Code of Conduct
+
+- Be respectful and inclusive
+- Welcome newcomers and help them get started
+- Focus on constructive feedback
+
+## How to Contribute
+
+### Reporting Bugs
+
+Open an issue with:
+1. A clear, descriptive title
+2. Steps to reproduce
+3. Expected vs actual behavior
+4. Environment details (OS, NATS version, Docker version if applicable)
+
+### Suggesting Features
+
+Open an issue with:
+1. A clear description of the problem you're solving
+2. Your proposed solution
+3. Any alternatives you've considered
+
+### Pull Requests
+
+1. Fork the repo
+2. Create a branch (`git checkout -b feature/my-feature`)
+3. Make your changes
+4. Run tests and lint:
+   ```bash
+   go fmt ./...
+   npm run lint
+   npm run build
+   ```
+5. Commit with [Conventional Commits](https://www.conventionalcommits.org/):
+   - `feat:` — new feature
+   - `fix:` — bug fix
+   - `docs:` — documentation
+   - `refactor:` — code change
+   - `test:` — adding tests
+   - `chore:` — maintenance
+6. Push and open a PR
+
+## Development Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/amir/nats-monitor.git
-cd nats-monitor
-
-# Install all dependencies (Go + Node)
+git clone https://github.com/amir/nats-monitoring.git
+cd nats-monitoring
 make install
-
-# Copy env and start a local NATS server (requires Docker)
-cp .env.example .env
-docker run -d --name nats -p 4222:4222 nats:latest -js
-
-# Start both backend and frontend in dev mode
 make dev
 ```
 
-The backend runs at `http://localhost:3000` and the frontend at `http://localhost:5173`.
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3000
+- API docs: http://localhost:3000/swagger/index.html
 
-## Running Tests
+## Commit Message Format
 
-```bash
-make test        # Go tests
-make fmt         # Format Go code
-cd web && npm run lint  # Frontend lint (zero warnings policy)
+```
+type(scope): description
+
+[optional body]
 ```
 
-## Reporting Issues
+Examples:
+- `feat(streams): add stream creation wizard`
+- `fix(consumer): resolve lag calculation edge case`
+- `docs(readme): add installation instructions for Windows`
 
-Please include:
-- NATS server version (`nats-server -v`)
-- Steps to reproduce
-- Expected vs. actual behavior
-- Relevant logs or screenshots
+---
 
-## Submitting Pull Requests
 
-1. Fork the repo and create a branch from `main`
-2. Make your changes with tests where applicable
-3. Ensure `make test` and `npm run lint` pass
-4. Open a PR with a clear description
 
-## Code Style
+## 🙏 Inspired By
 
-- **Go:** follow [Effective Go](https://go.dev/doc/effective_go); use `gofmt`
-- **TypeScript:** ESLint config is enforced (zero warnings)
-- No comments that describe *what* the code does — only *why* when non-obvious
+These projects set the standard for what a messaging dashboard should look and feel like:
 
-## Architecture
-
-See [CLAUDE.md](./CLAUDE.md) for a full description of the backend and frontend architecture.
-
-## Questions?
-
-Open a [GitHub Discussion](https://github.com/amir/nats-monitor/discussions) or file an issue.
+- [Grafana](https://grafana.com/) — The gold standard for observability dashboards
+- [Redpanda Console](https://github.com/redpanda-data/console) — Beautiful Kafka UI, design reference
+- [AKHQ](https://akhq.io/) — Comprehensive Kafka management, feature inspiration
+- [nats-nui](https://github.com/nats-nui/nui) — Fastest NATS UI, benchmark for performance
+- [nats-console](https://github.com/KLogicHQ/nats-console) — Most feature-rich, target to beat on simplicity

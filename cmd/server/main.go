@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -29,8 +30,8 @@ import (
 // @contact.name NATS Monitoring Project
 // @contact.url http://github.com/nats-monitoring
 
-// @license.name MIT
-// @license.url https://opensource.org/licenses/MIT
+// @license.name Apache-2.0
+// @license.url https://opensource.org/licenses/Apache-2.0
 
 // @BasePath /api
 // @schemes http https
@@ -307,12 +308,16 @@ func main() {
 	})
 
 	srv := &http.Server{
-		Addr:    ":" + cfg.ServerPort,
+		Addr:    fmt.Sprintf(":%d", cfg.ResolvedPort),
 		Handler: r,
 	}
 
+	if cfg.ServerPort != strconv.Itoa(cfg.ResolvedPort) {
+		log.Printf("Port %s was busy, using random port %d instead", cfg.ServerPort, cfg.ResolvedPort)
+	}
+	log.Printf("Server starting on http://localhost:%d", cfg.ResolvedPort)
+
 	go func() {
-		log.Printf("Server starting on http://localhost:%s", cfg.ServerPort)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed: %v", err)
 		}

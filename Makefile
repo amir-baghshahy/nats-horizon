@@ -1,63 +1,84 @@
-.PHONY: dev dev-backend dev-frontend build clean test fmt deps openapi
+.PHONY: dev dev-backend dev-frontend build clean test fmt deps openapi docker-build docker-run install-binary
 
-# Run both backend and frontend in development
+# ── Development ─────────────────────────────────────────────────────────────
+
 dev:
-	@echo "Starting backend and frontend..."
+	@echo "Starting backend (:3000) and frontend (:5173)..."
 	@make dev-backend & make dev-frontend
 
-# Run Go backend
 dev-backend:
 	@echo "Starting backend on :3000..."
 	@go run cmd/server/main.go
 
-# Run React frontend dev server
 dev-frontend:
 	@echo "Starting frontend on :5173..."
 	@cd web && npm run dev
 
-# Build frontend for production
+# ── Production ──────────────────────────────────────────────────────────────
+
+build: build-frontend build-backend
+
 build-frontend:
 	@echo "Building frontend..."
 	@cd web && npm run build
 
-# Run backend with built frontend
-run:
-	@make build-frontend
+build-backend:
+	@echo "Building backend..."
+	@go build -o out/server ./cmd/server
+
+run: build-frontend
 	@echo "Starting server with built frontend..."
 	@go run cmd/server/main.go
 
-# Install dependencies
+# ── Dependencies ─────────────────────────────────────────────────────────────
+
 install:
-	@echo "Installing Go dependencies..."
+	@echo "Installing dependencies..."
 	@go mod download
-	@echo "Installing npm dependencies..."
 	@cd web && npm install
 
-# Clean build artifacts
+deps:
+	@go mod download && go mod tidy
+
 clean:
 	@echo "Cleaning..."
-	@rm -rf web/dist
-	@rm -rf web/node_modules
+	@rm -rf out web/dist web/node_modules
 
-# Run tests
 test:
 	@echo "Running tests..."
 	@go test ./...
 
-# Format Go code
 fmt:
 	@echo "Formatting Go code..."
 	@go fmt ./...
 
-# Generate a single canonical OpenAPI 3.1 spec
 openapi:
-	@echo "Generating OpenAPI 3.1 spec..."
+	@echo "Generating OpenAPI spec..."
 	@swag init -g cmd/server/main.go -o api/swagger --parseDependency --parseInternal -ot go,json
 	@go run cmd/openapi3gen/main.go
 	@rm -f api/swagger/swagger.json api/swagger/swagger.yaml api/swagger/openapi.yaml
 
-# Download Go dependencies
-deps:
-	@echo "Downloading Go dependencies..."
-	@go mod download
-	@go mod tidy
+# ── Docker ──────────────────────────────────────────────────────────────────
+
+docker-build:
+	@echo "Building Docker image..."
+	@docker build -t nats-monitoring .
+
+docker-run:
+	@echo "Starting with Docker Compose..."
+	@docker compose up
+
+docker-run-detached:
+	@docker compose up -d
+
+docker-stop:
+	@docker compose down
+
+docker-logs:
+	@docker compose logs -f
+
+# ── Binary Release ──────────────────────────────────────────────────────────
+
+install-binary:
+	@echo "Downloading latest nats-monitoring binary..."
+	@bash install.sh

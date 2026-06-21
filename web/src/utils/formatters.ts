@@ -4,14 +4,16 @@
 export const formatBytes = (bytes: number): string => {
   if (!bytes || bytes === 0) return "0 B";
 
-  const units = ["B", "KB", "MB", "GB", "TB"];
+  const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
   const threshold = 1024;
-  const index = Math.floor(Math.log(bytes) / Math.log(threshold));
+  const index = Math.min(
+    Math.floor(Math.log(bytes) / Math.log(threshold)),
+    units.length - 1,
+  );
 
   const value = bytes / Math.pow(threshold, index);
   const unit = units[index];
 
-  // Format with appropriate precision
   if (index === 0) return `${bytes} B`;
   return `${value.toFixed(1)} ${unit}`;
 };

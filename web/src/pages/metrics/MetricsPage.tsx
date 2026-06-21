@@ -33,15 +33,39 @@ function Sparkline({
         style={{ width, height }}
         className="flex items-center justify-center text-dark-muted text-xs"
       >
-        No data
+        Collecting data...
       </div>
     )
   }
 
   const values = data.map((point) => point.value || 0)
+
+  if (values.every((v) => v === 0)) {
+    return (
+      <div
+        style={{ width, height }}
+        className="flex items-center justify-center text-dark-muted text-xs"
+      >
+        No activity
+      </div>
+    )
+  }
+
   const min = Math.min(...values)
   const max = Math.max(...values)
   const range = max - min || 1
+
+  if (data.length === 1) {
+    const x = width / 2
+    const y = height - ((values[0] - min) / range) * height
+    const cy = Math.max(4, Math.min(height - 4, y))
+    return (
+      <svg width={width} height={height} className="overflow-visible">
+        <line x1={0} y1={cy} x2={width} y2={cy} stroke={color} strokeWidth="1" strokeDasharray="4 3" opacity="0.4" />
+        <circle cx={x} cy={cy} r="4" fill={color} opacity="0.9" />
+      </svg>
+    )
+  }
 
   const points = values
     .map((value, index) => {
@@ -50,16 +74,6 @@ function Sparkline({
       return `${x},${y}`
     })
     .join(' ')
-
-  if (data.length === 1) {
-    const x = width / 2
-    const y = height - ((values[0] - min) / range) * height
-    return (
-      <svg width={width} height={height} className="overflow-visible">
-        <circle cx={x} cy={y} r="3" fill={color} />
-      </svg>
-    )
-  }
 
   return (
     <svg width={width} height={height} className="overflow-visible">
@@ -219,8 +233,11 @@ export default function MetricsPage({
                 {formatBytes(systemMetrics?.memory?.used || 0)}
               </p>
               <p className="text-xs text-dark-muted">
-                {systemMetrics?.memory?.usage || 0}% of{' '}
-                {formatBytes(systemMetrics?.memory?.max || 0)}
+                {systemMetrics?.memory?.max
+                  ? `${systemMetrics.memory.usage || 0}% of ${formatBytes(systemMetrics.memory.max)}`
+                  : systemMetrics?.memory?.usage !== undefined
+                    ? `${systemMetrics.memory.usage}% — Unlimited`
+                    : 'Unlimited'}
               </p>
             </div>
             <div className="rounded-xl bg-dark-bg/50 p-4">
@@ -229,8 +246,11 @@ export default function MetricsPage({
                 {formatBytes(systemMetrics?.storage?.used || 0)}
               </p>
               <p className="text-xs text-dark-muted">
-                {systemMetrics?.storage?.usage || 0}% of{' '}
-                {formatBytes(systemMetrics?.storage?.max || 0)}
+                {systemMetrics?.storage?.max
+                  ? `${systemMetrics.storage.usage || 0}% of ${formatBytes(systemMetrics.storage.max)}`
+                  : systemMetrics?.storage?.usage !== undefined
+                    ? `${systemMetrics.storage.usage}% — Unlimited`
+                    : 'Unlimited'}
               </p>
             </div>
             <div className="rounded-xl bg-dark-bg/50 p-4">
@@ -312,59 +332,61 @@ export default function MetricsPage({
           <div className="overflow-y-auto scrollbar-thin flex-1 p-4">
             <div className="grid gap-6 lg:grid-cols-2">
               {streamNames.map((streamName) => {
-          const messageSeries = getSeries(metrics, streamName, 'messages')
-          const bytesSeries = getSeries(metrics, streamName, 'bytes')
-          const messages = getLatestValue(messageSeries)
-          const bytes = getLatestValue(bytesSeries)
-          const messageTrend = getTrend(messageSeries)
+                const messageSeries = getSeries(metrics, streamName, 'messages')
+                const bytesSeries = getSeries(metrics, streamName, 'bytes')
+                const messages = getLatestValue(messageSeries)
+                const bytes = getLatestValue(bytesSeries)
+                const messageTrend = getTrend(messageSeries)
 
-          return (
-            <div key={streamName} className="card">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4 text-primary-400" />
-                  {streamName}
-                </h3>
-                <div className="flex items-center gap-2 text-sm">
-                  {messageTrend !== 0 && (
-                    <span
-                      className={`flex items-center gap-1 ${
-                        messageTrend > 0 ? 'text-green-400' : 'text-red-400'
-                      }`}
-                    >
-                      <TrendingUp className="h-3 w-3" />
-                      {Math.abs(messageTrend).toFixed(1)}%
-                    </span>
-                  )}
-                </div>
-              </div>
+                return (
+                  <div key={streamName} className="card">
+                    <div className="mb-4 flex items-center justify-between">
+                      <h3 className="font-semibold flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4 text-primary-400" />
+                        {streamName}
+                      </h3>
+                      <div className="flex items-center gap-2 text-sm">
+                        {messageTrend !== 0 && (
+                          <span
+                            className={`flex items-center gap-1 ${
+                              messageTrend > 0 ? 'text-green-400' : 'text-red-400'
+                            }`}
+                          >
+                            <TrendingUp className="h-3 w-3" />
+                            {Math.abs(messageTrend).toFixed(1)}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
-              <div className="space-y-4">
-                <div>
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm text-dark-muted">Messages</span>
-                    <span className="font-medium">{formatNumber(messages)}</span>
+                      <div key={`${streamName}-messages`} className="rounded-xl bg-dark-bg/50 p-4">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className="text-sm text-dark-muted whitespace-nowrap">Messages</span>
+                          <span className="font-medium tabular-nums whitespace-nowrap">{formatNumber(messages)}</span>
+                        </div>
+                        <Sparkline
+                          data={messageSeries?.data || []}
+                          color="rgb(59, 130, 246)"
+                          width={280}
+                          height={48}
+                        />
+                      </div>
+
+                      <div key={`${streamName}-bytes`} className="rounded-xl bg-dark-bg/50 p-4">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className="text-sm text-dark-muted whitespace-nowrap">Storage</span>
+                          <span className="font-medium tabular-nums whitespace-nowrap">{formatBytes(bytes)}</span>
+                        </div>
+                        <Sparkline
+                          data={bytesSeries?.data || []}
+                          color="rgb(16, 185, 129)"
+                          width={280}
+                          height={48}
+                        />
+                      </div>
                   </div>
-                  <Sparkline
-                    data={messageSeries?.data || []}
-                    color="rgb(59, 130, 246)"
-                  />
-                </div>
-
-                <div>
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm text-dark-muted">Storage</span>
-                    <span className="font-medium">{formatBytes(bytes)}</span>
-                  </div>
-                  <Sparkline
-                    data={bytesSeries?.data || []}
-                    color="rgb(16, 185, 129)"
-                  />
-                </div>
-              </div>
-            </div>
-          )
-        })}
+                )
+              })}
             </div>
           </div>
           <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">

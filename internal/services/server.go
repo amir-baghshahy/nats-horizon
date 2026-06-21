@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 	"time"
 
@@ -106,14 +107,23 @@ func (uc *ServerUseCase) GetAccountInfo(ctx context.Context) (*AccountInfo, erro
 		return nil, fmt.Errorf("failed to get account info: %w", err)
 	}
 
+	memoryMax := uint64(info.Limits.MaxMemory)
+	if isUnlimited(memoryMax) {
+		memoryMax = 0
+	}
+	storageMax := uint64(info.Limits.MaxStore)
+	if isUnlimited(storageMax) {
+		storageMax = 0
+	}
+
 	return &AccountInfo{
 		Memory:       info.Tier.Memory,
 		Storage:      info.Tier.Store,
 		Streams:      info.Tier.Streams,
 		Consumers:    info.Tier.Consumers,
 		Domain:       info.Domain,
-		MaxMemory:    uint64(info.Limits.MaxMemory),
-		MaxStorage:   uint64(info.Limits.MaxStore),
+		MaxMemory:    memoryMax,
+		MaxStorage:   storageMax,
 		MaxStreams:   info.Limits.MaxStreams,
 		MaxConsumers: info.Limits.MaxConsumers,
 	}, nil
@@ -447,6 +457,10 @@ type SystemMetrics struct {
 	Timestamp    int64
 }
 
+func isUnlimited(val uint64) bool {
+	return val == math.MaxUint64
+}
+
 // GetSystemMetrics returns system metrics
 func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, error) {
 	accountInfo, err := uc.js.AccountInfo()
@@ -459,22 +473,30 @@ func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, 
 		connections = 1
 	}
 
+	memoryMax := uint64(accountInfo.Limits.MaxMemory)
+	if isUnlimited(memoryMax) {
+		memoryMax = 0
+	}
 	memoryUsage := 0.0
-	if accountInfo.Limits.MaxMemory > 0 {
-		memoryUsage = float64(accountInfo.Tier.Memory) / float64(accountInfo.Limits.MaxMemory) * 100
+	if memoryMax > 0 {
+		memoryUsage = float64(accountInfo.Tier.Memory) / float64(memoryMax) * 100
 	}
 
+	storageMax := uint64(accountInfo.Limits.MaxStore)
+	if isUnlimited(storageMax) {
+		storageMax = 0
+	}
 	storageUsage := 0.0
-	if accountInfo.Limits.MaxStore > 0 {
-		storageUsage = float64(accountInfo.Tier.Store) / float64(accountInfo.Limits.MaxStore) * 100
+	if storageMax > 0 {
+		storageUsage = float64(accountInfo.Tier.Store) / float64(storageMax) * 100
 	}
 
 	return &SystemMetrics{
 		MemoryUsed:   accountInfo.Tier.Memory,
-		MemoryMax:    uint64(accountInfo.Limits.MaxMemory),
+		MemoryMax:    memoryMax,
 		MemoryUsage:  memoryUsage,
 		StorageUsed:  accountInfo.Tier.Store,
-		StorageMax:   uint64(accountInfo.Limits.MaxStore),
+		StorageMax:   storageMax,
 		StorageUsage: storageUsage,
 		Connections:  connections,
 		Streams:      accountInfo.Tier.Streams,

@@ -234,6 +234,65 @@
   -webkit-backdrop-filter: blur(14px) !important;
 }
 
+/* ===== ENHANCED ANIMATION LIBRARY ===== */
+
+/* Fade Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale Animations */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Slide Animations */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -245,6 +304,156 @@
   }
 }
 
-.animate-slide-in {
-  animation: slideIn 0.28s ease-out;
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Special Effects */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Animation Utility Classes */
+.animate-fade-in { animation: fadeIn 0.3s ease-out; }
+.animate-fade-in-up { animation: fadeInUp 0.4s ease-out; }
+.animate-fade-in-down { animation: fadeInDown 0.4s ease-out; }
+.animate-scale-in { animation: scaleIn 0.3s ease-out; }
+.animate-scale-out { animation: scaleOut 0.2s ease-in forwards; }
+.animate-slide-up { animation: slideUp 0.4s ease-out; }
+.animate-slide-down { animation: slideDown 0.4s ease-out; }
+.animate-slide-left { animation: slideLeft 0.4s ease-out; }
+.animate-slide-right { animation: slideRight 0.4s ease-out; }
+.animate-slide-in { animation: slideIn 0.28s ease-out; }
+.animate-bounce-in { animation: bounceIn 0.5s ease-out; }
+.animate-shake { animation: shake 0.5s ease-in-out; }
+.animate-spin-slow { animation: spin 1s linear infinite; }
+
+/* Staggered Animation Delays */
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-400 { animation-delay: 400ms; }
+.animate-delay-500 { animation-delay: 500ms; }
+
+/* Animation Durations */
+.animate-duration-150 { animation-duration: 150ms; }
+.animate-duration-200 { animation-duration: 200ms; }
+.animate-duration-300 { animation-duration: 300ms; }
+.animate-duration-500 { animation-duration: 500ms; }
+
+/* Animation Easing */
+.animate-ease-out { animation-timing-function: ease-out; }
+.animate-ease-in { animation-timing-function: ease-in; }
+.animate-ease-in-out { animation-timing-function: ease-in-out; }
+
+/* Interactive Hover Animations */
+.hover-lift {
+  @apply transition-transform duration-200 ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.hover-lift-lg {
+  @apply transition-transform duration-200 ease-out;
+}
+.hover-lift-lg:hover {
+  transform: translateY(-4px);
+}
+
+.hover-scale {
+  @apply transition-transform duration-150 ease-out;
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-scale-lg {
+  @apply transition-transform duration-150 ease-out;
+}
+.hover-scale-lg:hover {
+  transform: scale(1.05);
+}
+
+/* Press/Active States */
+.active-scale:active {
+  transform: scale(0.98);
+}
+
+/* Smooth Transitions */
+.transition-smooth {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.transition-fast {
+  @apply transition-all duration-150 ease-out;
 }

@@ -49,17 +49,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast: addToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm">
-        {toasts.map((t) => {
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
+        {toasts.map((t, index) => {
           const Icon = ICONS[t.type]
+          const delayClass = index === 0 ? "" : `animate-delay-${Math.min(index * 100, 500)}`
           return (
             <div
               key={t.id}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-lg shadow-lg animate-slide-in ${COLORS[t.type]}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-lg shadow-lg animate-slide-right animate-duration-200 hover-lift pointer-events-auto ${delayClass} ${COLORS[t.type]}`}
             >
-              <Icon className="w-5 h-5 flex-shrink-0" />
+              <Icon className="w-5 h-5 flex-shrink-0 animate-bounce-in" />
               <span className="text-sm flex-1">{t.message}</span>
-              <button onClick={() => removeToast(t.id)} className="opacity-60 hover:opacity-100">
+              <button
+                onClick={() => removeToast(t.id)}
+                className="opacity-60 hover:opacity-100 active-scale transition-opacity"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>

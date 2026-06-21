@@ -49,33 +49,33 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
       {children}
       {dialog && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
           onClick={() => handleClose(false)}
         >
           <div
-            className="card w-full max-w-md animate-slide-in"
+            className="card w-full max-w-md animate-scale-in animate-duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start gap-4">
-              <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${styles.iconBg}`}>
+              <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${styles.iconBg} animate-bounce-in`}>
                 <Icon className={`w-5 h-5 ${styles.iconColor}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold mb-1">{dialog.title}</h3>
-                <p className="text-sm text-dark-muted">{dialog.message}</p>
+                <h3 className="text-base font-semibold mb-1 animate-fade-in">{dialog.title}</h3>
+                <p className="text-sm text-dark-muted animate-fade-in-down animate-delay-100">{dialog.message}</p>
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-6">
               <button
                 onClick={() => handleClose(false)}
-                className="btn-secondary"
+                className="btn-secondary hover-lift"
                 autoFocus
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleClose(true)}
-                className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-bg ${styles.btn}`}
+                className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold active-scale hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-bg ${styles.btn}`}
               >
                 {dialog.confirmLabel ?? 'Confirm'}
               </button>

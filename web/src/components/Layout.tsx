@@ -70,10 +70,10 @@ export default function Layout({ children }: { children: ReactNode }) {
                 className={`group flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition-all duration-200 ${
                   isActive
                     ? "bg-primary-600 text-white shadow-lg shadow-primary-500/20"
-                    : "text-dark-muted hover:bg-dark-bg/70 hover:text-dark-text"
+                    : "text-dark-muted hover:bg-dark-bg/70 hover:text-dark-text hover-lift"
                 }`}
               >
-                <item.icon className={`h-5 w-5 ${isActive ? "text-white" : "text-dark-muted group-hover:text-dark-text"}`} />
+                <item.icon className={`h-5 w-5 transition-transform duration-200 ${isActive ? "text-white" : "text-dark-muted group-hover:text-dark-text group-hover:scale-110"}`} />
                 <span>{item.name}</span>
               </Link>
             );

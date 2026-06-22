@@ -152,9 +152,7 @@ export function useConsumersPage(): UseConsumersPageReturn {
           ? filteredConsumers.reduce(
               (acc, consumer) =>
                 acc +
-                parseInt(
-                  String(consumer.ack_rate || "0").replace(/[^\d]/g, "") || "0",
-                ),
+                parseFloat(String(consumer.ack_rate || "0").replace(/[^0-9.]/g, "")) || 0,
               0,
             ) / filteredConsumers.length
           : 0,

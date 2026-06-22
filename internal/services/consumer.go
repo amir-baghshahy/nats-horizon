@@ -54,6 +54,9 @@ func (uc *ConsumerUseCase) CreateConsumer(ctx context.Context, streamName string
 
 // UpdateConsumer updates an existing consumer
 func (uc *ConsumerUseCase) UpdateConsumer(ctx context.Context, streamName string, consumer *models.Consumer) (*models.Consumer, error) {
+	if streamName == "" {
+		return nil, fmt.Errorf("stream name is required")
+	}
 	if consumer == nil {
 		return nil, fmt.Errorf("consumer is required")
 	}

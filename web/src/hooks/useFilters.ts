@@ -67,7 +67,7 @@ export function useFilters<T extends Record<string, any>>(
 
   const applyFilters = useCallback(
     (items: any[]) => items.filter((item) => filterFn(item, filters)),
-    [filters], // Only track filters, filterFn should be stable
+    [filters, filterFn],
   );
 
   const hasActiveFilters = useCallback(() => {

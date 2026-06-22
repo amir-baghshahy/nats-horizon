@@ -24,9 +24,6 @@ func (uc *MessageUseCase) PublishMessage(ctx context.Context, subject string, da
 	if subject == "" {
 		return fmt.Errorf("subject is required")
 	}
-	if len(data) == 0 {
-		return fmt.Errorf("message data is required")
-	}
 	return uc.messageRepo.Publish(ctx, subject, data)
 }
 
@@ -34,9 +31,6 @@ func (uc *MessageUseCase) PublishMessage(ctx context.Context, subject string, da
 func (uc *MessageUseCase) PublishToStream(ctx context.Context, subject string, data []byte) error {
 	if subject == "" {
 		return fmt.Errorf("subject is required")
-	}
-	if len(data) == 0 {
-		return fmt.Errorf("message data is required")
 	}
 	return uc.messageRepo.PublishToStream(ctx, subject, data)
 }

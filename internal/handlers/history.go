@@ -254,7 +254,7 @@ func (h *HistoryHandler) GetAnalysis(c *gin.Context) {
 
 	// Calculate trend (last vs first)
 	trend := 0.0
-	if len(values) >= 2 {
+	if len(values) >= 2 && values[0] != 0 {
 		trend = ((values[len(values)-1] - values[0]) / values[0]) * 100
 	}
 

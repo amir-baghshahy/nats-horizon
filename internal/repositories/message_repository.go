@@ -68,17 +68,21 @@ func (r *NATSMessageRepository) List(ctx context.Context, streamName string, fil
 	lastSeq := streamInfo.State.LastSeq
 
 	// Calculate start sequence
+	limit := filter.Limit
+	if limit <= 0 {
+		limit = 25
+	}
 	startSeq := lastSeq
 	if filter.Sequence > 0 {
 		startSeq = filter.Sequence
-	} else if lastSeq > 25 {
-		startSeq = lastSeq - 24
+	} else if lastSeq > uint64(limit) {
+		startSeq = lastSeq - uint64(limit) + 1
 	} else {
 		startSeq = 1
 	}
 
 	// Determine limit
-	limit := filter.Limit
+	limit = filter.Limit
 	if limit <= 0 {
 		limit = 25
 	}

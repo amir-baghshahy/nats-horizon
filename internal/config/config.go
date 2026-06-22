@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"net"
 	"os"
@@ -34,8 +35,9 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-
-	_ = godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Printf("Warning: .env file not found or could not be loaded: %v", err)
+	}
 
 	cfg := &Config{
 		// Server
@@ -84,7 +86,10 @@ func ResolvePort(cfg *Config) (int, error) {
 		return p, nil
 	}
 
-	defaultPort, _ := strconv.Atoi(cfg.ServerPort)
+	defaultPort, err := strconv.Atoi(cfg.ServerPort)
+	if err != nil {
+		return 0, fmt.Errorf("invalid SERVER_PORT %q: %w", cfg.ServerPort, err)
+	}
 
 	// Try default first
 	if isPortFree(defaultPort) {

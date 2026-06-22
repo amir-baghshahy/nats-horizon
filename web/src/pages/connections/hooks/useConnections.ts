@@ -92,14 +92,16 @@ export function useConnections(): UseConnectionsReturn {
     }))
 
   const toggleExpand = useCallback((cid: number) => {
-    const newExpanded = new Set(expandedConnections)
-    if (newExpanded.has(cid)) {
-      newExpanded.delete(cid)
-    } else {
-      newExpanded.add(cid)
-    }
-    setExpandedConnections(newExpanded)
-  }, [expandedConnections])
+    setExpandedConnections((prev) => {
+      const newExpanded = new Set(prev)
+      if (newExpanded.has(cid)) {
+        newExpanded.delete(cid)
+      } else {
+        newExpanded.add(cid)
+      }
+      return newExpanded
+    })
+  }, [])
 
   const getConnectionDuration = useCallback((connectedAt: string) => {
     if (!connectedAt) return 'Not available'

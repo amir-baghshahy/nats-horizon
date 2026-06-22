@@ -249,7 +249,15 @@ func (h *KVHandler) CreateBucket(c *gin.Context) {
 		return
 	}
 
-	status, _ := kv.Status()
+	status, err := kv.Status()
+	if err != nil {
+		c.JSON(http.StatusCreated, dto.KVBucketCreateResponse{
+			Name:    req.Name,
+			Values:  0,
+			History: history,
+		})
+		return
+	}
 
 	c.JSON(http.StatusCreated, dto.KVBucketCreateResponse{
 		Name:    req.Name,

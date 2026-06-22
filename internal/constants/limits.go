@@ -54,3 +54,7 @@ const (
 // -2 is chosen because NATS uses -1 for unlimited and 0 is the Go zero-value default,
 // so -2 cannot be confused with either a default or an unlimited consumer.
 const PauseSentinel = -2
+
+// DefaultMaxDeliver is the default MaxDeliver value used when resuming a consumer.
+// This matches NATS's default behavior for consumers.
+const DefaultMaxDeliver = -1

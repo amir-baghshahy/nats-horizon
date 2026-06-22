@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 
 export interface ExpansionState<T> {
   expanded: Set<T>;
@@ -11,6 +11,9 @@ export interface ExpansionState<T> {
  */
 export function useExpansion<T>(): ExpansionState<T> {
   const [expanded, setExpanded] = useState<Set<T>>(new Set());
+  const expandedRef = useRef(expanded);
+
+  expandedRef.current = expanded;
 
   const toggleExpansion = useCallback((item: T) => {
     setExpanded((prev) => {
@@ -24,7 +27,7 @@ export function useExpansion<T>(): ExpansionState<T> {
     });
   }, []);
 
-  const isExpanded = useCallback((item: T) => expanded.has(item), [expanded]);
+  const isExpanded = useCallback((item: T) => expandedRef.current.has(item), []);
 
   return {
     expanded,

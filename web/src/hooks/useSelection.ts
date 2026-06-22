@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 
 export interface SelectionState<T> {
   selected: Set<T>;
@@ -13,6 +13,9 @@ export interface SelectionState<T> {
  */
 export function useSelection<T>(): SelectionState<T> {
   const [selected, setSelected] = useState<Set<T>>(new Set());
+  const selectedRef = useRef(selected);
+
+  selectedRef.current = selected;
 
   const toggleSelection = useCallback((item: T) => {
     setSelected((prev) => {
@@ -34,7 +37,7 @@ export function useSelection<T>(): SelectionState<T> {
     setSelected(new Set(items));
   }, []);
 
-  const isSelected = useCallback((item: T) => selected.has(item), [selected]);
+  const isSelected = useCallback((item: T) => selectedRef.current.has(item), []);
 
   return {
     selected,

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 import ConnectionFilters from '../../components/connections/ConnectionFilters'
 import { HealthService } from '../../types'
-import type { github_com_amir_baghshahy_nats_monitor_internal_dto_ConnectionInfo as ConnectionInfo } from '../../types'
+import type { github_com_amir_baghshahy_nats_horizon_internal_dto_ConnectionInfo as ConnectionInfo } from '../../types'
 
 export default function ConnectionsPage({
   searchQuery,

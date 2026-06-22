@@ -83,7 +83,7 @@ export default function AlertFormModal({
               </label>
               <select
                 name="condition_type"
-                defaultValue={alert?.condition.type || "lag"}
+                defaultValue={alert?.condition?.type || "lag"}
                 className="input w-full"
               >
                 <option value="lag">Consumer Lag</option>
@@ -109,7 +109,7 @@ export default function AlertFormModal({
               <label className="block text-sm font-medium mb-2">Operator</label>
               <select
                 name="operator"
-                defaultValue={alert?.condition.operator || ">"}
+                defaultValue={alert?.condition?.operator || ">"}
                 className="input w-full"
               >
                 <option value=">{">Greater than</option>
@@ -123,7 +123,7 @@ export default function AlertFormModal({
               <input
                 type="number"
                 name="threshold"
-                defaultValue={alert?.condition.threshold || 1000}
+                defaultValue={alert?.condition?.threshold || 1000}
                 className="input w-full"
                 required
               />
@@ -136,7 +136,7 @@ export default function AlertFormModal({
             <input
               type="text"
               name="stream"
-              defaultValue={alert?.condition.stream || ""}
+              defaultValue={alert?.condition?.stream || ""}
               placeholder="my-stream"
               className="input w-full"
             />
@@ -148,7 +148,7 @@ export default function AlertFormModal({
             <input
               type="text"
               name="consumer"
-              defaultValue={alert?.condition.consumer || ""}
+              defaultValue={alert?.condition?.consumer || ""}
               placeholder="my-consumer"
               className="input w-full"
             />

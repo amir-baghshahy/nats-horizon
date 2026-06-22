@@ -6,9 +6,9 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query";
 import type {
-  github_com_amir_baghshahy_nats_monitor_internal_dto_CreateStreamRequest as CreateStreamRequest,
-  github_com_amir_baghshahy_nats_monitor_internal_dto_StreamResponse as Stream,
-  github_com_amir_baghshahy_nats_monitor_internal_dto_StreamResponse as StreamResponse,
+  github_com_amir_baghshahy_nats_horizon_internal_dto_CreateStreamRequest as CreateStreamRequest,
+  github_com_amir_baghshahy_nats_horizon_internal_dto_StreamResponse as Stream,
+  github_com_amir_baghshahy_nats_horizon_internal_dto_StreamResponse as StreamResponse,
 } from "../../../types";
 import { ExportService, StreamsService } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
@@ -97,12 +97,14 @@ export interface UseStreamsPageReturn {
 
 function downloadBlob(data: Blob | string | object, filename: string) {
   let blob: Blob;
-  if (typeof data === 'string') {
-    blob = new Blob([data], { type: 'application/octet-stream' });
+  if (typeof data === "string") {
+    blob = new Blob([data], { type: "application/octet-stream" });
   } else if (data instanceof Blob) {
     blob = data;
   } else {
-    blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
   }
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -327,7 +329,17 @@ export function useStreamsPage(): UseStreamsPageReturn {
         0,
       ),
     }),
-    [filteredStreams],
+    // Use streams length instead of filteredStreams reference to avoid infinite loop
+    [
+      streams.length,
+      filters.search,
+      filters.storage,
+      filters.status,
+      filters.minMessages,
+      filters.maxMessages,
+      filters.minConsumers,
+      filters.subjectPattern,
+    ],
   );
 
   const handleDelete = async (streamName: string) => {

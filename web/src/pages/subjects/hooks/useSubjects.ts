@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import type { github_com_amir_baghshahy_nats_monitor_internal_dto_SubjectInfo as SubjectInfo } from '../../../types'
+import type { github_com_amir_baghshahy_nats_horizon_internal_dto_SubjectInfo as SubjectInfo } from '../../../types'
 import { HealthService } from '../../../types'
 
 export interface UseSubjectsReturn {

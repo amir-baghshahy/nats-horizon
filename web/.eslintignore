@@ -1,0 +1,4 @@
+# Generated files should not be linted
+src/generated/
+dist/
+node_modules/

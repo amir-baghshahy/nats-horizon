@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/amir-baghshahy/nats-monitor/internal/dto"
 	"github.com/amir-baghshahy/nats-monitor/internal/services"
@@ -136,10 +137,11 @@ func (h *StreamHandler) UpdateStream(c *gin.Context) {
 
 	result, err := h.useCase.UpdateStream(c.Request.Context(), stream)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to update stream",
-			Details: err.Error(),
-		})
+		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "does not exist") {
+			c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "Stream not found", Details: err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Failed to update stream", Details: err.Error()})
+		}
 		return
 	}
 
@@ -158,10 +160,11 @@ func (h *StreamHandler) UpdateStream(c *gin.Context) {
 func (h *StreamHandler) DeleteStream(c *gin.Context) {
 	name := c.Param("name")
 	if err := h.useCase.DeleteStream(c.Request.Context(), name); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to delete stream",
-			Details: err.Error(),
-		})
+		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "does not exist") {
+			c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "Stream not found", Details: err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Failed to delete stream", Details: err.Error()})
+		}
 		return
 	}
 	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "Stream deleted successfully"})
@@ -190,10 +193,11 @@ func (h *StreamHandler) PurgeStream(c *gin.Context) {
 
 	remaining, err := h.useCase.PurgeStream(c.Request.Context(), name, req.Subject, req.Sequence)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to purge stream",
-			Details: err.Error(),
-		})
+		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "does not exist") {
+			c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "Stream not found", Details: err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Failed to purge stream", Details: err.Error()})
+		}
 		return
 	}
 

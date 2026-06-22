@@ -181,9 +181,6 @@ func main() {
 	r.Use(middleware.PanicRecovery())
 	r.Use(CORSMiddleware(cfg.CORSAllowedOrigins))
 
-	rateLimiter := middleware.NewRateLimiter(100, 200)
-	r.Use(rateLimiter.Middleware())
-
 	apiGroup := r.Group("/api")
 	{
 		apiGroup.GET("/health", handlers.HealthCheck(serverUseCase))

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"net/http"
 	"time"
 
@@ -203,6 +204,11 @@ func (h *KVHandler) CreateBucket(c *gin.Context) {
 		}
 	}
 
+	if len(req.Name) > 256 {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "bucket name too long (max 256 characters)"})
+		return
+	}
+
 	// Validate payload sizes
 	const maxPayloadSize = 1 << 30 // 1GB
 	if req.MaxBytes > maxPayloadSize {
@@ -227,7 +233,11 @@ func (h *KVHandler) CreateBucket(c *gin.Context) {
 	}
 
 	replicas := 1
-	if req.Replicas > 0 && req.Replicas <= 5 {
+	if req.Replicas > 5 {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "replicas must be between 1 and 5"})
+		return
+	}
+	if req.Replicas > 0 {
 		replicas = req.Replicas
 	}
 
@@ -280,6 +290,10 @@ func (h *KVHandler) DeleteBucket(c *gin.Context) {
 
 	err := h.js.DeleteKeyValue(bucketName)
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "does not exist") {
+			c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "bucket not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
 		return
 	}

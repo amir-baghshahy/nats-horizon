@@ -18,7 +18,6 @@ export function useSSE(channel: string) {
     const eventSource = new EventSource(url)
 
     eventSource.onopen = () => {
-      console.log(`SSE connected to channel: ${channel}`)
       setConnected(true)
     }
 
@@ -54,7 +53,6 @@ export function useSSE(channel: string) {
     eventSourceRef.current = eventSource
 
     return () => {
-      console.log(`Closing SSE connection to channel: ${channel}`)
       eventSource.close()
     }
   }, [channel])

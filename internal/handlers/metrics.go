@@ -437,11 +437,18 @@ func (h *MetricsHandler) GetStreamMetrics(c *gin.Context) {
 	defer h.mu.RUnlock()
 
 	result := make(map[string][]MetricDataPoint)
+	found := false
 
 	for _, series := range h.metricsCache.Streams {
 		if series.Name == streamName {
 			result[series.Labels["type"]] = series.Data
+			found = true
 		}
+	}
+
+	if !found {
+		c.JSON(http.StatusNotFound, gin.H{"error": "stream not found"})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

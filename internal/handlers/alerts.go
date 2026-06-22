@@ -331,6 +331,55 @@ func (h *AlertsHandler) CreateAlert(c *gin.Context) {
 		return
 	}
 
+	// Validation
+	if alert.Name == "" {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "name is required"})
+		return
+	}
+
+	// Validate severity
+	validSeverities := map[AlertSeverity]bool{
+		SeverityInfo:     true,
+		SeverityWarning:  true,
+		SeverityCritical: true,
+	}
+	if !validSeverities[alert.Severity] {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid severity, must be one of: info, warning, critical"})
+		return
+	}
+
+	// Validate condition type
+	validTypes := map[string]bool{
+		"lag":           true,
+		"latency":        true,
+		"messages":      true,
+		"consumer_lag":  true,
+		"storage":       true,
+	}
+	if !validTypes[alert.Condition.Type] {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid condition type, must be one of: lag, latency, messages, consumer_lag, storage"})
+		return
+	}
+
+	// Validate operator
+	validOperators := map[string]bool{
+		">":  true,
+		"<":  true,
+		"=":  true,
+		">=": true,
+		"<=": true,
+	}
+	if !validOperators[alert.Condition.Operator] {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid operator, must be one of: >, <, =, >=, <="})
+		return
+	}
+
+	// Validate threshold
+	if alert.Condition.Threshold < 0 {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "threshold must be non-negative"})
+		return
+	}
+
 	alert.ID = fmt.Sprintf("alert-%d", time.Now().UnixNano())
 	alert.CreatedAt = time.Now()
 	alert.UpdatedAt = time.Now()

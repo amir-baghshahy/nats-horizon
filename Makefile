@@ -1,4 +1,4 @@
-.PHONY: dev dev-backend dev-frontend build clean test fmt deps openapi docker-build docker-run install-binary
+.PHONY: dev dev-backend dev-frontend build clean test test-e2e test-e2e-nats fmt deps openapi docker-build docker-run install-binary
 
 # ── Development ─────────────────────────────────────────────────────────────
 
@@ -45,8 +45,23 @@ clean:
 	@rm -rf out web/dist web/node_modules
 
 test:
-	@echo "Running tests..."
+	@echo "Running unit tests..."
 	@go test ./...
+
+test-e2e:
+	@echo "Running E2E tests (requires server running on :3000 with NATS)..."
+	@go test ./tests/e2e/ -v -timeout 120s
+
+test-e2e-nats:
+	@echo "Starting NATS for E2E tests..."
+	@docker compose -f docker-compose.test.yml up -d nats
+	@echo "Waiting for NATS to be ready..."
+	@sleep 3
+	@echo "Running E2E tests..."
+	@go test ./tests/e2e/ -v -timeout 120s; \
+		RESULT=$$?; \
+		docker compose -f docker-compose.test.yml down; \
+		exit $$RESULT
 
 fmt:
 	@echo "Formatting Go code..."

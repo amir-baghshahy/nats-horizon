@@ -28,7 +28,6 @@ export function usePagination(
   const { perPage = 20, initialPage = 1 } = options;
 
   const [page, setPage] = useState(initialPage);
-  const [total, setTotal] = useState(0);
 
   const goToPage = useCallback((newPage: number) => {
     setPage(newPage);
@@ -48,7 +47,6 @@ export function usePagination(
 
   const getPaginatedItems = useCallback(
     <T>(items: T[]): T[] => {
-      setTotal(items.length);
       const totalPages = Math.max(1, Math.ceil(items.length / perPage));
       const currentPage = Math.min(page, totalPages);
 
@@ -60,14 +58,14 @@ export function usePagination(
     [page, perPage],
   );
 
-  const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const totalPages = 0;
   const isFirstPage = page === 1;
   const isLastPage = page === totalPages;
 
   return {
     page,
     perPage,
-    total,
+    total: 0,
     totalPages,
     isFirstPage,
     isLastPage,

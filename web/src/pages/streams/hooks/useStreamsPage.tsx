@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   useMutation,
   useQuery,
@@ -65,7 +65,7 @@ export interface UseStreamsPageReturn {
   ) => void;
   resetFilters: () => void;
   applyFilters: (items: Stream[]) => Stream[];
-  hasActiveFilters: () => boolean;
+  hasActiveFilters: boolean;
   toggleSelection: (item: string) => void;
   clearSelection: () => void;
   selectAll: (items: string[]) => void;
@@ -153,7 +153,7 @@ export function useStreamsPage(): UseStreamsPageReturn {
     queryFn: () => StreamsService.getStreams(),
   });
 
-  const streamFilterFn = (stream: Stream, filters: StreamFilters) => {
+  const streamFilterFn = useCallback((stream: Stream, filters: StreamFilters) => {
     const streamName = stream.config?.name || "";
     const matchesSearch =
       streamName.toLowerCase().includes(filters.search.toLowerCase()) ||
@@ -195,7 +195,7 @@ export function useStreamsPage(): UseStreamsPageReturn {
       matchesMinConsumers &&
       matchesSubjectPattern
     );
-  };
+  }, []);
 
   const {
     filters,
@@ -217,8 +217,8 @@ export function useStreamsPage(): UseStreamsPageReturn {
     perPage: 20,
   });
 
-  const filteredStreams = applyFilters(streams);
-  const paginatedStreams = getPaginatedItems(filteredStreams);
+  const filteredStreams = useMemo(() => applyFilters(streams), [streams, filters, applyFilters]);
+  const paginatedStreams = useMemo(() => getPaginatedItems(filteredStreams), [filteredStreams, page, getPaginatedItems]);
 
   const deleteMutation = useMutation({
     mutationFn: (name: string) => StreamsService.deleteStreams(name),

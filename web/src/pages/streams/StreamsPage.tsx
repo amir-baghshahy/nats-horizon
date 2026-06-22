@@ -55,7 +55,7 @@ export default function StreamsPage() {
 
       <StreamsFilters
         filters={filters}
-        hasActiveFilters={hasActiveFilters()}
+        hasActiveFilters={hasActiveFilters}
         updateFilter={updateFilter}
         resetFilters={resetFilters}
       />
@@ -66,7 +66,7 @@ export default function StreamsPage() {
         isLoading={isLoading}
         selected={selected}
         page={page}
-        hasActiveFilters={hasActiveFilters()}
+        hasActiveFilters={hasActiveFilters}
         toggleSelection={toggleSelection}
         clearSelection={clearSelection}
         isSelected={isSelected}

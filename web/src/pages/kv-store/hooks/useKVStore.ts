@@ -61,7 +61,7 @@ export function useKVStore(): UseKVStoreReturn {
   const { toast } = useToast();
 
   const getMutationErrorMessage = (error: any) =>
-    error.response?.data?.error || error.message || "Operation failed";
+    error?.response?.data?.error || error?.message || "Operation failed";
 
   const { data: buckets, refetch: refetchBuckets, isLoading: bucketsLoading, error: bucketsError } = useQuery({
     queryKey: ["kvBuckets"],
@@ -88,7 +88,7 @@ export function useKVStore(): UseKVStoreReturn {
       setShowCreateModal(false);
       toast("success", "Bucket created successfully!");
     },
-    onError: (error: any) => toast("error", `Failed to create bucket: ${error.response?.data?.error || error.message}`),
+    onError: (error: any) => toast("error", `Failed to create bucket: ${error?.response?.data?.error || error?.message}`),
   });
 
   const deleteBucketMutation = useMutation({

@@ -145,7 +145,7 @@ export function CoreMessagingContent() {
     } catch (err: any) {
       toast(
         "error",
-        `Failed to publish: ${err.response?.data?.error || err.message}`,
+        `Failed to publish: ${err?.response?.data?.error || err?.message}`,
       );
     }
   };
@@ -162,7 +162,7 @@ export function CoreMessagingContent() {
     } catch (err: any) {
       console.error("Request failed:", err);
       setRequestResponse({
-        error: err.response?.data?.error || err.message || "Request failed",
+        error: err?.response?.data?.error || err?.message || "Request failed",
       });
     }
   };

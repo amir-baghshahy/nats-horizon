@@ -291,7 +291,7 @@ export function useStreamsPage(): UseStreamsPageReturn {
     onError: (error: any) => {
       toast(
         "error",
-        error.response?.data?.error || "Failed to export messages",
+        error?.response?.data?.error || "Failed to export messages",
       );
     },
   });
@@ -303,7 +303,7 @@ export function useStreamsPage(): UseStreamsPageReturn {
       setShowCreateModal(false);
     },
     onError: (error: any) => {
-      toast("error", error.response?.data?.error || "Failed to create stream");
+      toast("error", error?.response?.data?.error || "Failed to create stream");
     },
   });
 

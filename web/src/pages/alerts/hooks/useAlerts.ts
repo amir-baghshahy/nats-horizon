@@ -68,7 +68,7 @@ export function useAlerts() {
       queryClient.invalidateQueries({ queryKey: ["alertTriggers"] });
       toast("success", `${data.triggered} alert${data.triggered === 1 ? "" : "s"} triggered from ${data.evaluated} checked`);
     },
-    onError: (error: any) => { toast("error", error.response?.data?.error || "Failed to check alerts"); },
+    onError: (error: any) => { toast("error", error?.response?.data?.error || "Failed to check alerts"); },
   });
 
   return {

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Activity, Play, RefreshCw, StopCircle } from "lucide-react";
 
 interface MonitorEvent {
@@ -76,6 +77,8 @@ export default function TrafficMonitorPanel({
   onStart,
   onStop,
 }: TrafficMonitorPanelProps) {
+  const { t } = useTranslation();
+
   const subjectStats = getSubjectStats(events);
   const totalMessages = subjectStats.reduce((sum, stat) => sum + stat.count, 0);
   const totalBytes = subjectStats.reduce((sum, stat) => sum + stat.bytes, 0);
@@ -87,10 +90,10 @@ export default function TrafficMonitorPanel({
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <Activity className="h-5 w-5 text-primary-400" />
-              <h2 className="text-xl font-bold">Traffic Monitor</h2>
+              <h2 className="text-xl font-bold">{t('messages.trafficMonitor')}</h2>
             </div>
             <p className="text-sm leading-6 text-dark-muted">
-              Stream Core NATS traffic for one or more subjects. Use wildcards like orders.* to watch related subjects.
+              {t('messages.trafficMonitorDescription')}
             </p>
           </div>
 
@@ -102,7 +105,7 @@ export default function TrafficMonitorPanel({
               className="btn-primary inline-flex items-center gap-2 disabled:opacity-50"
             >
               <Play className="h-4 w-4" />
-              Start Monitor
+              {t('messages.startMonitor')}
             </button>
             <button
               type="button"
@@ -111,19 +114,19 @@ export default function TrafficMonitorPanel({
               className="btn-secondary inline-flex items-center gap-2 disabled:opacity-50"
             >
               <StopCircle className="h-4 w-4" />
-              Stop
+              {t('messages.stop')}
             </button>
           </div>
         </div>
 
         <div className="mt-5">
-          <label className="block text-sm font-medium mb-2">Subjects</label>
+          <label className="block text-sm font-medium mb-2">{t('messages.subjects')}</label>
           <div className="flex flex-col gap-3 md:flex-row">
             <input
               type="text"
               value={subjects}
               onChange={(e) => onSubjectsChange(e.target.value)}
-              placeholder="orders.*, events.created"
+              placeholder={t('messages.enterSubjectPlaceholder')}
               className="input flex-1 font-mono"
               disabled={isMonitoring}
             />
@@ -134,37 +137,37 @@ export default function TrafficMonitorPanel({
               className="btn-secondary inline-flex items-center gap-2 disabled:opacity-50"
             >
               <RefreshCw className="h-4 w-4" />
-              Restart
+              {t('messages.restart')}
             </button>
           </div>
           <p className="mt-2 text-xs text-dark-muted">
-            Separate multiple subjects with commas.
+            {t('messages.subjectsHelp')}
           </p>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <div className="card">
-          <p className="text-xs text-dark-muted">Status</p>
-          <p className="mt-2 text-2xl font-bold">{isMonitoring ? "Live" : "Idle"}</p>
+          <p className="text-xs text-dark-muted">{t('messages.status')}</p>
+          <p className="mt-2 text-2xl font-bold">{isMonitoring ? t('messages.live') : t('messages.idle')}</p>
         </div>
         <div className="card">
-          <p className="text-xs text-dark-muted">Subjects</p>
+          <p className="text-xs text-dark-muted">{t('messages.subjects')}</p>
           <p className="mt-2 text-2xl font-bold">{subjectStats.length}</p>
         </div>
         <div className="card">
-          <p className="text-xs text-dark-muted">Messages</p>
+          <p className="text-xs text-dark-muted">{t('messages.messagesLabel')}</p>
           <p className="mt-2 text-2xl font-bold">{totalMessages.toLocaleString()}</p>
         </div>
         <div className="card">
-          <p className="text-xs text-dark-muted">Bytes</p>
+          <p className="text-xs text-dark-muted">{t('messages.bytes')}</p>
           <p className="mt-2 text-2xl font-bold">{formatBytes(totalBytes)}</p>
         </div>
       </div>
 
       <div className="card overflow-hidden">
         <div className="border-b border-dark-border p-4">
-          <h3 className="font-semibold">Subject Traffic</h3>
+          <h3 className="font-semibold">{t('messages.subjectTraffic')}</h3>
         </div>
         {subjectStats.length > 0 ? (
           <div className="divide-y divide-dark-border">
@@ -174,16 +177,16 @@ export default function TrafficMonitorPanel({
                   <div className="min-w-0">
                     <p className="font-mono text-sm font-medium truncate">{stat.subject}</p>
                     <p className="mt-1 text-xs text-dark-muted">
-                      Last seen {formatTimestamp(stat.last_seen)}
+                      {t('messages.lastSeen')} {formatTimestamp(stat.last_seen)}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
-                      <span className="text-dark-muted">Messages:</span>{" "}
+                      <span className="text-dark-muted">{t('messages.messagesLabel')}:</span>{" "}
                       <span className="font-mono">{stat.count.toLocaleString()}</span>
                     </span>
                     <span>
-                      <span className="text-dark-muted">Bytes:</span>{" "}
+                      <span className="text-dark-muted">{t('messages.bytesLabel')}:</span>{" "}
                       <span className="font-mono">{formatBytes(stat.bytes)}</span>
                     </span>
                   </div>
@@ -194,15 +197,15 @@ export default function TrafficMonitorPanel({
         ) : (
           <div className="p-8 text-center text-dark-muted">
             <Activity className="mx-auto mb-3 h-12 w-12 opacity-50" />
-            <p>No traffic captured yet.</p>
-            <p className="mt-1 text-sm">Start the monitor and publish messages to the selected subjects.</p>
+            <p>{t('messages.noTrafficCaptured')}</p>
+            <p className="mt-1 text-sm">{t('messages.noTrafficCapturedDescription')}</p>
           </div>
         )}
       </div>
 
       <div className="card overflow-hidden">
         <div className="border-b border-dark-border p-4">
-          <h3 className="font-semibold">Recent Events</h3>
+          <h3 className="font-semibold">{t('messages.recentEvents')}</h3>
         </div>
         {events.length > 0 ? (
           <div className="max-h-[520px] overflow-y-auto divide-y divide-dark-border">
@@ -215,7 +218,7 @@ export default function TrafficMonitorPanel({
                         ? "bg-primary-500/15 text-primary-300"
                         : "bg-blue-500/15 text-blue-300"
                     }`}>
-                      {event.type || "event"}
+                      {event.type || t('messages.event')}
                     </span>
                     {event.subject && (
                       <span className="font-mono text-sm text-primary-300 truncate">
@@ -231,12 +234,12 @@ export default function TrafficMonitorPanel({
                     <div className="space-y-2 text-sm">
                       {event.reply && (
                         <p className="text-dark-muted">
-                          Reply: <span className="font-mono">{event.reply}</span>
+                          {t('messages.replyLabel')}: <span className="font-mono">{event.reply}</span>
                         </p>
                       )}
                       {event.size !== undefined && (
                         <p className="text-dark-muted">
-                          Size: <span className="font-mono">{formatBytes(event.size)}</span>
+                          {t('messages.sizeLabel')}: <span className="font-mono">{formatBytes(event.size)}</span>
                         </p>
                       )}
                       {event.data && (
@@ -253,7 +256,7 @@ export default function TrafficMonitorPanel({
                         <div key={stat.subject} className="rounded-lg bg-dark-bg p-3 text-sm">
                           <p className="font-mono text-primary-300 truncate">{stat.subject}</p>
                           <p className="mt-1 text-dark-muted">
-                            {stat.count.toLocaleString()} messages · {formatBytes(stat.bytes)}
+                            {stat.count.toLocaleString()} {t('messages.messagesAnd')} {formatBytes(stat.bytes)}
                           </p>
                         </div>
                       ))}
@@ -265,7 +268,7 @@ export default function TrafficMonitorPanel({
           </div>
         ) : (
           <div className="p-8 text-center text-dark-muted">
-            <p>Events will appear here while monitoring is active.</p>
+            <p>{t('messages.eventsEmpty')}</p>
           </div>
         )}
       </div>

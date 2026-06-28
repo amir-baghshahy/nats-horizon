@@ -1,6 +1,7 @@
 import { HardDrive, Zap, Server, TrendingUp } from "lucide-react";
 import StatCard from "../ui/StatCard";
 import { getHealthStatus } from "../../utils/validators";
+import { useTranslation } from "react-i18next";
 
 interface AccountInfo {
   memory?: number;
@@ -17,6 +18,7 @@ interface SecondaryStatsGridProps {
 export default function SecondaryStatsGrid({
   account,
 }: SecondaryStatsGridProps) {
+  const { t } = useTranslation();
   const apiHealthStatus = getHealthStatus(
     account.api?.total || 0,
     account.api?.errors || 0,
@@ -39,7 +41,7 @@ export default function SecondaryStatsGrid({
       <StatCard
         icon={HardDrive}
         value={account.storage || 0}
-        label="Storage Used"
+        label={t('dashboard.storageUsed')}
         iconBg="bg-purple-500/20"
         iconColor="text-purple-400"
         size="small"
@@ -49,7 +51,7 @@ export default function SecondaryStatsGrid({
       <StatCard
         icon={Zap}
         value={account.memory || 0}
-        label="Memory Used"
+        label={t('dashboard.memoryUsed')}
         iconBg="bg-orange-500/20"
         iconColor="text-orange-400"
         size="small"
@@ -59,7 +61,7 @@ export default function SecondaryStatsGrid({
       <StatCard
         icon={Server}
         value={account.api?.total || 0}
-        label="API Calls"
+        label={t('dashboard.apiCalls')}
         iconBg={apiStatusColor}
         size="small"
       />
@@ -67,7 +69,7 @@ export default function SecondaryStatsGrid({
       <StatCard
         icon={TrendingUp}
         value={account.api?.errors || 0}
-        label="API Errors"
+        label={t('dashboard.apiErrors')}
         iconBg={errorStatusColor}
         size="small"
       />

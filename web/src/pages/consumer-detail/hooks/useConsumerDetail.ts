@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { ConsumersService } from "../../../types";
 import type {
   AckMessageRequest,
@@ -59,6 +60,7 @@ export function useConsumerDetail(): UseConsumerDetailReturn {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { confirm } = useConfirm();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<"overview" | "messages" | "config">("overview");
     const [isTabHidden, setIsTabHidden] = useState(false);
@@ -188,9 +190,9 @@ export function useConsumerDetail(): UseConsumerDetailReturn {
   const handleDeleteConsumer = async () => {
     if (!name || !consumerData.stream) return;
     const ok = await confirm({
-      title: "Delete Consumer",
-      message: `Delete consumer "${name}"? This action cannot be undone.`,
-      confirmLabel: "Delete",
+      title: t('consumers.deleteConsumer'),
+      message: t('consumers.deleteConsumerConfirm', { name }),
+      confirmLabel: t('common.delete'),
       variant: "danger",
     });
     if (!ok) return;

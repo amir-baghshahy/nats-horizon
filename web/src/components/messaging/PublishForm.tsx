@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Send } from "lucide-react";
 import { validateSubject, validateJSON } from "../../utils/validators";
 
@@ -9,40 +10,23 @@ export interface PublishForm {
 }
 
 interface PublishFormProps {
-  /**
-   * Current form data
-   */
   form: PublishForm;
-
-  /**
-   * Form update callback
-   */
   onChange: (form: PublishForm) => void;
-
-  /**
-   * Submit callback
-   */
   onSubmit: () => void;
-
-  /**
-   * Form errors
-   */
   errors?: Record<string, string>;
 }
 
-/**
- * PublishForm for publishing NATS messages
- */
 export default function PublishForm({
   form,
   onChange,
   onSubmit,
   errors = {},
 }: PublishFormProps) {
+  const { t } = useTranslation();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate
     const subjectValidation = validateSubject(form.subject);
     if (!subjectValidation.valid) {
       return;
@@ -66,19 +50,18 @@ export default function PublishForm({
     <div className="card max-w-2xl">
       <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
         <Send className="w-5 h-5" />
-        Publish Message
+        {t('messages.publishMessage')}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Subject */}
         <div>
-          <label className="block text-sm font-medium mb-2">Subject</label>
+          <label className="block text-sm font-medium mb-2">{t('messages.subject')}</label>
           <p className="text-xs text-dark-muted mb-2">
-            The NATS address this message is sent to, e.g. orders.created.
+            {t('messages.subjectHelp')}
           </p>
           <input
             type="text"
-            placeholder="orders.created"
+            placeholder={t('messages.subjectPlaceholder')}
             value={form.subject}
             onChange={(e) => updateField("subject", e.target.value)}
             className="input w-full font-mono"
@@ -89,27 +72,25 @@ export default function PublishForm({
           )}
         </div>
 
-        {/* Reply To */}
         <div>
           <label className="block text-sm font-medium mb-2">
-            Reply To (Optional)
+            {t('messages.replyTo')} ({t('common.optional')})
           </label>
           <input
             type="text"
-            placeholder="_INBOX.reply"
+            placeholder={t('messages.replyToPlaceholder')}
             value={form.replyTo}
             onChange={(e) => updateField("replyTo", e.target.value)}
             className="input w-full font-mono"
           />
         </div>
 
-        {/* Headers */}
         <div>
           <label className="block text-sm font-medium mb-2">
-            Headers (JSON, Optional)
+            {t('messages.headers')} ({t('common.optional')})
           </label>
           <textarea
-            placeholder='{"Content-Type": "application/json"}'
+            placeholder={t('messages.headersPlaceholder')}
             value={form.headers}
             onChange={(e) => updateField("headers", e.target.value)}
             className="input w-full font-mono h-20"
@@ -119,11 +100,10 @@ export default function PublishForm({
           )}
         </div>
 
-        {/* Payload */}
         <div>
-          <label className="block text-sm font-medium mb-2">Payload</label>
+          <label className="block text-sm font-medium mb-2">{t('messages.payload')}</label>
           <textarea
-            placeholder='{"order_id": "123", "amount": 99.99}'
+            placeholder={t('messages.payloadPlaceholder')}
             value={form.payload}
             onChange={(e) => updateField("payload", e.target.value)}
             className="input w-full font-mono h-40"
@@ -134,11 +114,10 @@ export default function PublishForm({
           )}
         </div>
 
-        {/* Actions */}
         <div className="flex items-center gap-3 pt-4">
           <button type="submit" className="btn-primary flex items-center gap-2">
             <Send className="w-4 h-4" />
-            Publish
+            {t('messages.publish')}
           </button>
 
           <button
@@ -153,7 +132,7 @@ export default function PublishForm({
             }
             className="btn-secondary"
           >
-            Clear
+            {t('messages.clear')}
           </button>
         </div>
       </form>

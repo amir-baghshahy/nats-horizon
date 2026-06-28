@@ -10,7 +10,10 @@ import {
   Copy as CopyIcon,
   Check,
   Maximize2,
+  MessageSquare,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import EmptyState from "../../../components/ui/EmptyState";
 
 interface Message {
   sequence: number;
@@ -81,12 +84,13 @@ export default function MessagesList({
   onDelete,
   setViewMode,
 }: MessagesListProps) {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <div className="card overflow-hidden p-0">
-        <div className="p-8 text-center text-dark-muted">
+        <div className="p-6 text-center text-dark-muted">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
-          Loading messages...
+          {t('common.loading')}
         </div>
       </div>
     );
@@ -95,7 +99,11 @@ export default function MessagesList({
   if (messages.length === 0) {
     return (
       <div className="card overflow-hidden p-0">
-        <div className="p-8 text-center text-dark-muted">No messages found.</div>
+        <EmptyState
+          icon={MessageSquare}
+          title={t('messages.noMessagesYet')}
+          description={t('messages.noMessagesYetDescription')}
+        />
       </div>
     );
   }
@@ -114,8 +122,8 @@ export default function MessagesList({
             />
             <span className="text-sm text-dark-muted">
               {selected.size > 0
-                ? `${selected.size} selected`
-                : `${messages.length} messages`}
+                ? `${selected.size} ${t('common.selected')}`
+                : `${messages.length} ${t('messages.messageCount', { count: messages.length })}`}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -205,14 +213,14 @@ export default function MessagesList({
                     <button
                       onClick={() => onToggleExpand(sequence)}
                       className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale"
-                      title="View full message"
+                      title={t('messages.viewFullMessage')}
                     >
                       <Eye className="w-4 h-4 text-dark-muted" />
                     </button>
                     <button
                       onClick={() => onCopy(messageData, sequence)}
                       className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale"
-                      title="Copy message"
+                      title={t('messages.copyMessage')}
                     >
                       {copiedMessage === sequence ? (
                         <Check className="w-4 h-4 text-green- animate-bounce-in" />
@@ -224,7 +232,7 @@ export default function MessagesList({
                       onClick={() => onDelete(sequence)}
                       disabled={isDeletePending}
                       className="p-2 hover:bg-red-500/20 rounded-lg hover-lift active-scale text-status-error"
-                      title="Delete message"
+                      title={t('messages.deleteMessage')}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -238,7 +246,7 @@ export default function MessagesList({
                     <div className="bg-dark-bg/50 rounded-lg p-4 hover-scale">
                       <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                         <FileText className="w-4 h-4" />
-                        Headers
+                        {t('messages.headers')}
                       </h4>
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         {Object.entries(headers).map(([key, value]) => (
@@ -257,21 +265,21 @@ export default function MessagesList({
                       <div className="flex items-center justify-between mb-3">
                         <h4 className="text-sm font-medium flex items-center gap-2">
                           <Code className="w-4 h-4" />
-                          Payload
+                          {t('messages.payload')}
                         </h4>
                         <button
                           onClick={() => onToggleExpand(sequence)}
                           className="text-xs text-primary-400 hover:underline flex items-center gap-1"
                         >
                           <Maximize2 className="w-3 h-3" />
-                          Collapse
+                          {t('messages.collapse')}
                         </button>
                       </div>
                       <pre className="text-sm bg-dark-bg p-3 rounded overflow-x-auto">
                         <code className="text-green-400">
                           {messageData.length > MAX_DISPLAY_PAYLOAD_SIZE
                             ? messageData.slice(0, MAX_DISPLAY_PAYLOAD_SIZE) +
-                              "\n... [truncated — payload too large to display fully]"
+                              t('messages.truncated')
                             : messageData}
                         </code>
                       </pre>
@@ -280,21 +288,21 @@ export default function MessagesList({
                     {/* Metadata */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-xs text-dark-muted">Sequence</p>
+                        <p className="text-xs text-dark-muted">{t('messages.sequence')}</p>
                         <p className="font-mono text-sm">{sequence.toLocaleString()}</p>
                       </div>
                       <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-xs text-dark-muted">Timestamp</p>
+                        <p className="text-xs text-dark-muted">{t('messages.timestamp')}</p>
                         <p className="text-sm">
                           {new Date(message.timestamp || Date.now()).toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-xs text-dark-muted">Size</p>
+                        <p className="text-xs text-dark-muted">{t('common.size')}</p>
                         <p className="text-sm">{formatBytes(message.size || 0)}</p>
                       </div>
                       <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-xs text-dark-muted">Subject</p>
+                        <p className="text-xs text-dark-muted">{t('messages.subject')}</p>
                         <p className="text-sm font-mono truncate">{message.subject}</p>
                       </div>
                     </div>
@@ -307,10 +315,10 @@ export default function MessagesList({
                       >
                         {copiedMessage === sequence ? (
                           <>
-                            <Check className="w-3 h-3" /> Copied!
+                             <Check className="w-3 h-3" /> {t('messages.copied')}
                           </>
                         ) : (
-                          "Copy Payload"
+                          t('messages.copyPayload')
                         )}
                       </button>
                       <button
@@ -318,7 +326,7 @@ export default function MessagesList({
                         disabled={isDeletePending}
                         className="btn-secondary text-sm text-status-error"
                       >
-                        Delete
+                        {t('common.delete')}
                       </button>
                     </div>
                   </div>
@@ -329,7 +337,7 @@ export default function MessagesList({
         })}
       </div>
       <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-        {messages.length} message{messages.length !== 1 ? 's' : ''}
+        {t('messages.messageCount', { count: messages.length })}
       </div>
     </div>
   );

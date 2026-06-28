@@ -6,41 +6,20 @@ interface BulkAction {
 }
 
 interface BulkActionsProps {
-  /**
-   * Number of selected items
-   */
   selectedCount: number;
-
-  /**
-   * Total number of items
-   */
   totalCount: number;
-
-  /**
-   * Available actions
-   */
   actions: BulkAction[];
-
-  /**
-   * Select all callback
-   */
   onSelectAll: () => void;
-
-  /**
-   * Clear selection callback
-   */
   onClearSelection: () => void;
 }
 
-/**
- * Reusable bulk actions bar
- */
 export default function BulkActions({
   selectedCount,
   totalCount,
   actions,
   onClearSelection,
 }: BulkActionsProps) {
+
   if (selectedCount === 0) {
     return null;
   }

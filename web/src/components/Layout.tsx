@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { HealthService } from "../types";
 import { useState } from "react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 import {
   LayoutDashboard,
@@ -21,25 +23,26 @@ import {
   X,
 } from "lucide-react";
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Streams", href: "/streams", icon: Database },
-  { name: "Consumers", href: "/consumers", icon: Users },
-  { name: "Messages", href: "/messages", icon: MessageSquare },
-  { name: "KV Store", href: "/kv-store", icon: Database },
-  { name: "Subjects", href: "/subjects", icon: Globe },
-  { name: "Connections", href: "/connections", icon: Cable },
-  { name: "Cluster", href: "/cluster", icon: Activity },
-  { name: "Alerts", href: "/alerts", icon: Bell },
-  { name: "Metrics", href: "/metrics", icon: BarChart3 },
-  { name: "History", href: "/history", icon: History },
-  { name: "Security", href: "/security", icon: Shield },
-  { name: "Tenancy", href: "/tenancy", icon: Globe },
-];
+const NAV_ITEMS = [
+  { key: "dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { key: "streams", href: "/streams", icon: Database },
+  { key: "consumers", href: "/consumers", icon: Users },
+  { key: "messages", href: "/messages", icon: MessageSquare },
+  { key: "kvStore", href: "/kv-store", icon: Database },
+  { key: "subjects", href: "/subjects", icon: Globe },
+  { key: "connections", href: "/connections", icon: Cable },
+  { key: "cluster", href: "/cluster", icon: Activity },
+  { key: "alerts", href: "/alerts", icon: Bell },
+  { key: "metrics", href: "/metrics", icon: BarChart3 },
+  { key: "history", href: "/history", icon: History },
+  { key: "security", href: "/security", icon: Shield },
+  { key: "tenancy", href: "/tenancy", icon: Globe },
+] as const;
 
 export default function Layout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   const { data: health } = useQuery({
     queryKey: ["health"],
@@ -64,13 +67,19 @@ export default function Layout({ children }: { children: ReactNode }) {
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-dark-card border border-dark-border text-dark-text hover:bg-dark-bg transition-colors"
       >
-        {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {mobileMenuOpen ? (
+          <X className="w-6 h-6" />
+        ) : (
+          <Menu className="w-6 h-6" />
+        )}
       </button>
 
       {/* Sidebar */}
       <aside
         className={`fixed lg:relative z-50 flex w-72 flex-shrink-0 flex-col border-r border-dark-border/70 bg-dark-card/75 shadow-2xl shadow-black/20 backdrop-blur-xl overflow-hidden transition-transform duration-300 ${
-          mobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          mobileMenuOpen
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
         }`}
       >
         <div className="border-b border-dark-border/70 px-6 py-6">
@@ -79,18 +88,20 @@ export default function Layout({ children }: { children: ReactNode }) {
               <Activity className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-lg font-bold tracking-tight text-dark-text">nats-ui</h1>
-              <p className="text-xs text-dark-muted">NATS Horizon Platform</p>
+              <h1 className="text-lg font-bold tracking-tight text-dark-text">
+                {t("app.title")}
+              </h1>
+              <p className="text-xs text-dark-muted">{t("app.subtitle")}</p>
             </div>
           </div>
         </div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4 scrollbar-thin">
-          {navigation.map((item) => {
+          {NAV_ITEMS.map((item) => {
             const isActive = location.pathname === item.href;
             return (
               <Link
-                key={item.name}
+                key={item.key}
                 to={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`group flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition-all duration-200 ${
@@ -99,34 +110,43 @@ export default function Layout({ children }: { children: ReactNode }) {
                     : "text-dark-muted hover:bg-dark-bg/70 hover:text-dark-text hover-lift"
                 }`}
               >
-                <item.icon className={`h-5 w-5 transition-transform duration-200 ${isActive ? "text-white" : "text-dark-muted group-hover:text-dark-text group-hover:scale-110"}`} />
-                <span>{item.name}</span>
+                <item.icon
+                  className={`h-5 w-5 transition-transform duration-200 ${isActive ? "text-white" : "text-dark-muted group-hover:text-dark-text group-hover:scale-110"}`}
+                />
+                <span>{t(`nav.${item.key}`)}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div className="border-t border-dark-border/70 p-4">
+        <div className="border-t border-dark-border/70 p-4 space-y-3">
+          <LanguageSwitcher />
           <div className="rounded-2xl border border-dark-border/60 bg-dark-bg/45 p-3">
             <div className="flex items-center gap-2">
               <div
                 className={`h-2.5 w-2.5 rounded-full ${
-                  connected ? "bg-status-success animate-pulse" : "bg-status-error"
+                  connected
+                    ? "bg-status-success animate-pulse"
+                    : "bg-status-error"
                 }`}
               />
               <span className="text-xs text-dark-muted">
-                {connected ? "Connected to NATS" : "NATS Disconnected"}
+                {connected ? t("common.connected") : t("common.disconnected")}
               </span>
               {!connected && (
-                <CloudOff className="ml-auto h-4 w-4 text-status-error" />
+                <CloudOff className="ms-auto h-4 w-4 text-status-error" />
               )}
             </div>
           </div>
         </div>
       </aside>
 
-      {/* Main content with proper mobile padding */}
-      <main className="h-full overflow-y-auto flex-1 pt-16 lg:pt-0">{children}</main>
+      {/* Main content - full height, inner scroll */}
+      <main className="h-full flex-1 pt-16 lg:pt-0 overflow-hidden">
+        <div className="h-full overflow-y-auto overflow-x-hidden">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

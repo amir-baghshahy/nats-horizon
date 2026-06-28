@@ -1,5 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
+import { createPortal } from "react-dom";
 import type { StreamEditForm } from "../hooks/useStreamDetail";
+import { ModalWrapper } from "../../../components/ui/Modal";
 
 interface EditStreamModalProps {
   name: string;
@@ -18,31 +21,31 @@ export default function EditStreamModal({
   onClose,
   onSave,
 }: EditStreamModalProps) {
-  return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-card rounded-xl w-full max-w-lg shadow-2xl">
-        <div className="flex items-center justify-between p-6 border-b border-dark-border">
-          <h2 className="text-xl font-semibold">Edit Stream: {name}</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-dark-bg rounded-lg transition-colors text-dark-muted"
-          >
-            ✕
+  const { t } = useTranslation();
+
+  return createPortal(
+    <ModalWrapper isOpen={true}>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div className="card w-full max-w-lg">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">{t("streams.editStream")}: {name}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-dark-bg rounded-lg">
+            <span className="text-dark-muted">✕</span>
           </button>
         </div>
-        <div className="p-6 space-y-4">
+        <div className="space-y-4">
           <div>
-            <label className="block text-sm text-dark-muted mb-1">Subjects (comma-separated)</label>
+             <label className="block text-sm text-dark-muted mb-1">{t("streams.editSubjects")}</label>
             <input
               type="text"
               className="input w-full"
               value={editForm.subjects}
               onChange={(e) => setEditForm({ ...editForm, subjects: e.target.value })}
-              placeholder="orders.*, events.*"
+               placeholder={t("streams.subjectsPlaceholder")}
             />
           </div>
           <div>
-            <label className="block text-sm text-dark-muted mb-1">Replicas</label>
+             <label className="block text-sm text-dark-muted mb-1">{t("streams.replicas")}</label>
             <input
               type="number"
               className="input w-full"
@@ -53,17 +56,17 @@ export default function EditStreamModal({
             />
           </div>
           <div>
-            <label className="block text-sm text-dark-muted mb-1">Max Age (e.g. 24h, 7d — empty = unlimited)</label>
+             <label className="block text-sm text-dark-muted mb-1">{t("streams.maxAgeLabel")}</label>
             <input
               type="text"
               className="input w-full"
               value={editForm.max_age}
               onChange={(e) => setEditForm({ ...editForm, max_age: e.target.value })}
-              placeholder="24h"
+               placeholder={t("streams.maxAgePlaceholder")}
             />
           </div>
           <div>
-            <label className="block text-sm text-dark-muted mb-1">Max Bytes (0 = unlimited)</label>
+             <label className="block text-sm text-dark-muted mb-1">{t("streams.maxBytesLabel")}</label>
             <input
               type="number"
               className="input w-full"
@@ -73,20 +76,22 @@ export default function EditStreamModal({
             />
           </div>
         </div>
-        <div className="flex justify-end gap-3 p-6 border-t border-dark-border">
-          <button onClick={onClose} className="btn-secondary">
-            Cancel
-          </button>
+        <div className="flex justify-end gap-3 pt-6">
+           <button onClick={onClose} className="btn-secondary">
+             {t("common.cancel")}
+           </button>
           <button
             onClick={onSave}
             disabled={updatePending}
             className="btn-primary flex items-center gap-2"
           >
-            {updatePending && <Loader2 className="w-4 h-4 animate-spin" />}
-            Save Changes
+             {updatePending && <Loader2 className="w-4 h-4 animate-spin" />}
+             {t("streams.saveChanges")}
           </button>
         </div>
       </div>
     </div>
+    </ModalWrapper>,
+    document.body
   );
 }

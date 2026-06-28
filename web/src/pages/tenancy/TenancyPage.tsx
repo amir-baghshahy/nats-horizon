@@ -1,5 +1,6 @@
 import type { ConnectionConfig, ConnectionStatus } from '../../types'
 import { UseTenancyReturn } from './hooks/useTenancy'
+import { useTranslation } from "react-i18next";
 import {
   Server, Plus, Edit, Trash2, CheckCircle, XCircle,
   RefreshCw, Play, Globe, Star
@@ -31,8 +32,9 @@ export default function TenancyPage({
   formatDate,
   confirm,
 }: UseTenancyReturn) {
+  const { t } = useTranslation();
   if (connectionsLoading || statusesLoading) {
-    return <PageLoading text="Loading connections..." />
+    return <PageLoading text={t('tenancy.loading')} />
   }
 
   if (connectionsError || statusesError) {
@@ -53,19 +55,19 @@ export default function TenancyPage({
       ? statuses.filter((s: ConnectionStatus) => s.healthy)?.length || 0
       : 0,
     default:
-      connections?.connections?.find((c: ConnectionConfig) => c.is_default)?.name || 'None',
+      connections?.connections?.find((c: ConnectionConfig) => c.is_default)?.name || t('common.none'),
   }
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+    <div className="p-3 md:p-4 lg:p-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">
+          <h1 className="text-xl md:text-xl font-bold flex items-center gap-3">
             <Globe className="w-8 h-8 text-primary-400" />
-            Multi-Tenancy
+            {t('tenancy.title')}
           </h1>
           <p className="text-dark-muted mt-1">
-            Manage multiple NATS server connections
+            {t('tenancy.subtitle')}
           </p>
         </div>
         <button
@@ -76,66 +78,66 @@ export default function TenancyPage({
           className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Add Connection
+          {t('tenancy.addConnection')}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div className="card">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
               <Server className="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.total}</p>
-              <p className="text-xs text-dark-muted">Total Servers</p>
+              <p className="text-xl font-bold">{stats.total}</p>
+              <p className="text-xs text-dark-muted">{t('tenancy.totalServers')}</p>
             </div>
           </div>
         </div>
         <div className="card">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
               <CheckCircle className="w-5 h-5 text-green-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.active}</p>
-              <p className="text-xs text-dark-muted">Connected</p>
+              <p className="text-xl font-bold">{stats.active}</p>
+              <p className="text-xs text-dark-muted">{t('tenancy.connected')}</p>
             </div>
           </div>
         </div>
         <div className="card">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
               <Play className="w-5 h-5 text-blue-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.healthy}</p>
-              <p className="text-xs text-dark-muted">Healthy</p>
+              <p className="text-xl font-bold">{stats.healthy}</p>
+              <p className="text-xs text-dark-muted">{t('tenancy.healthy')}</p>
             </div>
           </div>
         </div>
         <div className="card">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
               <Star className="w-5 h-5 text-yellow-400" />
             </div>
             <div>
               <p className="text-sm font-medium truncate">{stats.default}</p>
-              <p className="text-xs text-dark-muted">Default</p>
+              <p className="text-xs text-dark-muted">{t('tenancy.default')}</p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="card">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Server className="w-5 h-5" />
-          Server Connections
+          {t('tenancy.serverConnections')}
         </h3>
         <div className="space-y-4">
           {connections?.connections?.map((conn: ConnectionConfig) => {
             const connectionId = conn.id ?? conn.name ?? conn.url ?? ''
-            const connectionName = conn.name ?? 'Unnamed connection'
+            const connectionName = conn.name ?? t('tenancy.unnamedConnection')
             const connectionUrl = conn.url ?? ''
             const status = getStatusForConnection(connectionId)
 
@@ -154,40 +156,40 @@ export default function TenancyPage({
                       <h4 className="font-medium">{connectionName}</h4>
                       {conn.is_default && (
                         <span className="text-xs px-2 py-1 rounded bg-yellow-500/20 text-yellow-400">
-                          Default
+                          {t('tenancy.default')}
                         </span>
                       )}
                       {conn.enabled ? (
                         <span className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">
-                          Enabled
+                          {t('tenancy.enabled')}
                         </span>
                       ) : (
                         <span className="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">
-                          Disabled
+                          {t('tenancy.disabled')}
                         </span>
                       )}
                       {status?.connected ? (
                         <span className="flex items-center gap-1 text-xs text-green-400">
                           <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                          Connected
+                          {t('tenancy.connected')}
                         </span>
                       ) : (
                         <span className="flex items-center gap-1 text-xs text-red-400">
                           <XCircle className="w-3 h-3" />
-                          {status?.error || 'Disconnected'}
+                          {status?.error || t('tenancy.disconnected')}
                         </span>
                       )}
                     </div>
                     <p className="text-sm text-dark-muted mb-2">
-                      {conn.description || 'No description'}
+                      {conn.description || t('tenancy.noDescription')}
                     </p>
                     <div className="flex items-center gap-4 text-xs text-dark-muted">
                       <span className="font-mono">{connectionUrl}</span>
                       {status?.latency && (
-                        <span>Latency: {status.latency}</span>
+                        <span>{t('tenancy.latency', { value: status.latency })}</span>
                       )}
                       <span>
-                        Last checked: {status ? formatDate(status.last_checked) : 'N/A'}
+                        {t('tenancy.lastChecked', { time: status ? formatDate(status.last_checked) : 'N/A' })}
                       </span>
                     </div>
                   </div>
@@ -196,7 +198,7 @@ export default function TenancyPage({
                       <button
                         onClick={() => setDefaultMutation.mutate(connectionId)}
                         className="p-2 hover:bg-yellow-500/20 text-yellow-400 rounded-lg"
-                        title="Set as default"
+                        title={t('tenancy.setDefault')}
                       >
                         <Star className="w-4 h-4" />
                       </button>
@@ -205,7 +207,7 @@ export default function TenancyPage({
                       onClick={() => handleTest(connectionUrl)}
                       disabled={testConnectionMutation.isPending}
                       className="p-2 hover:bg-blue-500/20 text-blue-400 rounded-lg"
-                      title="Test connection"
+                      title={t('tenancy.testConnection')}
                     >
                       <RefreshCw
                         className={`w-4 h-4 ${testConnectionMutation.isPending && testingUrl === connectionUrl ? 'animate-spin' : ''}`}
@@ -217,18 +219,18 @@ export default function TenancyPage({
                         setShowModal(true)
                       }}
                       className="p-2 hover:bg-dark-border rounded-lg"
-                      title="Edit"
+                      title={t('common.edit')}
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     {!conn.is_default && (
                       <button
                         onClick={async () => {
-                          const ok = await confirm({ title: "Delete Connection", message: `Delete connection "${connectionName}"?`, confirmLabel: "Delete", variant: "danger" })
+                          const ok = await confirm({ title: t('tenancy.deleteConnection'), message: t('tenancy.deleteConnectionConfirm', { name: connectionName }), confirmLabel: t('common.delete'), variant: "danger" })
                           if (ok) deleteMutation.mutate(connectionId)
                         }}
                         className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg"
-                        title="Delete"
+                        title={t('common.delete')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -248,13 +250,13 @@ export default function TenancyPage({
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4" />
                         <span>
-                          Connection successful - Latency: {testResult.latency}
+                          {t('tenancy.connectionSuccessful', { latency: testResult.latency })}
                         </span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
                         <XCircle className="w-4 h-4" />
-                        <span>Connection failed: {testResult.error}</span>
+                        <span>{t('tenancy.connectionFailed', { error: testResult.error })}</span>
                       </div>
                     )}
                   </div>
@@ -266,11 +268,11 @@ export default function TenancyPage({
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
           <div className="card max-w-md w-full">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">
-                {editingConnection ? 'Edit Connection' : 'Add Connection'}
+                {editingConnection ? t('tenancy.editConnection') : t('tenancy.addConnection')}
               </h2>
               <button
                 onClick={() => {
@@ -285,35 +287,35 @@ export default function TenancyPage({
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Name</label>
+                <label className="block text-sm font-medium mb-2">{t('tenancy.name')}</label>
                 <input
                   type="text"
                   name="name"
                   defaultValue={editingConnection?.name}
-                  placeholder="Production NATS"
+                  placeholder={t('tenancy.namePlaceholder')}
                   className="input w-full"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">URL</label>
+                <label className="block text-sm font-medium mb-2">{t('tenancy.url')}</label>
                 <input
                   type="text"
                   name="url"
                   defaultValue={editingConnection?.url}
-                  placeholder="nats://localhost:4222"
+                  placeholder={t('tenancy.urlPlaceholder')}
                   className="input w-full"
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Description
+                  {t('tenancy.description')}
                 </label>
                 <textarea
                   name="description"
                   defaultValue={editingConnection?.description}
-                  placeholder="Main production NATS server"
+                  placeholder={t('tenancy.descriptionPlaceholder')}
                   className="input w-full"
                   rows={3}
                 />
@@ -326,7 +328,7 @@ export default function TenancyPage({
                   defaultChecked={editingConnection?.enabled ?? true}
                 />
                 <label htmlFor="enabled" className="text-sm">
-                  Enabled
+                  {t('tenancy.enabled')}
                 </label>
               </div>
               <div className="flex items-center gap-3 pt-4">
@@ -338,10 +340,10 @@ export default function TenancyPage({
                   }}
                   className="btn-secondary"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" className="btn-primary">
-                  {editingConnection ? 'Update' : 'Create'} Connection
+                  {editingConnection ? t('tenancy.update') : t('tenancy.create')} Connection
                 </button>
               </div>
             </form>

@@ -1,4 +1,5 @@
 import { UseMetricsReturn } from "./hooks/useMetrics";
+import { useTranslation } from "react-i18next";
 import {
   Activity,
   BarChart3,
@@ -12,12 +13,13 @@ import {
 import type { MetricDataPoint } from "../../types";
 import { formatBytes, formatNumber } from "../../utils/formatters";
 import { PageError, PageLoading } from "../../components/ui/PageState";
+import { t } from "i18next";
 
 const durations = [
-  { label: "Last 15 minutes", value: "15m" },
-  { label: "Last 1 hour", value: "1h" },
-  { label: "Last 6 hours", value: "6h" },
-  { label: "Last 24 hours", value: "24h" },
+  { label: "last15Minutes", value: "15m" },
+  { label: "last1Hour", value: "1h" },
+  { label: "last6Hours", value: "6h" },
+  { label: "last24Hours", value: "24h" },
 ];
 
 function Sparkline({
@@ -50,7 +52,7 @@ function Sparkline({
         style={{ width, height }}
         className="flex items-center justify-center text-dark-muted text-xs"
       >
-        No activity
+        {t("metrics.noActivity")}
       </div>
     );
   }
@@ -126,8 +128,9 @@ export default function MetricsPage({
   rateTotalMessages,
   rateTotalBytes,
 }: UseMetricsReturn) {
+  const { t } = useTranslation();
   if (isLoading) {
-    return <PageLoading text="Loading metrics..." />;
+    return <PageLoading text={t("metrics.loading")} />;
   }
 
   if (error) {
@@ -135,13 +138,13 @@ export default function MetricsPage({
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+    <div className="p-3 md:p-4 lg:p-6">
+      <div className="mb-4 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-2xl font-bold md:text-3xl">Real-time Metrics</h1>
-          <p className="mt-1 text-dark-muted">
-            Monitor NATS infrastructure performance, rates, and system usage
-          </p>
+          <h1 className="text-xl font-bold md:text-3xl">
+            {t("metrics.title")}
+          </h1>
+          <p className="mt-1 text-dark-muted">{t("metrics.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <select
@@ -151,7 +154,7 @@ export default function MetricsPage({
           >
             {durations.map((item) => (
               <option key={item.value} value={item.value}>
-                {item.label}
+                {t(`metrics.${item.label}`)}
               </option>
             ))}
           </select>
@@ -170,7 +173,7 @@ export default function MetricsPage({
             ) : (
               <Clock className="h-4 w-4" />
             )}
-            Auto-refresh
+            {t("metrics.autoRefresh")}
           </button>
           <button
             type="button"
@@ -185,58 +188,68 @@ export default function MetricsPage({
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="card">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-500/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/20">
               <MessageSquare className="h-5 w-5 text-primary-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">
+              <p className="text-xl font-bold">
                 {formatNumber(totalMessages)}
               </p>
-              <p className="text-xs text-dark-muted">Total Messages</p>
+              <p className="text-xs text-dark-muted">
+                {t("metrics.totalMessages")}
+              </p>
             </div>
           </div>
         </div>
         <div className="card">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/20">
               <HardDrive className="h-5 w-5 text-blue-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{formatBytes(totalStorage)}</p>
-              <p className="text-xs text-dark-muted">Total Storage</p>
+              <p className="text-xl font-bold">{formatBytes(totalStorage)}</p>
+              <p className="text-xs text-dark-muted">
+                {t("metrics.totalStorage")}
+              </p>
             </div>
           </div>
         </div>
         <div className="card">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/20">
               <BarChart3 className="h-5 w-5 text-purple-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{streamNames.length}</p>
-              <p className="text-xs text-dark-muted">Active Streams</p>
+              <p className="text-xl font-bold">{streamNames.length}</p>
+              <p className="text-xs text-dark-muted">
+                {t("metrics.activeStreams")}
+              </p>
             </div>
           </div>
         </div>
         <div className="card">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/20">
               <Zap className="h-5 w-5 text-green-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">
+              <p className="text-xl font-bold">
                 {formatNumber(rateTotalMessages)}
               </p>
-              <p className="text-xs text-dark-muted">Messages in Rate Window</p>
+              <p className="text-xs text-dark-muted">
+                {t("metrics.messagesInRateWindow")}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr] mt-6">
+      <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr] mt-6">
         <div className="card">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">System Metrics</h2>
+            <h2 className="text-lg font-semibold">
+              {t("metrics.systemMetrics")}
+            </h2>
             <p className="text-xs text-dark-muted">
               {systemMetrics?.timestamp
                 ? new Date(systemMetrics.timestamp * 1000).toLocaleTimeString()
@@ -245,7 +258,9 @@ export default function MetricsPage({
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-xs text-dark-muted">Memory Used</p>
+              <p className="text-xs text-dark-muted">
+                {t("metrics.memoryUsed")}
+              </p>
               <p className="mt-1 text-lg font-medium">
                 {formatBytes(systemMetrics?.memory?.used || 0)}
               </p>
@@ -258,7 +273,9 @@ export default function MetricsPage({
               </p>
             </div>
             <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-xs text-dark-muted">Storage Used</p>
+              <p className="text-xs text-dark-muted">
+                {t("metrics.storageUsed")}
+              </p>
               <p className="mt-1 text-lg font-medium">
                 {formatBytes(systemMetrics?.storage?.used || 0)}
               </p>
@@ -271,7 +288,9 @@ export default function MetricsPage({
               </p>
             </div>
             <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-xs text-dark-muted">Connections</p>
+              <p className="text-xs text-dark-muted">
+                {t("metrics.connections")}
+              </p>
               <p className="mt-1 text-lg font-medium">
                 {systemMetrics?.connections || 0}
               </p>
@@ -281,7 +300,9 @@ export default function MetricsPage({
               </p>
             </div>
             <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-xs text-dark-muted">Rate Window</p>
+              <p className="text-xs text-dark-muted">
+                {t("metrics.rateWindow")}
+              </p>
               <p className="mt-1 text-lg font-medium">
                 {formatBytes(rateTotalBytes)} / {rates?.duration || 60}s
               </p>
@@ -296,7 +317,9 @@ export default function MetricsPage({
           <div className="p-4 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary-400" />
-              <h2 className="text-lg font-semibold">Rate by Stream</h2>
+              <h2 className="text-lg font-semibold">
+                {t("metrics.rateByStream")}
+              </h2>
             </div>
           </div>
           {rateStreams.length > 0 ? (
@@ -315,18 +338,19 @@ export default function MetricsPage({
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center">
-              <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-8 text-center text-dark-muted">
-                No rate data available for this window.
+              <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-6 text-center text-dark-muted">
+                {t("metrics.noRateData")}
               </div>
             </div>
           )}
           <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-            {rateStreams.length} stream{rateStreams.length !== 1 ? "s" : ""}
+            {rateStreams.length}{" "}
+            {t("metrics.streamCount", { count: rateStreams.length })}
           </div>
         </div>
       </div>
 
-      <div className="mb-6 mt-8">
+      <div className="mb-4 mt-8">
         <div className="card overflow-hidden flex flex-col max-h-[800px]">
           <div className="p-4 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
             <select
@@ -338,7 +362,7 @@ export default function MetricsPage({
               }
               className="input w-full"
             >
-              <option value="all">All Streams</option>
+              <option value="all">{t("metrics.allStreams")}</option>
               {streamNames.map((name) => (
                 <option key={name} value={name}>
                   {name}
@@ -348,7 +372,7 @@ export default function MetricsPage({
           </div>
 
           <div className="overflow-y-auto scrollbar-thin flex-1 p-4">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-4 lg:grid-cols-2">
               {streamNames.map((streamName) => {
                 const messageSeries = getSeries(
                   metrics,
@@ -389,7 +413,7 @@ export default function MetricsPage({
                     >
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <span className="text-sm text-dark-muted whitespace-nowrap">
-                          Messages
+                          {t("metrics.messages")}
                         </span>
                         <span className="font-medium tabular-nums whitespace-nowrap">
                           {formatNumber(messages)}
@@ -409,7 +433,7 @@ export default function MetricsPage({
                     >
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <span className="text-sm text-dark-muted whitespace-nowrap">
-                          Storage
+                          {t("metrics.storage")}
                         </span>
                         <span className="font-medium tabular-nums whitespace-nowrap">
                           {formatBytes(bytes)}
@@ -428,7 +452,8 @@ export default function MetricsPage({
             </div>
           </div>
           <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-            {streamNames.length} stream{streamNames.length !== 1 ? "s" : ""}
+            {streamNames.length}{" "}
+            {t("metrics.streamCount", { count: streamNames.length })}
           </div>
         </div>
       </div>
@@ -436,9 +461,11 @@ export default function MetricsPage({
       {streamNames.length === 0 && (
         <div className="card mt-6 text-center py-16">
           <BarChart3 className="mx-auto mb-4 h-16 w-16 text-dark-muted opacity-50" />
-          <h3 className="mb-2 text-lg font-medium">No Metrics Available</h3>
+          <h3 className="mb-2 text-lg font-medium">
+            {t("metrics.noMetricsAvailable")}
+          </h3>
           <p className="text-dark-muted">
-            Metrics will appear here once streams are created and sampled.
+            {t("metrics.noMetricsAvailableDescription")}
           </p>
         </div>
       )}

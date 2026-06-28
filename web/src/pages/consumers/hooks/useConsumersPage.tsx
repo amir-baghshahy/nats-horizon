@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   ConsumerResponse as Consumer,
@@ -72,6 +73,7 @@ export interface UseConsumersPageReturn {
 }
 
 export function useConsumersPage(): UseConsumersPageReturn {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStream, setSelectedStream] = useState("all");
   const [filterStatus, setFilterStatus] = useState<ConsumerFilterStatus>("all");
@@ -166,9 +168,9 @@ export function useConsumersPage(): UseConsumersPageReturn {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["consumers"] });
       clearConsumerSelection();
-      toast("success", "Consumer deleted");
+      toast("success", t("consumers.consumerDeleted"));
     },
-    onError: () => toast("error", "Failed to delete consumer"),
+    onError: () => toast("error", t("consumers.consumerDeleteFailed")),
   });
 
   const pauseResumeMutation = useMutation({
@@ -184,7 +186,7 @@ export function useConsumersPage(): UseConsumersPageReturn {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["consumers"] });
     },
-    onError: () => toast("error", "Failed to update consumer"),
+    onError: () => toast("error", t("consumers.consumerUpdateFailed")),
   });
 
   const resetLagMutation = useMutation({
@@ -192,16 +194,16 @@ export function useConsumersPage(): UseConsumersPageReturn {
       resetConsumerLag(stream, name),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["consumers"] });
-      toast("success", "Lag reset");
+      toast("success", t("consumers.lagReset"));
     },
-    onError: () => toast("error", "Failed to reset lag"),
+    onError: () => toast("error", t("consumers.lagResetFailed")),
   });
 
   const handleBulkResume = async () => {
     const ok = await confirm({
-      title: "Resume Consumers",
-      message: `Resume ${selectedConsumers.size} selected consumers?`,
-      confirmLabel: "Resume",
+      title: t("consumers.resumeConsumers"),
+      message: t("consumers.resumeConsumersConfirm", { count: selectedConsumers.size }),
+      confirmLabel: t("consumers.resumeConsumers").split(" ")[0],
       variant: "info",
     });
     if (ok) {
@@ -220,9 +222,9 @@ export function useConsumersPage(): UseConsumersPageReturn {
 
   const handleBulkPause = async () => {
     const ok = await confirm({
-      title: "Pause Consumers",
-      message: `Pause ${selectedConsumers.size} selected consumers?`,
-      confirmLabel: "Pause",
+      title: t("consumers.pauseConsumers"),
+      message: t("consumers.pauseConsumersConfirm", { count: selectedConsumers.size }),
+      confirmLabel: t("consumers.pauseConsumers").split(" ")[0],
       variant: "warning",
     });
     if (ok) {
@@ -241,9 +243,9 @@ export function useConsumersPage(): UseConsumersPageReturn {
 
   const handleBulkDelete = async () => {
     const ok = await confirm({
-      title: "Delete Consumers",
-      message: `Delete ${selectedConsumers.size} selected consumers? This action cannot be undone.`,
-      confirmLabel: "Delete All",
+      title: t("consumers.deleteConsumers"),
+      message: t("consumers.deleteConsumersConfirm", { count: selectedConsumers.size }),
+      confirmLabel: t("common.delete"),
       variant: "danger",
     });
     if (ok) {
@@ -276,9 +278,9 @@ export function useConsumersPage(): UseConsumersPageReturn {
 
   const handleDeleteConsumer = async (consumer: Consumer) => {
     const ok = await confirm({
-      title: "Delete Consumer",
-      message: `Delete consumer "${consumer.name}"?`,
-      confirmLabel: "Delete",
+      title: t("consumers.deleteConsumer"),
+      message: t("consumers.deleteConsumerConfirm", { name: consumer.name }),
+      confirmLabel: t("common.delete"),
       variant: "danger",
     });
     if (ok && consumer.name && consumer.stream) {
@@ -302,13 +304,13 @@ export function useConsumersPage(): UseConsumersPageReturn {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case "active":
-        return "Active";
+        return t("consumers.active");
       case "stuck":
-        return "Stuck";
+        return t("consumers.stuck");
       case "idle":
-        return "Idle";
+        return t("consumers.idle");
       default:
-        return "Unknown";
+        return t("consumers.unknown");
     }
   };
 

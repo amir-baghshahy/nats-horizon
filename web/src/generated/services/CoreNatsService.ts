@@ -37,17 +37,18 @@ export class CoreNatsService {
     /**
      * Publish a Core NATS message
      * Publishes a message to a NATS subject (non-JetStream)
-     * @param request Message to publish
+     * @param requestBody Message to publish
      * @returns PublishMessageResponse OK
      * @throws ApiError
      */
     public static postCorePublish(
-        request: PublishMessageRequest,
+        requestBody: PublishMessageRequest,
     ): CancelablePromise<PublishMessageResponse> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/core/publish',
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 500: `Internal Server Error`,
@@ -57,17 +58,18 @@ export class CoreNatsService {
     /**
      * Send a Core NATS request
      * Publishes a request message and waits for a reply (request/reply pattern)
-     * @param request Request message
+     * @param requestBody Request message
      * @returns MessageResponse OK
      * @throws ApiError
      */
     public static postCoreRequest(
-        request: RequestMessageRequest,
+        requestBody: RequestMessageRequest,
     ): CancelablePromise<MessageResponse> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/core/request',
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 408: `Request Timeout`,

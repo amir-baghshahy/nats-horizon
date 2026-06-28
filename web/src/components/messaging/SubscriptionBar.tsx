@@ -1,30 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import { X } from "lucide-react";
 
 interface SubscriptionBarProps {
-  /**
-   * Set of active subscriptions
-   */
   subscriptions: Set<string>;
-
-  /**
-   * Subscribe callback
-   */
   onSubscribe: (subject: string) => void;
-
-  /**
-   * Unsubscribe callback
-   */
   onUnsubscribe: (subject: string) => void;
 }
 
-/**
- * SubscriptionBar manages NATS subject subscriptions
- */
 export default function SubscriptionBar({
   subscriptions,
   onSubscribe,
   onUnsubscribe,
 }: SubscriptionBarProps) {
+  const { t } = useTranslation();
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       const target = e.target as HTMLInputElement;
@@ -42,12 +31,12 @@ export default function SubscriptionBar({
         <div className="flex-1 relative">
           <input
             type="text"
-            placeholder="Enter subject (e.g., 'orders.*', 'events.>')"
+            placeholder={t('messages.enterSubjectPlaceholder')}
             className="input w-full font-mono"
             onKeyPress={handleKeyPress}
           />
           <p className="text-xs text-dark-muted mt-2">
-            A subject is the NATS address messages are sent to. Subscribe to watch matching traffic.
+            {t('messages.subscriptionHelp')}
           </p>
         </div>
 
@@ -62,7 +51,7 @@ export default function SubscriptionBar({
                 <button
                   onClick={() => onUnsubscribe(sub)}
                   className="hover:text-red-400 transition-colors"
-                  aria-label={`Unsubscribe from ${sub}`}
+                  aria-label={`${t('messages.unsubscribeFrom')} ${sub}`}
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -74,9 +63,9 @@ export default function SubscriptionBar({
 
       {subscriptions.size === 0 && (
         <p className="text-xs text-dark-muted mt-2">
-          Tip: Use wildcards like{" "}
-          <code className="bg-dark-bg px-1 rounded">*</code> for single level or{" "}
-          <code className="bg-dark-bg px-1 rounded">&gt;</code> for all levels
+          {t('messages.tip')}: {t('messages.tipSingle')}{" "}
+          <code className="bg-dark-bg px-1 rounded">*</code> {t('messages.tipAll')}{" "}
+          <code className="bg-dark-bg px-1 rounded">&gt;</code>
         </p>
       )}
     </div>

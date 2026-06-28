@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { ConsumerResponse as Consumer } from "../../../types";
 import ConsumerRow from "./ConsumerRow";
 
@@ -36,6 +37,8 @@ export default function ConsumersList({
   getStatusLabel,
   getLagColor,
 }: ConsumersListProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="card overflow-hidden flex flex-col max-h-[600px] animate-fade-in">
       <div className="bg-dark-bg border-b border-dark-border p-4 flex-shrink-0">
@@ -51,18 +54,18 @@ export default function ConsumersList({
             />
             <span className="text-sm text-dark-muted">
               {selectedConsumers.size > 0
-                ? `${selectedConsumers.size} selected`
-                : `${consumers.length} consumers`}
+                ? t("consumers.selectedCount", { count: selectedConsumers.size })
+                : t("consumers.consumerCount", { count: consumers.length })}
             </span>
           </div>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="p-8 text-center text-dark-muted">Loading consumers...</div>
+        <div className="p-6 text-center text-dark-muted">{t("consumers.loadingConsumers")}</div>
       ) : consumers.length === 0 ? (
-        <div className="p-8 text-center text-dark-muted">
-          No consumers found matching your filters
+        <div className="p-6 text-center text-dark-muted">
+          {t("consumers.noConsumersFound")}
         </div>
       ) : (
         <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-dark-border">
@@ -97,7 +100,7 @@ export default function ConsumersList({
         </div>
       )}
       <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-        {consumers.length} consumer{consumers.length !== 1 ? 's' : ''}
+        {t("consumers.consumerCount", { count: consumers.length })}
       </div>
     </div>
   );

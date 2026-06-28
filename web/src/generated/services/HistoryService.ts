@@ -15,7 +15,7 @@ export class HistoryService {
      */
     public static getHistoryReport(
         duration: string = '24h',
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/history/report',
@@ -37,7 +37,7 @@ export class HistoryService {
         name: string,
         type: string = 'messages',
         duration: string = '24h',
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/history/streams/{name}',
@@ -63,7 +63,7 @@ export class HistoryService {
         name: string,
         type: string = 'messages',
         duration: string = '24h',
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/history/streams/{name}/analysis',

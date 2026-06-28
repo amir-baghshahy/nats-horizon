@@ -122,9 +122,9 @@ func (s *NotificationService) sendSlackNotification(channel NotificationChannel,
 	// Determine color based on severity
 	color := "#36a64f" // green
 	switch trigger.Severity {
-	case SeverityWarning:
+	case "warning":
 		color = "#ff9800" // orange
-	case SeverityCritical:
+	case "critical":
 		color = "#ff0000" // red
 	}
 
@@ -323,12 +323,6 @@ type AlertTrigger struct {
 
 // AlertSeverity represents the severity level
 type AlertSeverity string
-
-const (
-	SeverityInfo     AlertSeverity = "info"
-	SeverityWarning  AlertSeverity = "warning"
-	SeverityCritical AlertSeverity = "critical"
-)
 
 // Helper functions for config extraction
 func getStringConfig(config map[string]interface{}, key, defaultValue string) string {

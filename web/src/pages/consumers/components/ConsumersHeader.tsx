@@ -14,6 +14,7 @@ import {
   Zap,
 } from "lucide-react";
 import type { ConsumerStats } from "../hooks/useConsumersPage";
+import { useTranslation } from "react-i18next";
 
 interface ConsumersHeaderProps {
   sseConnected: boolean;
@@ -38,23 +39,25 @@ export default function ConsumersHeader({
   onRefetch,
   onNavigateStreams,
 }: ConsumersHeaderProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Consumers</h1>
-        <p className="text-dark-muted mt-1">Monitor and manage JetStream consumers</p>
+        <h1 className="text-2xl md:text-3xl font-bold">{t('consumers.title')}</h1>
+        <p className="text-dark-muted mt-1">{t('consumers.subtitle')}</p>
       </div>
       <div className="flex items-center gap-3">
         <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-dark-bg rounded-lg border border-dark-border text-xs">
           {sseConnected ? (
             <>
               <Wifi className="w-3.5 h-3.5 status-success" />
-              <span className="text-status-success">Live</span>
+              <span className="text-status-success">{t('common.live')}</span>
             </>
           ) : (
             <>
               <WifiOff className="w-3.5 h-3.5 status-warning" />
-              <span className="text-status-warning">Connecting...</span>
+              <span className="text-status-warning">{t('common.connecting')}</span>
             </>
           )}
         </div>
@@ -67,7 +70,7 @@ export default function ConsumersHeader({
               className="btn-secondary flex items-center gap-2"
             >
               <Play className="w-4 h-4" />
-              Resume ({selectedCount})
+              {t('consumers.resume', { count: selectedCount })}
             </button>
             <button
               onClick={onBulkPause}
@@ -75,7 +78,7 @@ export default function ConsumersHeader({
               className="btn-secondary flex items-center gap-2"
             >
               <Pause className="w-4 h-4" />
-              Pause ({selectedCount})
+              {t('consumers.pause', { count: selectedCount })}
             </button>
             <button
               onClick={onBulkDelete}
@@ -83,7 +86,7 @@ export default function ConsumersHeader({
               className="btn-secondary flex items-center gap-2 text-status-error"
             >
               <Trash2 className="w-4 h-4" />
-              Delete ({selectedCount})
+              {t('consumers.deleteSelected', { count: selectedCount })}
             </button>
           </>
         )}
@@ -92,7 +95,7 @@ export default function ConsumersHeader({
         </button>
         <button onClick={onNavigateStreams} className="btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" />
-          Create Consumer
+          {t('consumers.createConsumer')}
         </button>
       </div>
     </div>
@@ -104,8 +107,10 @@ interface ConsumersStatsProps {
 }
 
 export function ConsumersStats({ stats }: ConsumersStatsProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
       <div className="card">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
@@ -113,7 +118,7 @@ export function ConsumersStats({ stats }: ConsumersStatsProps) {
           </div>
           <div>
             <p className="text-2xl font-bold">{stats.total}</p>
-            <p className="text-xs text-dark-muted">Total</p>
+            <p className="text-xs text-dark-muted">{t('consumers.total')}</p>
           </div>
         </div>
       </div>
@@ -124,7 +129,7 @@ export function ConsumersStats({ stats }: ConsumersStatsProps) {
           </div>
           <div>
             <p className="text-2xl font-bold">{stats.active}</p>
-            <p className="text-xs text-dark-muted">Active</p>
+            <p className="text-xs text-dark-muted">{t('consumers.active')}</p>
           </div>
         </div>
       </div>
@@ -135,7 +140,7 @@ export function ConsumersStats({ stats }: ConsumersStatsProps) {
           </div>
           <div>
             <p className="text-2xl font-bold">{stats.stuck}</p>
-            <p className="text-xs text-dark-muted">Stuck</p>
+            <p className="text-xs text-dark-muted">{t('consumers.stuck')}</p>
           </div>
         </div>
       </div>
@@ -146,7 +151,7 @@ export function ConsumersStats({ stats }: ConsumersStatsProps) {
           </div>
           <div>
             <p className="text-2xl font-bold">{stats.idle}</p>
-            <p className="text-xs text-dark-muted">Idle</p>
+            <p className="text-xs text-dark-muted">{t('consumers.idle')}</p>
           </div>
         </div>
       </div>
@@ -161,7 +166,7 @@ export function ConsumersStats({ stats }: ConsumersStatsProps) {
                 ? `${(stats.totalLag / 1000).toFixed(1)}K`
                 : stats.totalLag.toLocaleString()}
             </p>
-            <p className="text-xs text-dark-muted">Total Lag</p>
+            <p className="text-xs text-dark-muted">{t('consumers.totalLag')}</p>
           </div>
         </div>
       </div>
@@ -172,7 +177,7 @@ export function ConsumersStats({ stats }: ConsumersStatsProps) {
           </div>
           <div>
             <p className="text-2xl font-bold">{Math.floor(stats.avgAckRate)}</p>
-            <p className="text-xs text-dark-muted">Avg ACK/s</p>
+            <p className="text-xs text-dark-muted">{t('consumers.avgAckRate')}</p>
           </div>
         </div>
       </div>

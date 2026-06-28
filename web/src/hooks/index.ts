@@ -7,3 +7,4 @@ export { useExpansion } from './useExpansion'
 export { usePagination } from './usePagination'
 
 export { useSSE } from './useSSE'
+export { useDirection } from './useDirection'

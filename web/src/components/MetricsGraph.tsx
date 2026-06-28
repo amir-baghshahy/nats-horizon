@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { HealthService, MetricsService } from '../types'
 import { TrendingUp, Activity, HardDrive, Cpu } from 'lucide-react'
@@ -27,6 +28,7 @@ export function MetricsGraph({
   getValue,
   maxPoints = 60,
 }: MetricsGraphProps) {
+  const { t } = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [dataPoints, setDataPoints] = useState<DataPoint[]>([])
 
@@ -36,7 +38,6 @@ export function MetricsGraph({
     refetchInterval: 2000,
   })
 
-  // Update data points when new data arrives
   useEffect(() => {
     if (data) {
       const value = getValue(data)
@@ -52,7 +53,6 @@ export function MetricsGraph({
     }
   }, [data, getValue, maxPoints])
 
-  // Draw graph
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -60,24 +60,20 @@ export function MetricsGraph({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Set canvas size
     const rect = canvas.getBoundingClientRect()
     canvas.width = rect.width * window.devicePixelRatio
     canvas.height = rect.height * window.devicePixelRatio
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
 
-    // Clear canvas
     ctx.clearRect(0, 0, rect.width, rect.height)
 
     if (dataPoints.length < 2) return
 
-    // Find min/max values
     const values = dataPoints.map(p => p.value)
     const minValue = Math.min(...values, 0)
     const maxValue = Math.max(...values, 1)
     const valueRange = maxValue - minValue || 1
 
-    // Draw grid lines
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'
     ctx.lineWidth = 1
     for (let i = 0; i <= 4; i++) {
@@ -88,7 +84,6 @@ export function MetricsGraph({
       ctx.stroke()
     }
 
-    // Draw line graph
     const gradient = ctx.createLinearGradient(0, 0, 0, rect.height)
     gradient.addColorStop(0, color.replace(')', ', 0.5)').replace('rgb', 'rgba'))
     gradient.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'))
@@ -109,14 +104,12 @@ export function MetricsGraph({
       }
     })
 
-    // Fill area under line
     const lastX = (dataPoints.length - 1) * xStep
     ctx.lineTo(lastX, rect.height)
     ctx.closePath()
     ctx.fillStyle = gradient
     ctx.fill()
 
-    // Draw line
     ctx.beginPath()
     dataPoints.forEach((point, index) => {
       const x = index * xStep
@@ -132,7 +125,6 @@ export function MetricsGraph({
     ctx.lineWidth = 2
     ctx.stroke()
 
-    // Draw dot at last point
     if (dataPoints.length > 0) {
       const lastPoint = dataPoints[dataPoints.length - 1]
       const lastX = (dataPoints.length - 1) * xStep
@@ -169,7 +161,7 @@ export function MetricsGraph({
           <p className={`text-sm font-medium ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
             {change >= 0 ? '+' : ''}{changePercent.toFixed(1)}%
           </p>
-          <p className="text-xs text-dark-muted">vs last period</p>
+          <p className="text-xs text-dark-muted">{t('common.vsLastPeriod')}</p>
         </div>
       </div>
       <div className="relative h-24 bg-dark-bg rounded-lg overflow-hidden">
@@ -179,12 +171,13 @@ export function MetricsGraph({
   )
 }
 
-// System Metrics Panel
 export function SystemMetrics() {
+  const { t } = useTranslation()
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <MetricsGraph
-        title="Messages"
+        title={t('messages.messagesLabel')}
         icon={<Activity className="w-5 h-5 text-green-400" />}
         color="rgb(74, 222, 128)"
         queryKey={['dashboardStats']}
@@ -193,7 +186,7 @@ export function SystemMetrics() {
       />
 
       <MetricsGraph
-        title="Memory"
+        title={t('common.memory')}
         icon={<Cpu className="w-5 h-5 text-orange-400" />}
         color="rgb(251, 146, 60)"
         queryKey={['systemMetrics']}
@@ -202,7 +195,7 @@ export function SystemMetrics() {
       />
 
       <MetricsGraph
-        title="Storage"
+        title={t('common.storage')}
         icon={<HardDrive className="w-5 h-5 text-purple-400" />}
         color="rgb(192, 132, 252)"
         queryKey={['systemMetrics']}
@@ -211,7 +204,7 @@ export function SystemMetrics() {
       />
 
       <MetricsGraph
-        title="Message Rate"
+        title={t('messages.messageRate')}
         icon={<TrendingUp className="w-5 h-5 text-cyan-400" />}
         color="rgb(34, 211, 238)"
         queryKey={['rateMetrics']}
@@ -225,8 +218,8 @@ export function SystemMetrics() {
   )
 }
 
-// Resource Usage Bar
 export function ResourceUsageBar({ label, used, max, color }: { label: string; used: number; max: number; color: string }) {
+  const { t } = useTranslation()
   const percentage = max > 0 ? (used / max) * 100 : 0
 
   return (
@@ -249,7 +242,7 @@ export function ResourceUsageBar({ label, used, max, color }: { label: string; u
           {percentage.toFixed(1)}%
         </span>
         <span className="text-xs text-dark-muted">
-          {percentage > 90 ? 'Critical' : percentage > 70 ? 'Warning' : 'Healthy'}
+          {percentage > 90 ? t('common.critical') : percentage > 70 ? t('common.warning') : t('common.healthy')}
         </span>
       </div>
     </div>

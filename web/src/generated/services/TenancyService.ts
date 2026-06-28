@@ -14,7 +14,7 @@ export class TenancyService {
      * @returns any connections list
      * @throws ApiError
      */
-    public static getTenancyConnections(): CancelablePromise<any> {
+    public static getTenancyConnections(): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/tenancy/connections',
@@ -23,17 +23,18 @@ export class TenancyService {
     /**
      * Create a tenancy connection
      * Creates a new multi-tenancy NATS connection configuration
-     * @param request Connection configuration
+     * @param requestBody Connection configuration
      * @returns ConnectionConfig Created
      * @throws ApiError
      */
     public static postTenancyConnections(
-        request: ConnectionConfig,
+        requestBody: ConnectionConfig,
     ): CancelablePromise<ConnectionConfig> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/tenancy/connections',
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
             },
@@ -42,19 +43,42 @@ export class TenancyService {
     /**
      * Test a connection
      * Attempts to connect to a NATS URL and reports connectivity and latency
-     * @param request Connection test request
+     * @param requestBody Connection test request
      * @returns any connection test result
      * @throws ApiError
      */
     public static postTenancyConnectionsTest(
-        request: any,
-    ): CancelablePromise<any> {
+        requestBody: Record<string, any>,
+    ): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/tenancy/connections/test',
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+            },
+        });
+    }
+    /**
+     * Delete a tenancy connection
+     * Deletes a multi-tenancy NATS connection configuration (the default connection cannot be deleted)
+     * @param id Connection ID
+     * @returns SuccessResponse OK
+     * @throws ApiError
+     */
+    public static deleteTenancyConnections(
+        id: string,
+    ): CancelablePromise<SuccessResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/tenancy/connections/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
             },
         });
     }
@@ -83,13 +107,13 @@ export class TenancyService {
      * Update a tenancy connection
      * Updates an existing multi-tenancy NATS connection configuration
      * @param id Connection ID
-     * @param request Connection configuration
+     * @param requestBody Connection configuration
      * @returns ConnectionConfig OK
      * @throws ApiError
      */
     public static putTenancyConnections(
         id: string,
-        request: ConnectionConfig,
+        requestBody: ConnectionConfig,
     ): CancelablePromise<ConnectionConfig> {
         return __request(OpenAPI, {
             method: 'PUT',
@@ -97,29 +121,8 @@ export class TenancyService {
             path: {
                 'id': id,
             },
-            body: request,
-            errors: {
-                400: `Bad Request`,
-                404: `Not Found`,
-            },
-        });
-    }
-    /**
-     * Delete a tenancy connection
-     * Deletes a multi-tenancy NATS connection configuration (the default connection cannot be deleted)
-     * @param id Connection ID
-     * @returns SuccessResponse OK
-     * @throws ApiError
-     */
-    public static deleteTenancyConnections(
-        id: string,
-    ): CancelablePromise<SuccessResponse> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/tenancy/connections/{id}',
-            path: {
-                'id': id,
-            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,
@@ -153,7 +156,7 @@ export class TenancyService {
      * @returns any connection statuses
      * @throws ApiError
      */
-    public static getTenancyStatus(): CancelablePromise<any> {
+    public static getTenancyStatus(): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/tenancy/status',

@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { AlertTriangle, Trash2, Info } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { ModalWrapper } from './ui/Modal'
 
 type Variant = 'danger' | 'warning' | 'info'
 
@@ -28,6 +30,7 @@ const VARIANT_STYLES: Record<Variant, { icon: typeof Trash2; iconBg: string; ico
 
 export function ConfirmProvider({ children }: { children: ReactNode }) {
   const [dialog, setDialog] = useState<DialogState | null>(null)
+  const { t } = useTranslation();
 
   const confirm = useCallback((options: ConfirmOptions): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -48,10 +51,11 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     <ConfirmContext.Provider value={{ confirm }}>
       {children}
       {dialog && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
-          onClick={() => handleClose(false)}
-        >
+        <ModalWrapper isOpen={true}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+            onClick={() => handleClose(false)}
+          >
           <div
             className="card w-full max-w-md animate-scale-in animate-duration-200"
             onClick={(e) => e.stopPropagation()}
@@ -71,17 +75,18 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
                 className="btn-secondary hover-lift"
                 autoFocus
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => handleClose(true)}
                 className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold active-scale hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-bg ${styles.btn}`}
               >
-                {dialog.confirmLabel ?? 'Confirm'}
+                {dialog.confirmLabel ?? t('common.confirm')}
               </button>
             </div>
           </div>
         </div>
+        </ModalWrapper>
       )}
     </ConfirmContext.Provider>
   )

@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+import { useDirection } from "./hooks/useDirection";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Streams from "./pages/Streams";
@@ -18,6 +19,7 @@ import History from "./pages/History";
 import Tenancy from "./pages/Tenancy";
 
 function App() {
+  useDirection();
   const location = useLocation();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const prevLocationRef = useRef(location);

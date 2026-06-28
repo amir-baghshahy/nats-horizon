@@ -1,4 +1,5 @@
 import { useAlerts } from "./hooks/useAlerts";
+import { useTranslation } from "react-i18next";
 import { PageError, PageLoading } from "../../components/ui/PageState";
 import AlertsHeader from "./components/AlertsHeader";
 import AlertsStats from "./components/AlertsStats";
@@ -10,6 +11,7 @@ import AlertFormModal from "./components/AlertFormModal";
 import type { Alert } from "../../types";
 
 export default function AlertsPage() {
+  const { t } = useTranslation();
   const {
     activeTab,
     setActiveTab,
@@ -38,7 +40,7 @@ export default function AlertsPage() {
 
   const getErrorMessage = (error: unknown) => {
     if (error instanceof Error) return error.message;
-    return "Unable to load alerts";
+    return t("alerts.unableToLoad");
   };
 
   const filteredAlerts = (alerts ?? []).filter((alert: Alert) => {
@@ -53,8 +55,8 @@ export default function AlertsPage() {
       <PageLoading
         text={
           activeTab === "triggers"
-            ? "Loading alert triggers..."
-            : "Loading alerts..."
+            ? t("alerts.loading")
+            : t("alerts.alertsLoading")
         }
       />
     );
@@ -74,16 +76,16 @@ export default function AlertsPage() {
 
   const handleDeleteAlert = async (alert: Alert) => {
     const ok = await confirm({
-      title: "Delete Alert",
-      message: `Delete alert "${alert.name}"?`,
-      confirmLabel: "Delete",
+      title: t("alerts.deleteAlert"),
+      message: t("alerts.deleteAlertConfirm", { name: alert.name }),
+      confirmLabel: t("alerts.delete"),
       variant: "danger",
     });
     if (ok && alert.id) deleteAlertMutation.mutate(alert.id);
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <div className="p-3 md:p-4 lg:p-6">
       <AlertsHeader
         onNewAlert={() => {
           setSelectedAlert(null);
@@ -102,7 +104,9 @@ export default function AlertsPage() {
       />
 
       <AlertsFilters
-        filterSeverity={filterSeverity as "all" | "critical" | "warning" | "info"}
+        filterSeverity={
+          filterSeverity as "all" | "critical" | "warning" | "info"
+        }
         onFilterChange={(value) => setFilterSeverity(value)}
       />
 
@@ -133,14 +137,16 @@ export default function AlertsPage() {
       <AlertFormModal
         isOpen={showCreateModal}
         alert={selectedAlert}
-        isPending={createAlertMutation.isPending || updateAlertMutation.isPending}
+        isPending={
+          createAlertMutation.isPending || updateAlertMutation.isPending
+        }
         onClose={() => {
           setShowCreateModal(false);
           setSelectedAlert(null);
         }}
         onSubmit={(data) => {
           if (selectedAlert) {
-            updateAlertMutation.mutate({ id: selectedAlert.id || '', data });
+            updateAlertMutation.mutate({ id: selectedAlert.id || "", data });
           } else {
             createAlertMutation.mutate(data);
           }

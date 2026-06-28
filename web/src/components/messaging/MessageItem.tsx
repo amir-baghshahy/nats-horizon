@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
   Copy,
   Code,
@@ -25,45 +26,15 @@ export interface Message {
 import { FORMAT_COLORS } from "../../utils/constants";
 
 interface MessageItemProps {
-  /**
-   * The message to display
-   */
   message: Message;
-
-  /**
-   * Whether the message is expanded
-   */
   isExpanded: boolean;
-
-  /**
-   * Current view mode
-   */
   viewMode: "pretty" | "raw" | "hex";
-
-  /**
-   * Detected message format
-   */
   format: "json" | "binary" | "text";
-
-  /**
-   * Toggle expansion callback
-   */
   onToggleExpand: () => void;
-
-  /**
-   * Cycle view mode callback
-   */
   onCycleViewMode: () => void;
-
-  /**
-   * Copy message callback
-   */
   onCopy: () => void;
 }
 
-/**
- * MessageItem displays a single NATS message with expandable details
- */
 export default function MessageItem({
   message,
   isExpanded,
@@ -73,7 +44,8 @@ export default function MessageItem({
   onCycleViewMode,
   onCopy,
 }: MessageItemProps) {
-  // Format message data based on view mode
+  const { t } = useTranslation();
+
   const formatMessageData = (): string => {
     switch (viewMode) {
       case "hex":
@@ -93,15 +65,21 @@ export default function MessageItem({
   const formatColorClass =
     FORMAT_COLORS[format] || "bg-gray-500/20 text-gray-400";
 
-  return (
+  const nextViewModeLabel =
+    viewMode === "pretty"
+      ? t('messages.raw')
+      : viewMode === "raw"
+        ? t('messages.hex')
+        : t('messages.pretty');
+
+    return (
     <div className="border-l-2 border-l-transparent hover:border-l-primary-500 transition-colors">
       <div className="p-4 hover:bg-dark-bg/50 transition-colors">
         <div className="flex items-start gap-4">
-          {/* Expand Button */}
           <button
             onClick={onToggleExpand}
             className="p-1 hover:bg-dark-bg rounded transition-colors mt-0.5"
-            aria-label={isExpanded ? "Collapse" : "Expand"}
+            aria-label={isExpanded ? t('messages.collapse') : t('messages.expand')}
           >
             {isExpanded ? (
               <ChevronDown className="w-4 h-4 text-dark-muted" />
@@ -110,7 +88,6 @@ export default function MessageItem({
             )}
           </button>
 
-          {/* Message Content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-2 flex-wrap">
               <span className="font-mono text-sm text-primary-400">
@@ -134,7 +111,7 @@ export default function MessageItem({
 
               {message.reply && (
                 <span className="text-xs text-primary-400">
-                  → {message.reply}
+                  {t('messages.replyLabel')} {message.reply}
                 </span>
               )}
             </div>
@@ -144,50 +121,42 @@ export default function MessageItem({
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-2">
             <button
               onClick={onCycleViewMode}
               className="p-2 hover:bg-dark-bg rounded-lg transition-colors text-xs"
-              title={`View mode: ${viewMode}`}
+              title={`${t('messages.viewMode')}: ${viewMode}`}
             >
               {viewMode === "pretty"
-                ? "Pretty"
+                ? t('messages.pretty')
                 : viewMode === "raw"
-                  ? "Raw"
-                  : "Hex"}
+                  ? t('messages.raw')
+                  : t('messages.hex')}
             </button>
 
             <button
               onClick={onCopy}
               className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
-              title="Copy message"
+              title={t('messages.copyMessage')}
             >
               <Copy className="w-4 h-4 text-dark-muted" />
             </button>
           </div>
         </div>
 
-        {/* Expanded Details */}
         {isExpanded && (
           <div className="mt-4 pl-8 space-y-4">
-            {/* Payload */}
             <div className="bg-dark-bg/50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium flex items-center gap-2">
                   <Code className="w-4 h-4" />
-                  Payload ({format.toUpperCase()})
+                  {t('messages.payload')} ({format.toUpperCase()})
                 </h4>
                 <button
                   onClick={onCycleViewMode}
                   className="text-xs text-primary-400 hover:underline"
                 >
-                  Switch to{" "}
-                  {viewMode === "pretty"
-                    ? "Raw"
-                    : viewMode === "raw"
-                      ? "Hex"
-                      : "Pretty"}
+                  {t('messages.switchTo')} {nextViewModeLabel}
                 </button>
               </div>
               <pre className={`text-sm p-3 rounded overflow-x-auto bg-dark-bg`}>
@@ -205,12 +174,11 @@ export default function MessageItem({
               </pre>
             </div>
 
-            {/* Headers */}
             {message.headers && Object.keys(message.headers).length > 0 && (
               <div className="bg-dark-bg/50 rounded-lg p-4">
                 <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  Headers
+                  {t('messages.headers')}
                 </h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   {Object.entries(message.headers).map(([key, values]) => (
@@ -225,23 +193,22 @@ export default function MessageItem({
               </div>
             )}
 
-            {/* Metadata */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-xs text-dark-muted">Subject</p>
+                <p className="text-xs text-dark-muted">{t('messages.subject')}</p>
                 <p className="font-mono text-sm truncate">{message.subject}</p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-xs text-dark-muted">Size</p>
+                <p className="text-xs text-dark-muted">{t('common.size')}</p>
                 <p className="text-sm">{formatBytes(message.size)}</p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-xs text-dark-muted">Timestamp</p>
+                <p className="text-xs text-dark-muted">{t('messages.timestamp')}</p>
                 <p className="text-sm">{formatTimestamp(message.timestamp)}</p>
               </div>
               {message.reply && (
                 <div className="bg-dark-bg/50 rounded-lg p-3">
-                  <p className="text-xs text-dark-muted">Reply To</p>
+                  <p className="text-xs text-dark-muted">{t('messages.replyTo')}</p>
                   <p className="font-mono text-sm truncate">{message.reply}</p>
                 </div>
               )}

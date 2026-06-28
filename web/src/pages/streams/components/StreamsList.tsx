@@ -4,6 +4,7 @@ import { BulkActions, Pagination } from "../../../components/common";
 import { EmptyState } from "../../../components/ui";
 import type { StreamResponse as Stream } from "../../../types";
 import StreamRow from "./StreamRow";
+import { useTranslation } from "react-i18next";
 
 interface StreamsListProps {
   streams: Stream[];
@@ -56,14 +57,15 @@ export default function StreamsList({
   getStreamHealthStatus,
   getStreamName,
 }: StreamsListProps) {
+  const { t } = useTranslation();
   const actions = [
     {
-      label: "Export All",
+      label: t('streams.exportAll'),
       icon: Download as LucideIcon,
       onClick: onExportAll,
     },
     {
-      label: "Delete",
+      label: t('streams.delete'),
       icon: Trash2 as LucideIcon,
       onClick: onBulkDelete,
       variant: "danger" as const,
@@ -82,11 +84,11 @@ export default function StreamsList({
     return (
       <EmptyState
         icon={Database}
-        title="No Streams Found"
+        title={t('streams.noStreamsFound')}
         description={
           hasActiveFilters
-            ? "Try adjusting your filters"
-            : "Create your first stream to get started"
+            ? t('streams.adjustFilters')
+            : t('streams.noStreamsDescription')
         }
       />
     );
@@ -135,7 +137,7 @@ export default function StreamsList({
         })}
         </div>
         <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-          {streams.length} stream{streams.length !== 1 ? 's' : ''}
+          {t('streams.streamCount', { count: streams.length })}
         </div>
       </div>
 

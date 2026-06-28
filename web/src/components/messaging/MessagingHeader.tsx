@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { CheckCircle, MessageSquare, Send, Zap } from "lucide-react";
 import type { MessagingTab } from "./MessagingTabs";
 
@@ -12,11 +13,13 @@ export default function MessagingHeader({
   activeTab,
   onTabChange,
 }: MessagingHeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
-        <h1 className="text-2xl font-bold md:text-3xl">Messages</h1>
-        <p className="mt-1 text-dark-muted">NATS Pub/Sub, Request/Reply, Subjects and Services</p>
+        <h1 className="text-2xl font-bold md:text-3xl">{t('messages.title')}</h1>
+        <p className="mt-1 text-dark-muted">{t('messages.subtitle')}</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -24,12 +27,12 @@ export default function MessagingHeader({
           {sseConnected ? (
             <>
               <CheckCircle className="h-4 w-4 text-green-400" />
-              <span className="text-sm text-green-400">SSE Connected</span>
+              <span className="text-sm text-green-400">{t('common.sseConnected')}</span>
             </>
           ) : (
             <>
               <Zap className="h-4 w-4 text-yellow-400" />
-              <span className="text-sm text-yellow-400">Polling</span>
+              <span className="text-sm text-yellow-400">{t('common.polling')}</span>
             </>
           )}
         </div>
@@ -40,7 +43,7 @@ export default function MessagingHeader({
           className="btn-primary inline-flex items-center gap-2"
         >
           <Send className="h-4 w-4" />
-          Publish
+          {t('messages.publish')}
         </button>
 
         <button
@@ -49,7 +52,7 @@ export default function MessagingHeader({
           className="btn-secondary inline-flex items-center gap-2"
         >
           <MessageSquare className="h-4 w-4" />
-          Request
+          {t('messages.request')}
         </button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { Eye, Clock, CheckCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { AlertTrigger } from "../../../types";
 
 interface AlertsTriggersListProps {
@@ -21,13 +22,16 @@ export default function AlertsTriggersList({
   isAckPending,
   onAcknowledge,
 }: AlertsTriggersListProps) {
+  const { t } = useTranslation();
   if (!triggers || triggers.length === 0) {
     return (
       <div className="card text-center py-16">
         <Eye className="w-16 h-16 text-dark-muted mx-auto mb-4 opacity-50" />
-        <h3 className="text-lg font-medium mb-2">No Triggered Alerts</h3>
+        <h3 className="text-lg font-medium mb-2">
+          {t("alerts.noTriggeredAlerts")}
+        </h3>
         <p className="text-dark-muted">
-          Alerts will appear here when conditions are met
+          {t("alerts.noTriggeredAlertsDescription")}
         </p>
       </div>
     );
@@ -39,12 +43,12 @@ export default function AlertsTriggersList({
         {triggers.map((trigger: AlertTrigger, index: number) => (
           <div
             key={`${trigger.alert_id}-${index}`}
-            className={`border-l-4 ${
+            className={`border-s-4 ${
               trigger.severity === "critical"
-                ? "border-l-red-500"
+                ? "border-s-red-500"
                 : trigger.severity === "warning"
-                  ? "border-l-yellow-500"
-                  : "border-l-blue-500"
+                  ? "border-s-yellow-500"
+                  : "border-s-blue-500"
             } ${trigger.acked ? "opacity-60" : ""}`}
           >
             <div className="flex items-start justify-between">
@@ -53,14 +57,15 @@ export default function AlertsTriggersList({
                   <h3 className="font-semibold">{trigger.alert_name}</h3>
                   <span
                     className={`text-xs px-2 py-1 rounded border ${
-                      SEVERITY_COLORS[trigger.severity || 'info']
+                      SEVERITY_COLORS[trigger.severity || "info"]
                     }`}
                   >
                     {trigger.severity}
                   </span>
                   {trigger.acked && (
                     <span className="text-xs flex items-center gap-1 text-green-400">
-                      <CheckCircle className="w-3 h-3" />Acknowledged
+                      <CheckCircle className="w-3 h-3" />
+                      {t("alerts.acknowledged")}
                     </span>
                   )}
                 </div>
@@ -68,20 +73,24 @@ export default function AlertsTriggersList({
                 <div className="flex items-center gap-4 text-xs text-dark-muted">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {formatTimestamp(trigger.triggered_at || '')}
+                    {formatTimestamp(trigger.triggered_at || "")}
                   </span>
                   {trigger.acked_by && (
-                    <span>Acked by: {trigger.acked_by}</span>
+                    <span>
+                      {t("alerts.ackedBy", { name: trigger.acked_by })}
+                    </span>
                   )}
                 </div>
               </div>
               {!trigger.acked && (
                 <button
-                  onClick={() => trigger.alert_id && onAcknowledge(trigger.alert_id)}
+                  onClick={() =>
+                    trigger.alert_id && onAcknowledge(trigger.alert_id)
+                  }
                   className="btn-secondary text-sm"
                   disabled={isAckPending}
                 >
-                  Acknowledge
+                  {t("alerts.acknowledge")}
                 </button>
               )}
             </div>
@@ -89,7 +98,7 @@ export default function AlertsTriggersList({
         ))}
       </div>
       <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-        {triggers.length} trigger{triggers.length !== 1 ? 's' : ''}
+        {t("alerts.triggerCount", { count: triggers.length })}
       </div>
     </div>
   );

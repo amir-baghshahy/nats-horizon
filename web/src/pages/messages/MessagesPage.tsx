@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useMessages } from "./hooks/useMessages";
 import { CoreMessagingContent } from "../CoreMessaging";
 import MessagesHeader from "./components/MessagesHeader";
@@ -9,6 +10,7 @@ import MessagesList from "./components/MessagesList";
 import PublishModal from "./components/PublishModal";
 
 export default function MessagesPage() {
+  const { t } = useTranslation();
   const {
     streams,
     selectedStream,
@@ -66,10 +68,10 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <div className="p-3 md:p-4 lg:p-6">
       <MessagesHeader
-        title="Message Browser"
-        description="View, publish, and manage stream messages"
+        title={t('messages.messageBrowser')}
+        description={t('messages.messageBrowserDescription')}
         selectedCount={selectedMessages.size}
         onExport={handleExportSelected}
         onDelete={handleBulkDelete}

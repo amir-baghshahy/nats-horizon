@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface Props {
   children: ReactNode
@@ -10,8 +11,8 @@ interface State {
   error: Error | null
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+class ErrorBoundaryInner extends Component<Props & { t: (key: string) => string }, State> {
+  constructor(props: Props & { t: (key: string) => string }) {
     super(props)
     this.state = { hasError: false, error: null }
   }
@@ -25,21 +26,23 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   render() {
+    const { t } = this.props;
+
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback
       return (
         <div className="flex items-center justify-center h-full p-8">
           <div className="card text-center max-w-md">
             <div className="text-red-400 text-4xl mb-4">!</div>
-            <h2 className="text-lg font-semibold mb-2">Something went wrong</h2>
+            <h2 className="text-lg font-semibold mb-2">{t('common.somethingWentWrong')}</h2>
             <p className="text-dark-muted text-sm mb-4">
-              {this.state.error?.message || 'An unexpected error occurred'}
+              {this.state.error?.message || t('common.unexpectedError')}
             </p>
             <button
               onClick={() => this.setState({ hasError: false, error: null })}
               className="btn-primary"
             >
-              Try again
+              {t('common.tryAgain')}
             </button>
           </div>
         </div>
@@ -48,4 +51,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
     return this.props.children
   }
+}
+
+export function ErrorBoundary({ children, fallback }: Props) {
+  const { t } = useTranslation();
+  return <ErrorBoundaryInner t={t} fallback={fallback}>{children}</ErrorBoundaryInner>;
 }

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Zap, Eye, MessageSquare } from "lucide-react";
 import { validateSubject, validateTimeout } from "../../utils/validators";
 import { formatTimestamp } from "../../utils/formatters";
@@ -9,35 +10,13 @@ export interface RequestForm {
 }
 
 interface RequestFormProps {
-  /**
-   * Current form data
-   */
   form: RequestForm;
-
-  /**
-   * Form update callback
-   */
   onChange: (form: RequestForm) => void;
-
-  /**
-   * Submit callback
-   */
   onSubmit: () => void;
-
-  /**
-   * Response data (if any)
-   */
   response?: any;
-
-  /**
-   * Form errors
-   */
   errors?: Record<string, string>;
 }
 
-/**
- * RequestForm for NATS request/reply pattern
- */
 export default function RequestForm({
   form,
   onChange,
@@ -45,6 +24,8 @@ export default function RequestForm({
   response,
   errors = {},
 }: RequestFormProps) {
+  const { t } = useTranslation();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -67,23 +48,21 @@ export default function RequestForm({
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
-      {/* Request Form */}
       <div className="card">
         <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
           <Zap className="w-5 h-5" />
-          Send Request
+          {t('messages.sendRequest')}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Subject */}
           <div>
-            <label className="block text-sm font-medium mb-2">Subject</label>
+            <label className="block text-sm font-medium mb-2">{t('messages.subject')}</label>
             <p className="text-xs text-dark-muted mb-2">
-              The service address you want to call, e.g. service.get.
+              {t('messages.subjectHelp')}
             </p>
             <input
               type="text"
-              placeholder="service.get"
+              placeholder={t('messages.subjectPlaceholder')}
               value={form.subject}
               onChange={(e) => updateField("subject", e.target.value)}
               className="input w-full font-mono"
@@ -94,18 +73,16 @@ export default function RequestForm({
             )}
           </div>
 
-          {/* Payload */}
           <div>
-            <label className="block text-sm font-medium mb-2">Payload</label>
+            <label className="block text-sm font-medium mb-2">{t('messages.payload')}</label>
             <textarea
-              placeholder='{"id": "123"}'
+              placeholder={t('messages.payloadPlaceholder')}
               value={form.payload}
               onChange={(e) => updateField("payload", e.target.value)}
               className="input w-full font-mono h-32"
             />
           </div>
 
-          {/* Timeout */}
           <div>
             <label className="block text-sm font-medium mb-2">
               Timeout (ms)
@@ -125,24 +102,22 @@ export default function RequestForm({
             )}
           </div>
 
-          {/* Submit */}
           <div className="flex items-center gap-3 pt-4">
             <button
               type="submit"
               className="btn-primary flex items-center gap-2"
             >
               <Zap className="w-4 h-4" />
-              Send Request
+              {t('messages.sendRequest')}
             </button>
           </div>
         </form>
       </div>
 
-      {/* Response */}
       <div className="card">
         <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
           <Eye className="w-5 h-5" />
-          Response
+          {t('messages.response')}
         </h2>
 
         {response ? (
@@ -153,38 +128,34 @@ export default function RequestForm({
               </div>
             ) : (
               <>
-                {/* Subject */}
                 <div className="bg-dark-bg/50 rounded-lg p-4">
-                  <p className="text-xs text-dark-muted mb-1">Subject</p>
+                  <p className="text-xs text-dark-muted mb-1">{t('messages.subject')}</p>
                   <p className="font-mono text-sm">
-                    {response.subject || "N/A"}
+                    {response.subject || t('common.na')}
                   </p>
                 </div>
 
-                {/* Data */}
                 <div className="bg-dark-bg/50 rounded-lg p-4">
-                  <p className="text-xs text-dark-muted mb-2">Data</p>
+                  <p className="text-xs text-dark-muted mb-2">{t('common.data')}</p>
                   <pre className="text-sm p-3 bg-dark-bg rounded overflow-x-auto">
                     <code className="text-green-400">
-                      {response.data || "No data"}
+                      {response.data || t('messages.noData')}
                     </code>
                   </pre>
                 </div>
 
-                {/* Base64 (if present) */}
                 {response.data_base64 && (
                   <div className="bg-dark-bg/50 rounded-lg p-4">
-                    <p className="text-xs text-dark-muted mb-1">Base64</p>
+                    <p className="text-xs text-dark-muted mb-1">{t('messages.base64')}</p>
                     <p className="font-mono text-xs break-all">
                       {response.data_base64}
                     </p>
                   </div>
                 )}
 
-                {/* Metadata */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-dark-bg/50 rounded-lg p-3">
-                    <p className="text-xs text-dark-muted">Timestamp</p>
+                    <p className="text-xs text-dark-muted">{t('messages.timestamp')}</p>
                     <p className="text-sm">
                       {formatTimestamp(response.timestamp || 0)}
                     </p>
@@ -192,7 +163,7 @@ export default function RequestForm({
 
                   {response.reply && (
                     <div className="bg-dark-bg/50 rounded-lg p-3">
-                      <p className="text-xs text-dark-muted">Reply</p>
+                      <p className="text-xs text-dark-muted">{t('messages.reply')}</p>
                       <p className="font-mono text-sm truncate">
                         {response.reply}
                       </p>
@@ -205,7 +176,7 @@ export default function RequestForm({
         ) : (
           <div className="p-8 text-center text-dark-muted">
             <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>Send a request to see the response here.</p>
+            <p>{t('messages.sendRequestDescription')}</p>
           </div>
         )}
       </div>

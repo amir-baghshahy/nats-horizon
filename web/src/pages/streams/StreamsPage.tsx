@@ -44,7 +44,7 @@ export default function StreamsPage() {
   } = useStreamsPage();
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <div className="p-3 md:p-4 lg:p-6">
       <StreamsHeader
         sseConnected={sseConnected}
         onShowCreateModal={() => setShowCreateModal(true)}

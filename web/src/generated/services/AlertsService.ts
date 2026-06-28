@@ -25,17 +25,18 @@ export class AlertsService {
     /**
      * Create an alert
      * Creates a new alert configuration
-     * @param request Alert configuration
+     * @param requestBody Alert configuration
      * @returns Alert Created
      * @throws ApiError
      */
     public static postAlerts(
-        request: Alert,
+        requestBody: Alert,
     ): CancelablePromise<Alert> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/alerts',
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
             },
@@ -78,13 +79,13 @@ export class AlertsService {
      * Acknowledge an alert trigger
      * Acknowledges one or more triggers for the given alert ID
      * @param id Alert ID
-     * @param request Acknowledging user
+     * @param requestBody Acknowledging user
      * @returns SuccessResponse OK
      * @throws ApiError
      */
     public static postAlertsTriggersAck(
         id: string,
-        request?: any,
+        requestBody?: Record<string, any>,
     ): CancelablePromise<SuccessResponse> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -92,7 +93,29 @@ export class AlertsService {
             path: {
                 'id': id,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+    /**
+     * Delete an alert
+     * Deletes an alert configuration by ID
+     * @param id Alert ID
+     * @returns SuccessResponse OK
+     * @throws ApiError
+     */
+    public static deleteAlerts(
+        id: string,
+    ): CancelablePromise<SuccessResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/alerts/{id}',
+            path: {
+                'id': id,
+            },
+            errors: {
+                404: `Not Found`,
+            },
         });
     }
     /**
@@ -120,13 +143,13 @@ export class AlertsService {
      * Update an alert
      * Updates an existing alert configuration
      * @param id Alert ID
-     * @param request Alert configuration
+     * @param requestBody Alert configuration
      * @returns Alert OK
      * @throws ApiError
      */
     public static putAlerts(
         id: string,
-        request: Alert,
+        requestBody: Alert,
     ): CancelablePromise<Alert> {
         return __request(OpenAPI, {
             method: 'PUT',
@@ -134,30 +157,10 @@ export class AlertsService {
             path: {
                 'id': id,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                404: `Not Found`,
-            },
-        });
-    }
-    /**
-     * Delete an alert
-     * Deletes an alert configuration by ID
-     * @param id Alert ID
-     * @returns SuccessResponse OK
-     * @throws ApiError
-     */
-    public static deleteAlerts(
-        id: string,
-    ): CancelablePromise<SuccessResponse> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/alerts/{id}',
-            path: {
-                'id': id,
-            },
-            errors: {
                 404: `Not Found`,
             },
         });

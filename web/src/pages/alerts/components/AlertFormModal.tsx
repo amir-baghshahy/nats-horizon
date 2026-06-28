@@ -1,6 +1,7 @@
 import type { Alert } from "../../../types";
-import { Duration } from "../../../types";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
+import { ModalWrapper } from "../../../components/ui/Modal";
 
 interface AlertFormModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export default function AlertFormModal({
   onClose,
   onSubmit,
 }: AlertFormModalProps) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -25,9 +27,12 @@ export default function AlertFormModal({
 
     // Collect selected channels
     const channels: string[] = [];
-    if ((formData.get("channel_email") as string) === "on") channels.push("email");
-    if ((formData.get("channel_webhook") as string) === "on") channels.push("webhook");
-    if ((formData.get("channel_slack") as string) === "on") channels.push("slack");
+    if ((formData.get("channel_email") as string) === "on")
+      channels.push("email");
+    if ((formData.get("channel_webhook") as string) === "on")
+      channels.push("webhook");
+    if ((formData.get("channel_slack") as string) === "on")
+      channels.push("slack");
 
     const data: Partial<Alert> = {
       name: formData.get("name") as string,
@@ -42,45 +47,45 @@ export default function AlertFormModal({
         operator: formData.get("operator") as string,
       },
       channels,
-      cooldown: Duration.Minute * 5,
+      cooldown: 300000000000 as any, // 5 minutes in nanoseconds
     };
     onSubmit(data);
   };
 
   return createPortal(
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="card max-w-lg w-full">
-        <div className="flex items-center justify-between mb-6">
+    <ModalWrapper isOpen={isOpen}>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div className="card max-w-lg w-full">
+        <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">
-            {alert ? "Edit Alert" : "Create Alert"}
+            {alert ? t("alerts.editAlert") : t("alerts.createAlert")}
           </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-dark-bg rounded-lg"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-dark-bg rounded-lg">
             ×
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Alert Name</label>
+            <label className="block text-sm font-medium mb-2">
+              {t("alerts.alertName")}
+            </label>
             <input
               type="text"
               name="name"
               defaultValue={alert?.name}
-              placeholder="High Consumer Lag"
+              placeholder={t("alerts.alertNamePlaceholder")}
               className="input w-full"
               required
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">
-              Description
+              {t("alerts.description")}
             </label>
             <textarea
               name="description"
               defaultValue={alert?.description}
-              placeholder="Alert when consumer lag exceeds threshold"
+              placeholder={t("alerts.descriptionPlaceholder")}
               rows={2}
               className="input w-full"
             />
@@ -88,47 +93,53 @@ export default function AlertFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">
-                Condition Type
+                {t("alerts.conditionType")}
               </label>
               <select
                 name="condition_type"
                 defaultValue={alert?.condition?.type || "lag"}
                 className="input w-full"
               >
-                <option value="lag">Consumer Lag</option>
-                <option value="storage">Storage Usage</option>
-                <option value="messages">Message Count</option>
+                <option value="lag">{t("alerts.consumerLag")}</option>
+                <option value="storage">{t("alerts.storageUsage")}</option>
+                <option value="messages">{t("alerts.messageCount")}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Severity</label>
+              <label className="block text-sm font-medium mb-2">
+                {t("alerts.severity")}
+              </label>
               <select
                 name="severity"
                 defaultValue={alert?.severity || "warning"}
                 className="input w-full"
               >
-                <option value="info">Info</option>
-                <option value="warning">Warning</option>
-                <option value="critical">Critical</option>
+                <option value="info">{t("alerts.info")}</option>
+                <option value="warning">{t("alerts.warning")}</option>
+                <option value="critical">{t("alerts.critical")}</option>
               </select>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Operator</label>
+              <label className="block text-sm font-medium mb-2">
+                {t("alerts.operator")}
+              </label>
               <select
                 name="operator"
                 defaultValue={alert?.condition?.operator || ">"}
                 className="input w-full"
               >
-                <option value=">">Greater than</option>
-                <option value="<">Less than</option>
-                <option value=">=">Greater or equal</option>
-                <option value="<=">Less or equal</option>
+                <option value=">">{t("alerts.greaterThan")}</option>
+                <option value="<">{t("alerts.lessThan")}</option>
+                <option value=">=">{t("alerts.greaterOrEqual")}</option>
+                <option value="<=">{t("alerts.lessOrEqual")}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Threshold</label>
+              <label className="block text-sm font-medium mb-2">
+                {t("alerts.threshold")}
+              </label>
               <input
                 type="number"
                 name="threshold"
@@ -140,31 +151,31 @@ export default function AlertFormModal({
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">
-              Stream Name (optional)
+              {t("alerts.streamNameOptional")}
             </label>
             <input
               type="text"
               name="stream"
               defaultValue={alert?.condition?.stream || ""}
-              placeholder="my-stream"
+              placeholder={t("alerts.streamNamePlaceholder")}
               className="input w-full"
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">
-              Consumer Name (optional)
+              {t("alerts.consumerNameOptional")}
             </label>
             <input
               type="text"
               name="consumer"
               defaultValue={alert?.condition?.consumer || ""}
-              placeholder="my-consumer"
+              placeholder={t("alerts.consumerNamePlaceholder")}
               className="input w-full"
             />
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">
-              Notification Channels
+              {t("alerts.notificationChannels")}
             </label>
             <div className="space-y-2">
               <label className="flex items-center gap-2">
@@ -174,7 +185,7 @@ export default function AlertFormModal({
                   defaultChecked={alert?.channels?.includes("email")}
                   className="rounded"
                 />
-                <span className="text-sm">Email</span>
+                <span className="text-sm">{t("alerts.email")}</span>
               </label>
               <label className="flex items-center gap-2">
                 <input
@@ -183,7 +194,7 @@ export default function AlertFormModal({
                   defaultChecked={alert?.channels?.includes("webhook")}
                   className="rounded"
                 />
-                <span className="text-sm">Webhook</span>
+                <span className="text-sm">{t("alerts.webhook")}</span>
               </label>
               <label className="flex items-center gap-2">
                 <input
@@ -192,7 +203,7 @@ export default function AlertFormModal({
                   defaultChecked={alert?.channels?.includes("slack")}
                   className="rounded"
                 />
-                <span className="text-sm">Slack</span>
+                <span className="text-sm">{t("alerts.slack")}</span>
               </label>
             </div>
           </div>
@@ -205,28 +216,21 @@ export default function AlertFormModal({
               value="true"
             />
             <label htmlFor="enabled" className="text-sm">
-              Enable this alert
+              {t("alerts.enableAlert")}
             </label>
           </div>
           <div className="flex items-center gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-secondary"
-            >
-              Cancel
+            <button type="button" onClick={onClose} className="btn-secondary">
+              {t("common.cancel")}
             </button>
-            <button
-              type="submit"
-              disabled={isPending}
-              className="btn-primary"
-            >
-              {alert ? "Update" : "Create"} Alert
+            <button type="submit" disabled={isPending} className="btn-primary">
+              {alert ? t("alerts.update") : t("alerts.create")} Alert
             </button>
           </div>
         </form>
       </div>
-    </div>,
-    document.body
+    </div>
+      </ModalWrapper>,
+    document.body,
   );
 }

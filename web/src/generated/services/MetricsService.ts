@@ -39,7 +39,7 @@ export class MetricsService {
      */
     public static getMetricsRates(
         duration: number = 60,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/metrics/rates',
@@ -60,7 +60,7 @@ export class MetricsService {
      */
     public static getMetricsStreams(
         name: string,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/metrics/streams/{name}',
@@ -80,7 +80,7 @@ export class MetricsService {
     public static getMetricsStreamsConsumers(
         name: string,
         consumer: string,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/metrics/streams/{name}/consumers/{consumer}',
@@ -98,7 +98,7 @@ export class MetricsService {
      * @returns any System metrics
      * @throws ApiError
      */
-    public static getMetricsSystem(): CancelablePromise<any> {
+    public static getMetricsSystem(): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/metrics/system',

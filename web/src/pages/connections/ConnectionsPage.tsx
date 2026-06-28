@@ -6,6 +6,9 @@ import {
 import ConnectionFilters from '../../components/connections/ConnectionFilters'
 import { HealthService } from '../../types'
 import type { ConnectionInfo } from '../../types'
+import { useTranslation } from 'react-i18next'
+import EmptyState from '../../components/ui/EmptyState'
+import { Cable } from 'lucide-react'
 
 export default function ConnectionsPage({
   searchQuery,
@@ -25,13 +28,15 @@ export default function ConnectionsPage({
   toast,
   confirm,
 }: UseConnectionsReturn) {
+  const { t } = useTranslation();
+
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-8 gap-4">
+    <div className="p-3 md:p-4 lg:p-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-4 gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Connections</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{t('connections.title')}</h1>
           <p className="text-dark-muted mt-1">
-            Active NATS connections and clients
+            {t('connections.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -41,7 +46,7 @@ export default function ConnectionsPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <div className="card">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
@@ -49,7 +54,7 @@ export default function ConnectionsPage({
             </div>
             <div>
               <p className="text-2xl font-bold">{stats.total}</p>
-              <p className="text-xs text-dark-muted">Connections</p>
+              <p className="text-xs text-dark-muted">{t('connections.title')}</p>
             </div>
           </div>
         </div>
@@ -60,7 +65,7 @@ export default function ConnectionsPage({
             </div>
             <div>
               <p className="text-2xl font-bold">{stats.uniqueUsers}</p>
-              <p className="text-xs text-dark-muted">Unique Users</p>
+              <p className="text-xs text-dark-muted">{t('connections.uniqueUsers')}</p>
             </div>
           </div>
         </div>
@@ -71,7 +76,7 @@ export default function ConnectionsPage({
             </div>
             <div>
               <p className="text-2xl font-bold">{stats.totalSubs}</p>
-              <p className="text-xs text-dark-muted">Subscriptions</p>
+              <p className="text-xs text-dark-muted">{t('connections.subscriptions')}</p>
             </div>
           </div>
         </div>
@@ -82,23 +87,23 @@ export default function ConnectionsPage({
             </div>
             <div>
               <p className="text-2xl font-bold">{Math.floor(stats.avgSubs)}</p>
-              <p className="text-xs text-dark-muted">Avg Subs/Conn</p>
+              <p className="text-xs text-dark-muted">{t('connections.avgSubsPerConn')}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <div className="card">
-          <div className="mb-5 flex items-center justify-between gap-4">
+          <div className="mb-3 flex items-center justify-between gap-4">
             <div>
-              <h3 className="text-lg font-semibold">Server Distribution</h3>
+              <h3 className="text-lg font-semibold">{t('connections.serverDistribution')}</h3>
               <p className="text-sm text-dark-muted">
-                Connection spread across NATS servers
+                {t('connections.serverDistributionDescription')}
               </p>
             </div>
             <span className="rounded-full bg-primary-500/10 px-3 py-1 text-sm text-primary-300">
-              {filteredConnections.length} total
+              {t('connections.total', { count: filteredConnections.length })}
             </span>
           </div>
 
@@ -129,9 +134,9 @@ export default function ConnectionsPage({
               })}
             </div>
           ) : (
-            <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-8 text-center text-dark-muted">
+            <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-6 text-center text-dark-muted">
               <Network className="mx-auto mb-3 h-10 w-10 opacity-50" />
-              <p>No server distribution data available.</p>
+              <p>{t('connections.noServerData')}</p>
             </div>
           )}
         </div>
@@ -148,11 +153,18 @@ export default function ConnectionsPage({
       <div className="card overflow-hidden flex flex-col max-h-[600px]">
         {isLoading ? (
           <div className="p-8 text-center text-dark-muted">
-            Loading connections...
+            <div className="animate-spin inline-block mb-2">
+              <RefreshCw className="w-6 h-6" />
+            </div>
+            <p>{t('connections.loadingConnections')}</p>
           </div>
         ) : filteredConnections.length === 0 ? (
-          <div className="p-8 text-center text-dark-muted">
-            No connections found matching your filters
+          <div className="p-8">
+            <EmptyState
+              icon={Cable}
+              title={t('connections.noConnectionsFound')}
+              description={t('connections.searchPlaceholder')}
+            />
           </div>
         ) : (
           <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-dark-border">
@@ -183,7 +195,7 @@ export default function ConnectionsPage({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-medium">
-                            {conn.user || 'Anonymous'}
+                            {conn.user || t('connections.anonymous')}
                           </span>
                           <span className="text-xs text-dark-muted">•</span>
                           <span className="text-sm text-dark-muted">
@@ -198,23 +210,28 @@ export default function ConnectionsPage({
                         </div>
                       </div>
 
-                      <div className="hidden md:flex items-center gap-6 text-sm">
+                      <div className="hidden md:flex items-center gap-4 text-sm">
                         <div className="text-center">
                           <p className="font-medium">{conn.subs_count || 0}</p>
-                          <p className="text-xs text-dark-muted">Subs</p>
+                          <p className="text-xs text-dark-muted">{t('connections.subs')}</p>
                         </div>
                         <div className="text-center">
                           <p className="font-medium">
                             {getConnectionDuration(conn.connected_at || '')}
                           </p>
-                          <p className="text-xs text-dark-muted">Duration</p>
+                          <p className="text-xs text-dark-muted">{t('connections.duration')}</p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2">
                         <button
                           onClick={async () => {
-                            const ok = await confirm({ title: "Terminate Connection", message: `Terminate connection "${conn.cid}"? This action cannot be undone.`, confirmLabel: "Terminate", variant: "danger" })
+                            const ok = await confirm({
+                              title: t('connections.terminateConnection'),
+                              message: t('connections.terminateConfirm', { cid: String(conn.cid) }),
+                              confirmLabel: t('connections.terminate'),
+                              variant: "danger"
+                            })
                             if (ok) {
                               HealthService.deleteConnections(
                                 String(conn.cid || ''),
@@ -223,13 +240,13 @@ export default function ConnectionsPage({
                                 .catch(() =>
                                   toast(
                                     'error',
-                                    'Failed to terminate connection',
+                                    t('connections.terminateFailed'),
                                   ),
                                 )
                             }
                           }}
                           className="p-2 hover:bg-dark-bg rounded-lg transition-colors text-status-error"
-                          title="Terminate connection"
+                          title={t('connections.terminateConnection')}
                         >
                           <XCircle className="w-4 h-4" />
                         </button>
@@ -240,12 +257,12 @@ export default function ConnectionsPage({
                       <div className="mt-4 pl-8 space-y-4">
                         <div className="bg-dark-bg/50 rounded-lg p-4">
                           <p className="text-xs text-dark-muted">
-                            Connected Since
+                            {t('connections.connectedSince')}
                           </p>
                           <p className="font-medium text-sm">
                             {conn.connected_at
                               ? new Date(conn.connected_at).toLocaleString()
-                              : 'N/A'}
+                              : t('dashboard.na')}
                           </p>
                         </div>
                       </div>
@@ -257,12 +274,8 @@ export default function ConnectionsPage({
           </div>
         )}
         <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted">
-          Showing {filteredConnections.length} of {connections.length} connections
+          {t('connections.showingConnections', { filtered: filteredConnections.length, total: connections.length })}
         </div>
-      </div>
-
-      <div className="mt-4 text-sm text-dark-muted">
-        Showing {filteredConnections.length} of {connections.length} connections
       </div>
     </div>
   )

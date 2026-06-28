@@ -11,6 +11,11 @@
     @apply scroll-smooth;
   }
 
+  html[lang="fa"],
+  html[lang="ar"] {
+    font-family: "Vazirmatn", "Tahoma", "Arial", sans-serif;
+  }
+
   body {
     @apply min-h-screen bg-dark-bg text-dark-text antialiased;
     background:
@@ -94,7 +99,7 @@
   }
 
   .table th {
-    @apply border-b border-dark-border bg-dark-bg/40 p-3 text-left text-xs font-semibold uppercase tracking-wide text-dark-muted;
+    @apply border-b border-dark-border bg-dark-bg/40 p-3 text-start text-xs font-semibold uppercase tracking-wide text-dark-muted;
   }
 
   .table td {
@@ -219,6 +224,34 @@
   .truncate-3-lines {
     -webkit-line-clamp: 3;
   }
+}
+
+/* RTL Support */
+[dir="rtl"] .rtl\:flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .rtl\:text-right {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl\:text-left {
+  text-align: left;
+}
+
+[dir="rtl"] .rtl\:ml-auto {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+[dir="rtl"] .rtl\:mr-auto {
+  margin-right: unset;
+  margin-left: auto;
+}
+
+/* Flip icons and directional elements in RTL */
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
 }
 
 .recharts-tooltip-wrapper {

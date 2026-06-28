@@ -1935,373 +1935,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/object-store/buckets": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "object-store"
-                ],
-                "summary": "List object store buckets",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/ObjectStoreBucket"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "object-store"
-                ],
-                "summary": "Create object store bucket",
-                "parameters": [
-                    {
-                        "description": "Bucket configuration",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/CreateBucketRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/ObjectStoreBucket"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/object-store/buckets/{name}": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "object-store"
-                ],
-                "summary": "Get object store bucket info",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bucket name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ObjectStoreBucket"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "object-store"
-                ],
-                "summary": "Delete object store bucket",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bucket name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/SuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/object-store/buckets/{name}/keys": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "object-store"
-                ],
-                "summary": "List object store keys",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bucket name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/ObjectStoreKeysResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/object-store/buckets/{name}/keys/{key}": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "object-store"
-                ],
-                "summary": "Get object from bucket",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bucket name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Object key",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/GetObjectResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "object-store"
-                ],
-                "summary": "Put object in bucket",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bucket name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Object key",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Object data",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/PutObjectRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/PutObjectResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "object-store"
-                ],
-                "summary": "Delete object from bucket",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bucket name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Object key",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/SuccessResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/object-store/buckets/{name}/keys/{key}/info": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "object-store"
-                ],
-                "summary": "Get object metadata",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Bucket name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Object key",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/GetObjectInfoResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/security/audit": {
             "get": {
                 "description": "Returns audit log entries from the NATS audit stream",
@@ -3961,6 +3594,7 @@ const docTemplate = `{
             }
         },
         "AlertSeverity": {
+            "description": "Severity level for alerts",
             "type": "string",
             "enum": [
                 "info",
@@ -4423,23 +4057,6 @@ const docTemplate = `{
                 }
             }
         },
-        "CreateBucketRequest": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "max_bytes": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "ttl": {
-                    "type": "integer"
-                }
-            }
-        },
         "CreateConsumerRequest": {
             "type": "object",
             "required": [
@@ -4561,10 +4178,18 @@ const docTemplate = `{
                 1000,
                 1000000,
                 1000000000,
+                1,
+                1000,
+                1000000,
+                1000000000,
                 60000000000,
                 3600000000000
             ],
             "x-enum-varnames": [
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
@@ -4584,50 +4209,6 @@ const docTemplate = `{
                 },
                 "error": {
                     "type": "string"
-                }
-            }
-        },
-        "GetObjectInfoResponse": {
-            "type": "object",
-            "properties": {
-                "bucket": {
-                    "type": "string"
-                },
-                "chunks": {
-                    "type": "integer"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "key": {
-                    "type": "string"
-                },
-                "modified": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "integer"
-                }
-            }
-        },
-        "GetObjectResponse": {
-            "type": "object",
-            "properties": {
-                "bucket": {
-                    "type": "string"
-                },
-                "data": {
-                    "description": "Base64 encoded data",
-                    "type": "string"
-                },
-                "key": {
-                    "type": "string"
-                },
-                "modified": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "integer"
                 }
             }
         },
@@ -4875,60 +4456,6 @@ const docTemplate = `{
                 }
             }
         },
-        "ObjectStoreBucket": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "max_bytes": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "num_buckets": {
-                    "type": "integer"
-                },
-                "num_values": {
-                    "type": "integer"
-                },
-                "storage": {
-                    "type": "string"
-                }
-            }
-        },
-        "ObjectStoreKey": {
-            "type": "object",
-            "properties": {
-                "modified": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "integer"
-                }
-            }
-        },
-        "ObjectStoreKeysResponse": {
-            "type": "object",
-            "properties": {
-                "bucket": {
-                    "type": "string"
-                },
-                "count": {
-                    "type": "integer"
-                },
-                "keys": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ObjectStoreKey"
-                    }
-                }
-            }
-        },
         "PaginatedMessagesResponse": {
             "type": "object",
             "properties": {
@@ -5065,29 +4592,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "remaining": {
-                    "type": "integer"
-                }
-            }
-        },
-        "PutObjectRequest": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Base64 encoded data",
-                    "type": "string"
-                }
-            }
-        },
-        "PutObjectResponse": {
-            "type": "object",
-            "properties": {
-                "bucket": {
-                    "type": "string"
-                },
-                "key": {
-                    "type": "string"
-                },
-                "size": {
                     "type": "integer"
                 }
             }

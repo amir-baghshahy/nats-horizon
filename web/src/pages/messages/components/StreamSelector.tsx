@@ -1,4 +1,5 @@
 import { Search, Filter, RefreshCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface StreamSelectorProps {
   streams: any[];
@@ -21,11 +22,12 @@ export default function StreamSelector({
   onToggleFilters,
   onRefresh,
 }: StreamSelectorProps) {
+  const { t } = useTranslation();
   return (
-    <div className="card mb-6">
+    <div className="card mb-4">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
-          <label className="block text-sm text-dark-muted mb-2">Select Stream</label>
+          <label className="block text-sm text-dark-muted mb-2">{t('messages.selectStream')}</label>
           <select
             value={selectedStream}
             onChange={(e) => onStreamChange(e.target.value)}
@@ -43,11 +45,11 @@ export default function StreamSelector({
           </select>
         </div>
         <div className="flex-1 relative">
-          <label className="block text-sm text-dark-muted mb-2">Search Messages</label>
+          <label className="block text-sm text-dark-muted mb-2">{t('messages.searchMessages')}</label>
           <Search className="absolute left-3 top-9 w-4 h-4 text-dark-muted" />
           <input
             type="text"
-            placeholder="Search by subject, content, or headers..."
+            placeholder={t('messages.searchMessagesPlaceholder')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="input pl-10 w-full"
@@ -59,7 +61,7 @@ export default function StreamSelector({
             className="btn-secondary flex items-center gap-2"
           >
             <Filter className="w-4 h-4" />
-            {showFilters ? "Less Filters" : "Filters"}
+            {showFilters ? t('messages.lessFilters') : t('messages.filters')}
           </button>
           <button onClick={onRefresh} className="btn-secondary">
             <RefreshCw className="w-4 h-4" />

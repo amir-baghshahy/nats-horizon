@@ -86,14 +86,14 @@ export class ExportService {
      * Exports messages from a stream, optionally filtered by subject, as JSON
      * @param name Stream name
      * @param subject Filter subject
-     * @param request Export options
+     * @param requestBody Export options
      * @returns binary Exported messages
      * @throws ApiError
      */
     public static postExportStreamsMessages(
         name: string,
         subject?: string,
-        request?: any,
+        requestBody?: Record<string, any>,
     ): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -104,7 +104,8 @@ export class ExportService {
             query: {
                 'subject': subject,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 404: `Not Found`,
                 500: `Internal Server Error`,

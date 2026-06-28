@@ -1,4 +1,5 @@
 import { UseClusterReturn } from './hooks/useCluster'
+import { useTranslation } from "react-i18next";
 import {
   Server, HardDrive, Activity, CheckCircle, XCircle,
   RefreshCw, Copy, Database, Shield,
@@ -28,8 +29,9 @@ export default function ClusterPage({
   getErrorMessage,
   refetchReplicas,
 }: UseClusterReturn) {
+  const { t } = useTranslation();
   if (infoLoading || nodesLoading || healthLoading || streamsLoading || (selectedStream && replicasLoading)) {
-    return <PageLoading text="Loading cluster data..." />
+    return <PageLoading text={t('cluster.loading')} />
   }
 
   if (infoError || nodesError || healthError || streamsError) {
@@ -51,23 +53,23 @@ export default function ClusterPage({
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-3 md:p-4 lg:p-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Cluster Monitoring</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{t('cluster.title')}</h1>
           <p className="text-dark-muted mt-1">
             {clusterInfo?.is_clustered
-              ? `Cluster: ${clusterInfo?.cluster_name || 'Not clustered'}`
-              : 'Standalone mode'}
+              ? t('cluster.cluster', { name: clusterInfo?.cluster_name || t('cluster.notClustered') })
+              : t('cluster.standaloneMode')}
           </p>
         </div>
         <button onClick={refreshAll} className="btn-secondary flex items-center gap-2">
           <RefreshCw className="w-4 h-4" />
-          Refresh
+          {t('common.refresh')}
         </button>
       </div>
 
-      <div className={`card mb-6 border-l-4 ${
+      <div className={`card mb-4 border-l-4 ${
         clusterHealth?.connected
           ? 'border-l-status-success bg-status-success/10'
           : 'border-l-status-error bg-status-error/10'
@@ -80,65 +82,65 @@ export default function ClusterPage({
           )}
           <div>
             <p className="font-medium">
-              {clusterHealth?.connected ? 'Connected' : 'Disconnected'}
+              {clusterHealth?.connected ? t('cluster.connected') : t('cluster.disconnected')}
             </p>
             <p className="text-sm text-dark-muted">
               {clusterHealth?.connected
-                ? `Server: ${clusterHealth?.connected_server?.id || 'Current server'}`
-                : 'Unable to connect to NATS server'}
+                ? t('cluster.server', { name: clusterHealth?.connected_server?.id || 'Current server' })
+                : t('cluster.unableToConnect')}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-4">
         <div className="card">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Server className="w-5 h-5 text-primary-400" />
-            Cluster Information
+            {t('cluster.clusterInformation')}
           </h2>
           <div className="space-y-4">
             <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">Cluster Name</span>
+              <span className="text-dark-muted">{t('cluster.clusterName')}</span>
               <span className="font-medium font-mono">
                 {clusterInfo?.cluster_name || 'N/A'}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">Server Name</span>
+              <span className="text-dark-muted">{t('cluster.serverName')}</span>
               <span className="font-medium font-mono">
                 {clusterInfo?.server_name || 'N/A'}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">Mode</span>
+              <span className="text-dark-muted">{t('cluster.mode')}</span>
               <span className={`px-2 py-1 rounded text-xs ${
                 clusterInfo?.is_clustered
                   ? 'bg-purple-500/20 text-purple-400'
                   : 'bg-blue-500/20 text-blue-400'
               }`}>
-                {clusterInfo?.is_clustered ? 'Clustered' : 'Standalone'}
+                {clusterInfo?.is_clustered ? t('cluster.clustered') : t('cluster.standalone')}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">JetStream</span>
+              <span className="text-dark-muted">{t('cluster.jetStream')}</span>
               <span className={`px-2 py-1 rounded text-xs ${
                 clusterInfo?.jetstream?.enabled
                   ? 'bg-green-500/20 text-green-400'
                   : 'bg-dark-border'
               }`}>
-                {clusterInfo?.jetstream?.enabled ? 'Enabled' : 'Disabled'}
+                {clusterInfo?.jetstream?.enabled ? t('common.enabled') : t('common.disabled')}
               </span>
             </div>
             {clusterInfo?.jetstream?.domain && (
               <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                <span className="text-dark-muted">JS Domain</span>
+                <span className="text-dark-muted">{t('cluster.jsDomain')}</span>
                 <span className="font-mono text-sm">{clusterInfo.jetstream.domain}</span>
               </div>
             )}
             {clusterInfo?.jetstream?.tier && (
               <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                <span className="text-dark-muted">JS Tier</span>
+                <span className="text-dark-muted">{t('cluster.jsTier')}</span>
                 <span className="font-mono text-sm">{clusterInfo.jetstream.tier}</span>
               </div>
             )}
@@ -148,38 +150,38 @@ export default function ClusterPage({
         <div className="card">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Activity className="w-5 h-5 text-primary-400" />
-            System Health
+            {t('cluster.systemHealth')}
           </h2>
           <div className="space-y-4">
             <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">Connection Status</span>
+              <span className="text-dark-muted">{t('cluster.connectionStatus')}</span>
               <span className={`px-2 py-1 rounded text-xs ${
                 clusterHealth?.connected
                   ? 'bg-status-success/20 text-status-success'
                   : 'bg-status-error/20 text-status-error'
               }`}>
-                {clusterHealth?.status || 'Disconnected'}
+                {clusterHealth?.status || t('cluster.disconnected')}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">Server Status</span>
+              <span className="text-dark-muted">{t('cluster.serverStatus')}</span>
               <span className="font-mono text-sm capitalize">
                 {clusterHealth?.server_status || 'N/A'}
               </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">JetStream Status</span>
+              <span className="text-dark-muted">{t('cluster.jetStreamStatus')}</span>
               <span className={`px-2 py-1 rounded text-xs ${
                 clusterHealth?.jetstream?.status === 'ok'
                   ? 'bg-status-success/20 text-status-success'
                   : 'bg-status-error/20 text-status-error'
               }`}>
-                {clusterHealth?.jetstream?.status || 'Not available'}
+                {clusterHealth?.jetstream?.status || t('messages.notAvailable')}
               </span>
             </div>
             {clusterHealth?.connected_server?.url && (
               <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                <span className="text-dark-muted">Connected URL</span>
+                <span className="text-dark-muted">{t('cluster.connectedUrl')}</span>
                 <span className="font-mono text-sm truncate max-w-[200px]">
                   {clusterHealth.connected_server.url}
                 </span>
@@ -193,7 +195,7 @@ export default function ClusterPage({
         <div className="card mt-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <HardDrive className="w-5 h-5 text-primary-400" />
-            Cluster Nodes ({clusterNodes.nodes.length})
+            {t('cluster.clusterNodes', { count: clusterNodes.nodes.length })}
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {clusterNodes.nodes.map((node: any) => (
@@ -221,26 +223,30 @@ export default function ClusterPage({
                     </div>
                     {node.current && (
                       <span className="text-xs text-primary-400 ml-6">
-                        (Current)
+                        {t('cluster.current')}
                       </span>
                     )}
                   </div>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-dark-muted">Status</span>
+                    <span className="text-dark-muted">{t('common.status')}</span>
                     <span className={`px-2 py-0.5 rounded text-xs ${
                       node.healthy
                         ? 'bg-status-success/20 text-status-success'
                         : 'bg-status-error/20 text-status-error'
                     }`}>
-                      {node.healthy ? 'Healthy' : 'Unhealthy'}
+                      {node.healthy ? t('cluster.healthy') : t('cluster.unhealthy')}
                     </span>
                   </div>
                   {node.active ? (
                     <div className="flex items-center justify-between">
-                      <span className="text-dark-muted">Active</span>
-                      <Zap className="w-4 h-4 text-yellow-400" />
+                      <span className="text-dark-muted">{t('cluster.active')}</span>
+                      {node.active ? (
+                        <Zap className="w-4 h-4 text-yellow-400" />
+                      ) : (
+                        <span className="text-dark-muted">{t('common.no')}</span>
+                      )}
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
@@ -259,12 +265,12 @@ export default function ClusterPage({
         <div className="card mt-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Database className="w-5 h-5 text-primary-400" />
-            Stream Replication
+            {t('cluster.streamReplication')}
           </h2>
 
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-2 gap-4">
             <div>
-              <h3 className="font-medium mb-3">Select Stream</h3>
+              <h3 className="font-medium mb-3">{t('cluster.selectStream')}</h3>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {streams?.map((stream: any) => (
                   <div
@@ -279,7 +285,7 @@ export default function ClusterPage({
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-sm">{stream.config?.name}</span>
                       <span className="text-xs text-dark-muted">
-                        {stream.config?.replicas}x replica
+                        {stream.config?.replicas}x {t('cluster.replicas', { count: stream.config?.replicas })}
                       </span>
                     </div>
                   </div>
@@ -288,7 +294,7 @@ export default function ClusterPage({
                 {(!streams || streams.length === 0) && (
                   <div className="text-center py-8 text-dark-muted">
                     <Database className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                    <p>No streams found</p>
+                    <p>{t('cluster.noStreamsFound')}</p>
                   </div>
                 )}
               </div>
@@ -297,27 +303,27 @@ export default function ClusterPage({
             {selectedStream && streamReplicas && (
               <div>
                 <h3 className="font-medium mb-3">
-                  Replication Details: <span className="font-mono text-primary-400">{selectedStream}</span>
+                  {t('cluster.replicationDetails', { name: selectedStream })}
                 </h3>
                 <div className="space-y-4">
                   <div className="p-4 bg-dark-bg/50 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-dark-muted">Replicas</span>
+                      <span className="text-dark-muted">{t('common.replicas')}</span>
                       <span className="font-medium">{streamReplicas.replicas}x</span>
                     </div>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-dark-muted">Clustered</span>
+                      <span className="text-dark-muted">{t('cluster.clustered')}</span>
                       <span className={`px-2 py-1 rounded text-xs ${
                         streamReplicas.is_clustered
                           ? 'bg-status-success/20 text-status-success'
                           : 'bg-dark-border'
                       }`}>
-                        {streamReplicas.is_clustered ? 'Yes' : 'No'}
+                        {streamReplicas.is_clustered ? t('common.yes') : t('common.no')}
                       </span>
                     </div>
                     {streamReplicas.cluster && (
                       <div className="mt-3 pt-3 border-t border-dark-border">
-                        <p className="text-sm text-dark-muted mb-2">Cluster Info</p>
+                        <p className="text-sm text-dark-muted mb-2">{t('cluster.clusterInfo')}</p>
                         <p className="font-mono text-sm">{streamReplicas.cluster.name}</p>
                       </div>
                     )}
@@ -327,12 +333,12 @@ export default function ClusterPage({
                     <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/30">
                       <div className="flex items-center gap-2 mb-2">
                         <Copy className="w-4 h-4 text-purple-400" />
-                        <span className="font-medium">Mirror Source</span>
+                        <span className="font-medium">{t('cluster.mirrorSource')}</span>
                       </div>
                       <p className="font-mono text-sm">{streamReplicas.mirror.name}</p>
                       {streamReplicas.mirror.domain && (
                         <p className="text-xs text-dark-muted mt-1">
-                          Domain: {streamReplicas.mirror.domain}
+                          {t('cluster.domain', { domain: streamReplicas.mirror.domain })}
                         </p>
                       )}
                     </div>
@@ -342,7 +348,7 @@ export default function ClusterPage({
                     <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
                       <div className="flex items-center gap-2 mb-2">
                         <Globe className="w-4 h-4 text-blue-400" />
-                        <span className="font-medium">Aggregate Sources</span>
+                        <span className="font-medium">{t('cluster.aggregateSources')}</span>
                       </div>
                       <div className="space-y-1">
                         {streamReplicas.sources.map((source: any, idx: any) => (
@@ -359,14 +365,14 @@ export default function ClusterPage({
                     <div className="p-4 bg-dark-bg/50 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Shield className="w-4 h-4 text-primary-400" />
-                        <span className="font-medium">Placement Rules</span>
+                        <span className="font-medium">{t('cluster.placementRules')}</span>
                       </div>
                       <p className="text-sm text-dark-muted">
                         Cluster: <span className="font-mono">{streamReplicas.placement.cluster}</span>
                       </p>
                       {streamReplicas.placement.tags.length > 0 && (
                         <div className="mt-2">
-                          <span className="text-sm text-dark-muted">Tags: </span>
+                          <span className="text-sm text-dark-muted">{t('cluster.tags')}</span>
                           {streamReplicas.placement.tags.map((tag: any, idx: any) => (
                             <span key={idx} className="inline-block px-2 py-0.5 bg-dark-bg rounded text-xs font-mono ml-1">
                               {tag}
@@ -384,7 +390,7 @@ export default function ClusterPage({
               <div className="flex items-center justify-center h-64 text-dark-muted">
                 <div className="text-center">
                   <Database className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>Select a stream to view replication details</p>
+                  <p>{t('cluster.selectStreamPrompt')}</p>
                 </div>
               </div>
             )}
@@ -397,11 +403,9 @@ export default function ClusterPage({
           <div className="flex items-start gap-4 p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
             <Info className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-blue-400 mb-1">Standalone Mode</h3>
+              <h3 className="font-semibold text-blue-400 mb-1">{t('cluster.standaloneModeTitle')}</h3>
               <p className="text-dark-muted text-sm">
-                This NATS server is running in standalone mode. Cluster monitoring features
-                like node health, replication status, and raft groups are only available
-                in clustered deployments.
+                {t('cluster.standaloneModeDescription')}
               </p>
             </div>
           </div>

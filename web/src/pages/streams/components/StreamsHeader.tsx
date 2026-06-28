@@ -1,4 +1,5 @@
 import { Plus, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface StreamsHeaderProps {
   sseConnected: boolean;
@@ -11,12 +12,14 @@ export default function StreamsHeader({
   onShowCreateModal,
   onRefetch,
 }: StreamsHeaderProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Streams</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">{t('streams.title')}</h1>
         <p className="text-dark-muted mt-1">
-          Manage and monitor JetStream streams
+          {t('streams.subtitle')}
         </p>
       </div>
 
@@ -25,12 +28,12 @@ export default function StreamsHeader({
           {sseConnected ? (
             <>
               <Wifi className="w-3.5 h-3.5 text-green-400" />
-              <span className="text-green-400">Live</span>
+              <span className="text-green-400">{t('common.live')}</span>
             </>
           ) : (
             <>
               <WifiOff className="w-3.5 h-3.5 text-yellow-400" />
-              <span className="text-yellow-400">Connecting...</span>
+              <span className="text-yellow-400">{t('common.connecting')}</span>
             </>
           )}
         </div>
@@ -40,7 +43,7 @@ export default function StreamsHeader({
           className="btn-secondary flex items-center gap-2"
         >
           <RefreshCw className="w-4 h-4" />
-          Refresh
+          {t('common.refresh')}
         </button>
 
         <button
@@ -48,7 +51,7 @@ export default function StreamsHeader({
           className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Create Stream
+          {t('streams.createStream')}
         </button>
       </div>
     </div>

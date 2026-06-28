@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -26,6 +27,7 @@ import EditConsumerModal from "./components/EditConsumerModal";
 import CloneConsumerModal from "./components/CloneConsumerModal";
 
 export default function ConsumerDetailPage() {
+  const { t } = useTranslation();
   const {
     name,
     consumerData,
@@ -62,7 +64,7 @@ export default function ConsumerDetailPage() {
     handleTerm,
   } = useConsumerDetail();
 
-  if (!name) return <div>Consumer not found</div>;
+  if (!name) return <div>{t("consumers.notFound")}</div>;
 
   const StatusIcon = (() => {
     switch (consumerData.status) {
@@ -74,8 +76,8 @@ export default function ConsumerDetailPage() {
   })();
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <div className="flex items-center gap-4 mb-8">
+    <div className="p-3 md:p-4 lg:p-6">
+      <div className="flex items-center gap-4 mb-4">
         <Link to="/consumers" className="p-2 hover:bg-dark-bg rounded-lg transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
@@ -97,7 +99,7 @@ export default function ConsumerDetailPage() {
             )}
           </div>
           <p className="text-dark-muted mt-1">
-            Stream:{" "}
+            {t("consumers.stream")}:{" "}
             <Link to={`/streams/${encodeURIComponent(consumerData.stream ?? "")}`} className="text-primary-400 hover:underline">
               {consumerData.stream}
             </Link>
@@ -122,16 +124,16 @@ export default function ConsumerDetailPage() {
           </button>
           <button onClick={() => setActiveTab("messages")} className="btn-secondary flex items-center gap-2">
             <Eye className="w-4 h-4" />
-            Peek Messages
+            {t("consumers.peekMessages")}
           </button>
           <button onClick={() => setActiveTab("config")} className="btn-primary flex items-center gap-2">
             <Settings className="w-4 h-4" />
-            Configure
+            {t("consumers.configure")}
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
         <div className="card">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
@@ -139,7 +141,7 @@ export default function ConsumerDetailPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{(consumerData.lag || 0).toLocaleString()}</p>
-              <p className="text-xs text-dark-muted">Lag</p>
+              <p className="text-xs text-dark-muted">{t("consumers.totalLag")}</p>
             </div>
           </div>
         </div>
@@ -150,7 +152,7 @@ export default function ConsumerDetailPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{(consumerData.num_pending || 0).toLocaleString()}</p>
-              <p className="text-xs text-dark-muted">Pending</p>
+              <p className="text-xs text-dark-muted">{t("consumers.pending")}</p>
             </div>
           </div>
         </div>
@@ -160,8 +162,8 @@ export default function ConsumerDetailPage() {
               <FastForward className="w-5 h-5 text-purple-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{(consumerData as any).num_delivered?.toLocaleString() ?? "N/A"}</p>
-              <p className="text-xs text-dark-muted">Delivered</p>
+              <p className="text-2xl font-bold">{(consumerData as any).num_delivered?.toLocaleString() ?? t("common.na")}</p>
+              <p className="text-xs text-dark-muted">{t("consumers.delivered")}</p>
             </div>
           </div>
         </div>
@@ -171,8 +173,8 @@ export default function ConsumerDetailPage() {
               <CheckCircle className="w-5 h-5 text-cyan-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{(consumerData as any).ack_rate ?? "N/A"}</p>
-              <p className="text-xs text-dark-muted">ACK Rate</p>
+              <p className="text-2xl font-bold">{(consumerData as any).ack_rate ?? t("common.na")}</p>
+              <p className="text-xs text-dark-muted">{t("consumers.avgAckRate")}</p>
             </div>
           </div>
         </div>
@@ -182,14 +184,14 @@ export default function ConsumerDetailPage() {
               <TrendingUp className="w-5 h-5 text-primary-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{(consumerData as any).paused ? "Paused" : "Active"}</p>
-              <p className="text-xs text-dark-muted">State</p>
+              <p className="text-2xl font-bold">{(consumerData as any).paused ? t("streams.paused") : t("consumers.active")}</p>
+              <p className="text-xs text-dark-muted">{t("consumers.state")}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-1 mb-6 bg-dark-bg p-1 rounded-lg w-fit">
+      <div className="flex items-center gap-1 mb-4 bg-dark-bg p-1 rounded-lg w-fit">
         {[
           { id: "overview", label: "Overview", icon: BarChart3 },
           { id: "messages", label: "Messages", icon: MessageSquare },
@@ -213,7 +215,7 @@ export default function ConsumerDetailPage() {
       {activeTab === "overview" && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("consumers.quickActions")}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <button
                 onClick={handleResetLag}
@@ -221,7 +223,7 @@ export default function ConsumerDetailPage() {
                 className={`btn-secondary flex items-center gap-2 ${loadingAction === "reset-lag" ? "opacity-50" : ""}`}
               >
                 {loadingAction === "reset-lag" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipBack className="w-4 h-4" />}
-                Reset Lag
+                {t("consumers.resetLag")}
               </button>
               <button
                 onClick={handleReplayMessages}
@@ -229,11 +231,11 @@ export default function ConsumerDetailPage() {
                 className={`btn-secondary flex items-center gap-2 ${loadingAction === "replay" ? "opacity-50" : ""}`}
               >
                 {loadingAction === "replay" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipForward className="w-4 h-4" />}
-                Replay Messages
+                {t("consumers.replayMessages")}
               </button>
               <button onClick={() => setActiveTab("messages")} className="btn-secondary flex items-center gap-2">
                 <Eye className="w-4 h-4" />
-                Peek Messages
+                {t("consumers.peekMessages")}
               </button>
               <button
                 onClick={handleDeleteConsumer}
@@ -241,7 +243,7 @@ export default function ConsumerDetailPage() {
                 className={`btn-secondary flex items-center gap-2 text-status-error ${loadingAction === "delete" ? "opacity-50" : ""}`}
               >
                 {loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                Delete
+                {t("common.delete")}
               </button>
             </div>
           </div>
@@ -253,22 +255,22 @@ export default function ConsumerDetailPage() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
-              Pending Messages ({pendingMessages?.messages?.length || 0})
+              {t("consumers.pendingMessages", { count: pendingMessages?.messages?.length || 0 })}
             </h3>
             <button onClick={() => refetchPending()} className="btn-secondary flex items-center gap-2">
               <RefreshCw className="w-4 h-4" />
-              Refresh
+              {t("common.refresh")}
             </button>
           </div>
 
           {!pendingMessages || !pendingMessages.messages || pendingMessages.messages.length === 0 ? (
             <div className="text-center py-12">
               <MessageSquare className="w-16 h-16 mx-auto mb-4 text-dark-muted opacity-50" />
-              <h3 className="text-lg font-semibold mb-2">No Pending Messages</h3>
+              <h3 className="text-lg font-semibold mb-2">{t("consumers.noPendingMessages")}</h3>
               <p className="text-dark-muted">
                 {consumerData.num_pending && consumerData.num_pending > 0
-                  ? `This consumer has ${consumerData.num_pending} pending messages, but they may not be fetchable (push consumer).`
-                  : "This consumer has no pending messages."}
+                  ? t("consumers.noPendingMessagesDescription", { count: consumerData.num_pending })
+                  : t("consumers.noPendingMessagesDescriptionEmpty")}
               </p>
             </div>
           ) : (
@@ -284,7 +286,7 @@ export default function ConsumerDetailPage() {
                           <Clock className="w-3 h-3" />
                           {new Date(msg.timestamp).toLocaleString()}
                         </span>
-                        <span className="text-xs text-dark-muted">Delivered: {msg.num_delivered}x</span>
+                        <span className="text-xs text-dark-muted">{t("consumers.deliveredCount", { count: msg.num_delivered })}</span>
                       </div>
                       <pre className="text-sm p-3 bg-dark-bg rounded overflow-x-auto max-h-32">
                         <code className="text-green-400">{msg.data}</code>
@@ -295,7 +297,7 @@ export default function ConsumerDetailPage() {
                         onClick={() => handleAck(msg.sequence)}
                         disabled={ackPending}
                         className="p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30"
-                        title="Ack"
+                        title={t("consumers.ack")}
                       >
                         <Check className="w-4 h-4" />
                       </button>
@@ -303,7 +305,7 @@ export default function ConsumerDetailPage() {
                         onClick={() => handleNack(msg.sequence)}
                         disabled={nackPending}
                         className="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/30"
-                        title="Nack"
+                        title={t("consumers.nack")}
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -311,7 +313,7 @@ export default function ConsumerDetailPage() {
                         onClick={() => handleTerm(msg.sequence)}
                         disabled={termPending}
                         className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
-                        title="Ack Term (no re-deliver)"
+                        title={t("consumers.ackTerm")}
                       >
                         <FastForward className="w-4 h-4" />
                       </button>
@@ -327,46 +329,46 @@ export default function ConsumerDetailPage() {
       {activeTab === "config" && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold mb-4">Consumer Configuration</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("consumers.consumerConfiguration")}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
                   <span className="text-dark-muted">Durable</span>
                   <span className={`px-2 py-1 rounded text-xs ${consumerData.config?.durable ? "bg-green-500/20 text-green-400" : "bg-dark-border"}`}>
-                    {consumerData.config?.durable ? "Yes" : "No"}
+                    {consumerData.config?.durable ? t("consumers.yes") : t("consumers.no")}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">Delivery Policy</span>
+                  <span className="text-dark-muted">{t("consumers.deliveryPolicy")}</span>
                   <span className="font-medium capitalize">{consumerData.config?.deliver_policy || "all"}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">Ack Policy</span>
+                  <span className="text-dark-muted">{t("consumers.ackPolicy")}</span>
                   <span className="font-medium capitalize">{consumerData.config?.ack_policy || "explicit"}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">Replay Policy</span>
+                  <span className="text-dark-muted">{t("consumers.replayPolicy")}</span>
                   <span className="font-medium capitalize">{consumerData.config?.replay_policy || "instant"}</span>
                 </div>
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">Max Deliveries</span>
+                  <span className="text-dark-muted">{t("consumers.maxDeliveries")}</span>
                   <span className="font-medium">
-                    {consumerData.config?.max_deliver === -1 ? "Unlimited" : consumerData.config?.max_deliver || 3}
+                    {consumerData.config?.max_deliver === -1 ? t("common.unlimited") : consumerData.config?.max_deliver || 3}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">Ack Wait</span>
-                  <span className="font-medium">{(consumerData.config as any)?.ack_wait ?? "N/A"}</span>
+                  <span className="text-dark-muted">{t("consumers.ackWait")}</span>
+                  <span className="font-medium">{(consumerData.config as any)?.ack_wait ?? t("common.na")}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">Max Waiting</span>
-                  <span className="font-medium">{(consumerData.config as any)?.max_waiting ?? "N/A"}</span>
+                  <span className="text-dark-muted">{t("consumers.maxWaiting")}</span>
+                  <span className="font-medium">{(consumerData.config as any)?.max_waiting ?? t("common.na")}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">Max Batch</span>
-                  <span className="font-medium">{(consumerData.config as any)?.max_batch ?? "N/A"}</span>
+                  <span className="text-dark-muted">{t("consumers.maxBatch")}</span>
+                  <span className="font-medium">{(consumerData.config as any)?.max_batch ?? t("common.na")}</span>
                 </div>
               </div>
             </div>
@@ -374,20 +376,20 @@ export default function ConsumerDetailPage() {
 
           {(consumerData.config as any)?.filter_subject && (
             <div className="card">
-              <h3 className="text-lg font-semibold mb-4">Filter Subject</h3>
+              <h3 className="text-lg font-semibold mb-4">{t("consumers.filterSubject")}</h3>
               <div className="p-3 bg-dark-bg/50 rounded-lg">
                 <p className="font-mono text-sm">{(consumerData.config as any).filter_subject}</p>
-                <p className="text-xs text-dark-muted mt-1">Only messages matching this subject will be delivered</p>
+                <p className="text-xs text-dark-muted mt-1">{t("consumers.filterSubjectHelp")}</p>
               </div>
             </div>
           )}
 
           <div className="card">
-            <h3 className="text-lg font-semibold mb-4">Consumer Actions</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("consumers.consumerActions")}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <button onClick={handleOpenEdit} className="btn-secondary flex items-center gap-2">
                 <Settings className="w-4 h-4" />
-                Edit Config
+                {t("consumers.editConsumer")}
               </button>
               <button
                 onClick={handleResetLag}
@@ -395,11 +397,11 @@ export default function ConsumerDetailPage() {
                 className={`btn-secondary flex items-center gap-2 ${loadingAction === "reset-lag" ? "opacity-50" : ""}`}
               >
                 {loadingAction === "reset-lag" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipBack className="w-4 h-4" />}
-                Reset Lag
+                {t("consumers.resetLag")}
               </button>
               <button onClick={handleOpenClone} className="btn-secondary flex items-center gap-2">
                 <Copy className="w-4 h-4" />
-                Clone Consumer
+                {t("consumers.cloneConsumer")}
               </button>
               <button
                 onClick={handleDeleteConsumer}
@@ -407,7 +409,7 @@ export default function ConsumerDetailPage() {
                 className={`btn-secondary flex items-center gap-2 text-status-error ${loadingAction === "delete" ? "opacity-50" : ""}`}
               >
                 {loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                Delete
+                {t("common.delete")}
               </button>
             </div>
           </div>

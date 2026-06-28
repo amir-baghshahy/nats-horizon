@@ -1,4 +1,5 @@
 import { UseHistoryReturn } from "./hooks/useHistory";
+import { useTranslation } from "react-i18next";
 import { BarChart3, History as HistoryIcon, RefreshCw } from "lucide-react";
 import EmptyState from "../../components/ui/EmptyState";
 
@@ -14,13 +15,14 @@ export default function HistoryPage({
   historyStreams,
   streamHistoryPoints,
 }: UseHistoryReturn) {
+  const { t } = useTranslation();
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="p-3 md:p-4 lg:p-6">
+      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold md:text-3xl">History</h1>
+          <h1 className="text-xl font-bold md:text-2xl">{t('history.title')}</h1>
           <p className="mt-1 text-dark-muted">
-            Historical stream metrics and trend analysis
+            {t('history.subtitle')}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -31,24 +33,25 @@ export default function HistoryPage({
           >
             {durations.map((item) => (
               <option key={item} value={item}>
-                Last {item}
+                {t('history.lastDuration', { duration: item })}
               </option>
             ))}
           </select>
           <button onClick={() => refetch()} className="btn-secondary">
             <RefreshCw className="h-4 w-4" />
+            {t('common.refresh')}
           </button>
         </div>
       </div>
 
-      <div className="mb-6 card">
-        <label className="mb-2 block text-sm text-dark-muted">Stream</label>
+      <div className="mb-4 card">
+        <label className="mb-2 block text-sm text-dark-muted">{t('history.stream')}</label>
         <select
           value={selectedStream}
           onChange={(e) => setSelectedStream(e.target.value)}
           className="input"
         >
-          <option value="all">All Streams</option>
+          <option value="all">{t('history.allStreams')}</option>
           {streamOptions.map((name: any, index: number) => (
             <option key={name || `stream-${index}`} value={name}>
               {name}
@@ -57,12 +60,12 @@ export default function HistoryPage({
         </select>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <div key="stream-summary" className="card overflow-hidden flex flex-col max-h-[500px]">
           <div className="p-4 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
             <div className="flex items-center gap-2">
               <HistoryIcon className="h-5 w-5 text-primary-400" />
-              <h2 className="text-lg font-semibold">Stream Summary</h2>
+              <h2 className="text-lg font-semibold">{t('history.streamSummary')}</h2>
             </div>
           </div>
           {historyStreams.length > 0 ? (
@@ -76,18 +79,18 @@ export default function HistoryPage({
                     <div className="mb-3 flex items-center justify-between">
                       <p className="font-medium">{stream.name}</p>
                       <p className="text-sm text-dark-muted">
-                        {stream.messages?.toLocaleString?.() || 0} msgs
+                        {t('history.messages', { count: stream.messages?.toLocaleString?.() || 0 })}
                       </p>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="text-dark-muted">Bytes</p>
+                        <p className="text-dark-muted">{t('common.bytes')}</p>
                         <p className="font-mono">
                           {(stream.bytes || 0).toLocaleString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-dark-muted">Trend</p>
+                        <p className="text-dark-muted">{t('history.trend')}</p>
                         <p className="font-mono">{stream.trend || "N/A"}</p>
                       </div>
                     </div>
@@ -95,16 +98,15 @@ export default function HistoryPage({
                 ))}
               </div>
               <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-                {historyStreams.length} stream
-                {historyStreams.length !== 1 ? "s" : ""}
+                {t('history.streamCount', { count: historyStreams.length })}
               </div>
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <EmptyState
                 icon={BarChart3}
-                title="No History Data"
-                description="Metrics history will appear after the collector has sampled stream data."
+                title={t('history.noHistoryData')}
+                description={t('history.noHistoryDataDescription')}
               />
             </div>
           )}
@@ -114,7 +116,7 @@ export default function HistoryPage({
           <div className="p-4 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
             <div className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-primary-400" />
-              <h2 className="text-lg font-semibold">Messages Trend</h2>
+              <h2 className="text-lg font-semibold">{t('history.messagesTrend')}</h2>
             </div>
           </div>
           {streamHistoryPoints.length > 0 ? (
@@ -139,16 +141,15 @@ export default function HistoryPage({
                 ))}
               </div>
               <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-                {streamHistoryPoints.length} point
-                {streamHistoryPoints.length !== 1 ? "s" : ""}
+                {t('history.pointCount', { count: streamHistoryPoints.length })}
               </div>
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <EmptyState
                 icon={BarChart3}
-                title="No Stream Trend"
-                description="Select a stream to view historical message points."
+                title={t('history.noStreamTrend')}
+                description={t('history.noStreamTrendDescription')}
               />
             </div>
           )}

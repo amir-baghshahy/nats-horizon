@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Filter, Search } from "lucide-react";
 import type { ConsumerFilterStatus } from "../hooks/useConsumersPage";
 
@@ -32,15 +33,17 @@ export default function ConsumersFilters({
   onClear,
   getStatusLabel,
 }: ConsumersFiltersProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="card mb-6">
+    <div className="card mb-4">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col xl:flex-row xl:items-center gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-muted" />
             <input
               type="text"
-              placeholder="Search consumers by name or stream..."
+              placeholder={t("consumers.searchPlaceholder")}
               value={searchQuery}
               onChange={(event) => onSearchChange(event.target.value)}
               className="input pl-11"
@@ -53,7 +56,7 @@ export default function ConsumersFilters({
               onChange={(event) => onStreamChange(event.target.value)}
               className="input"
             >
-              <option value="all">All Streams</option>
+              <option value="all">{t("consumers.allStreams")}</option>
               {streamOptions.map((streamName) => (
                 <option key={streamName} value={streamName}>
                   {streamName}
@@ -68,35 +71,35 @@ export default function ConsumersFilters({
               }
               className="input"
             >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="stuck">Stuck</option>
-              <option value="idle">Idle</option>
+              <option value="all">{t("consumers.allStatus")}</option>
+              <option value="active">{t("consumers.active")}</option>
+              <option value="stuck">{t("consumers.stuck")}</option>
+              <option value="idle">{t("consumers.idle")}</option>
             </select>
           </div>
         </div>
 
         <div className="flex flex-col gap-3 border-t border-dark-border/60 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-dark-muted">Filters:</span>
+            <span className="text-xs font-medium text-dark-muted">{t("common.filters")}</span>
             {activeFilterCount === 0 ? (
               <span className="rounded-full bg-dark-bg px-3 py-1 text-xs text-dark-muted">
-                Showing all consumers
+                {t("consumers.showingAllConsumers")}
               </span>
             ) : null}
             {searchQuery ? (
               <span className="rounded-full bg-primary-500/15 px-3 py-1 text-xs text-primary-300 ring-1 ring-primary-500/30">
-                Search: {searchQuery}
+                {t("consumers.searchFilter", { value: searchQuery })}
               </span>
             ) : null}
             {selectedStream !== "all" ? (
               <span className="rounded-full bg-primary-500/15 px-3 py-1 text-xs text-primary-300 ring-1 ring-primary-500/30">
-                Stream: {selectedStream}
+                {t("consumers.streamFilter", { value: selectedStream })}
               </span>
             ) : null}
             {filterStatus !== "all" ? (
               <span className="rounded-full bg-primary-500/15 px-3 py-1 text-xs text-primary-300 ring-1 ring-primary-500/30">
-                Status: {getStatusLabel(filterStatus)}
+                {t("consumers.statusFilter", { value: getStatusLabel(filterStatus) })}
               </span>
             ) : null}
           </div>
@@ -107,11 +110,11 @@ export default function ConsumersFilters({
               disabled={activeFilterCount === 0}
               className="btn-secondary"
             >
-              Clear filters
+              {t("consumers.clearFilters")}
             </button>
             <button onClick={onShowMoreFiltersToggle} className="btn-secondary">
               <Filter className="h-4 w-4" />
-              {showMoreFilters ? "Less Filters" : "More Filters"}
+              {showMoreFilters ? t("consumers.lessFilters") : t("consumers.moreFilters")}
             </button>
           </div>
         </div>
@@ -119,7 +122,7 @@ export default function ConsumersFilters({
         {showMoreFilters && (
           <div className="grid grid-cols-1 gap-4 rounded-2xl border border-dark-border/50 bg-dark-bg/40 p-4 md:grid-cols-3">
             <div>
-              <p className="text-xs font-medium text-dark-muted">Quick status</p>
+              <p className="text-xs font-medium text-dark-muted">{t("consumers.quickStatus")}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {statusOptions.map((status) => (
                   <button
@@ -131,20 +134,20 @@ export default function ConsumersFilters({
                         : "bg-dark-card text-dark-muted ring-dark-border hover:bg-dark-border hover:text-dark-text"
                     }`}
                   >
-                    {status === "all" ? "All" : getStatusLabel(status)}
+                    {status === "all" ? t("common.all") : getStatusLabel(status)}
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <p className="text-xs font-medium text-dark-muted">Stream</p>
+              <p className="text-xs font-medium text-dark-muted">{t("consumers.stream")}</p>
               <select
                 value={selectedStream}
                 onChange={(event) => onStreamChange(event.target.value)}
                 className="input mt-3"
               >
-                <option value="all">All Streams</option>
+                <option value="all">{t("consumers.allStreams")}</option>
                 {streamOptions.map((streamName) => (
                   <option key={streamName} value={streamName}>
                     {streamName}
@@ -154,12 +157,12 @@ export default function ConsumersFilters({
             </div>
 
             <div>
-              <p className="text-xs font-medium text-dark-muted">Search</p>
+              <p className="text-xs font-medium text-dark-muted">{t("common.search").replace("...", "")}</p>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(event) => onSearchChange(event.target.value)}
-                placeholder="Type to filter..."
+                placeholder={t("consumers.typeToFilter")}
                 className="input mt-3"
               />
             </div>

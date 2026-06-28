@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { MessagesService, StreamsService } from "../../../types";
 import type { StreamResponse as Stream } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
@@ -58,14 +60,18 @@ export const parseMessageData = (data: any): string => {
 };
 
 export function useMessages(): UseMessagesReturn {
-  const [selectedStream, setSelectedStream] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Initialize state from URL parameters
+  const [selectedStream, setSelectedStream] = useState<string>(() => searchParams.get('stream') || "");
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('search') || "");
   const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
   const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set());
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [activeMessageTab, setActiveMessageTab] = useState<"stream" | "core">("stream");
-  const [messagesPerPage, setMessagesPerPage] = useState(25);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [messagesPerPage, setMessagesPerPage] = useState(() => parseInt(searchParams.get('perPage') || '25'));
+  const [currentPage, setCurrentPage] = useState(() => parseInt(searchParams.get('page') || '1'));
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [copiedMessage, setCopiedMessage] = useState<number | null>(null);
@@ -74,6 +80,34 @@ export function useMessages(): UseMessagesReturn {
   const { toast } = useToast();
   const { confirm } = useConfirm();
   const { connected: sseConnected } = useSSE("messages");
+
+  // Update URL when state changes
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    if (selectedStream) newParams.set('stream', selectedStream);
+    else newParams.delete('stream');
+    if (searchQuery) newParams.set('search', searchQuery);
+    else newParams.delete('search');
+    newParams.set('page', currentPage.toString());
+    newParams.set('perPage', messagesPerPage.toString());
+    setSearchParams(newParams);
+  }, [selectedStream, searchQuery, currentPage, messagesPerPage, setSearchParams]);
+
+  // Create setters that update both state and URL
+  const updateSelectedStream = (value: string) => {
+    setSelectedStream(value);
+    setCurrentPage(1); // Reset to page 1 when stream changes
+  };
+
+  const updateSearchQuery = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1); // Reset to page 1 when search changes
+  };
+
+  const updateMessagesPerPage = (value: number) => {
+    setMessagesPerPage(value);
+    setCurrentPage(1); // Reset to page 1 when per page changes
+  };
 
   const { data: streams = [] } = useQuery({
     queryKey: ["streams"],
@@ -148,9 +182,9 @@ export function useMessages(): UseMessagesReturn {
 
   const handleBulkDelete = async () => {
     const ok = await confirm({
-      title: "Delete Messages",
-      message: `Delete ${selectedMessages.size} selected messages?`,
-      confirmLabel: "Delete",
+      title: t('messages.deleteMessages'),
+      message: t('messages.deleteMessagesConfirm', { count: selectedMessages.size }),
+      confirmLabel: t('common.delete'),
       variant: "danger",
     });
     if (ok) {
@@ -208,11 +242,11 @@ export function useMessages(): UseMessagesReturn {
     messages,
     totalMessages,
     totalPages,
-    setSelectedStream,
-    setSearchQuery,
+    setSelectedStream: updateSelectedStream,
+    setSearchQuery: updateSearchQuery,
     setShowPublishModal,
     setActiveMessageTab,
-    setMessagesPerPage,
+    setMessagesPerPage: updateMessagesPerPage,
     setCurrentPage,
     setShowFilters,
     setViewMode,

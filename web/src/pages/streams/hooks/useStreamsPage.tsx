@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   useMutation,
   useQuery,
@@ -139,6 +140,7 @@ export function getStreamName(stream: Stream): string {
 
 export function useStreamsPage(): UseStreamsPageReturn {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { confirm } = useConfirm();
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -241,10 +243,10 @@ export function useStreamsPage(): UseStreamsPageReturn {
         blob,
         `streams-${new Date().toISOString().slice(0, 10)}.json`,
       );
-      toast("success", "Streams export downloaded");
+      toast("success", t("streams.exportDownloaded"));
     },
     onError: (error: any) => {
-      toast("error", error?.body?.error || "Failed to export streams");
+      toast("error", error?.body?.error || t("streams.exportFailed"));
     },
   });
 
@@ -260,10 +262,10 @@ export function useStreamsPage(): UseStreamsPageReturn {
     }) => ExportService.getExportStreams1(name, format, includeMessages),
     onSuccess: (blob, variables) => {
       downloadBlob(blob, `${variables.name}.${variables.format}`);
-      toast("success", "Stream export downloaded");
+      toast("success", t("streams.streamExportDownloaded"));
     },
     onError: (error: any) => {
-      toast("error", error?.body?.error || "Failed to export stream");
+      toast("error", error?.body?.error || t("streams.streamExportFailed"));
     },
   });
 
@@ -286,12 +288,12 @@ export function useStreamsPage(): UseStreamsPageReturn {
         ? variables.subject.replace(/\./g, "_")
         : "messages";
       downloadBlob(blob, `${variables.name}-${suffix}.json`);
-      toast("success", "Messages export downloaded");
+      toast("success", t("streams.messagesExportDownloaded"));
     },
     onError: (error: any) => {
       toast(
         "error",
-        error?.response?.data?.error || "Failed to export messages",
+        error?.response?.data?.error || t("streams.messagesExportFailed"),
       );
     },
   });
@@ -303,7 +305,7 @@ export function useStreamsPage(): UseStreamsPageReturn {
       setShowCreateModal(false);
     },
     onError: (error: any) => {
-      toast("error", error?.response?.data?.error || "Failed to create stream");
+      toast("error", error?.response?.data?.error || t("streams.createFailed"));
     },
   });
 
@@ -343,22 +345,22 @@ export function useStreamsPage(): UseStreamsPageReturn {
   );
 
   const handleDelete = async (streamName: string) => {
-    const ok = await confirm({
-      title: "Delete Stream",
-      message: `Delete "${streamName}"? This action cannot be undone.`,
-      confirmLabel: "Delete",
-      variant: "danger",
-    });
+     const ok = await confirm({
+       title: t("streams.deleteStream"),
+       message: t("streams.deleteStreamConfirm", { streamName }),
+       confirmLabel: t("streams.delete"),
+       variant: "danger",
+     });
     if (ok) deleteMutation.mutate(streamName);
   };
 
   const handlePurge = async (streamName: string) => {
-    const ok = await confirm({
-      title: "Purge Stream",
-      message: `Purge all messages from "${streamName}"?`,
-      confirmLabel: "Purge",
-      variant: "warning",
-    });
+     const ok = await confirm({
+       title: t("streams.purgeStream"),
+       message: t("streams.purgeStreamConfirm", { streamName }),
+       confirmLabel: t("streams.purge"),
+       variant: "warning",
+     });
     if (ok) purgeMutation.mutate(streamName);
   };
 
@@ -378,12 +380,12 @@ export function useStreamsPage(): UseStreamsPageReturn {
   };
 
   const handleBulkDelete = async () => {
-    const ok = await confirm({
-      title: "Delete Streams",
-      message: `Delete ${selected.size} selected streams? This action cannot be undone.`,
-      confirmLabel: "Delete All",
-      variant: "danger",
-    });
+     const ok = await confirm({
+       title: t("streams.deleteStreams"),
+       message: t("streams.deleteStreamsConfirm", { count: selected.size }),
+       confirmLabel: t("streams.deleteAll"),
+       variant: "danger",
+     });
     if (ok) {
       selected.forEach((name) => deleteMutation.mutate(name));
       clearSelection();

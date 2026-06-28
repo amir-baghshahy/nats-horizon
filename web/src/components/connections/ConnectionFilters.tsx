@@ -1,4 +1,5 @@
 import { Filter, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ConnectionFiltersProps {
   searchQuery: string;
@@ -15,6 +16,8 @@ export default function ConnectionFilters({
   setFilterServer,
   servers,
 }: ConnectionFiltersProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="card mb-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
@@ -22,7 +25,7 @@ export default function ConnectionFilters({
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-dark-muted" />
           <input
             type="text"
-            placeholder="Search by user or IP..."
+            placeholder={t('connections.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input w-full pl-10"
@@ -35,7 +38,7 @@ export default function ConnectionFilters({
             onChange={(e) => setFilterServer(e.target.value)}
             className="input w-full min-w-40 lg:w-auto"
           >
-            <option value="all">All Servers</option>
+            <option value="all">{t('connections.allServers')}</option>
             {servers
               .filter((server) => server !== "all")
               .map((server) => (
@@ -46,7 +49,7 @@ export default function ConnectionFilters({
           </select>
           <button className="btn-secondary inline-flex shrink-0 items-center gap-2">
             <Filter className="h-4 w-4" />
-            More Filters
+            {t('connections.moreFilters')}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface PaginationProps {
   page: number;
@@ -7,15 +8,13 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-/**
- * Reusable pagination component
- */
 export default function Pagination({
   page,
   perPage,
   total,
   onPageChange,
 }: PaginationProps) {
+  const { t } = useTranslation();
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const hasNextPage = page < totalPages;
   const hasPrevPage = page > 1;
@@ -26,7 +25,7 @@ export default function Pagination({
   return (
     <div className="flex items-center justify-between">
       <div className="text-sm text-dark-muted">
-        Showing {startItem} to {endItem} of {total} results
+        {t('common.showing', { start: startItem, end: endItem, total })}
       </div>
 
       <div className="flex items-center gap-2">
@@ -34,20 +33,20 @@ export default function Pagination({
           onClick={() => onPageChange(page - 1)}
           disabled={!hasPrevPage}
           className="p-2 rounded-lg border border-dark-border hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Previous page"
+          aria-label={t('common.previousPage')}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
 
         <div className="text-sm">
-          Page {page} of {totalPages}
+          {t('common.page', { page, total: totalPages })}
         </div>
 
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={!hasNextPage}
           className="p-2 rounded-lg border border-dark-border hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Next page"
+          aria-label={t('common.nextPage')}
         >
           <ChevronRight className="w-4 h-4" />
         </button>

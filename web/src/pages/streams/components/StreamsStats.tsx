@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { StreamStats } from "../hooks/useStreamsPage";
 import { Database, HardDrive, MessageSquare, Users } from "lucide-react";
 
@@ -6,8 +7,10 @@ interface StreamsStatsProps {
 }
 
 export default function StreamsStats({ stats }: StreamsStatsProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
       <div className="card">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
@@ -15,7 +18,7 @@ export default function StreamsStats({ stats }: StreamsStatsProps) {
           </div>
           <div>
             <p className="text-xl font-bold">{stats.total}</p>
-            <p className="text-xs text-dark-muted">Total Streams</p>
+             <p className="text-xs text-dark-muted">{t("streams.totalStreams")}</p>
           </div>
         </div>
       </div>
@@ -27,7 +30,7 @@ export default function StreamsStats({ stats }: StreamsStatsProps) {
           </div>
           <div>
             <p className="text-xl font-bold">{stats.fileStorage}</p>
-            <p className="text-xs text-dark-muted">File Storage</p>
+             <p className="text-xs text-dark-muted">{t("streams.fileStorage")}</p>
           </div>
         </div>
       </div>
@@ -39,7 +42,7 @@ export default function StreamsStats({ stats }: StreamsStatsProps) {
           </div>
           <div>
             <p className="text-xl font-bold">{stats.memoryStorage}</p>
-            <p className="text-xs text-dark-muted">Memory Storage</p>
+             <p className="text-xs text-dark-muted">{t("streams.memoryStorage")}</p>
           </div>
         </div>
       </div>
@@ -51,7 +54,7 @@ export default function StreamsStats({ stats }: StreamsStatsProps) {
           </div>
           <div>
             <p className="text-xl font-bold">{stats.totalMessages.toLocaleString()}</p>
-            <p className="text-xs text-dark-muted">Total Messages</p>
+             <p className="text-xs text-dark-muted">{t("streams.totalMessages")}</p>
           </div>
         </div>
       </div>
@@ -63,7 +66,7 @@ export default function StreamsStats({ stats }: StreamsStatsProps) {
           </div>
           <div>
             <p className="text-xl font-bold">{stats.totalConsumers}</p>
-            <p className="text-xs text-dark-muted">Total Consumers</p>
+             <p className="text-xs text-dark-muted">{t("streams.totalConsumers")}</p>
           </div>
         </div>
       </div>

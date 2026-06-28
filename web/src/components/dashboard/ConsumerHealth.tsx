@@ -1,11 +1,14 @@
 import type { ConsumerResponse } from "../../types";
 import { getConsumerStatus } from "../../utils/validators";
+import { useTranslation } from "react-i18next";
 
 interface ConsumerHealthProps {
   consumers: ConsumerResponse[];
 }
 
 export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
+  const { t } = useTranslation();
+
   if (!consumers || consumers.length === 0) {
     return null;
   }
@@ -19,7 +22,7 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
   return (
     <div className="card overflow-hidden flex flex-col max-h-[350px]">
       <div className="p-3 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
-        <h3 className="text-base font-semibold">Consumer Health (Highest Lag)</h3>
+        <h3 className="text-base font-semibold">{t('dashboard.consumerHealth')}</h3>
       </div>
 
       <div className="overflow-y-auto scrollbar-thin flex-1 p-3 space-y-2">
@@ -29,10 +32,10 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
 
           const statusText =
             status === "error"
-              ? "Critical"
+              ? t('dashboard.critical')
               : status === "warning"
-                ? "Slow"
-                : "Healthy";
+                ? t('dashboard.slow')
+                : t('dashboard.healthy');
 
           return (
             <div
@@ -42,7 +45,7 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{consumer.name}</p>
                 <p className="text-xs text-dark-muted truncate">
-                  {consumer.stream || "Not specified"}
+                  {consumer.stream || t('dashboard.notSpecified')}
                 </p>
               </div>
               <div className="text-right shrink-0 ml-2">
@@ -64,7 +67,7 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
         })}
       </div>
       <div className="p-2 border-t border-dark-border bg-dark-bg/50 text-center text-xs text-dark-muted flex-shrink-0">
-        {topLagging.length} consumer{topLagging.length !== 1 ? 's' : ''}
+        {t('dashboard.consumerCount', { count: topLagging.length })}
       </div>
     </div>
   );

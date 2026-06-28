@@ -1,5 +1,6 @@
 import type { SubjectInfo } from '../../types'
 import { UseSubjectsReturn } from './hooks/useSubjects'
+import { useTranslation } from "react-i18next";
 import {
   Search, RefreshCw, ChevronRight, ChevronDown,
   MessageSquare, Globe, Activity, FolderOpen
@@ -17,6 +18,7 @@ export default function SubjectsPage({
   buildSubjectTree,
   filteredSubjects,
 }: UseSubjectsReturn) {
+  const { t } = useTranslation();
           const subjectTree = buildSubjectTree()
 
           const renderNode = (
@@ -52,7 +54,7 @@ export default function SubjectsPage({
             {node.name}
           </span>
           <span className="ml-auto text-xs text-dark-muted">
-            {node.count?.toLocaleString()} msgs
+            {t('subjects.messageCount', { count: node.count })}
           </span>
         </div>
 
@@ -77,12 +79,12 @@ export default function SubjectsPage({
   }
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-3 md:p-4 lg:p-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Subjects</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{t('subjects.title')}</h1>
           <p className="text-dark-muted mt-1">
-            Subjects from NATS JetStream streams
+            {t('subjects.subtitle')}
           </p>
         </div>
         <button onClick={() => refetch()} className="btn-secondary">
@@ -90,13 +92,13 @@ export default function SubjectsPage({
         </button>
       </div>
 
-      <div className="card mb-6">
+      <div className="card mb-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
             <input
               type="text"
-              placeholder="Search subjects..."
+              placeholder={t('subjects.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="input pl-10 w-full"
@@ -112,7 +114,7 @@ export default function SubjectsPage({
               }`}
             >
               <FolderOpen className="w-4 h-4 inline mr-2" />
-              Tree
+              {t('subjects.tree')}
             </button>
             <button
               onClick={() => setViewMode('list')}
@@ -123,7 +125,7 @@ export default function SubjectsPage({
               }`}
             >
               <MessageSquare className="w-4 h-4 inline mr-2" />
-              List
+              {t('subjects.list')}
             </button>
           </div>
         </div>
@@ -132,9 +134,9 @@ export default function SubjectsPage({
       {subjects.length === 0 && (
         <div className="card text-center p-12">
           <Globe className="w-16 h-16 text-dark-muted mx-auto mb-4" />
-          <h3 className="text-lg font-medium mb-2">No Subjects Found</h3>
+          <h3 className="text-lg font-medium mb-2">{t('subjects.noSubjectsFound')}</h3>
           <p className="text-dark-muted">
-            Create streams with subjects to see them here.
+            {t('subjects.noSubjectsFoundDescription')}
           </p>
         </div>
       )}
@@ -149,7 +151,7 @@ export default function SubjectsPage({
                 </div>
               </div>
               <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-                {filteredSubjects.length} subject{filteredSubjects.length !== 1 ? 's' : ''}
+                {t('subjects.subjectCount', { count: filteredSubjects.length })}
               </div>
             </div>
           ) : (
@@ -158,8 +160,8 @@ export default function SubjectsPage({
                 <table className="table">
                   <thead className="sticky top-0 bg-dark-bg z-10">
                     <tr>
-                      <th>Subject</th>
-                      <th>Messages</th>
+                      <th>{t('subjects.subject')}</th>
+                      <th>{t('subjects.messages')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -182,7 +184,7 @@ export default function SubjectsPage({
                 </table>
               </div>
               <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-                {filteredSubjects.length} subject{filteredSubjects.length !== 1 ? 's' : ''}
+                {t('subjects.subjectCount', { count: filteredSubjects.length })}
               </div>
             </div>
           )}

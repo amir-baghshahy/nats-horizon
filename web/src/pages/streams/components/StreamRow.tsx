@@ -88,7 +88,7 @@ export default function StreamRow({
               </span>
             </div>
 
-            <div className="flex items-center gap-6 text-sm text-dark-muted">
+            <div className="flex items-center gap-4 text-sm text-dark-muted">
               <span>{stream.state?.messages?.toLocaleString() || 0} messages</span>
               <span>{formatBytes(stream.state?.bytes || 0)}</span>
               <span>{stream.state?.consumers || 0} consumers</span>

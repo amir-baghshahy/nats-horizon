@@ -45,7 +45,7 @@ export class SecurityService {
      * @returns any connection status
      * @throws ApiError
      */
-    public static getSecurityConnections(): CancelablePromise<any> {
+    public static getSecurityConnections(): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/security/connections',
@@ -57,7 +57,7 @@ export class SecurityService {
      * @returns any security info
      * @throws ApiError
      */
-    public static getSecurityInfo(): CancelablePromise<any> {
+    public static getSecurityInfo(): CancelablePromise<Record<string, any>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/security/info',
@@ -81,41 +81,18 @@ export class SecurityService {
     /**
      * Create a user
      * Creates a NATS user (not implemented)
-     * @param request User to create
+     * @param requestBody User to create
      * @returns User Created
      * @throws ApiError
      */
     public static postSecurityUsers(
-        request: User,
+        requestBody: User,
     ): CancelablePromise<User> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/security/users',
-            body: request,
-            errors: {
-                501: `Not Implemented`,
-            },
-        });
-    }
-    /**
-     * Update a user
-     * Updates a NATS user (not implemented)
-     * @param name User name
-     * @param request User update
-     * @returns User OK
-     * @throws ApiError
-     */
-    public static putSecurityUsers(
-        name: string,
-        request: User,
-    ): CancelablePromise<User> {
-        return __request(OpenAPI, {
-            method: 'PUT',
-            url: '/security/users/{name}',
-            path: {
-                'name': name,
-            },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 501: `Not Implemented`,
             },
@@ -137,6 +114,31 @@ export class SecurityService {
             path: {
                 'name': name,
             },
+            errors: {
+                501: `Not Implemented`,
+            },
+        });
+    }
+    /**
+     * Update a user
+     * Updates a NATS user (not implemented)
+     * @param name User name
+     * @param requestBody User update
+     * @returns User OK
+     * @throws ApiError
+     */
+    public static putSecurityUsers(
+        name: string,
+        requestBody: User,
+    ): CancelablePromise<User> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/security/users/{name}',
+            path: {
+                'name': name,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 501: `Not Implemented`,
             },

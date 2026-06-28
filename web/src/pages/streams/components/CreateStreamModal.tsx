@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
+import { createPortal } from "react-dom";
 import type { CreateStreamRequest } from "../../../types";
+import { ModalWrapper } from "../../../components/ui/Modal";
 
 interface CreateStreamModalProps {
   onClose: () => void;
@@ -13,6 +16,7 @@ export default function CreateStreamModal({
   onSubmit,
   isPending,
 }: CreateStreamModalProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [subjects, setSubjects] = useState("");
   const [storage, setStorage] = useState<"file" | "memory">("file");
@@ -31,75 +35,78 @@ export default function CreateStreamModal({
     });
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="card max-w-md w-full">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">Create Stream</h2>
-          <button onClick={onClose} className="p-2 hover:bg-dark-bg rounded-lg">
-            <X className="w-5 h-5" />
-          </button>
+  return createPortal(
+    <ModalWrapper isOpen={true}>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div className="card max-w-md w-full">
+          <div className="flex items-center justify-between mb-4">
+             <h2 className="text-xl font-bold">{t("streams.createStream")}</h2>
+            <button onClick={onClose} className="p-2 hover:bg-dark-bg rounded-lg">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+               <label className="block text-sm font-medium mb-2">
+               {t("streams.streamName")}
+             </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                 placeholder={t("streams.streamNamePlaceholder")}
+                className="input w-full"
+                required
+              />
+            </div>
+            <div>
+               <label className="block text-sm font-medium mb-2">{t("streams.subjects")}</label>
+              <input
+                type="text"
+                value={subjects}
+                onChange={(event) => setSubjects(event.target.value)}
+                 placeholder={t("streams.subjectsPlaceholder")}
+                className="input w-full"
+                required
+              />
+               <p className="text-xs text-dark-muted mt-1">{t("streams.subjectsHelp")}</p>
+            </div>
+            <div>
+               <label className="block text-sm font-medium mb-2">{t("streams.storage")}</label>
+              <select
+                value={storage}
+                onChange={(event) =>
+                  setStorage(event.target.value as "file" | "memory")
+                }
+                className="input w-full"
+              >
+                 <option value="file">{t("streams.file")}</option>
+                 <option value="memory">{t("streams.memory")}</option>
+              </select>
+            </div>
+            <div>
+               <label className="block text-sm font-medium mb-2">{t("streams.replicas")}</label>
+              <input
+                type="number"
+                value={replicas}
+                onChange={(event) => setReplicas(Number(event.target.value))}
+                min={1}
+                max={5}
+                className="input w-full"
+              />
+            </div>
+            <div className="flex items-center gap-3 pt-4">
+               <button type="button" onClick={onClose} className="btn-secondary">
+                 {t("common.cancel")}
+               </button>
+               <button type="submit" disabled={isPending} className="btn-primary">
+                 {isPending ? t("streams.creating") : t("streams.createStream")}
+               </button>
+            </div>
+          </form>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Stream Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="my-stream"
-              className="input w-full"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Subjects</label>
-            <input
-              type="text"
-              value={subjects}
-              onChange={(event) => setSubjects(event.target.value)}
-              placeholder="orders.*, events.*"
-              className="input w-full"
-              required
-            />
-            <p className="text-xs text-dark-muted mt-1">Comma-separated list</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Storage</label>
-            <select
-              value={storage}
-              onChange={(event) =>
-                setStorage(event.target.value as "file" | "memory")
-              }
-              className="input w-full"
-            >
-              <option value="file">File</option>
-              <option value="memory">Memory</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Replicas</label>
-            <input
-              type="number"
-              value={replicas}
-              onChange={(event) => setReplicas(Number(event.target.value))}
-              min={1}
-              max={5}
-              className="input w-full"
-            />
-          </div>
-          <div className="flex items-center gap-3 pt-4">
-            <button type="button" onClick={onClose} className="btn-secondary">
-              Cancel
-            </button>
-            <button type="submit" disabled={isPending} className="btn-primary">
-              {isPending ? "Creating..." : "Create Stream"}
-            </button>
-          </div>
-        </form>
       </div>
-    </div>
+    </ModalWrapper>,
+    document.body
   );
 }

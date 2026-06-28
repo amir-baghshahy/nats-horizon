@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { ConsumersService, StreamsService } from "../../../types";
 import type {
   StreamResponse,
@@ -43,6 +44,7 @@ export function useStreamDetail(): UseStreamDetailReturn {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { confirm } = useConfirm();
+  const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<"overview" | "messages" | "consumers" | "config">("overview");
   const [isPaused, setIsPaused] = useState(false);
@@ -123,9 +125,9 @@ export function useStreamDetail(): UseStreamDetailReturn {
   const handleDeleteStream = async () => {
     if (!name) return;
     const ok = await confirm({
-      title: "Delete Stream",
-      message: `Delete stream "${name}"? This action cannot be undone.`,
-      confirmLabel: "Delete",
+      title: t('streams.deleteStream'),
+      message: t('streams.deleteStreamConfirm', { name }),
+      confirmLabel: t('common.delete'),
       variant: "danger",
     });
     if (!ok) return;

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Download, Trash2, Send } from "lucide-react";
 
 interface MessagesHeaderProps {
@@ -22,8 +23,9 @@ export default function MessagesHeader({
   isDeletePending = false,
   rightElement,
 }: MessagesHeaderProps) {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold">{title}</h1>
         <p className="text-dark-muted mt-1">{description}</p>
@@ -36,7 +38,7 @@ export default function MessagesHeader({
               className="btn-secondary flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
-              Export ({selectedCount})
+              {t('messages.exportCount', { count: selectedCount })}
             </button>
             <button
               onClick={onDelete}
@@ -44,7 +46,7 @@ export default function MessagesHeader({
               className="btn-secondary flex items-center gap-2 text-status-error"
             >
               <Trash2 className="w-4 h-4" />
-              Delete ({selectedCount})
+              {t('messages.deleteCount', { count: selectedCount })}
             </button>
           </>
         )}
@@ -53,7 +55,7 @@ export default function MessagesHeader({
           className="btn-primary flex items-center gap-2"
         >
           <Send className="w-4 h-4" />
-          Publish Message
+          {t('messages.publishMessage')}
         </button>
         {rightElement}
       </div>

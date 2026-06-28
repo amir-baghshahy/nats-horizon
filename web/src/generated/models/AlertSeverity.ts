@@ -2,6 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+/**
+ * Severity level for alerts
+ */
 export enum AlertSeverity {
     SeverityInfo = 'info',
     SeverityWarning = 'warning',

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
   ChevronDown,
@@ -39,11 +40,13 @@ export default function ConsumerRow({
   getStatusLabel,
   getLagColor,
 }: ConsumerRowProps) {
+  const { t } = useTranslation();
+
   const consumerName = consumer.name || "";
   if (!consumerName) return null;
 
   return (
-    <div className="border-l-2 border-l-transparent hover:border-l-primary-500 transition-colors">
+    <div className="border-s-2 border-s-transparent hover:border-s-primary-500 transition-colors">
       <div className="p-4 hover:bg-dark-bg/50 transition-colors">
         <div className="flex items-center gap-4">
           <input
@@ -86,20 +89,20 @@ export default function ConsumerRow({
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-6 text-sm">
+          <div className="hidden md:flex items-center gap-4 text-sm">
             <div className="text-center">
               <p className={`font-medium ${getLagColor(consumer.lag || 0)}`}>
                 {(consumer.lag || 0).toLocaleString()}
               </p>
-              <p className="text-xs text-dark-muted">Lag</p>
+              <p className="text-xs text-dark-muted">{t("consumers.totalLag")}</p>
             </div>
             <div className="text-center">
-              <p className="font-medium">{consumer.ack_rate || "N/A"}</p>
-              <p className="text-xs text-dark-muted">ACK Rate</p>
+              <p className="font-medium">{consumer.ack_rate || t("common.na")}</p>
+              <p className="text-xs text-dark-muted">{t("consumers.avgAckRate")}</p>
             </div>
             <div className="text-center">
               <p className="font-medium">{consumer.num_pending || consumer.lag || 0}</p>
-              <p className="text-xs text-dark-muted">Pending</p>
+              <p className="text-xs text-dark-muted">{t("consumers.pending")}</p>
             </div>
           </div>
 
@@ -109,8 +112,8 @@ export default function ConsumerRow({
               className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
               title={
                 !consumer.paused
-                  ? "Pause consumer"
-                  : "Resume consumer"
+                  ? t("consumers.pauseConsumer")
+                  : t("consumers.resumeConsumer")
               }
             >
               {!consumer.paused ? (
@@ -122,7 +125,7 @@ export default function ConsumerRow({
             <Link
               to={`/consumers/${encodeURIComponent(consumer.name || "")}`}
               className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
-              title="View details"
+              title={t("common.viewDetails")}
             >
               <Eye className="w-4 h-4 text-dark-muted" />
             </Link>
@@ -130,22 +133,22 @@ export default function ConsumerRow({
         </div>
 
         {isExpanded && (
-          <div className="mt-4 pl-8 space-y-4">
+          <div className="mt-4 ps-8 space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-xs text-dark-muted">Delivery Policy</p>
+                <p className="text-xs text-dark-muted">{t("consumers.deliveryPolicy")}</p>
                 <p className="font-medium">{(consumer.config as { delivery?: string })?.delivery || "all"}</p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-xs text-dark-muted">Ack Policy</p>
+                <p className="text-xs text-dark-muted">{t("consumers.ackPolicy")}</p>
                 <p className="font-medium">{consumer.config?.ack_policy || "explicit"}</p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-xs text-dark-muted">Replay Policy</p>
+                <p className="text-xs text-dark-muted">{t("consumers.replayPolicy")}</p>
                 <p className="font-medium">{consumer.config?.replay_policy || "instant"}</p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-xs text-dark-muted">Max Deliveries</p>
+                <p className="text-xs text-dark-muted">{t("consumers.maxDeliveries")}</p>
                 <p className="font-medium">{consumer.config?.max_deliver || "-1"}</p>
               </div>
             </div>
@@ -155,26 +158,26 @@ export default function ConsumerRow({
                 onClick={() => onViewDetails(consumerName)}
                 className="btn-secondary text-sm"
               >
-                Edit Configuration
+                {t("consumers.editConfiguration")}
               </button>
               <button
                 onClick={() => onViewDetails(consumerName)}
                 className="btn-secondary text-sm"
               >
-                View Messages
+                {t("consumers.viewMessages")}
               </button>
               <button
                 onClick={() => onResetLag(consumer)}
                 disabled={resetLagPending}
                 className="btn-secondary text-sm"
               >
-                Reset Lag
+                {t("consumers.resetLag")}
               </button>
               <button
                 onClick={() => onDelete(consumer)}
                 className="btn-secondary text-sm text-status-error"
               >
-                Delete Consumer
+                {t("consumers.deleteConsumerBtn")}
               </button>
             </div>
           </div>

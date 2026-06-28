@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useConsumersPage } from "./hooks/useConsumersPage";
 import ConsumersFilters from "./components/ConsumersFilters";
 import ConsumersHeader from "./components/ConsumersHeader";
@@ -7,6 +8,7 @@ import { ConsumersStats } from "./components/ConsumersHeader";
 
 export default function ConsumersPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     searchQuery,
     selectedStream,
@@ -45,7 +47,7 @@ export default function ConsumersPage() {
   } = useConsumersPage();
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
+    <div className="p-3 md:p-4 lg:p-6">
       <ConsumersHeader
         sseConnected={sseConnected}
         selectedCount={selectedConsumers.size}
@@ -95,8 +97,7 @@ export default function ConsumersPage() {
 
       <div className="mt-4 flex items-center justify-between text-sm text-dark-muted">
         <span>
-          Showing {filteredConsumers.length} of {totalConsumers}{" "}
-          consumers
+          {t('consumers.showingConsumers', { filtered: filteredConsumers.length, total: totalConsumers })}
         </span>
       </div>
     </div>

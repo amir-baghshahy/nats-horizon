@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Plus, Zap } from "lucide-react";
 
 interface AlertsHeaderProps {
@@ -14,13 +15,12 @@ export default function AlertsHeader({
   isChecking,
   rightElement,
 }: AlertsHeaderProps) {
+  const { t } = useTranslation();
   return (
-    <div className="flex items-center justify-between mb-8">
+    <div className="flex items-center justify-between mb-4">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Alerts & Notifications</h1>
-        <p className="text-dark-muted mt-1">
-          Configure and monitor alerts for your NATS infrastructure
-        </p>
+        <h1 className="text-xl md:text-xl font-bold">{t("alerts.title")}</h1>
+        <p className="text-dark-muted mt-1">{t("alerts.subtitle")}</p>
       </div>
       <div className="flex items-center gap-3">
         <button
@@ -28,7 +28,7 @@ export default function AlertsHeader({
           className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          New Alert
+          {t("alerts.newAlert")}
         </button>
         <button
           onClick={onCheckAlerts}
@@ -36,7 +36,7 @@ export default function AlertsHeader({
           className="btn-secondary flex items-center gap-2 disabled:opacity-50"
         >
           <Zap className="w-4 h-4" />
-          Check Now
+          {t("alerts.checkNow")}
         </button>
         {rightElement}
       </div>

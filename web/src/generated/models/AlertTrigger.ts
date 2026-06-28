@@ -9,7 +9,7 @@ export type AlertTrigger = {
     acked_by?: string;
     alert_id?: string;
     alert_name?: string;
-    data?: any;
+    data?: Record<string, any>;
     message?: string;
     severity?: AlertSeverity;
     triggered_at?: string;

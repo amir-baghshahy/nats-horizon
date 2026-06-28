@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { SearchBar } from "../../../components/common";
 import type { StreamFilters } from "../hooks/useStreamsPage";
 
@@ -14,14 +15,16 @@ export default function StreamsFilters({
   updateFilter,
   resetFilters,
 }: StreamsFiltersProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="card mb-6">
+    <div className="card mb-4">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col xl:flex-row xl:items-center gap-3">
           <SearchBar
             value={filters.search}
             onChange={(value) => updateFilter("search", value)}
-            placeholder="Search streams by name or subject..."
+            placeholder={t("streams.searchPlaceholder")}
             className="flex-1"
           />
 
@@ -31,9 +34,9 @@ export default function StreamsFilters({
               onChange={(event) => updateFilter("storage", event.target.value as StreamFilters["storage"])}
               className="input"
             >
-              <option value="all">All Storage</option>
-              <option value="file">File</option>
-              <option value="memory">Memory</option>
+               <option value="all">{t("streams.allStorage")}</option>
+               <option value="file">{t("streams.file")}</option>
+               <option value="memory">{t("streams.memory")}</option>
             </select>
 
             <select
@@ -41,36 +44,36 @@ export default function StreamsFilters({
               onChange={(event) => updateFilter("status", event.target.value as StreamFilters["status"])}
               className="input"
             >
-              <option value="all">All Status</option>
-              <option value="healthy">Healthy</option>
-              <option value="warning">Warning</option>
-              <option value="critical">Critical</option>
+               <option value="all">{t("streams.allStatus")}</option>
+               <option value="healthy">{t("streams.healthy")}</option>
+               <option value="warning">{t("streams.warning")}</option>
+               <option value="critical">{t("streams.critical")}</option>
             </select>
           </div>
         </div>
 
         <div className="flex flex-col gap-3 border-t border-dark-border/60 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-dark-muted">Filters:</span>
+             <span className="text-xs font-medium text-dark-muted">{t("streams.filters")}:</span>
             {!hasActiveFilters ? (
-              <span className="rounded-full bg-dark-bg px-3 py-1 text-xs text-dark-muted">
-                Showing all streams
-              </span>
+               <span className="rounded-full bg-dark-bg px-3 py-1 text-xs text-dark-muted">
+                 {t("streams.showingAllStreams")}
+               </span>
             ) : null}
             {filters.search ? (
-              <span className="rounded-full bg-primary-500/15 px-3 py-1 text-xs text-primary-300 ring-1 ring-primary-500/30">
-                Search: {filters.search}
-              </span>
+               <span className="rounded-full bg-primary-500/15 px-3 py-1 text-xs text-primary-300 ring-1 ring-primary-500/30">
+                 {t("streams.searchFilter")}: {filters.search}
+               </span>
             ) : null}
             {filters.storage !== "all" ? (
-              <span className="rounded-full bg-primary-500/15 px-3 py-1 text-xs text-primary-300 ring-1 ring-primary-500/30">
-                Storage: {filters.storage}
-              </span>
+               <span className="rounded-full bg-primary-500/15 px-3 py-1 text-xs text-primary-300 ring-1 ring-primary-500/30">
+                 {t("streams.storageFilter")}: {filters.storage}
+               </span>
             ) : null}
             {filters.status !== "all" ? (
-              <span className="rounded-full bg-primary-500/15 px-3 py-1 text-xs text-primary-300 ring-1 ring-primary-500/30">
-                Status: {filters.status}
-              </span>
+               <span className="rounded-full bg-primary-500/15 px-3 py-1 text-xs text-primary-300 ring-1 ring-primary-500/30">
+                 {t("streams.statusFilter")}: {filters.status}
+               </span>
             ) : null}
           </div>
 
@@ -80,7 +83,7 @@ export default function StreamsFilters({
               disabled={!hasActiveFilters}
               className="btn-secondary"
             >
-              Clear filters
+               {t("streams.clearFilters")}
             </button>
           </div>
         </div>

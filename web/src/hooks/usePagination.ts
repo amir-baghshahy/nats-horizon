@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 interface Pagination {
   page: number;
@@ -9,6 +10,7 @@ interface Pagination {
 export interface UsePaginationOptions {
   perPage?: number;
   initialPage?: number;
+  urlKey?: string; // Key for URL parameter, defaults to 'page'
 }
 
 export interface UsePaginationReturn extends Pagination {
@@ -25,9 +27,21 @@ export interface UsePaginationReturn extends Pagination {
 export function usePagination(
   options: UsePaginationOptions = {},
 ): UsePaginationReturn {
-  const { perPage = 20, initialPage = 1 } = options;
+  const { perPage = 20, initialPage = 1, urlKey = 'page' } = options;
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [page, setPage] = useState(initialPage);
+  // Initialize page from URL or default to initialPage
+  const [page, setPage] = useState(() => {
+    const pageParam = searchParams.get(urlKey);
+    return pageParam ? parseInt(pageParam) : initialPage;
+  });
+
+  // Update URL when page changes
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(urlKey, page.toString());
+    setSearchParams(newParams);
+  }, [page, urlKey, setSearchParams]);
 
   const goToPage = useCallback((newPage: number) => {
     setPage(newPage);

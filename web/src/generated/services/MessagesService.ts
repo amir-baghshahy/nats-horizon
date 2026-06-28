@@ -67,13 +67,13 @@ export class MessagesService {
     /**
      * Publish a message to a stream
      * @param name Stream name
-     * @param request Message to publish
+     * @param requestBody Message to publish
      * @returns SuccessResponse OK
      * @throws ApiError
      */
     public static postStreamsMessagesPublish(
         name: string,
-        request: PublishMessageRequest,
+        requestBody: PublishMessageRequest,
     ): CancelablePromise<SuccessResponse> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -81,7 +81,8 @@ export class MessagesService {
             path: {
                 'name': name,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 500: `Internal Server Error`,

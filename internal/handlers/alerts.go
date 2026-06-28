@@ -14,13 +14,9 @@ import (
 )
 
 // AlertSeverity represents the severity level of an alert
+//	@Description	Severity level for alerts (info, warning, critical)
+//	@Type			string
 type AlertSeverity string
-
-const (
-	SeverityInfo     AlertSeverity = "info"
-	SeverityWarning  AlertSeverity = "warning"
-	SeverityCritical AlertSeverity = "critical"
-)
 
 // AlertCondition represents the condition to trigger an alert
 type AlertCondition struct {
@@ -362,9 +358,9 @@ func (h *AlertsHandler) CreateAlert(c *gin.Context) {
 
 	// Validate severity
 	validSeverities := map[AlertSeverity]bool{
-		SeverityInfo:     true,
-		SeverityWarning:  true,
-		SeverityCritical: true,
+		"info":     true,
+		"warning":  true,
+		"critical": true,
 	}
 	if !validSeverities[alert.Severity] {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid severity, must be one of: info, warning, critical"})

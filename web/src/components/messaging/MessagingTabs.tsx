@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export type MessagingTab = "messages" | "publish" | "request" | "monitor" | "services" | "subjects";
 
 interface TabConfig {
@@ -16,18 +18,20 @@ export default function MessagingTabs({
   messagesCount,
   onTabChange,
 }: MessagingTabsProps) {
+  const { t } = useTranslation();
+
   const tabs: TabConfig[] = [
-    { id: "messages", label: `Messages (${messagesCount})` },
-    { id: "publish", label: "Publish" },
-    { id: "request", label: "Request/Reply" },
-    { id: "monitor", label: "Traffic Monitor" },
-    { id: "subjects", label: "Subjects" },
-    { id: "services", label: "Services" },
+    { id: "messages", label: `${t('messages.messagesCount', { count: messagesCount })}` },
+    { id: "publish", label: t('messages.publish') },
+    { id: "request", label: t('messages.requestReply') },
+    { id: "monitor", label: t('messages.trafficMonitor') },
+    { id: "subjects", label: t('messages.subjects') },
+    { id: "services", label: t('messages.services') },
   ];
 
   return (
     <div className="mb-6 border-b border-dark-border pb-4">
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Core messaging actions">
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label={t('messages.coreMessaging')}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
 

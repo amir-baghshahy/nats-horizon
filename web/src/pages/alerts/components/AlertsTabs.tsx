@@ -1,4 +1,5 @@
 import { Settings, Eye } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface AlertsTabsProps {
   activeTab: "alerts" | "triggers";
@@ -11,8 +12,9 @@ export default function AlertsTabs({
   onTabChange,
   unackedCount,
 }: AlertsTabsProps) {
+  const { t } = useTranslation();
   return (
-    <div className="flex items-center gap-1 mb-6 bg-dark-bg p-1 rounded-lg w-fit">
+    <div className="flex items-center gap-1 mb-4 bg-dark-bg p-1 rounded-lg w-fit">
       <button
         onClick={() => onTabChange("alerts")}
         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
@@ -22,7 +24,7 @@ export default function AlertsTabs({
         }`}
       >
         <Settings className="w-4 h-4" />
-        <span>Alert Rules</span>
+        <span>{t("alerts.alertRules")}</span>
       </button>
       <button
         onClick={() => onTabChange("triggers")}
@@ -33,7 +35,7 @@ export default function AlertsTabs({
         }`}
       >
         <Eye className="w-4 h-4" />
-        <span>Triggered Alerts</span>
+        <span>{t("alerts.triggeredAlerts")}</span>
         {unackedCount > 0 && (
           <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center">
             {unackedCount}

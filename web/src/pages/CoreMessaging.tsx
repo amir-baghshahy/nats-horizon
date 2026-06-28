@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import {
   CoreNatsService,
@@ -47,6 +48,7 @@ export interface RequestForm {
 }
 
 export function CoreMessagingContent() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<MessagingTab>("messages");
   const [subscriptions, setSubscriptions] = useState<Set<string>>(new Set());
   const [autoScroll, setAutoScroll] = useState(true);
@@ -141,11 +143,11 @@ export function CoreMessagingContent() {
       };
       await CoreNatsService.postCorePublish(request);
       setPublishForm({ subject: "", payload: "", replyTo: "", headers: "{}" });
-      toast("success", "Message published successfully!");
+      toast("success", t('messages.messagePublished'));
     } catch (err: any) {
       toast(
         "error",
-        `Failed to publish: ${err?.response?.data?.error || err?.message}`,
+        t('messages.publishFailed', { error: err?.response?.data?.error || err?.message }),
       );
     }
   };
@@ -162,7 +164,7 @@ export function CoreMessagingContent() {
     } catch (err: any) {
       console.error("Request failed:", err);
       setRequestResponse({
-        error: err?.response?.data?.error || err?.message || "Request failed",
+        error: err?.response?.data?.error || err?.message || t('messages.requestFailed'),
       });
     }
   };
@@ -185,7 +187,7 @@ export function CoreMessagingContent() {
     setMonitorEvents([]);
 
     if (subjects.length === 0) {
-      toast("error", "Enter at least one subject to monitor");
+      toast("error", t('messages.enterSubjectToMonitor'));
       return;
     }
 
@@ -216,7 +218,7 @@ export function CoreMessagingContent() {
     });
 
     source.onerror = () => {
-      toast("error", "Traffic monitor disconnected");
+      toast("error", t('messages.trafficMonitorDisconnected'));
       source.close();
       monitorSourceRef.current = null;
     };
@@ -233,7 +235,7 @@ export function CoreMessagingContent() {
 
   const getErrorMessage = (error: unknown) => {
     if (error instanceof Error) return error.message;
-    return "Unable to load service discovery";
+    return t('messages.serviceDiscoveryError');
   };
 
   const knownSubjects = Array.from(
@@ -248,7 +250,7 @@ export function CoreMessagingContent() {
   );
 
   if (serviceInfoLoading) {
-    return <PageLoading text="Loading core messaging..." />;
+    return <PageLoading text={t('messages.loadingCoreMessaging')} />;
   }
 
   if (serviceInfoError) {
@@ -342,7 +344,7 @@ export function CoreMessagingContent() {
 
 export default function CoreMessaging() {
   return (
-    <div className="p-4 md:p-8">
+    <div className="p-3 md:p-4 lg:p-6">
       <CoreMessagingContent />
     </div>
   );

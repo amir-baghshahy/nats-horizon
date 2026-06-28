@@ -32,19 +32,41 @@ export class KvService {
     /**
      * Create a KV bucket
      * Creates a new JetStream Key-Value store bucket
-     * @param request Bucket configuration
+     * @param requestBody Bucket configuration
      * @returns KVBucketCreateResponse Created
      * @throws ApiError
      */
     public static postKvBuckets(
-        request: any,
+        requestBody: Record<string, any>,
     ): CancelablePromise<KVBucketCreateResponse> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/kv/buckets',
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * Delete a KV bucket
+     * Deletes a JetStream Key-Value store bucket
+     * @param name Bucket name
+     * @returns KVBucketDeleteResponse OK
+     * @throws ApiError
+     */
+    public static deleteKvBuckets(
+        name: string,
+    ): CancelablePromise<KVBucketDeleteResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/kv/buckets/{name}',
+            path: {
+                'name': name,
+            },
+            errors: {
                 500: `Internal Server Error`,
             },
         });
@@ -72,27 +94,6 @@ export class KvService {
         });
     }
     /**
-     * Delete a KV bucket
-     * Deletes a JetStream Key-Value store bucket
-     * @param name Bucket name
-     * @returns KVBucketDeleteResponse OK
-     * @throws ApiError
-     */
-    public static deleteKvBuckets(
-        name: string,
-    ): CancelablePromise<KVBucketDeleteResponse> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/kv/buckets/{name}',
-            path: {
-                'name': name,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * Get KV key history
      * Returns the revision history of a single key in a KV bucket
      * @param name Bucket name
@@ -107,6 +108,34 @@ export class KvService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/kv/buckets/{name}/history',
+            path: {
+                'name': name,
+            },
+            query: {
+                'key': key,
+            },
+            errors: {
+                400: `Bad Request`,
+                404: `Not Found`,
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * Delete a KV key
+     * Deletes a key from a KV bucket
+     * @param name Bucket name
+     * @param key Key name
+     * @returns KVKeyDeleteResponse OK
+     * @throws ApiError
+     */
+    public static deleteKvBucketsKey(
+        name: string,
+        key: string,
+    ): CancelablePromise<KVKeyDeleteResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/kv/buckets/{name}/key',
             path: {
                 'name': name,
             },
@@ -151,13 +180,13 @@ export class KvService {
      * Put a KV key
      * Creates or updates a key in a KV bucket
      * @param name Bucket name
-     * @param request Key/value to write
+     * @param requestBody Key/value to write
      * @returns KVKeyPutResponse OK
      * @throws ApiError
      */
     public static putKvBucketsKey(
         name: string,
-        request: any,
+        requestBody: Record<string, any>,
     ): CancelablePromise<KVKeyPutResponse> {
         return __request(OpenAPI, {
             method: 'PUT',
@@ -165,35 +194,8 @@ export class KvService {
             path: {
                 'name': name,
             },
-            body: request,
-            errors: {
-                400: `Bad Request`,
-                404: `Not Found`,
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * Delete a KV key
-     * Deletes a key from a KV bucket
-     * @param name Bucket name
-     * @param key Key name
-     * @returns KVKeyDeleteResponse OK
-     * @throws ApiError
-     */
-    public static deleteKvBucketsKey(
-        name: string,
-        key: string,
-    ): CancelablePromise<KVKeyDeleteResponse> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/kv/buckets/{name}/key',
-            path: {
-                'name': name,
-            },
-            query: {
-                'key': key,
-            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 404: `Not Found`,

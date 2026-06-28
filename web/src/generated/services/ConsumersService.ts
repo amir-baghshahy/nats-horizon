@@ -57,13 +57,13 @@ export class ConsumersService {
     /**
      * Create a consumer
      * @param name Stream name
-     * @param request Consumer creation request
+     * @param requestBody Consumer creation request
      * @returns ConsumerResponse Created
      * @throws ApiError
      */
     public static postStreamsConsumers(
         name: string,
-        request: CreateConsumerRequest,
+        requestBody: CreateConsumerRequest,
     ): CancelablePromise<ConsumerResponse> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -71,9 +71,33 @@ export class ConsumersService {
             path: {
                 'name': name,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * Delete a consumer
+     * @param name Stream name
+     * @param consumer Consumer name
+     * @returns SuccessResponse OK
+     * @throws ApiError
+     */
+    public static deleteStreamsConsumers(
+        name: string,
+        consumer: string,
+    ): CancelablePromise<SuccessResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/streams/{name}/consumers/{consumer}',
+            path: {
+                'name': name,
+                'consumer': consumer,
+            },
+            errors: {
                 500: `Internal Server Error`,
             },
         });
@@ -106,14 +130,14 @@ export class ConsumersService {
      * Update a consumer
      * @param name Stream name
      * @param consumer Consumer name
-     * @param request Consumer update request
+     * @param requestBody Consumer update request
      * @returns ConsumerResponse OK
      * @throws ApiError
      */
     public static putStreamsConsumers(
         name: string,
         consumer: string,
-        request: UpdateConsumerRequest,
+        requestBody: UpdateConsumerRequest,
     ): CancelablePromise<ConsumerResponse> {
         return __request(OpenAPI, {
             method: 'PUT',
@@ -122,32 +146,10 @@ export class ConsumersService {
                 'name': name,
                 'consumer': consumer,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * Delete a consumer
-     * @param name Stream name
-     * @param consumer Consumer name
-     * @returns SuccessResponse OK
-     * @throws ApiError
-     */
-    public static deleteStreamsConsumers(
-        name: string,
-        consumer: string,
-    ): CancelablePromise<SuccessResponse> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/streams/{name}/consumers/{consumer}',
-            path: {
-                'name': name,
-                'consumer': consumer,
-            },
-            errors: {
                 500: `Internal Server Error`,
             },
         });
@@ -156,14 +158,14 @@ export class ConsumersService {
      * Acknowledge a message
      * @param name Stream name
      * @param consumer Consumer name
-     * @param request Acknowledgment request
+     * @param requestBody Acknowledgment request
      * @returns AckMessageResponse OK
      * @throws ApiError
      */
     public static postStreamsConsumersAck(
         name: string,
         consumer: string,
-        request: AckMessageRequest,
+        requestBody: AckMessageRequest,
     ): CancelablePromise<AckMessageResponse> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -172,7 +174,8 @@ export class ConsumersService {
                 'name': name,
                 'consumer': consumer,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 500: `Internal Server Error`,
@@ -183,14 +186,14 @@ export class ConsumersService {
      * Reset consumer lag
      * @param name Stream name
      * @param consumer Consumer name
-     * @param request Reset lag options
+     * @param requestBody Reset lag options
      * @returns ResetLagResponse OK
      * @throws ApiError
      */
     public static postStreamsConsumersLagReset(
         name: string,
         consumer: string,
-        request?: ResetLagRequest,
+        requestBody?: ResetLagRequest,
     ): CancelablePromise<ResetLagResponse> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -199,7 +202,8 @@ export class ConsumersService {
                 'name': name,
                 'consumer': consumer,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -209,14 +213,14 @@ export class ConsumersService {
      * Negatively acknowledge a message
      * @param name Stream name
      * @param consumer Consumer name
-     * @param request Negative acknowledgment request
+     * @param requestBody Negative acknowledgment request
      * @returns SuccessResponse OK
      * @throws ApiError
      */
     public static postStreamsConsumersNack(
         name: string,
         consumer: string,
-        request: NackMessageRequest,
+        requestBody: NackMessageRequest,
     ): CancelablePromise<SuccessResponse> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -225,7 +229,8 @@ export class ConsumersService {
                 'name': name,
                 'consumer': consumer,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 500: `Internal Server Error`,
@@ -287,14 +292,14 @@ export class ConsumersService {
      * Replay messages to consumer
      * @param name Stream name
      * @param consumer Consumer name
-     * @param request Replay options
+     * @param requestBody Replay options
      * @returns ReplayResponse OK
      * @throws ApiError
      */
     public static postStreamsConsumersReplay(
         name: string,
         consumer: string,
-        request?: ReplayRequest,
+        requestBody?: ReplayRequest,
     ): CancelablePromise<ReplayResponse> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -303,7 +308,8 @@ export class ConsumersService {
                 'name': name,
                 'consumer': consumer,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -336,14 +342,14 @@ export class ConsumersService {
      * Terminate a message
      * @param name Stream name
      * @param consumer Consumer name
-     * @param request Termination request
+     * @param requestBody Termination request
      * @returns SuccessResponse OK
      * @throws ApiError
      */
     public static postStreamsConsumersTerm(
         name: string,
         consumer: string,
-        request: AckTermMessageRequest,
+        requestBody: AckTermMessageRequest,
     ): CancelablePromise<SuccessResponse> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -352,7 +358,8 @@ export class ConsumersService {
                 'name': name,
                 'consumer': consumer,
             },
-            body: request,
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
                 500: `Internal Server Error`,

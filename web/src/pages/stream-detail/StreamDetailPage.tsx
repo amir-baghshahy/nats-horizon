@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Activity,
   ArrowLeft,
@@ -32,6 +33,7 @@ function formatBytes(bytes: number) {
 }
 
 export default function StreamDetailPage() {
+  const { t } = useTranslation();
   const {
     name,
     stream: streamData,
@@ -55,11 +57,11 @@ export default function StreamDetailPage() {
     navigate,
   } = useStreamDetail();
 
-  if (!name) return <div>Stream not found</div>;
+   if (!name) return <div>{t("streams.notFound")}</div>;
 
   return (
-    <div className="p-4 md:p-6 lg:p-8">
-      <div className="flex items-center gap-4 mb-8">
+    <div className="p-3 md:p-4 lg:p-6">
+      <div className="flex items-center gap-4 mb-4">
         <Link to="/streams" className="p-2 hover:bg-dark-bg rounded-lg transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
@@ -74,9 +76,9 @@ export default function StreamDetailPage() {
               }`}
             >
               <div className={`w-2 h-2 rounded-full ${isPaused ? "" : "animate-pulse"}`} />
-              <span className="text-sm font-medium">
-                {isPaused ? "Paused" : (streamData.state?.num_pending || 0) > 1000 ? "High Lag" : "Healthy"}
-              </span>
+               <span className="text-sm font-medium">
+                 {isPaused ? t("streams.paused") : (streamData.state?.num_pending || 0) > 1000 ? t("streams.highLag") : t("streams.healthy")}
+               </span>
             </div>
           </div>
           <p className="text-dark-muted mt-1">{streamData.config?.subjects?.join(", ")}</p>
@@ -92,17 +94,17 @@ export default function StreamDetailPage() {
             onClick={() => window.open(`/api/export/streams/${encodeURIComponent(name)}`, "_blank")}
             className="btn-secondary flex items-center gap-2"
           >
-            <Download className="w-4 h-4" />
-            Export
+             <Download className="w-4 h-4" />
+             {t("streams.export")}
           </button>
-          <button className="btn-primary flex items-center gap-2" onClick={() => setActiveTab("consumers")}>
-            <Plus className="w-4 h-4" />
-            Add Consumer
-          </button>
+           <button className="btn-primary flex items-center gap-2" onClick={() => setActiveTab("consumers")}>
+             <Plus className="w-4 h-4" />
+             {t("streams.addConsumer")}
+           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
         <div className="card">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
@@ -110,7 +112,7 @@ export default function StreamDetailPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{(streamData.state?.messages || 0).toLocaleString()}</p>
-              <p className="text-xs text-dark-muted">Messages</p>
+               <p className="text-xs text-dark-muted">{t("streams.messages")}</p>
             </div>
           </div>
         </div>
@@ -121,7 +123,7 @@ export default function StreamDetailPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{formatBytes(streamData.state?.bytes || 0)}</p>
-              <p className="text-xs text-dark-muted">Storage</p>
+               <p className="text-xs text-dark-muted">{t("streams.storage")}</p>
             </div>
           </div>
         </div>
@@ -132,7 +134,7 @@ export default function StreamDetailPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{streamData.state?.consumers || 0}</p>
-              <p className="text-xs text-dark-muted">Consumers</p>
+               <p className="text-xs text-dark-muted">{t("streams.consumers")}</p>
             </div>
           </div>
         </div>
@@ -153,8 +155,8 @@ export default function StreamDetailPage() {
               <Database className="w-5 h-5 text-cyan-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{streamData.config?.storage === "file" ? "File" : "Memory"}</p>
-              <p className="text-xs text-dark-muted">Storage Type</p>
+               <p className="text-2xl font-bold">{streamData.config?.storage === "file" ? t("streams.file") : t("streams.memory")}</p>
+               <p className="text-xs text-dark-muted">{t("streams.storageType")}</p>
             </div>
           </div>
         </div>
@@ -165,18 +167,18 @@ export default function StreamDetailPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{streamData.config?.replicas || 1}</p>
-              <p className="text-xs text-dark-muted">Replicas</p>
+               <p className="text-xs text-dark-muted">{t("streams.replicas")}</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-1 mb-6 bg-dark-bg p-1 rounded-lg w-fit">
+      <div className="flex items-center gap-1 mb-4 bg-dark-bg p-1 rounded-lg w-fit">
         {[
-          { id: "overview", label: "Overview", icon: Activity },
-          { id: "messages", label: "Messages", icon: MessageSquare },
-          { id: "consumers", label: "Consumers", icon: Users },
-          { id: "config", label: "Configuration", icon: Settings },
+           { id: "overview", label: t("streams.overview"), icon: Activity },
+           { id: "messages", label: t("streams.messages"), icon: MessageSquare },
+           { id: "consumers", label: t("streams.consumers"), icon: Users },
+           { id: "config", label: t("streams.configuration"), icon: Settings },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -196,24 +198,24 @@ export default function StreamDetailPage() {
       {activeTab === "overview" && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold mb-4">Stream Information</h3>
+             <h3 className="text-lg font-semibold mb-4">{t("streams.streamInformation")}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-xs text-dark-muted mb-1">First Sequence</p>
+                 <p className="text-xs text-dark-muted mb-1">{t("streams.firstSequence")}</p>
                 <p className="font-mono font-medium">{streamData.state?.first_seq?.toLocaleString() || "N/A"}</p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-xs text-dark-muted mb-1">Last Sequence</p>
+                 <p className="text-xs text-dark-muted mb-1">{t("streams.lastSequence")}</p>
                 <p className="font-mono font-medium">{streamData.state?.last_seq?.toLocaleString() || "N/A"}</p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-xs text-dark-muted mb-1">Created</p>
+                 <p className="text-xs text-dark-muted mb-1">{t("streams.created")}</p>
                 <p className="text-sm">
                   {streamData.state?.first_ts ? new Date(streamData.state?.first_ts).toLocaleDateString() : "N/A"}
                 </p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-xs text-dark-muted mb-1">Last Message</p>
+                 <p className="text-xs text-dark-muted mb-1">{t("streams.lastMessage")}</p>
                 <p className="text-sm">
                   {streamData.state?.last_ts ? new Date(streamData.state?.last_ts).toLocaleString() : "N/A"}
                 </p>
@@ -229,7 +231,7 @@ export default function StreamDetailPage() {
             <div className="flex items-center gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
-                <input type="text" placeholder="Search messages..." className="input pl-10" />
+                <input type="text" placeholder={t("streams.searchMessagesPlaceholder")} className="input pl-10" />
               </div>
               <button
                 onClick={() => navigate(`/messages`)}
@@ -240,24 +242,24 @@ export default function StreamDetailPage() {
               </button>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-dark-muted">{(streamData.state?.messages || 0).toLocaleString()} messages</span>
-              <button
-                onClick={() => navigate(`/messages`)}
-                className="btn-secondary text-sm py-1 px-3"
-              >
-                View All
-              </button>
+               <span className="text-sm text-dark-muted">{(streamData.state?.messages || 0).toLocaleString()} {t("streams.messages")}</span>
+               <button
+                 onClick={() => navigate(`/messages`)}
+                 className="btn-secondary text-sm py-1 px-3"
+               >
+                 {t("streams.viewAll")}
+               </button>
             </div>
           </div>
           <div className="text-center py-8 text-dark-muted">
             <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>Use the Message Browser to view and manage messages in this stream</p>
-            <Link
-              to={`/messages?stream=${encodeURIComponent(name)}`}
-              className="inline-block mt-4 btn-primary"
-            >
-              Open Message Browser
-            </Link>
+             <p>{t("streams.useMessageBrowser")}</p>
+             <Link
+               to={`/messages?stream=${encodeURIComponent(name)}`}
+               className="inline-block mt-4 btn-primary"
+             >
+               {t("streams.openMessageBrowser")}
+             </Link>
           </div>
         </div>
       )}
@@ -267,11 +269,11 @@ export default function StreamDetailPage() {
           {consumers.length === 0 ? (
             <div className="card text-center py-8">
               <Users className="w-12 h-12 mx-auto mb-3 text-dark-muted opacity-50" />
-              <p className="text-dark-muted mb-4">No consumers found for this stream</p>
-              <button onClick={() => setActiveTab("consumers")} className="btn-primary flex items-center gap-2 mx-auto">
-                <Plus className="w-4 h-4" />
-                Create Consumer
-              </button>
+             <p className="text-dark-muted mb-4">{t("streams.noConsumers")}</p>
+               <button onClick={() => setActiveTab("consumers")} className="btn-primary flex items-center gap-2 mx-auto">
+                 <Plus className="w-4 h-4" />
+                 {t("streams.createConsumer")}
+               </button>
             </div>
           ) : (
             consumers.map((consumer: any) => (
@@ -286,23 +288,23 @@ export default function StreamDetailPage() {
                       >
                         {consumer.name}
                       </Link>
-                      <p className="text-xs text-dark-muted mt-1">
-                        {consumer.config?.durable ? "Durable" : "Ephemeral"}
-                      </p>
+                       <p className="text-xs text-dark-muted mt-1">
+                         {consumer.config?.durable ? t("streams.durable") : t("streams.ephemeral")}
+                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-6">
-                    <div className="text-center">
-                      <p className="font-medium">{(consumer.lag || 0).toLocaleString()}</p>
-                      <p className="text-xs text-dark-muted">Lag</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="font-medium">{consumer.ack_rate || "N/A"}</p>
-                      <p className="text-xs text-dark-muted">ACK Rate</p>
-                    </div>
-                    <Link to={`/consumers/${encodeURIComponent(consumer.name)}`} className="btn-secondary text-sm">
-                      Manage
-                    </Link>
+                  <div className="flex items-center gap-4">
+                     <div className="text-center">
+                       <p className="font-medium">{(consumer.lag || 0).toLocaleString()}</p>
+                       <p className="text-xs text-dark-muted">{t("streams.lag")}</p>
+                     </div>
+                     <div className="text-center">
+                       <p className="font-medium">{consumer.ack_rate || "N/A"}</p>
+                       <p className="text-xs text-dark-muted">{t("streams.ackRate")}</p>
+                     </div>
+                     <Link to={`/consumers/${encodeURIComponent(consumer.name)}`} className="btn-secondary text-sm">
+                       {t("streams.manage")}
+                     </Link>
                   </div>
                 </div>
               </div>
@@ -314,41 +316,41 @@ export default function StreamDetailPage() {
       {activeTab === "config" && (
         <div className="space-y-6">
           <div className="card">
-            <h3 className="text-lg font-semibold mb-4">Stream Configuration</h3>
+             <h3 className="text-lg font-semibold mb-4">{t("streams.streamConfiguration")}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">Name</span>
+                   <span className="text-dark-muted">{t("streams.name")}</span>
                   <span className="font-medium">{streamData.config?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">Storage</span>
+                   <span className="text-dark-muted">{t("streams.storage")}</span>
                   <span className="font-medium">{streamData.config?.storage}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">Retention</span>
+                   <span className="text-dark-muted">{t("streams.retention")}</span>
                   <span className="font-medium">{streamData.config?.retention}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">Replicas</span>
+                   <span className="text-dark-muted">{t("streams.replicas")}</span>
                   <span className="font-medium">{streamData.config?.replicas}</span>
                 </div>
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">Max Age</span>
+                   <span className="text-dark-muted">{t("streams.maxAge")}</span>
                   <span className="font-medium">{streamData.config?.max_age ? streamData.config.max_age : "None"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">Max Bytes</span>
+                   <span className="text-dark-muted">{t("streams.maxBytes")}</span>
                   <span className="font-medium">{formatBytes(streamData.config?.max_bytes || 0)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">Max Msg Size</span>
+                   <span className="text-dark-muted">{t("streams.maxMsgSize")}</span>
                   <span className="font-medium">{formatBytes((streamData.config as any)?.max_msg_size || 0)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">Subjects</span>
+                   <span className="text-dark-muted">{t("streams.subjects")}</span>
                   <span className="font-mono text-sm">{streamData.config?.subjects?.join(", ")}</span>
                 </div>
               </div>
@@ -356,32 +358,32 @@ export default function StreamDetailPage() {
           </div>
 
           <div className="card">
-            <h3 className="text-lg font-semibold mb-4">Stream Actions</h3>
+             <h3 className="text-lg font-semibold mb-4">{t("streams.streamActions")}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <button onClick={handleEditConfig} className="btn-secondary flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Edit Config
-              </button>
+               <button onClick={handleEditConfig} className="btn-secondary flex items-center gap-2">
+                 <FileText className="w-4 h-4" />
+                 {t("streams.editConfig")}
+               </button>
               <button
                 onClick={handlePurgeStream}
                 disabled={loadingAction === "purge"}
                 className={`btn-secondary flex items-center gap-2 ${loadingAction === "purge" ? "opacity-50" : ""}`}
               >
-                {loadingAction === "purge" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                Purge Stream
+                 {loadingAction === "purge" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                 {t("streams.purgeStream")}
               </button>
               <button
                 onClick={handleDeleteStream}
                 disabled={loadingAction === "delete"}
                 className={`btn-secondary flex items-center gap-2 text-status-error ${loadingAction === "delete" ? "opacity-50" : ""}`}
               >
-                {loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                Delete Stream
+                 {loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                 {t("streams.deleteStream")}
               </button>
-              <button onClick={handleCloneStream} className="btn-secondary flex items-center gap-2">
-                <CopyIcon className="w-4 h-4" />
-                Clone Stream
-              </button>
+               <button onClick={handleCloneStream} className="btn-secondary flex items-center gap-2">
+                 <CopyIcon className="w-4 h-4" />
+                 {t("streams.cloneStream")}
+               </button>
             </div>
           </div>
         </div>

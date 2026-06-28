@@ -1,4 +1,5 @@
 import { Filter } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface AlertsFiltersProps {
   filterSeverity: "all" | "critical" | "warning" | "info";
@@ -9,6 +10,7 @@ export default function AlertsFilters({
   filterSeverity,
   onFilterChange,
 }: AlertsFiltersProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center gap-4 mb-4">
       <div className="flex items-center gap-2">
@@ -18,10 +20,10 @@ export default function AlertsFilters({
           onChange={(e) => onFilterChange(e.target.value as any)}
           className="input"
         >
-          <option value="all">All Severities</option>
-          <option value="critical">Critical</option>
-          <option value="warning">Warning</option>
-          <option value="info">Info</option>
+          <option value="all">{t("alerts.allSeverities")}</option>
+          <option value="critical">{t("alerts.critical")}</option>
+          <option value="warning">{t("alerts.warning")}</option>
+          <option value="info">{t("alerts.info")}</option>
         </select>
       </div>
     </div>

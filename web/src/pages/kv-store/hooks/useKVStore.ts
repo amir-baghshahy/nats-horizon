@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import type { KVBucketInfo, KVKeyEntry, KVKeyHistoryEntry } from "../../../types";
 import { KvService } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
@@ -48,6 +49,7 @@ export interface UseKVStoreReturn {
 
 export function useKVStore(): UseKVStoreReturn {
   const { confirm } = useConfirm();
+  const { t } = useTranslation();
   const [selectedBucket, setSelectedBucket] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -152,13 +154,13 @@ export function useKVStore(): UseKVStoreReturn {
   const handleCreateBucket = (data: Record<string, any>) => createBucketMutation.mutate(data);
 
   const handleDeleteBucket = async (name: string) => {
-    const ok = await confirm({ title: "Delete Bucket", message: `Delete bucket "${name}"?`, confirmLabel: "Delete", variant: "danger" });
+    const ok = await confirm({ title: t('kvStore.deleteBucket'), message: t('kvStore.deleteBucketConfirm', { name }), confirmLabel: t('common.delete'), variant: "danger" });
     if (ok) deleteBucketMutation.mutate(name);
   };
 
   const handlePurgeBucket = async () => {
     if (!selectedBucket) return;
-    const ok = await confirm({ title: "Purge Bucket", message: `Purge deleted-key tombstones from "${selectedBucket}"?`, confirmLabel: "Purge", variant: "warning" });
+    const ok = await confirm({ title: t('kvStore.purgeBucket'), message: t('kvStore.purgeBucketConfirm', { name: selectedBucket }), confirmLabel: t('common.purge'), variant: "warning" });
     if (ok) purgeBucketMutation.mutate(selectedBucket);
   };
 
@@ -166,7 +168,7 @@ export function useKVStore(): UseKVStoreReturn {
   const handleGetKey = (key: string) => getKeyMutation.mutate(key);
 
   const handleDeleteKey = async (key: string) => {
-    const ok = await confirm({ title: "Delete Key", message: `Delete key "${key}"?`, confirmLabel: "Delete", variant: "danger" });
+    const ok = await confirm({ title: t('kvStore.deleteKey'), message: t('kvStore.deleteKeyConfirm', { key }), confirmLabel: t('common.delete'), variant: "danger" });
     if (ok) deleteKeyMutation.mutate(key);
   };
 

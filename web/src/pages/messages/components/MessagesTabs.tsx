@@ -1,11 +1,14 @@
+import { useTranslation } from "react-i18next";
+
 interface MessagesTabsProps {
   activeTab: "stream" | "core";
   onTabChange: (tab: "stream" | "core") => void;
 }
 
 export default function MessagesTabs({ activeTab, onTabChange }: MessagesTabsProps) {
+  const { t } = useTranslation();
   return (
-    <div className="mb-6 border-b border-dark-border pb-3">
+    <div className="mb-4 border-b border-dark-border pb-3">
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
@@ -16,7 +19,7 @@ export default function MessagesTabs({ activeTab, onTabChange }: MessagesTabsPro
               : "text-dark-muted hover:bg-dark-bg hover:text-dark-text"
           }`}
         >
-          Stream Messages
+          {t('messages.streamMessages')}
         </button>
         <button
           type="button"
@@ -27,7 +30,7 @@ export default function MessagesTabs({ activeTab, onTabChange }: MessagesTabsPro
               : "text-dark-muted hover:bg-dark-bg hover:text-dark-text"
           }`}
         >
-          Core Messaging
+          {t('messages.coreMessaging')}
         </button>
       </div>
     </div>

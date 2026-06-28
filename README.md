@@ -6,6 +6,7 @@
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-1.25-blue.svg)](https://go.dev)
+[![Wails](https://img.shields.io/badge/Wails-2.0-00B4AB.svg)](https://wails.io)
 [![React](https://img.shields.io/badge/React-18-61DAFB.svg)](https://reactjs.org)
 [![Vite](https://img.shields.io/badge/Vite-5.0-646CFF.svg)](https://vitejs.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6.svg)](https://www.typescriptlang.org)
@@ -13,11 +14,11 @@
 [![i18n](https://img.shields.io/badge/i18n-6%20languages-red.svg)]()
 
 A comprehensive, open-source monitoring and management platform for NATS JetStream infrastructure.
-Built for teams that need real-time visibility, powerful management tools, and a deployment experience that doesn't require a PhD in DevOps.
+Built as a **native desktop app** using Wails v2 — no browser needed, no server required.
 
 ---
 
-| [🚀 Quick Start](#--quick-start) | [📦 Installation](#-installation) | [📊 Features](#--features) | [🖼️ Screenshots](#--screenshots) | [⚖️ Compare](#-vs-others) | [🏗️ Architecture](#-architecture) |
+| [🚀 Quick Start](#-quick-start) | [📦 Installation](#-installation) | [📊 Features](#-features) | [🖼️ Screenshots](#️-screenshots) | [⚖️ Compare](#️-vs-others) | [🏗️ Architecture](#️-architecture) |
 
 </div>
 
@@ -27,13 +28,13 @@ Built for teams that need real-time visibility, powerful management tools, and a
 
 NATS is fast. NATS scales well. But managing a production NATS JetStream cluster shouldn't require memorizing CLI flags or running five infrastructure services just to see what's happening.
 
-**nats-horizon** is a single-binary, zero-dependency web platform that gives you full observability and control over your NATS JetStream infrastructure:
+**nats-horizon** is a **native desktop application** that gives you full observability and control over your NATS JetStream infrastructure:
 
 - **See everything** — Real-time dashboard with live metrics for streams, consumers, KV stores, and cluster health
 - **Control everything** — Create, edit, delete, replay, and pause consumers directly from the UI
 - **Debug everything** — Message inspector, header viewer, JSON formatter, subject explorer, and audit logs
 - **Alert on everything** — Get notified when consumer lag spikes, storage fills up, or any threshold is breached
-- **Deploy anywhere** — One Docker command, one binary file, or one `go run`. No PostgreSQL, no Redis, no ClickHouse, no Node.js server.
+- **Deploy anywhere** — Native desktop app for Windows, macOS, and Linux. Single binary, zero dependencies.
 
 ### Why we built this
 
@@ -43,7 +44,7 @@ We run NATS JetStream in production. We tried every existing tool and hit the sa
 - **nats-nui** — Fast and popular, but it's a *browser*, not a *command center*. No alerts, no audit, no history.
 - **nats-dashboard** — Beautiful, but read-only. You can watch, but you can't act.
 
-So we built **nats-horizon** — the full-featured option that fits in a single binary.
+So we built **nats-horizon** — a native desktop app that fits in a single binary with no external dependencies.
 
 ---
 
@@ -51,9 +52,36 @@ So we built **nats-horizon** — the full-featured option that fits in a single 
 
 ## 🚀 Quick Start
 
-Four ways to run — pick whichever fits your workflow.
+### Option 1: Run Desktop App ⭐ (Recommended)
 
-### Option 1: Docker Compose ⭐ (Recommended)
+Build and run the native desktop application:
+
+```bash
+# Clone the repository
+git clone https://github.com/amir-baghshahy/nats-horizon.git
+cd nats-horizon
+
+# Install dependencies
+make install
+
+# Run in development mode (with hot reload)
+make dev
+
+# Or build for production
+make build
+```
+
+The desktop app will open as a native window. No browser needed!
+
+### Option 2: Download Pre-built Binary
+
+Download a pre-built binary for your platform from the [Releases](https://github.com/amir-baghshahy/nats-horizon/releases) page:
+
+- **Windows**: `nats-horizon-windows-amd64.exe`
+- **macOS**: `nats-horizon-darwin-amd64` (or `darwin-arm64` for Apple Silicon)
+- **Linux**: `nats-horizon-linux-amd64`
+
+### Option 3: Docker Compose (Web Mode)
 
 Zero local dependencies. Starts nats-horizon **and** a JetStream-enabled NATS server automatically.
 
@@ -64,50 +92,6 @@ docker compose up
 ```
 
 Open **http://localhost:3000**. Done.
-
-To connect to an **existing** NATS server instead:
-
-```bash
-docker compose -f docker-compose.yml
-```
-
-### Option 2: Standalone Binary
-
-Download a pre-built binary for your platform — no Docker required.
-
-```bash
-# Mac / Linux (one-liner)
-curl -fsSL https://raw.githubusercontent.com/amir-baghshahy/nats-horizon/main/install.sh | bash
-
-# Windows (PowerShell)
-iwr https://raw.githubusercontent.com/amir-baghshahy/nats-horizon/main/install.bat -OutFile install.bat; .\install.bat
-```
-
-Then run:
-
-```bash
-nats-horizon --nats-url nats://your-server:4222
-```
-
-### Option 3: Kubernetes (Helm)
-
-Deploy to your Kubernetes cluster:
-
-```bash
-# Build and push image
-docker build -t your-registry/nats-horizon:latest .
-docker push your-registry/nats-horizon:latest
-
-# Install with Helm
-helm install nats-horizon ./helm/nats-horizon \
-  --set image.repository=your-registry/nats-horizon \
-  --set app.natsUrl="nats://nats:4222"
-
-# Check status
-helm status nats-horizon
-```
-
-Full documentation in [`helm/README.md`](helm/README.md).
 
 ### Option 4: Local Development
 
@@ -126,6 +110,39 @@ Backend on `:3000`, frontend on `:5173`.
 
 ## 📦 Installation
 
+### Desktop App (Wails v2)
+
+| Platform | Command |
+|----------|---------|
+| **Development** | `make dev` |
+| **Build** | `make build` |
+| **Run** | `./build/nats-horizon` |
+
+#### Requirements
+
+- **Go 1.25+**
+- **Node.js 18+** (for frontend build)
+- **Wails CLI**: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
+
+#### Platform-specific dependencies
+
+**Linux:**
+```bash
+# Debian/Ubuntu
+sudo apt install libgtk-3-dev libwebkit2gtk-4.0-dev
+
+# Fedora
+sudo dnf install gtk3-devel webkit2gtk3-devel
+```
+
+**macOS:**
+- Xcode Command Line Tools
+
+**Windows:**
+- WebView2 Runtime (included with Windows 11)
+
+### Web Mode (Docker)
+
 | Method | Time | When to use |
 |---|---|---|
 | `docker compose up` | 30s | Production, staging, quick demo |
@@ -133,7 +150,7 @@ Backend on `:3000`, frontend on `:5173`.
 | Binary download | 15s | No Docker, want native performance |
 | `make dev` | 2 min | Contributing, local changes |
 
-### Docker Image
+#### Docker Image
 
 ```bash
 docker build -t nats-horizon .
@@ -142,13 +159,7 @@ docker run -p 3000:3000 \
   --rm nats-horizon
 ```
 
-Or via Docker Compose (recommended):
-
-```bash
-docker compose up
-```
-
-### Kubernetes (Helm)
+#### Kubernetes (Helm)
 
 Deploy to any Kubernetes cluster using the included Helm chart:
 
@@ -161,65 +172,17 @@ docker push your-registry/nats-horizon:latest
 helm install nats-horizon ./helm/nats-horizon \
   --set image.repository=your-registry/nats-horizon \
   --set app.natsUrl="nats://nats.production.svc.cluster.local:4222"
-
-# With custom values
-helm install nats-horizon ./helm/nats-horizon -f custom-values.yaml
-
-# Upgrade
-helm upgrade nats-horizon ./helm/nats-horizon
-
-# Uninstall
-helm uninstall nats-horizon
 ```
 
-**Production configuration example:**
-
-```yaml
-# custom-values.yaml
-replicaCount: 3
-image:
-  repository: your-registry/nats-horizon
-  tag: "v1.0.0"
-ingress:
-  enabled: true
-  className: "nginx"
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-    - host: nats-horizon.example.com
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: nats-horizon-tls
-      hosts:
-        - nats-horizon.example.com
-resources:
-  limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
-    cpu: 200m
-    memory: 256Mi
-autoscaling:
-  enabled: true
-  minReplicas: 2
-  maxReplicas: 5
-  targetCPUUtilizationPercentage: 70
-app:
-  natsUrl: "nats://nats.production.svc.cluster.local:4222"
-  corsAllowedOrigins: "https://nats-horizon.example.com"
-```
-
-See [`helm/README.md`](helm/README.md) for full Helm chart documentation.
+Full documentation in [`helm/README.md`](helm/README.md).
 
 ### Configuration
 
 | Variable | Default | Description |
 |---|---|---|
 | `NATS_URL` | `nats://localhost:4222` | NATS server address |
-| `PORT` | `3000` | Web server port |
-| `CORS_ALLOWED_ORIGINS` | `*` | Allowed CORS origins |
+| `PORT` | `3000` | Web server port (web mode only) |
+| `CORS_ALLOWED_ORIGINS` | `*` | Allowed CORS origins (web mode only) |
 | `GIN_MODE` | `release` | `debug` or `release` |
 
 See `.env.example` for the full list.
@@ -342,6 +305,74 @@ Modern Next.js 16 + shadcn/ui stack. Object Store support, command palette, dark
 
 ## 🏗️ Architecture
 
+### Desktop Mode (Wails v2)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   nats-horizon Desktop App                  │
+│                   (Wails v2 + WebView2)                     │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │              React Frontend (Vite + Tailwind)        │   │
+│  │  ┌─────────────┐ ┌──────────────┐ ┌─────────────┐ │   │
+│  │  │  Dashboard  │ │   Streams    │ │  Consumers  │ │   │
+│  │  └─────────────┘ └──────────────┘ └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                            │                                │
+│                    Wails Runtime Bridge                     │
+│                            │                                │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │              Go Backend (Gin + NATS)                 │   │
+│  │  ┌─────────────┐ ┌──────────────┐ ┌─────────────┐ │   │
+│  │  │   REST      │ │   SSE Hub    │ │   Use Cases │ │   │
+│  │  │   Handlers  │ │   (events)   │ │   Layer     │ │   │
+│  │  └─────────────┘ └──────────────┘ └─────────────┘ │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                            │                                │
+└────────────────────────────┼────────────────────────────────┘
+                             │
+                             ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    NATS Server                               │
+│                   (JetStream enabled)                        │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### Web Mode (Docker)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     User Browser                            │
+│                  http://localhost:3000                       │
+└──────────────────────────┬──────────────────────────────────┘
+                           │  REST API  │  SSE (events)
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  nats-horizon Server                        │
+│                    (Go 1.25 + Gin)                          │
+│  ┌─────────────┐ ┌──────────────┐ ┌────────────────────┐  │
+│  │   REST      │ │   SSE Hub    │ │   Static Assets    │  │
+│  │   Handlers  │ │   (events)   │ │   (React build)    │  │
+│  │  └──────┬──────┘ └──────┬───────┘ └────────────────────┘  │
+│  │         │                │                                  │
+│  │  ┌──────▼────────────────▼──────┐                          │
+│  │  │     Use Cases Layer          │                          │
+│  │  │  (Stream / Consumer / KV /  │                          │
+│  │  │   Messages / Metrics / ...) │                          │
+│  │  └──────────────┬──────────────┘                          │
+│  │                 │                                         │
+│  │  ┌──────────────▼──────────────┐                          │
+│  │  │     NATS Go Client          │                          │
+│  │  │     (nats.go v1.x)          │                          │
+│  │  └──────────────┬──────────────┘                          │
+│  └─────────────────┼─────────────────────────────────────────┘
+│                    │
+└────────────────────┼─────────────────────────────────────────┘
+                     │
+                     ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    NATS Server                               │
+│                   (JetStream enabled)                        │
+└──────────────────────────────────────────────────────────────┘
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        User Browser                         │
@@ -380,6 +411,7 @@ Modern Next.js 16 + shadcn/ui stack. Object Store support, command palette, dark
 
 | Layer | Technology | Why |
 |---|---|---|
+| **Desktop Framework** | Wails v2 | Native desktop apps with Go + web frontend |
 | **Backend** | Go 1.25 + Gin | Single binary, minimal memory (~15MB), fast compile |
 | **Frontend** | React 18 + Vite + TailwindCSS | Fast dev, small bundle, modern DX |
 | **Charts** | Recharts | Responsive, composable, no bloat |
@@ -407,69 +439,6 @@ We chose **SSE over WebSocket** because:
 
 
 
-## 📦 Installation
-
-### Docker Compose (Recommended)
-
-```bash
-git clone https://github.com/amir-baghshahy/nats-horizon.git
-cd nats-horizon
-docker compose up
-```
-
-### Binary (Mac / Linux / Windows)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/amir-baghshahy/nats-horizon/main/install.sh | bash
-nats-horizon --nats-url nats://your-server:4222
-```
-
-### Source
-
-```bash
-git clone https://github.com/amir-baghshahy/nats-horizon.git
-cd nats-horizon
-make install
-make dev
-```
-
----
-
-
-
-## 📋 Configuration
-
-| Variable | Default | Description |
-|---|---|---|
-| `PORT` | `3000` | Preferred web server port |
-| `AUTO_PORT` | `true` | Auto-find a free port if `PORT` is busy |
-| `PORT_RANGE_START` | `3001` | Sequential fallback range start |
-| `PORT_RANGE_END` | `3020` | Sequential fallback range end |
-| `NATS_URL` | `nats://localhost:4222` | NATS server address |
-| `CORS_ALLOWED_ORIGINS` | `*` | Comma-separated allowed origins |
-| `GIN_MODE` | `release` | `debug` or `release` |
-
-### Smart Port Selection
-
-No more "port already in use" errors. nats-horizon finds an available port automatically:
-
-1. Tries your preferred port (`PORT`, default `3000`)
-2. If busy, sweeps sequentially through `PORT_RANGE_START` → `PORT_RANGE_END` (default `3001`–`3019`)
-3. If still busy, picks a random port from the pool
-4. Logs the actual port so you know where to open the browser
-
-```
-# If 3000 is busy, you'll see:
-Port 3000 was busy, using random port 3014 instead
-Server starting on http://localhost:3014
-```
-
-To disable auto-port and fail fast instead:
-```
-AUTO_PORT=false PORT=3000
-```
-
----
 
 ## 🔌 NATS Compatibility
 
@@ -517,6 +486,7 @@ For detailed security information, see [SECURITY.md](SECURITY.md).
 - [x] Export streams, consumers, messages
 - [x] History & usage analysis
 - [x] Cluster topology
+- [x] Native desktop app (Wails v2)
 - [x] Internationalization (i18n) with 6 languages
 - [x] RTL support for Persian and Arabic
 - [ ] Consumer-based message inspection deep-dive

@@ -11,10 +11,14 @@
 [![Vite](https://img.shields.io/badge/Vite-5.0-646CFF.svg)](https://vitejs.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6.svg)](https://www.typescriptlang.org)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](Dockerfile)
-[![i18n](https://img.shields.io/badge/i18n-6%20languages-red.svg)]()
+[![i18n](https://img.shields.io/badge/i18n-6%20languages-blue.svg)]()
+[![Stars](https://img.shields.io/github/stars/amir-baghshahy/nats-horizon?style=social)](https://github.com/amir-baghshahy/nats-horizon)
 
 A comprehensive, open-source monitoring and management platform for NATS JetStream infrastructure.
-Built as a **native desktop app** using Wails v2 — no browser needed, no server required.
+
+**🌍 6 Languages | 🖥️ Native Desktop | 🔌 Zero Dependencies | 📦 Single Binary**
+
+![Dashboard](docs/images/dashboard.png)
 
 ---
 
@@ -92,17 +96,6 @@ docker compose up
 ```
 
 Open **http://localhost:3000**. Done.
-
-### Option 4: Local Development
-
-```bash
-git clone https://github.com/amir-baghshahy/nats-horizon.git
-cd nats-horizon
-make install
-make dev
-```
-
-Backend on `:3000`, frontend on `:5173`.
 
 ---
 
@@ -369,38 +362,6 @@ Modern Next.js 16 + shadcn/ui stack. Object Store support, command palette, dark
 └────────────────────┼─────────────────────────────────────────┘
                      │
                      ▼
-┌──────────────────────────────────────────────────────────────┐
-│                    NATS Server                               │
-│                   (JetStream enabled)                        │
-└──────────────────────────────────────────────────────────────┘
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        User Browser                         │
-│                     http://localhost:3000                    │
-└──────────────────────────┬──────────────────────────────────┘
-                           │  REST API  │  SSE (events)
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  nats-horizon Server                      │
-│                    (Go 1.25 + Gin)                          │
-│  ┌─────────────┐ ┌──────────────┐ ┌────────────────────┐  │
-│  │   REST      │ │   SSE Hub    │ │   Static Assets    │  │
-│  │   Handlers  │ │   (events)   │ │   (React build)    │  │
-│  └──────┬──────┘ └──────┬───────┘ └────────────────────┘  │
-│         │                │                                  │
-│  ┌──────▼────────────────▼──────┐                          │
-│  │     Use Cases Layer           │                         │
-│  │  (Stream / Consumer / KV /   │                         │
-│  │   Messages / Metrics / ...)  │                          │
-│  └──────────────┬───────────────┘                          │
-│                 │                                          │
-│  ┌──────────────▼───────────────┐                          │
-│  │     NATS Go Client            │                         │
-│  │     (nats.go v1.x)            │                         │
-│  └──────────────┬───────────────┘                          │
-└─────────────────┼───────────────────────────────────────────┘
-                  │
-                  ▼
 ┌──────────────────────────────────────────────────────────────┐
 │                    NATS Server                               │
 │                   (JetStream enabled)                        │

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Send } from "lucide-react";
 import { validateSubject, validateJSON } from "../../utils/validators";
+import { Button } from "../ui";
 
 export interface PublishForm {
   subject: string;
@@ -115,13 +116,13 @@ export default function PublishForm({
         </div>
 
         <div className="flex items-center gap-3 pt-4">
-          <button type="submit" className="btn-primary flex items-center gap-2">
-            <Send className="w-4 h-4" />
+          <Button type="submit" variant="primary" icon={<Send className="w-4 h-4" />}>
             {t('messages.publish')}
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={() =>
               onChange({
                 subject: "",
@@ -130,10 +131,9 @@ export default function PublishForm({
                 headers: "{}",
               })
             }
-            className="btn-secondary"
           >
             {t('messages.clear')}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

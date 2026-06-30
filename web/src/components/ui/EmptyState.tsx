@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+import { Button } from "./Button";
 
 interface EmptyStateProps {
   icon?: LucideIcon;
@@ -48,9 +49,9 @@ export default function EmptyState({
       <h3 className={`${titleSize[size]} font-semibold text-dark-text`}>{title}</h3>
       {description && <p className="mt-2 text-sm leading-6 text-dark-muted">{description}</p>}
       {action && (
-        <button onClick={action.onClick} className="btn-primary mt-6">
+        <Button variant="primary" onClick={action.onClick} className="mt-6">
           {action.label}
-        </button>
+        </Button>
       )}
     </div>
   );

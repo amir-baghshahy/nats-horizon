@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Zap } from "lucide-react";
+import { PageHeader } from "../../../components/ui";
+import { Button } from "../../../components/ui";
 
 interface AlertsHeaderProps {
   onNewAlert: () => void;
@@ -17,29 +19,29 @@ export default function AlertsHeader({
 }: AlertsHeaderProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center justify-between mb-4">
-      <div>
-        <h1 className="text-xl md:text-xl font-bold">{t("alerts.title")}</h1>
-        <p className="text-dark-muted mt-1">{t("alerts.subtitle")}</p>
-      </div>
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onNewAlert}
-          className="btn-primary flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          {t("alerts.newAlert")}
-        </button>
-        <button
-          onClick={onCheckAlerts}
-          disabled={isChecking}
-          className="btn-secondary flex items-center gap-2 disabled:opacity-50"
-        >
-          <Zap className="w-4 h-4" />
-          {t("alerts.checkNow")}
-        </button>
-        {rightElement}
-      </div>
-    </div>
+    <PageHeader
+      title={t("alerts.title")}
+      subtitle={t("alerts.subtitle")}
+      actions={
+        <>
+           <Button
+             variant="primary"
+             icon={<Plus className="w-4 h-4" />}
+             onClick={onNewAlert}
+           >
+             {t("alerts.newAlert")}
+           </Button>
+           <Button
+             variant="secondary"
+             icon={<Zap className="w-4 h-4" />}
+             onClick={onCheckAlerts}
+             loading={isChecking}
+           >
+             {t("alerts.checkNow")}
+           </Button>
+          {rightElement}
+        </>
+      }
+    />
   );
 }

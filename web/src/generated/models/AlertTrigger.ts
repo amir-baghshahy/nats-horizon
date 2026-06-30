@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AlertSeverity } from './AlertSeverity';
 export type AlertTrigger = {
     acked?: boolean;
     acked_at?: string;
@@ -11,7 +10,7 @@ export type AlertTrigger = {
     alert_name?: string;
     data?: Record<string, any>;
     message?: string;
-    severity?: AlertSeverity;
+    severity?: string;
     triggered_at?: string;
 };
 

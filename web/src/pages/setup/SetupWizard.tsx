@@ -1,8 +1,10 @@
+import PanelCard from "../../components/ui/PanelCard";
+import { Button } from "../../components/ui";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { 
   Database, Mail, Globe, Check, ArrowRight, ArrowLeft,
-  AlertCircle, Loader2
+  AlertCircle
 } from "lucide-react";
 
 interface SetupData {
@@ -105,13 +107,13 @@ export default function SetupWizard() {
   if (success) {
     return (
       <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
-        <div className="card max-w-md w-full text-center p-8">
+        <PanelCard className="max-w-md w-full text-center">
           <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-green-400" />
           </div>
           <h2 className="text-2xl font-bold mb-2">{t("setup.successTitle")}</h2>
           <p className="text-dark-muted">{t("setup.successDesc")}</p>
-        </div>
+        </PanelCard>
       </div>
     );
   }
@@ -120,7 +122,7 @@ export default function SetupWizard() {
 
   return (
     <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
-      <div className="card max-w-lg w-full">
+      <PanelCard className="max-w-lg w-full">
         {/* Progress */}
         <div className="flex items-center justify-between mb-8">
           {steps.map((s, i) => (
@@ -299,37 +301,33 @@ export default function SetupWizard() {
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between">
-          <button
-            onClick={prevStep}
-            disabled={step === 0}
-            className="btn-secondary flex items-center gap-2 disabled:opacity-50"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {t("common.back")}
-          </button>
-          
-          {step < steps.length - 1 ? (
-            <button onClick={nextStep} className="btn-primary flex items-center gap-2">
-              {t("common.next")}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              onClick={finishSetup}
-              disabled={loading}
-              className="btn-primary flex items-center gap-2"
-            >
-              {loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Check className="w-4 h-4" />
-              )}
-              {t("setup.finish")}
-            </button>
-          )}
-        </div>
-      </div>
+         <div className="flex justify-between">
+           <Button
+             variant="secondary"
+             onClick={prevStep}
+             disabled={step === 0}
+             icon={<ArrowLeft className="w-4 h-4" />}
+             className="disabled:opacity-50"
+           >
+             {t("common.back")}
+           </Button>
+           
+           {step < steps.length - 1 ? (
+             <Button variant="primary" onClick={nextStep} icon={<ArrowRight className="w-4 h-4" />}>
+               {t("common.next")}
+             </Button>
+           ) : (
+             <Button
+               variant="primary"
+               onClick={finishSetup}
+               loading={loading}
+               icon={loading ? undefined : <Check className="w-4 h-4" />}
+             >
+               {t("setup.finish")}
+             </Button>
+           )}
+         </div>
+      </PanelCard>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Network, RefreshCw, Server } from "lucide-react";
+import { Button } from "../ui";
 
 export interface ServiceInfo {
   server_name?: string;
@@ -30,14 +31,9 @@ export default function ServiceDiscoveryPanel({
             <Server className="h-5 w-5" />
             {t('messages.serviceDiscovery')}
           </h2>
-          <button
-            type="button"
-            onClick={onRefresh}
-            className="btn-secondary inline-flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
+          <Button variant="secondary" onClick={onRefresh} icon={<RefreshCw className="h-4 w-4" />}>
             {t('common.refresh')}
-          </button>
+          </Button>
         </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">

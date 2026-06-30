@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Activity, Play, RefreshCw, StopCircle } from "lucide-react";
+import { Button } from "../ui";
 
 interface MonitorEvent {
   type?: string;
@@ -98,24 +99,12 @@ export default function TrafficMonitorPanel({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={onStart}
-              disabled={isMonitoring}
-              className="btn-primary inline-flex items-center gap-2 disabled:opacity-50"
-            >
-              <Play className="h-4 w-4" />
+            <Button variant="primary" onClick={onStart} disabled={isMonitoring} icon={<Play className="h-4 w-4" />}>
               {t('messages.startMonitor')}
-            </button>
-            <button
-              type="button"
-              onClick={onStop}
-              disabled={!isMonitoring}
-              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-50"
-            >
-              <StopCircle className="h-4 w-4" />
+            </Button>
+            <Button variant="secondary" onClick={onStop} disabled={!isMonitoring} icon={<StopCircle className="h-4 w-4" />}>
               {t('messages.stop')}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -130,15 +119,9 @@ export default function TrafficMonitorPanel({
               className="input flex-1 font-mono"
               disabled={isMonitoring}
             />
-            <button
-              type="button"
-              onClick={onStart}
-              disabled={isMonitoring}
-              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-50"
-            >
-              <RefreshCw className="h-4 w-4" />
+            <Button variant="secondary" onClick={onStart} disabled={isMonitoring} icon={<RefreshCw className="h-4 w-4" />}>
               {t('messages.restart')}
-            </button>
+            </Button>
           </div>
           <p className="mt-2 text-xs text-dark-muted">
             {t('messages.subjectsHelp')}

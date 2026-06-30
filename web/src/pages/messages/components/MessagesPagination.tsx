@@ -1,6 +1,8 @@
 import { RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import PanelCard from "../../../components/ui/PanelCard";
 import Select from "../../../components/ui/Select";
+import { Button } from "../../../components/ui";
 
 interface MessagesPaginationProps {
   currentPage: number;
@@ -23,7 +25,7 @@ export default function MessagesPagination({
   const totalPages = Math.max(1, Math.ceil(totalMessages / messagesPerPage));
 
   return (
-    <div className="card mb-4">
+    <PanelCard className="mb-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <span className="text-sm text-dark-muted">
@@ -42,32 +44,20 @@ export default function MessagesPagination({
           />
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-            disabled={currentPage <= 1}
-            className="btn-secondary text-sm py-1 px-3 disabled:opacity-50"
-          >
+          <Button variant="secondary" size="sm" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage <= 1}>
             {t('messages.previous')}
-          </button>
+          </Button>
           <span className="text-sm text-dark-muted">
             {t('common.page', { page: currentPage, total: totalPages })}
           </span>
-          <button
-            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage >= totalPages}
-            className="btn-secondary text-sm py-1 px-3 disabled:opacity-50"
-          >
+          <Button variant="secondary" size="sm" onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage >= totalPages}>
             {t('messages.next')}
-          </button>
-          <button
-            onClick={onRefresh}
-            className="btn-secondary text-sm py-1 px-3 flex items-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
+          </Button>
+          <Button variant="secondary" size="sm" onClick={onRefresh} icon={<RefreshCw className="w-4 h-4" />}>
             {t('common.refresh')}
-          </button>
+          </Button>
         </div>
       </div>
-    </div>
+    </PanelCard>
   );
 }

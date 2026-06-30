@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { StreamStats } from "../hooks/useStreamsPage";
 import { Database, HardDrive, MessageSquare, Users } from "lucide-react";
+import { StatCard } from "../../../components/ui";
 
 interface StreamsStatsProps {
   stats: StreamStats;
@@ -11,65 +12,11 @@ export default function StreamsStats({ stats }: StreamsStatsProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
-            <Database className="w-5 h-5 text-primary-400" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{stats.total}</p>
-             <p className="text-xs text-dark-muted">{t("streams.totalStreams")}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-            <HardDrive className="w-5 h-5 text-blue-400" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{stats.fileStorage}</p>
-             <p className="text-xs text-dark-muted">{t("streams.fileStorage")}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-            <Database className="w-5 h-5 text-purple-400" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{stats.memoryStorage}</p>
-             <p className="text-xs text-dark-muted">{t("streams.memoryStorage")}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-            <MessageSquare className="w-5 h-5 text-green-400" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{stats.totalMessages.toLocaleString()}</p>
-             <p className="text-xs text-dark-muted">{t("streams.totalMessages")}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-            <Users className="w-5 h-5 text-cyan-400" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{stats.totalConsumers}</p>
-             <p className="text-xs text-dark-muted">{t("streams.totalConsumers")}</p>
-          </div>
-        </div>
-      </div>
+      <StatCard icon={Database} value={stats.total} label={t("streams.totalStreams")} />
+      <StatCard icon={HardDrive} value={stats.fileStorage} label={t("streams.fileStorage")} iconBg="bg-blue-500/20" iconColor="text-blue-400" />
+      <StatCard icon={Database} value={stats.memoryStorage} label={t("streams.memoryStorage")} iconBg="bg-purple-500/20" iconColor="text-purple-400" />
+      <StatCard icon={MessageSquare} value={stats.totalMessages} label={t("streams.totalMessages")} iconBg="bg-green-500/20" iconColor="text-green-400" />
+      <StatCard icon={Users} value={stats.totalConsumers} label={t("streams.totalConsumers")} iconBg="bg-cyan-500/20" iconColor="text-cyan-400" />
     </div>
   );
 }

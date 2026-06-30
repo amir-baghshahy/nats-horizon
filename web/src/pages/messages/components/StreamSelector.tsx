@@ -1,6 +1,8 @@
 import { Search, Filter, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Select from "../../../components/ui/Select";
+import PanelCard from "../../../components/ui/PanelCard";
+import { Button } from "../../../components/ui";
 
 interface StreamSelectorProps {
   streams: any[];
@@ -25,7 +27,7 @@ export default function StreamSelector({
 }: StreamSelectorProps) {
   const { t } = useTranslation();
   return (
-    <div className="card mb-4">
+    <PanelCard className="mb-4">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
           <label className="block text-sm text-dark-muted mb-2">{t('messages.selectStream')}</label>
@@ -52,18 +54,12 @@ export default function StreamSelector({
           />
         </div>
         <div className="flex items-end gap-3">
-          <button
-            onClick={onToggleFilters}
-            className="btn-secondary flex items-center gap-2"
-          >
-            <Filter className="w-4 h-4" />
+          <Button variant="secondary" onClick={onToggleFilters} icon={<Filter className="w-4 h-4" />}>
             {showFilters ? t('messages.lessFilters') : t('messages.filters')}
-          </button>
-          <button onClick={onRefresh} className="btn-secondary">
-            <RefreshCw className="w-4 h-4" />
-          </button>
+          </Button>
+          <Button variant="secondary" onClick={onRefresh} icon={<RefreshCw className="w-4 h-4" />} />
         </div>
       </div>
-    </div>
+    </PanelCard>
   );
 }

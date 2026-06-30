@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { AlertCircle } from 'lucide-react'
 import LoadingSpinner from './LoadingSpinner'
+import { Button } from './Button'
 
 export function PageLoading({ text }: { text?: string }) {
   const { t } = useTranslation()
@@ -29,9 +30,9 @@ export function PageError({ message, onRetry }: { message: string; onRetry?: () 
             <h2 className="text-lg font-semibold text-dark-text">{t('common.unableToLoadData')}</h2>
             <p className="mt-2 text-sm leading-6 text-dark-muted">{message}</p>
             {onRetry && (
-              <button onClick={onRetry} className="btn-secondary mt-5">
+              <Button variant="secondary" onClick={onRetry} className="mt-5">
                 {t('common.tryAgain')}
-              </button>
+              </Button>
             )}
           </div>
         </div>

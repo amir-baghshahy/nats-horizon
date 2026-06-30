@@ -3,35 +3,34 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AlertCondition } from './AlertCondition';
-import type { AlertSeverity } from './AlertSeverity';
 import type { Duration } from './Duration';
 export type Alert = {
     /**
      * Notification channels: "email", "webhook", "slack"
      */
     channels?: Array<string>;
-    /**
-     * Email address for email notifications
-     */
-    emailAddress?: string;
-    /**
-     * Webhook URL for webhook notifications
-     */
-    webhookUrl?: string;
-    /**
-     * Slack webhook URL for Slack notifications
-     */
-    slackWebhookUrl?: string;
     condition?: AlertCondition;
     cooldown?: Duration;
     created_at?: string;
     description?: string;
+    /**
+     * Email address for email notifications
+     */
+    email_address?: string;
     enabled?: boolean;
     id?: string;
     last_trigger?: string;
     name?: string;
-    severity?: AlertSeverity;
+    severity?: string;
+    /**
+     * Slack webhook URL for Slack notifications
+     */
+    slack_webhook_url?: string;
     trigger_count?: number;
     updated_at?: string;
+    /**
+     * Webhook URL for webhook notifications
+     */
+    webhook_url?: string;
 };
 

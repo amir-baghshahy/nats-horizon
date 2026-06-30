@@ -1,5 +1,7 @@
-import { Plus, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { PageHeader } from "../../../components/ui";
+import { Button } from "../../../components/ui";
 
 interface StreamsHeaderProps {
   sseConnected: boolean;
@@ -15,45 +17,22 @@ export default function StreamsHeader({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold">{t('streams.title')}</h1>
-        <p className="text-dark-muted mt-1">
-          {t('streams.subtitle')}
-        </p>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-dark-bg rounded-lg border border-dark-border text-xs">
-          {sseConnected ? (
-            <>
-              <Wifi className="w-3.5 h-3.5 text-green-400" />
-              <span className="text-green-400">{t('common.live')}</span>
-            </>
-          ) : (
-            <>
-              <WifiOff className="w-3.5 h-3.5 text-yellow-400" />
-              <span className="text-yellow-400">{t('common.connecting')}</span>
-            </>
-          )}
-        </div>
-
-        <button
-          onClick={onRefetch}
-          className="btn-secondary flex items-center gap-2"
-        >
-          <RefreshCw className="w-4 h-4" />
-          {t('common.refresh')}
-        </button>
-
-        <button
-          onClick={onShowCreateModal}
-          className="btn-primary flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          {t('streams.createStream')}
-        </button>
-      </div>
-    </div>
+    <PageHeader
+      title={t("streams.title")}
+      subtitle={t("streams.subtitle")}
+      sseConnected={sseConnected}
+      sseLabel={t("common.live")}
+      sseDisconnectedLabel={t("common.connecting")}
+       actions={
+         <>
+           <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={onRefetch}>
+             {t("common.refresh")}
+           </Button>
+           <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={onShowCreateModal}>
+             {t("streams.createStream")}
+           </Button>
+         </>
+       }
+    />
   );
 }

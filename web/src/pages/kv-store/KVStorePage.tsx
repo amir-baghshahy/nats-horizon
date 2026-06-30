@@ -6,7 +6,8 @@ import { createPortal } from "react-dom";
 import type { KVBucketInfo, KVKeyEntry, KVKeyHistoryEntry } from "../../types";
 import { useKVStore } from "./hooks/useKVStore";
 import { PageError, PageLoading } from "../../components/ui/PageState";
-import { ModalWrapper } from "../../components/ui/Modal";
+import { ModalWrapper, PageHeader, PanelCard, EmptyState } from "../../components/ui";
+import { Button } from "../../components/ui";
 
 function formatBytes(bytes: number) {
   if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(1) + " GB";
@@ -37,29 +38,39 @@ export default function KVStorePage() {
 
   return (
     <div className="p-3 md:p-4 lg:p-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-4 gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">{t('kvStore.title')}</h1>
-          <p className="text-dark-muted mt-1">{t('kvStore.subtitle')}</p>
-        </div>
-        <button onClick={() => store.setShowCreateModal(true)} className="btn-primary flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          {t('kvStore.newBucket')}
-        </button>
-      </div>
+      <PageHeader
+        title={t('kvStore.title')}
+        subtitle={t('kvStore.subtitle')}
+        actions={
+           <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={() => store.setShowCreateModal(true)}>
+             {t('kvStore.newBucket')}
+           </Button>
+        }
+      />
 
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-1">
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold flex items-center gap-2">
-                <Database className="w-5 h-5 text-primary-400" />
-                {t('kvStore.buckets', { count: store.buckets?.length || 0 })}
-              </h2>
-              <button onClick={() => store.refetchBuckets()} className="p-2 hover:bg-dark-bg rounded-lg">
-                <RefreshCw className="w-4 h-4" />
-              </button>
-            </div>
+           <PanelCard
+             header={
+               <div className="flex items-center justify-between">
+                 <h2 className="font-semibold flex items-center gap-2">
+                   <Database className="w-5 h-5 text-primary-400" />
+                   {t('kvStore.buckets', { count: store.buckets?.length || 0 })}
+                 </h2>
+                 <div className="flex items-center gap-2">
+                   <button onClick={() => store.refetchBuckets()} className="p-2 hover:bg-dark-bg rounded-lg">
+                     <RefreshCw className="w-4 h-4" />
+                   </button>
+                   <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} size="sm" onClick={() => store.handlePurgeBucket()}>
+                     {t('streams.purge')}
+                   </Button>
+                   <Button variant="primary" icon={<Plus className="w-4 h-4" />} size="sm" onClick={() => { store.setModalMode("create"); store.setShowKeyModal(true); }}>
+                     {t('kvStore.addKey')}
+                   </Button>
+                 </div>
+               </div>
+             }
+           >
             <div className="space-y-2">
               {store.buckets?.map((bucket: KVBucketInfo) => (
                 <div
@@ -95,33 +106,34 @@ export default function KVStorePage() {
                 </div>
               )}
             </div>
-          </div>
+          </PanelCard>
         </div>
 
         {store.selectedBucket && (
           <div className="lg:col-span-2">
-            <div className="card">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="font-semibold flex items-center gap-2">
-                    <Key className="w-5 h-5 text-primary-400" />
-                    {t('kvStore.keys', { count: store.filteredKeys.length })}
-                  </h2>
-                  <p className="text-sm text-dark-muted">
-                    {store.buckets?.find((b: KVBucketInfo) => b.name === store.selectedBucket)?.bucket_name}
-                  </p>
+            <PanelCard
+              header={
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="font-semibold flex items-center gap-2">
+                      <Key className="w-5 h-5 text-primary-400" />
+                      {t('kvStore.keys', { count: store.filteredKeys.length })}
+                    </h2>
+                    <p className="text-sm text-dark-muted">
+                      {store.buckets?.find((b: KVBucketInfo) => b.name === store.selectedBucket)?.bucket_name}
+                    </p>
+                  </div>
+                   <div className="flex items-center gap-2">
+                     <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} size="sm" onClick={() => store.handlePurgeBucket()}>
+                       {t('streams.purge')}
+                     </Button>
+                     <Button variant="primary" icon={<Plus className="w-4 h-4" />} size="sm" onClick={() => { store.setModalMode("create"); store.setShowKeyModal(true); }}>
+                       {t('kvStore.addKey')}
+                     </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <button onClick={() => store.handlePurgeBucket()} className="btn-secondary flex items-center gap-2 text-sm py-2">
-                      <RefreshCw className="w-4 h-4" />
-                      {t('streams.purge')}
-                    </button>
-                    <button onClick={() => { store.setModalMode("create"); store.setShowKeyModal(true); }} className="btn-primary flex items-center gap-2 text-sm py-2">
-                      <Plus className="w-4 h-4" />
-                      {t('kvStore.addKey')}
-                    </button>
-                </div>
-              </div>
+              }
+            >
               <div className="relative mb-4">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
                 <input type="text" placeholder={t('kvStore.searchKeys')} value={store.searchQuery} onChange={(e) => store.setSearchQuery(e.target.value)} className="input pl-10 w-full" />
@@ -158,17 +170,17 @@ export default function KVStorePage() {
                   </div>
                 )}
               </div>
-            </div>
+            </PanelCard>
           </div>
         )}
 
         {!store.selectedBucket && (
           <div className="lg:col-span-2">
-            <div className="card text-center py-16">
-              <FolderOpen className="w-16 h-16 text-dark-muted mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-medium mb-2">{t('kvStore.selectBucket')}</h3>
-              <p className="text-dark-muted">{t('kvStore.selectBucketDescription')}</p>
-            </div>
+            <EmptyState
+              icon={FolderOpen}
+              title={t('kvStore.selectBucket')}
+              description={t('kvStore.selectBucketDescription')}
+            />
           </div>
         )}
       </div>
@@ -186,10 +198,10 @@ export default function KVStorePage() {
               <div><label className="block text-sm font-medium mb-2">{t('kvStore.historyRevisions')}</label><input type="number" name="history" defaultValue={1} min={1} max={10} className="input w-full" /></div>
               <div><label className="block text-sm font-medium mb-2">{t('kvStore.maxBytes')}</label><input type="number" name="max_bytes" placeholder={t('kvStore.maxBytesPlaceholder')} className="input w-full" /></div>
               <div className="flex items-center gap-2"><input type="checkbox" name="compression" value="true" id="compression" /><label htmlFor="compression" className="text-sm">{t('kvStore.enableCompression')}</label></div>
-              <div className="flex items-center gap-3 pt-4">
-                <button type="button" onClick={() => store.setShowCreateModal(false)} className="btn-secondary">{t('common.cancel')}</button>
-                <button type="submit" className="btn-primary">{t('kvStore.createBucket')}</button>
-              </div>
+               <div className="flex items-center gap-3 pt-4">
+                 <Button type="button" variant="secondary" onClick={() => store.setShowCreateModal(false)}>{t('common.cancel')}</Button>
+                 <Button type="submit" variant="primary">{t('kvStore.createBucket')}</Button>
+               </div>
             </form>
           </div>
         </div>
@@ -208,10 +220,10 @@ export default function KVStorePage() {
             <form onSubmit={(e) => { e.preventDefault(); const formData = new FormData(e.target as HTMLFormElement); store.handlePutKey({ key: formData.get("key") as string, value: formData.get("value") as string }); }} className="space-y-4">
               <div><label className="block text-sm font-medium mb-2">{t('kvStore.key')}</label><input type="text" name="key" defaultValue={store.selectedKey || ""} placeholder={t('kvStore.keyPlaceholder')} className="input w-full font-mono" disabled={store.modalMode === "edit"} required /></div>
               <div><label className="block text-sm font-medium mb-2">{t('kvStore.value')}</label><textarea name="value" placeholder={t('kvStore.valuePlaceholder')} rows={6} className="input w-full font-mono" required /></div>
-              <div className="flex items-center gap-3 pt-4">
-                <button type="button" onClick={() => store.setShowKeyModal(false)} className="btn-secondary">{t('common.cancel')}</button>
-                <button type="submit" className="btn-primary">{store.modalMode === "create" ? t('kvStore.add') : t('kvStore.update')} {t('kvStore.key')}</button>
-              </div>
+               <div className="flex items-center gap-3 pt-4">
+                 <Button type="button" variant="secondary" onClick={() => store.setShowKeyModal(false)}>{t('common.cancel')}</Button>
+                 <Button type="submit" variant="primary">{store.modalMode === "create" ? t('kvStore.add') : t('kvStore.update')} {t('kvStore.key')}</Button>
+               </div>
             </form>
           </div>
         </div>

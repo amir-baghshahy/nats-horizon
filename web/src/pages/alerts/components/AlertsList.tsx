@@ -1,6 +1,5 @@
 import {
   Bell,
-  Plus,
   ToggleLeft,
   ToggleRight,
   Edit,
@@ -9,6 +8,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Alert } from "../../../types";
+import { PanelCard, EmptyState } from "../../../components/ui";
 
 interface AlertsListProps {
   alerts: Alert[];
@@ -45,28 +45,24 @@ export default function AlertsList({
   const { t } = useTranslation();
   if (alerts.length === 0) {
     return (
-      <div className="card text-center py-16">
-        <Bell className="w-16 h-16 text-dark-muted mx-auto mb-4 opacity-50" />
-        <h3 className="text-lg font-medium mb-2">
-          {t("alerts.noAlertsConfigured")}
-        </h3>
-        <p className="text-dark-muted mb-4">
-          {t("alerts.noAlertsConfiguredDescription")}
-        </p>
-        <button
-          onClick={() => onEdit({} as Alert)}
-          className="btn-primary flex items-center gap-2 mx-auto"
-        >
-          <Plus className="w-4 h-4" />
-          {t("alerts.createFirstAlert")}
-        </button>
-      </div>
+      <EmptyState
+        icon={Bell}
+        title={t("alerts.noAlertsConfigured")}
+        description={t("alerts.noAlertsConfiguredDescription")}
+        action={{
+          label: t("alerts.createFirstAlert"),
+          onClick: () => onEdit({} as Alert),
+        }}
+      />
     );
   }
 
   return (
-    <div className="card overflow-hidden flex flex-col max-h-[600px]">
-      <div className="overflow-y-auto scrollbar-thin flex-1 p-4 space-y-4">
+    <PanelCard
+      maxHeight={600}
+      footer={<span>{t("alerts.alertCount", { count: alerts.length })}</span>}
+    >
+      <div className="space-y-4">
         {alerts.map((alert: Alert, index: number) => {
           const delayClass =
             index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
@@ -169,9 +165,6 @@ export default function AlertsList({
           );
         })}
       </div>
-      <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-        {t("alerts.alertCount", { count: alerts.length })}
-      </div>
-    </div>
+    </PanelCard>
   );
 }

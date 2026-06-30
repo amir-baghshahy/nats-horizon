@@ -1,10 +1,17 @@
-import type { SubjectInfo } from '../../types'
-import { UseSubjectsReturn } from './hooks/useSubjects'
+import type { SubjectInfo } from "../../types";
+import { UseSubjectsReturn } from "./hooks/useSubjects";
 import { useTranslation } from "react-i18next";
 import {
-  Search, RefreshCw, ChevronRight, ChevronDown,
-  MessageSquare, Globe, Activity, FolderOpen
-} from 'lucide-react'
+  RefreshCw,
+  ChevronRight,
+  ChevronDown,
+  MessageSquare,
+  Globe,
+  Activity,
+  FolderOpen,
+} from "lucide-react";
+import { PageHeader, FilterBar, EmptyState, PanelCard } from "../../components/ui";
+import { Button } from "../../components/ui";
 
 export default function SubjectsPage({
   searchQuery,
@@ -19,14 +26,11 @@ export default function SubjectsPage({
   filteredSubjects,
 }: UseSubjectsReturn) {
   const { t } = useTranslation();
-          const subjectTree = buildSubjectTree()
+  const subjectTree = buildSubjectTree();
 
-          const renderNode = (
-            node: any,
-            depth: number = 0,
-          ) => {
-    const isExpanded = expandedNodes.has(node.name)
-    const hasChildren = node.children && node.children.length > 0
+  const renderNode = (node: any, depth: number = 0) => {
+    const isExpanded = expandedNodes.has(node.name);
+    const hasChildren = node.children && node.children.length > 0;
 
     return (
       <div key={node.name} style={{ marginLeft: depth > 0 ? 16 : 0 }}>
@@ -44,17 +48,17 @@ export default function SubjectsPage({
             <div className="w-4" />
           )}
 
-          {node.name.includes('>') ? (
+          {node.name.includes(">") ? (
             <Globe className="w-4 h-4 text-primary-400" />
           ) : (
             <Activity className="w-4 h-4 text-dark-muted" />
           )}
 
-          <span className={depth === 0 ? 'font-semibold' : ''}>
+          <span className={depth === 0 ? "font-semibold" : ""}>
             {node.name}
           </span>
           <span className="ml-auto text-xs text-dark-muted">
-            {t('subjects.messageCount', { count: node.count })}
+            {t("subjects.messageCount", { count: node.count })}
           </span>
         </div>
 
@@ -75,93 +79,77 @@ export default function SubjectsPage({
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="p-3 md:p-4 lg:p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">{t('subjects.title')}</h1>
-          <p className="text-dark-muted mt-1">
-            {t('subjects.subtitle')}
-          </p>
-        </div>
-        <button onClick={() => refetch()} className="btn-secondary">
-          <RefreshCw className="w-4 h-4" />
-        </button>
-      </div>
+      <PageHeader
+        title={t("subjects.title")}
+        subtitle={t("subjects.subtitle")}
+        actions={
+           <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={() => refetch()} />
+        }
+      />
 
-      <div className="card mb-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
-            <input
-              type="text"
-              placeholder={t('subjects.searchPlaceholder')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="input pl-10 w-full"
-            />
-          </div>
+      <FilterBar
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder={t("subjects.searchPlaceholder")}
+        filters={
           <div className="flex items-center bg-dark-bg rounded-lg p-1">
             <button
-              onClick={() => setViewMode('tree')}
+              onClick={() => setViewMode("tree")}
               className={`px-4 py-2 rounded transition-colors ${
-                viewMode === 'tree'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-dark-muted'
+                viewMode === "tree"
+                  ? "bg-primary-600 text-white"
+                  : "text-dark-muted"
               }`}
             >
               <FolderOpen className="w-4 h-4 inline mr-2" />
-              {t('subjects.tree')}
+              {t("subjects.tree")}
             </button>
             <button
-              onClick={() => setViewMode('list')}
+              onClick={() => setViewMode("list")}
               className={`px-4 py-2 rounded transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-dark-muted'
+                viewMode === "list"
+                  ? "bg-primary-600 text-white"
+                  : "text-dark-muted"
               }`}
             >
               <MessageSquare className="w-4 h-4 inline mr-2" />
-              {t('subjects.list')}
+              {t("subjects.list")}
             </button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {subjects.length === 0 && (
-        <div className="card text-center p-12">
-          <Globe className="w-16 h-16 text-dark-muted mx-auto mb-4" />
-          <h3 className="text-lg font-medium mb-2">{t('subjects.noSubjectsFound')}</h3>
-          <p className="text-dark-muted">
-            {t('subjects.noSubjectsFoundDescription')}
-          </p>
-        </div>
+        <EmptyState
+          icon={Globe}
+          title={t("subjects.noSubjectsFound")}
+          description={t("subjects.noSubjectsFoundDescription")}
+        />
       )}
 
       {subjects.length > 0 && (
         <>
-          {viewMode === 'tree' ? (
-            <div className="card overflow-hidden flex flex-col max-h-[600px]">
+          {viewMode === "tree" ? (
+            <PanelCard maxHeight={600} footer={<span>{t("subjects.subjectCount", { count: filteredSubjects.length })}</span>}>
               <div className="overflow-y-auto scrollbar-thin flex-1 p-4">
                 <div className="space-y-1">
                   {subjectTree.map((node) => renderNode(node))}
                 </div>
               </div>
-              <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-                {t('subjects.subjectCount', { count: filteredSubjects.length })}
-              </div>
-            </div>
+            </PanelCard>
           ) : (
-            <div className="card overflow-hidden flex flex-col max-h-[600px]">
+            <PanelCard maxHeight={600} footer={<span>{t("subjects.subjectCount", { count: filteredSubjects.length })}</span>}>
               <div className="overflow-x-auto overflow-y-auto scrollbar-thin flex-1">
                 <table className="table">
                   <thead className="sticky top-0 bg-dark-bg z-10">
                     <tr>
-                      <th>{t('subjects.subject')}</th>
-                      <th>{t('subjects.messages')}</th>
+                      <th>{t("subjects.subject")}</th>
+                      <th>{t("subjects.messages")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -169,7 +157,7 @@ export default function SubjectsPage({
                       <tr key={i}>
                         <td>
                           <div className="flex items-center gap-2">
-                            {(s.name || '').includes('>') ? (
+                            {(s.name || "").includes(">") ? (
                               <Globe className="w-4 h-4 text-primary-400" />
                             ) : (
                               <Activity className="w-4 h-4 text-dark-muted" />
@@ -183,13 +171,10 @@ export default function SubjectsPage({
                   </tbody>
                 </table>
               </div>
-              <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-                {t('subjects.subjectCount', { count: filteredSubjects.length })}
-              </div>
-            </div>
+            </PanelCard>
           )}
         </>
       )}
     </div>
-  )
+  );
 }

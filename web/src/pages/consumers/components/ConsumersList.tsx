@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { ConsumerResponse as Consumer } from "../../../types";
+import { DataList } from "../../../components/ui";
 import ConsumerRow from "./ConsumerRow";
 
 interface ConsumersListProps {
@@ -40,68 +41,64 @@ export default function ConsumersList({
   const { t } = useTranslation();
 
   return (
-    <div className="card overflow-hidden flex flex-col max-h-[600px] animate-fade-in">
-      <div className="bg-dark-bg border-b border-dark-border p-4 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <input
-              type="checkbox"
-              checked={
-                selectedConsumers.size === consumers.length && consumers.length > 0
-              }
-              onChange={onToggleAll}
-              className="w-4 h-4 rounded"
-            />
-            <span className="text-sm text-dark-muted">
-              {selectedConsumers.size > 0
-                ? t("consumers.selectedCount", { count: selectedConsumers.size })
-                : t("consumers.consumerCount", { count: consumers.length })}
-            </span>
+    <DataList
+      items={consumers}
+      isLoading={isLoading}
+      isEmpty={consumers.length === 0}
+      emptyTitle={t("consumers.noConsumersFound")}
+      getKey={(consumer) => consumer.name || ""}
+      header={
+        <div className="bg-dark-bg border-b border-dark-border p-4 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <input
+                type="checkbox"
+                checked={
+                  selectedConsumers.size === consumers.length && consumers.length > 0
+                }
+                onChange={onToggleAll}
+                className="w-4 h-4 rounded"
+              />
+              <span className="text-sm text-dark-muted">
+                {selectedConsumers.size > 0
+                  ? t("consumers.selectedCount", { count: selectedConsumers.size })
+                  : t("consumers.consumerCount", { count: consumers.length })}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      }
+      renderItem={(consumer, index) => {
+        const consumerName = consumer.name || "";
+        if (!consumerName) return null;
+        const delayClass = index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
 
-      {isLoading ? (
-        <div className="p-6 text-center text-dark-muted">{t("consumers.loadingConsumers")}</div>
-      ) : consumers.length === 0 ? (
-        <div className="p-6 text-center text-dark-muted">
-          {t("consumers.noConsumersFound")}
-        </div>
-      ) : (
-        <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-dark-border">
-          {consumers.map((consumer, index) => {
-            const consumerName = consumer.name || "";
-            if (!consumerName) return null;
-            const delayClass = index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
-
-            return (
-              <div
-                key={consumerName}
-                className={`animate-slide-in animate-duration-200 ${delayClass}`}
-              >
-                <ConsumerRow
-                  consumer={consumer}
-                  isSelected={selectedConsumers.has(consumerName)}
-                  isExpanded={isConsumerExpanded(consumerName)}
-                  resetLagPending={resetLagPending}
-                  onToggleSelection={onToggleSelection}
-                  onToggleExpansion={onToggleExpansion}
-                  onTogglePauseResume={onTogglePauseResume}
-                  onViewDetails={onViewDetails}
-                  onResetLag={onResetLag}
-                  onDelete={onDelete}
-                  getStatusIcon={getStatusIcon}
-                  getStatusLabel={getStatusLabel}
-                  getLagColor={getLagColor}
-                />
-              </div>
-            );
-          })}
-        </div>
-      )}
-      <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-        {t("consumers.consumerCount", { count: consumers.length })}
-      </div>
-    </div>
+        return (
+          <div
+            key={consumerName}
+            className={`animate-slide-in animate-duration-200 ${delayClass}`}
+          >
+            <ConsumerRow
+              consumer={consumer}
+              isSelected={selectedConsumers.has(consumerName)}
+              isExpanded={isConsumerExpanded(consumerName)}
+              resetLagPending={resetLagPending}
+              onToggleSelection={onToggleSelection}
+              onToggleExpansion={onToggleExpansion}
+              onTogglePauseResume={onTogglePauseResume}
+              onViewDetails={onViewDetails}
+              onResetLag={onResetLag}
+              onDelete={onDelete}
+              getStatusIcon={getStatusIcon}
+              getStatusLabel={getStatusLabel}
+              getLagColor={getLagColor}
+            />
+          </div>
+        );
+      }}
+      footer={
+        <span>{t("consumers.consumerCount", { count: consumers.length })}</span>
+      }
+    />
   );
 }

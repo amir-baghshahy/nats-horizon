@@ -8,6 +8,7 @@ import {
   Play,
 } from "lucide-react";
 import type { ConsumerResponse as Consumer } from "../../../types";
+import { Button } from "../../../components/ui";
 
 interface ConsumerRowProps {
   consumer: Consumer;
@@ -154,31 +155,18 @@ export default function ConsumerRow({
             </div>
 
             <div className="flex items-center gap-3 pt-2">
-              <button
-                onClick={() => onViewDetails(consumerName)}
-                className="btn-secondary text-sm"
-              >
+              <Button variant="secondary" size="sm" onClick={() => onViewDetails(consumerName)}>
                 {t("consumers.editConfiguration")}
-              </button>
-              <button
-                onClick={() => onViewDetails(consumerName)}
-                className="btn-secondary text-sm"
-              >
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => onViewDetails(consumerName)}>
                 {t("consumers.viewMessages")}
-              </button>
-              <button
-                onClick={() => onResetLag(consumer)}
-                disabled={resetLagPending}
-                className="btn-secondary text-sm"
-              >
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => onResetLag(consumer)} disabled={resetLagPending}>
                 {t("consumers.resetLag")}
-              </button>
-              <button
-                onClick={() => onDelete(consumer)}
-                className="btn-secondary text-sm text-status-error"
-              >
+              </Button>
+              <Button variant="secondary" size="sm" className="text-status-error" onClick={() => onDelete(consumer)}>
                 {t("consumers.deleteConsumerBtn")}
-              </button>
+              </Button>
             </div>
           </div>
         )}

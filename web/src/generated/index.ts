@@ -13,7 +13,6 @@ export type { AckTermMessageRequest } from './models/AckTermMessageRequest';
 export type { ActiveSubscription } from './models/ActiveSubscription';
 export type { Alert } from './models/Alert';
 export type { AlertCondition } from './models/AlertCondition';
-export { AlertSeverity } from './models/AlertSeverity';
 export type { AlertTrigger } from './models/AlertTrigger';
 export type { AuditEvent } from './models/AuditEvent';
 export type { CheckAlertsResponse } from './models/CheckAlertsResponse';

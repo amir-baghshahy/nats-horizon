@@ -1,6 +1,7 @@
 import { Bell, CheckCircle, AlertTriangle, AlertCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Alert, AlertTrigger } from "../../../types";
+import { StatCard } from "../../../components/ui";
 
 interface AlertsStatsProps {
   alerts: Alert[];
@@ -19,52 +20,34 @@ export default function AlertsStats({ alerts, triggers }: AlertsStatsProps) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-            <Bell className="w-5 h-5 text-blue-400" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{totalAlerts}</p>
-            <p className="text-xs text-dark-muted">{t("alerts.totalAlerts")}</p>
-          </div>
-        </div>
-      </div>
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-            <CheckCircle className="w-5 h-5 text-green-400" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{activeAlerts}</p>
-            <p className="text-xs text-dark-muted">{t("alerts.active")}</p>
-          </div>
-        </div>
-      </div>
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
-            <AlertTriangle className="w-5 h-5 text-yellow-400" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{unackedTriggers.length}</p>
-            <p className="text-xs text-dark-muted">
-              {t("alerts.unacknowledged")}
-            </p>
-          </div>
-        </div>
-      </div>
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
-            <AlertCircle className="w-5 h-5 text-red-400" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{criticalTriggers.length}</p>
-            <p className="text-xs text-dark-muted">{t("alerts.critical")}</p>
-          </div>
-        </div>
-      </div>
+      <StatCard
+        icon={Bell}
+        value={totalAlerts}
+        label={t("alerts.totalAlerts")}
+        iconBg="bg-blue-500/20"
+        iconColor="text-blue-400"
+      />
+      <StatCard
+        icon={CheckCircle}
+        value={activeAlerts}
+        label={t("alerts.active")}
+        iconBg="bg-green-500/20"
+        iconColor="text-green-400"
+      />
+      <StatCard
+        icon={AlertTriangle}
+        value={unackedTriggers.length}
+        label={t("alerts.unacknowledged")}
+        iconBg="bg-yellow-500/20"
+        iconColor="text-yellow-400"
+      />
+      <StatCard
+        icon={AlertCircle}
+        value={criticalTriggers.length}
+        label={t("alerts.critical")}
+        iconBg="bg-red-500/20"
+        iconColor="text-red-400"
+      />
     </div>
   );
 }

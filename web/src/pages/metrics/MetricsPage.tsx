@@ -15,6 +15,8 @@ import { formatBytes, formatNumber } from "../../utils/formatters";
 import { PageError, PageLoading } from "../../components/ui/PageState";
 import { t } from "i18next";
 import Select from "../../components/ui/Select";
+import { StatCard, PanelCard, EmptyState } from "../../components/ui";
+import { Button } from "../../components/ui";
 
 const durations = [
   { label: "last15Minutes", value: "15m" },
@@ -120,7 +122,6 @@ export default function MetricsPage({
   refetch,
   getErrorMessage,
   getLatestValue,
-  getTrend,
   getSeries,
   streamNames,
   totalMessages,
@@ -147,113 +148,70 @@ export default function MetricsPage({
           </h1>
           <p className="mt-1 text-dark-muted">{t("metrics.subtitle")}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-3">
           <Select
             value={duration}
             onChange={setDuration}
             options={durations.map((item) => ({
               value: item.value,
-              label: t(`metrics.${item.label}`)
+              label: t(`metrics.${item.label}`),
             }))}
-            className="w-full shrink-0 sm:w-auto"
-            aria-label={t('metrics.duration')}
+            className="shrink-0"
+            aria-label={t("metrics.duration")}
           />
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => setAutoRefresh(!autoRefresh)}
             aria-pressed={autoRefresh}
-            className={`btn-secondary inline-flex shrink-0 items-center gap-2 ${
-              autoRefresh
-                ? "border-primary-500/40 bg-primary-500/15 text-primary-300"
-                : ""
-            }`}
+            className={autoRefresh ? "border-primary-500/40 bg-primary-500/15 text-primary-300" : ""}
+            icon={autoRefresh ? <Activity className="h-4 w-4 text-green-400" /> : <Clock className="h-4 w-4" />}
           >
-            {autoRefresh ? (
-              <Activity className="h-4 w-4 text-green-400" />
-            ) : (
-              <Clock className="h-4 w-4" />
-            )}
             {t("metrics.autoRefresh")}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => refetch()}
-            className="btn-secondary inline-flex shrink-0"
-          >
-            <RefreshCw className="h-4 w-4" />
-          </button>
+            icon={<RefreshCw className="h-4 w-4" />}
+          />
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-500/20">
-              <MessageSquare className="h-5 w-5 text-primary-400" />
-            </div>
-            <div>
-              <p className="text-xl font-bold">{formatNumber(totalMessages)}</p>
-              <p className="text-xs text-dark-muted">
-                {t("metrics.totalMessages")}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/20">
-              <HardDrive className="h-5 w-5 text-blue-400" />
-            </div>
-            <div>
-              <p className="text-xl font-bold">{formatBytes(totalStorage)}</p>
-              <p className="text-xs text-dark-muted">
-                {t("metrics.totalStorage")}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/20">
-              <BarChart3 className="h-5 w-5 text-purple-400" />
-            </div>
-            <div>
-              <p className="text-xl font-bold">{streamNames.length}</p>
-              <p className="text-xs text-dark-muted">
-                {t("metrics.activeStreams")}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/20">
-              <Zap className="h-5 w-5 text-green-400" />
-            </div>
-            <div>
-              <p className="text-xl font-bold">
-                {formatNumber(rateTotalMessages)}
-              </p>
-              <p className="text-xs text-dark-muted">
-                {t("metrics.messagesInRateWindow")}
-              </p>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          icon={MessageSquare}
+          value={formatNumber(totalMessages)}
+          label={t("metrics.totalMessages")}
+          formatValue={false}
+        />
+        <StatCard
+          icon={HardDrive}
+          value={formatBytes(totalStorage)}
+          label={t("metrics.totalStorage")}
+          iconBg="bg-blue-500/20"
+          iconColor="text-blue-400"
+          formatValue={false}
+        />
+        <StatCard
+          icon={BarChart3}
+          value={streamNames.length}
+          label={t("metrics.activeStreams")}
+          iconBg="bg-purple-500/20"
+          iconColor="text-purple-400"
+        />
+        <StatCard
+          icon={Zap}
+          value={formatNumber(rateTotalMessages)}
+          label={t("metrics.messagesInRateWindow")}
+          iconBg="bg-green-500/20"
+          iconColor="text-green-400"
+          formatValue={false}
+        />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr] mt-6">
-        <div className="card">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">
-              {t("metrics.systemMetrics")}
-            </h2>
-            <p className="text-xs text-dark-muted">
-              {systemMetrics?.timestamp
-                ? new Date(systemMetrics.timestamp * 1000).toLocaleTimeString()
-                : "N/A"}
-            </p>
-          </div>
+        <PanelCard title={t("metrics.systemMetrics")}>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-xl bg-dark-bg/50 p-4">
               <p className="text-xs text-dark-muted">
@@ -309,160 +267,126 @@ export default function MetricsPage({
               </p>
             </div>
           </div>
-        </div>
+        </PanelCard>
 
-        <div className="card overflow-hidden flex flex-col max-h-[400px]">
-          <div className="p-4 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary-400" />
-              <h2 className="text-lg font-semibold">
-                {t("metrics.rateByStream")}
-              </h2>
+        <PanelCard
+          title={t("metrics.rateByStream")}
+          icon={<TrendingUp className="h-5 w-5 text-primary-400" />}
+          maxHeight={400}
+          empty={rateStreams.length === 0}
+          emptyState={
+            <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-6 text-center text-dark-muted">
+              {t("metrics.noRateData")}
             </div>
-          </div>
-          {rateStreams.length > 0 ? (
-            <div className="overflow-y-auto scrollbar-thin flex-1 p-4 space-y-3">
-              {rateStreams.map((stream: any) => (
-                <div key={stream.name} className="rounded-xl bg-dark-bg/50 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="font-mono text-sm truncate">{stream.name}</p>
-                    <p className="text-xs text-dark-muted whitespace-nowrap">
-                      {formatNumber(stream.messages || 0)} msgs ·{" "}
-                      {formatBytes(stream.bytes || 0)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-6 text-center text-dark-muted">
-                {t("metrics.noRateData")}
+          }
+          footer={
+            <span>
+              {rateStreams.length}{" "}
+              {t("metrics.streamCount", { count: rateStreams.length })}
+            </span>
+          }
+        >
+          {rateStreams.map((stream: any) => (
+            <div key={stream.name} className="rounded-xl bg-dark-bg/50 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-mono text-sm truncate">{stream.name}</p>
+                <p className="text-xs text-dark-muted whitespace-nowrap">
+                  {formatNumber(stream.messages || 0)} msgs ·{" "}
+                  {formatBytes(stream.bytes || 0)}
+                </p>
               </div>
             </div>
-          )}
-          <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-            {rateStreams.length}{" "}
-            {t("metrics.streamCount", { count: rateStreams.length })}
-          </div>
-        </div>
+          ))}
+        </PanelCard>
       </div>
 
       <div className="mb-4 mt-8">
-        <div className="card overflow-hidden flex flex-col max-h-[800px]">
-          <div className="p-4 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
+        <PanelCard
+          maxHeight={800}
+          header={
             <Select
               value={selectedStream || "all"}
               onChange={(value) =>
-                setSelectedStream(
-                  value === "all" ? null : value,
-                )
+                setSelectedStream(value === "all" ? null : value)
               }
               options={[
                 { value: "all", label: t("metrics.allStreams") },
-                ...streamNames.map((name) => ({ value: name, label: name }))
+                ...streamNames.map((name) => ({ value: name, label: name })),
               ]}
-              aria-label={t('metrics.selectStream')}
+              aria-label={t("metrics.selectStream")}
             />
-          </div>
-
-          <div className="overflow-y-auto scrollbar-thin flex-1 p-4">
-            <div className="grid gap-4 lg:grid-cols-2">
-              {streamNames.map((streamName) => {
-                const messageSeries = getSeries(
-                  metrics,
-                  streamName,
-                  "messages",
-                );
-                const bytesSeries = getSeries(metrics, streamName, "bytes");
-                const messages = getLatestValue(messageSeries);
-                const bytes = getLatestValue(bytesSeries);
-                const messageTrend = getTrend(messageSeries);
-
-                return (
-                  <div key={streamName} className="card">
-                    <div className="mb-4 flex items-center justify-between">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4 text-primary-400" />
-                        {streamName}
-                      </h3>
-                      <div className="flex items-center gap-2 text-sm">
-                        {messageTrend !== 0 && (
-                          <span
-                            className={`flex items-center gap-1 ${
-                              messageTrend > 0
-                                ? "text-green-400"
-                                : "text-red-400"
-                            }`}
-                          >
-                            <TrendingUp className="h-3 w-3" />
-                            {Math.abs(messageTrend).toFixed(1)}%
-                          </span>
-                        )}
-                      </div>
+          }
+          footer={
+            <span>
+              {streamNames.length}{" "}
+              {t("metrics.streamCount", { count: streamNames.length })}
+            </span>
+          }
+        >
+          <div className="grid gap-4 lg:grid-cols-2">
+            {streamNames.map((streamName) => {
+              const messageSeries = getSeries(metrics, streamName, "messages");
+              const bytesSeries = getSeries(metrics, streamName, "bytes");
+              const messages = getLatestValue(messageSeries);
+              const bytes = getLatestValue(bytesSeries);
+              return (
+                <PanelCard
+                  key={streamName}
+                  title={streamName}
+                  icon={<MessageSquare className="h-4 w-4 text-primary-400" />}
+                >
+                  <div
+                    key={`${streamName}-messages`}
+                    className="rounded-xl bg-dark-bg/50 p-4"
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-sm text-dark-muted whitespace-nowrap">
+                        {t("metrics.messages")}
+                      </span>
+                      <span className="font-medium tabular-nums whitespace-nowrap">
+                        {formatNumber(messages)}
+                      </span>
                     </div>
-
-                    <div
-                      key={`${streamName}-messages`}
-                      className="rounded-xl bg-dark-bg/50 p-4"
-                    >
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="text-sm text-dark-muted whitespace-nowrap">
-                          {t("metrics.messages")}
-                        </span>
-                        <span className="font-medium tabular-nums whitespace-nowrap">
-                          {formatNumber(messages)}
-                        </span>
-                      </div>
-                      <Sparkline
-                        data={messageSeries?.data || []}
-                        color="rgb(59, 130, 246)"
-                        width={280}
-                        height={48}
-                      />
-                    </div>
-
-                    <div
-                      key={`${streamName}-bytes`}
-                      className="rounded-xl bg-dark-bg/50 p-4"
-                    >
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="text-sm text-dark-muted whitespace-nowrap">
-                          {t("metrics.storage")}
-                        </span>
-                        <span className="font-medium tabular-nums whitespace-nowrap">
-                          {formatBytes(bytes)}
-                        </span>
-                      </div>
-                      <Sparkline
-                        data={bytesSeries?.data || []}
-                        color="rgb(16, 185, 129)"
-                        width={280}
-                        height={48}
-                      />
-                    </div>
+                    <Sparkline
+                      data={messageSeries?.data || []}
+                      color="rgb(59, 130, 246)"
+                      width={280}
+                      height={48}
+                    />
                   </div>
-                );
-              })}
-            </div>
+
+                  <div
+                    key={`${streamName}-bytes`}
+                    className="rounded-xl bg-dark-bg/50 p-4"
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-sm text-dark-muted whitespace-nowrap">
+                        {t("metrics.storage")}
+                      </span>
+                      <span className="font-medium tabular-nums whitespace-nowrap">
+                        {formatBytes(bytes)}
+                      </span>
+                    </div>
+                    <Sparkline
+                      data={bytesSeries?.data || []}
+                      color="rgb(16, 185, 129)"
+                      width={280}
+                      height={48}
+                    />
+                  </div>
+                </PanelCard>
+              );
+            })}
           </div>
-          <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-            {streamNames.length}{" "}
-            {t("metrics.streamCount", { count: streamNames.length })}
-          </div>
-        </div>
+        </PanelCard>
       </div>
 
       {streamNames.length === 0 && (
-        <div className="card mt-6 text-center py-16">
-          <BarChart3 className="mx-auto mb-4 h-16 w-16 text-dark-muted opacity-50" />
-          <h3 className="mb-2 text-lg font-medium">
-            {t("metrics.noMetricsAvailable")}
-          </h3>
-          <p className="text-dark-muted">
-            {t("metrics.noMetricsAvailableDescription")}
-          </p>
-        </div>
+        <EmptyState
+          icon={BarChart3}
+          title={t("metrics.noMetricsAvailable")}
+          description={t("metrics.noMetricsAvailableDescription")}
+        />
       )}
     </div>
   );

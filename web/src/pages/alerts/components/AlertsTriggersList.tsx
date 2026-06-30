@@ -1,6 +1,8 @@
 import { Eye, Clock, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { AlertTrigger } from "../../../types";
+import { PanelCard, EmptyState } from "../../../components/ui";
+import { Button } from "../../../components/ui";
 
 interface AlertsTriggersListProps {
   triggers: AlertTrigger[];
@@ -25,21 +27,22 @@ export default function AlertsTriggersList({
   const { t } = useTranslation();
   if (!triggers || triggers.length === 0) {
     return (
-      <div className="card text-center py-16">
-        <Eye className="w-16 h-16 text-dark-muted mx-auto mb-4 opacity-50" />
-        <h3 className="text-lg font-medium mb-2">
-          {t("alerts.noTriggeredAlerts")}
-        </h3>
-        <p className="text-dark-muted">
-          {t("alerts.noTriggeredAlertsDescription")}
-        </p>
-      </div>
+      <EmptyState
+        icon={Eye}
+        title={t("alerts.noTriggeredAlerts")}
+        description={t("alerts.noTriggeredAlertsDescription")}
+      />
     );
   }
 
   return (
-    <div className="card overflow-hidden flex flex-col max-h-[600px]">
-      <div className="overflow-y-auto scrollbar-thin flex-1 p-4 space-y-4">
+    <PanelCard
+      maxHeight={600}
+      footer={
+        <span>{t("alerts.triggerCount", { count: triggers.length })}</span>
+      }
+    >
+      <div className="space-y-4">
         {triggers.map((trigger: AlertTrigger, index: number) => (
           <div
             key={`${trigger.alert_id}-${index}`}
@@ -83,23 +86,20 @@ export default function AlertsTriggersList({
                 </div>
               </div>
               {!trigger.acked && (
-                <button
+                <Button
+                  variant="secondary"
                   onClick={() =>
                     trigger.alert_id && onAcknowledge(trigger.alert_id)
                   }
-                  className="btn-secondary text-sm"
                   disabled={isAckPending}
                 >
                   {t("alerts.acknowledge")}
-                </button>
+                </Button>
               )}
             </div>
           </div>
         ))}
       </div>
-      <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-        {t("alerts.triggerCount", { count: triggers.length })}
-      </div>
-    </div>
+    </PanelCard>
   );
 }

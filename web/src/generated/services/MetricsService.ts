@@ -11,7 +11,7 @@ export class MetricsService {
      * Get metrics
      * Returns collected stream metrics series, optionally filtered by stream, type and duration
      * @param stream Filter by stream name
-     * @param type Metric type (messages, bytes, lag)
+     * @param type Metric type (messages, bytes, lag, first_sequence, last_sequence, subject_count, consumer_count, deleted_messages, message_age_seconds, replicas, messages_rate, bytes_rate)
      * @param duration Time window (15m, 1h, 6h, 24h)
      * @returns MetricsResponse OK
      * @throws ApiError

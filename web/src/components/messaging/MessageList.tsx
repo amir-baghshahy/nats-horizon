@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { MessageSquare, Trash2, CheckCircle, Zap } from "lucide-react";
 import EmptyState from "../ui/EmptyState";
 import MessageItem from "./MessageItem";
+import { Button } from "../ui";
 import type { Message, MessageFormat } from "../../hooks/useMessageList";
 
 interface MessageListProps {
@@ -76,13 +77,9 @@ export default function MessageList({
             {t('messages.autoScroll')}: {autoScroll ? t('common.on') : t('common.off')}
           </button>
 
-          <button
-            onClick={onClearMessages}
-            className="btn-secondary flex items-center gap-2"
-          >
-            <Trash2 className="w-4 h-4" />
+          <Button variant="secondary" onClick={onClearMessages} icon={<Trash2 className="w-4 h-4" />}>
             {t('common.clear')}
-          </button>
+          </Button>
         </div>
       </div>
 

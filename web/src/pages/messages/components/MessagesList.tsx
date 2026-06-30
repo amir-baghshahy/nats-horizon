@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import EmptyState from "../../../components/ui/EmptyState";
+import PanelCard from "../../../components/ui/PanelCard";
+import { Button } from "../../../components/ui";
 
 interface Message {
   sequence: number;
@@ -87,69 +89,75 @@ export default function MessagesList({
   const { t } = useTranslation();
   if (isLoading) {
     return (
-      <div className="card overflow-hidden p-0">
+      <PanelCard>
         <div className="p-6 text-center text-dark-muted">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
           {t('common.loading')}
         </div>
-      </div>
+      </PanelCard>
     );
   }
 
   if (messages.length === 0) {
     return (
-      <div className="card overflow-hidden p-0">
+      <PanelCard>
         <EmptyState
           icon={MessageSquare}
           title={t('messages.noMessagesYet')}
           description={t('messages.noMessagesYetDescription')}
         />
-      </div>
+      </PanelCard>
     );
   }
 
   return (
-    <div className="card overflow-hidden flex flex-col max-h-[600px]">
-      {/* Header */}
-      <div className="bg-dark-bg border-b border-dark-border p-4 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <input
-              type="checkbox"
-              checked={selected.size === messages.length && messages.length > 0}
-              onChange={onSelectAll}
-              className="w-4 h-4 rounded"
-            />
-            <span className="text-sm text-dark-muted">
-              {selected.size > 0
-                ? `${selected.size} ${t('common.selected')}`
-                : `${messages.length} ${t('messages.messageCount', { count: messages.length })}`}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setViewMode("list")}
-              className={`p-2 rounded-lg transition-colors ${
-                viewMode === "list"
-                  ? "bg-primary-500/20 text-primary-400"
-                  : "hover:bg-dark-bg"
-              }`}
-            >
-              <FileText className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`p-2 rounded-lg transition-colors ${
-                viewMode === "grid"
-                  ? "bg-primary-500/20 text-primary-400"
-                  : "hover:bg-dark-bg"
-              }`}
-            >
-              <Code className="w-4 h-4" />
-            </button>
+    <PanelCard
+      maxHeight={600}
+      header={
+        <div className="bg-dark-bg border-b border-dark-border p-4 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <input
+                type="checkbox"
+                checked={selected.size === messages.length && messages.length > 0}
+                onChange={onSelectAll}
+                className="w-4 h-4 rounded"
+              />
+              <span className="text-sm text-dark-muted">
+                {selected.size > 0
+                  ? `${selected.size} ${t('common.selected')}`
+                  : `${messages.length} ${t('messages.messageCount', { count: messages.length })}`}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setViewMode("list")}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === "list"
+                    ? "bg-primary-500/20 text-primary-400"
+                    : "hover:bg-dark-bg"
+                }`}
+              >
+                <FileText className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-2 rounded-lg transition-colors ${
+                  viewMode === "grid"
+                    ? "bg-primary-500/20 text-primary-400"
+                    : "hover:bg-dark-bg"
+                }`}
+              >
+                <Code className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      }
+      footer={
+        <span>{t('messages.messageCount', { count: messages.length })}</span>
+      }
+    >
 
       {/* Messages */}
       <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-dark-border">
@@ -308,27 +316,26 @@ export default function MessagesList({
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-3 pt-2">
-                      <button
-                        onClick={() => onCopy(messageData, sequence)}
-                        className="btn-secondary text-sm flex items-center gap-2"
-                      >
-                        {copiedMessage === sequence ? (
-                          <>
-                             <Check className="w-3 h-3" /> {t('messages.copied')}
-                          </>
-                        ) : (
-                          t('messages.copyPayload')
-                        )}
-                      </button>
-                      <button
-                        onClick={() => onDelete(sequence)}
-                        disabled={isDeletePending}
-                        className="btn-secondary text-sm text-status-error"
-                      >
-                        {t('common.delete')}
-                      </button>
-                    </div>
+                     <div className="flex items-center gap-3 pt-2">
+                       <Button variant="secondary" size="sm" onClick={() => onCopy(messageData, sequence)}>
+                         {copiedMessage === sequence ? (
+                           <>
+                              <Check className="w-3 h-3" /> {t('messages.copied')}
+                           </>
+                         ) : (
+                           t('messages.copyPayload')
+                         )}
+                       </Button>
+                       <Button
+                         variant="secondary"
+                         size="sm"
+                         className="text-status-error"
+                         onClick={() => onDelete(sequence)}
+                         disabled={isDeletePending}
+                       >
+                         {t('common.delete')}
+                       </Button>
+                     </div>
                   </div>
                 )}
               </div>
@@ -336,9 +343,6 @@ export default function MessagesList({
           );
         })}
       </div>
-      <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-        {t('messages.messageCount', { count: messages.length })}
-      </div>
-    </div>
+    </PanelCard>
   );
 }

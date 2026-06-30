@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Zap, Eye, MessageSquare } from "lucide-react";
 import { validateSubject, validateTimeout } from "../../utils/validators";
 import { formatTimestamp } from "../../utils/formatters";
+import { Button } from "../ui";
 
 export interface RequestForm {
   subject: string;
@@ -103,13 +104,9 @@ export default function RequestForm({
           </div>
 
           <div className="flex items-center gap-3 pt-4">
-            <button
-              type="submit"
-              className="btn-primary flex items-center gap-2"
-            >
-              <Zap className="w-4 h-4" />
+            <Button type="submit" variant="primary" icon={<Zap className="w-4 h-4" />}>
               {t('messages.sendRequest')}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

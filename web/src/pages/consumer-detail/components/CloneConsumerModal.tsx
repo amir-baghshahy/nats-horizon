@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { ModalWrapper } from "../../../components/ui/Modal";
+import { Button } from "../../../components/ui";
 
 interface CloneConsumerModalProps {
   name: string;
@@ -40,13 +41,12 @@ export default function CloneConsumerModal({
               {t("consumers.cloneConsumerHelp", { stream })}
             </p>
           </div>
-          <div className="flex justify-end gap-3 pt-6">
-            <button onClick={onClose} className="btn-secondary">{t("common.cancel")}</button>
-            <button onClick={onClone} disabled={clonePending || !cloneName.trim()} className="btn-primary flex items-center gap-2">
-              {clonePending && <Loader2 className="w-4 h-4 animate-spin" />}
-              {t("consumers.clone")}
-            </button>
-          </div>
+           <div className="flex justify-end gap-3 pt-6">
+             <Button variant="secondary" onClick={onClose}>{t("common.cancel")}</Button>
+             <Button variant="primary" onClick={onClone} disabled={clonePending || !cloneName.trim()} icon={clonePending ? <Loader2 className="w-4 h-4 animate-spin" /> : undefined}>
+               {t("consumers.clone")}
+             </Button>
+           </div>
         </div>
       </div>
     </ModalWrapper>,

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { CheckCircle, MessageSquare, Send, Zap } from "lucide-react";
 import type { MessagingTab } from "./MessagingTabs";
+import { Button } from "../ui";
 
 interface MessagingHeaderProps {
   sseConnected: boolean;
@@ -37,23 +38,17 @@ export default function MessagingHeader({
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => onTabChange("publish")}
-          className="btn-primary inline-flex items-center gap-2"
-        >
-          <Send className="h-4 w-4" />
+        <Button variant="primary" onClick={() => onTabChange("publish")} icon={<Send className="h-4 w-4" />}>
           {t('messages.publish')}
-        </button>
+        </Button>
 
-        <button
-          type="button"
+        <Button
+          variant="secondary"
           onClick={() => onTabChange(activeTab === "request" ? "publish" : "request")}
-          className="btn-secondary inline-flex items-center gap-2"
+          icon={<MessageSquare className="h-4 w-4" />}
         >
-          <MessageSquare className="h-4 w-4" />
           {t('messages.request')}
-        </button>
+        </Button>
       </div>
     </div>
   );

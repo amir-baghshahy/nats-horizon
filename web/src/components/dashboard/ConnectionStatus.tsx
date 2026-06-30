@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Server, Radio, Clock, Download, Upload } from "
 import StatusBadge from "../ui/StatusBadge";
 import type { ConnectionInfo } from "../../types";
 import { useTranslation } from "react-i18next";
+import { Button } from "../ui";
 
 interface ConnectionStatusProps {
   connected: boolean;
@@ -151,25 +152,17 @@ export default function ConnectionStatus({
         ))}
       </div>
 
-      {shouldExpand && (
-        <button
-          type="button"
-          onClick={() => setExpanded(!expanded)}
-          className="btn-secondary mt-3 inline-flex items-center gap-2 text-sm px-3 py-1.5"
-        >
-          {expanded ? (
-            <>
-              <ChevronUp className="h-3.5 w-3.5" />
-              {t('dashboard.showLess')}
-            </>
-          ) : (
-            <>
-              <ChevronDown className="h-3.5 w-3.5" />
-              {t('dashboard.showMore', { count: connections.length - VISIBLE_CONNECTIONS })}
-            </>
-          )}
-        </button>
-      )}
+       {shouldExpand && (
+         <Button
+           type="button"
+           variant="secondary"
+           size="sm"
+           onClick={() => setExpanded(!expanded)}
+           icon={expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+         >
+           {expanded ? t('dashboard.showLess') : t('dashboard.showMore', { count: connections.length - VISIBLE_CONNECTIONS })}
+         </Button>
+       )}
     </div>
   );
 }

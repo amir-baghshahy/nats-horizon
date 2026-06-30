@@ -1,14 +1,14 @@
 import { UseConnectionsReturn } from './hooks/useConnections'
 import {
   RefreshCw, XCircle, Server, Users, Network, Activity,
-  ChevronDown, ChevronRight
+  ChevronDown, ChevronRight, Cable
 } from 'lucide-react'
 import ConnectionFilters from '../../components/connections/ConnectionFilters'
 import { HealthService } from '../../types'
 import type { ConnectionInfo } from '../../types'
 import { useTranslation } from 'react-i18next'
-import EmptyState from '../../components/ui/EmptyState'
-import { Cable } from 'lucide-react'
+import { StatCard, DataList, PageHeader, PanelCard } from '../../components/ui'
+import { Button } from '../../components/ui';
 
 export default function ConnectionsPage({
   searchQuery,
@@ -32,80 +32,52 @@ export default function ConnectionsPage({
 
   return (
     <div className="p-3 md:p-4 lg:p-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-4 gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">{t('connections.title')}</h1>
-          <p className="text-dark-muted mt-1">
-            {t('connections.subtitle')}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={() => refetch()} className="btn-secondary">
-            <RefreshCw className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title={t('connections.title')}
+        subtitle={t('connections.subtitle')}
+        actions={
+           <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={() => refetch()} />
+        }
+      />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
-              <Network className="w-5 h-5 text-primary-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{stats.total}</p>
-              <p className="text-xs text-dark-muted">{t('connections.title')}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-              <Users className="w-5 h-5 text-blue-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{stats.uniqueUsers}</p>
-              <p className="text-xs text-dark-muted">{t('connections.uniqueUsers')}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-              <Activity className="w-5 h-5 text-green-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{stats.totalSubs}</p>
-              <p className="text-xs text-dark-muted">{t('connections.subscriptions')}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
-              <Server className="w-5 h-5 text-orange-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{Math.floor(stats.avgSubs)}</p>
-              <p className="text-xs text-dark-muted">{t('connections.avgSubsPerConn')}</p>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          icon={Network}
+          value={stats.total}
+          label={t('connections.title')}
+        />
+        <StatCard
+          icon={Users}
+          value={stats.uniqueUsers}
+          label={t('connections.uniqueUsers')}
+          iconBg="bg-blue-500/20"
+          iconColor="text-blue-400"
+        />
+        <StatCard
+          icon={Activity}
+          value={stats.totalSubs}
+          label={t('connections.subscriptions')}
+          iconBg="bg-green-500/20"
+          iconColor="text-green-400"
+        />
+        <StatCard
+          icon={Server}
+          value={Math.floor(stats.avgSubs)}
+          label={t('connections.avgSubsPerConn')}
+          iconBg="bg-orange-500/20"
+          iconColor="text-orange-400"
+        />
       </div>
 
       <div className="mb-4">
-        <div className="card">
-          <div className="mb-3 flex items-center justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-semibold">{t('connections.serverDistribution')}</h3>
-              <p className="text-sm text-dark-muted">
-                {t('connections.serverDistributionDescription')}
-              </p>
-            </div>
+        <PanelCard
+          title={t('connections.serverDistribution')}
+          footer={
             <span className="rounded-full bg-primary-500/10 px-3 py-1 text-sm text-primary-300">
               {t('connections.total', { count: filteredConnections.length })}
             </span>
-          </div>
+          }
+        >
 
           {serverData.length > 0 ? (
             <div className="space-y-4">
@@ -139,7 +111,7 @@ export default function ConnectionsPage({
               <p>{t('connections.noServerData')}</p>
             </div>
           )}
-        </div>
+        </PanelCard>
       </div>
 
       <ConnectionFilters
@@ -150,133 +122,123 @@ export default function ConnectionsPage({
         servers={servers}
       />
 
-      <div className="card overflow-hidden flex flex-col max-h-[600px]">
-        {isLoading ? (
-          <div className="p-8 text-center text-dark-muted">
-            <div className="animate-spin inline-block mb-2">
-              <RefreshCw className="w-6 h-6" />
-            </div>
-            <p>{t('connections.loadingConnections')}</p>
-          </div>
-        ) : filteredConnections.length === 0 ? (
-          <div className="p-8">
-            <EmptyState
-              icon={Cable}
-              title={t('connections.noConnectionsFound')}
-              description={t('connections.searchPlaceholder')}
-            />
-          </div>
-        ) : (
-          <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-dark-border">
-            {filteredConnections.map((conn: ConnectionInfo) => {
-              const cid = conn.cid ?? 0
-              const isExpanded = expandedConnections.has(cid)
+      <DataList
+        items={filteredConnections}
+        isLoading={isLoading}
+        isEmpty={filteredConnections.length === 0}
+        emptyIcon={Cable}
+        emptyTitle={t('connections.noConnectionsFound')}
+        emptyDescription={t('connections.searchPlaceholder')}
+        getKey={(conn) => String(conn.cid)}
+        footer={
+          <span>
+            {t('connections.showingConnections', { filtered: filteredConnections.length, total: connections.length })}
+          </span>
+        }
+        renderItem={(conn: ConnectionInfo) => {
+          const cid = conn.cid ?? 0
+          const isExpanded = expandedConnections.has(cid)
 
-              return (
-                <div
-                  key={cid}
-                  className="border-l-2 border-l-transparent hover:border-l-primary-500 transition-colors"
-                >
-                  <div className="p-4 hover:bg-dark-bg/50 transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
+          return (
+            <div
+              key={cid}
+              className="border-l-2 border-l-transparent hover:border-l-primary-500 transition-colors"
+            >
+              <div className="p-4 hover:bg-dark-bg/50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
 
-                      <button
-                        onClick={() => toggleExpand(cid)}
-                        className="p-1 hover:bg-dark-bg rounded transition-colors"
-                      >
-                        {isExpanded ? (
-                          <ChevronDown className="w-4 h-4 text-dark-muted" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-dark-muted" />
-                        )}
-                      </button>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">
-                            {conn.user || t('connections.anonymous')}
-                          </span>
-                          <span className="text-xs text-dark-muted">•</span>
-                          <span className="text-sm text-dark-muted">
-                            {conn.ip}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-4 mt-1 text-xs text-dark-muted">
-                          <span className="flex items-center gap-1">
-                            <Server className="w-3 h-3" />
-                            {conn.server}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="hidden md:flex items-center gap-4 text-sm">
-                        <div className="text-center">
-                          <p className="font-medium">{conn.subs_count || 0}</p>
-                          <p className="text-xs text-dark-muted">{t('connections.subs')}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="font-medium">
-                            {getConnectionDuration(conn.connected_at || '')}
-                          </p>
-                          <p className="text-xs text-dark-muted">{t('connections.duration')}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={async () => {
-                            const ok = await confirm({
-                              title: t('connections.terminateConnection'),
-                              message: t('connections.terminateConfirm', { cid: String(conn.cid) }),
-                              confirmLabel: t('connections.terminate'),
-                              variant: "danger"
-                            })
-                            if (ok) {
-                              HealthService.deleteConnections(
-                                String(conn.cid || ''),
-                              )
-                                .then(() => refetch())
-                                .catch(() =>
-                                  toast(
-                                    'error',
-                                    t('connections.terminateFailed'),
-                                  ),
-                                )
-                            }
-                          }}
-                          className="p-2 hover:bg-dark-bg rounded-lg transition-colors text-status-error"
-                          title={t('connections.terminateConnection')}
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {isExpanded && (
-                      <div className="mt-4 pl-8 space-y-4">
-                        <div className="bg-dark-bg/50 rounded-lg p-4">
-                          <p className="text-xs text-dark-muted">
-                            {t('connections.connectedSince')}
-                          </p>
-                          <p className="font-medium text-sm">
-                            {conn.connected_at
-                              ? new Date(conn.connected_at).toLocaleString()
-                              : t('dashboard.na')}
-                          </p>
-                        </div>
-                      </div>
+                  <button
+                    onClick={() => toggleExpand(cid)}
+                    className="p-1 hover:bg-dark-bg rounded transition-colors"
+                  >
+                    {isExpanded ? (
+                      <ChevronDown className="w-4 h-4 text-dark-muted" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-dark-muted" />
                     )}
+                  </button>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {conn.user || t('connections.anonymous')}
+                      </span>
+                      <span className="text-xs text-dark-muted">•</span>
+                      <span className="text-sm text-dark-muted">
+                        {conn.ip}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 mt-1 text-xs text-dark-muted">
+                      <span className="flex items-center gap-1">
+                        <Server className="w-3 h-3" />
+                        {conn.server}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="hidden md:flex items-center gap-4 text-sm">
+                    <div className="text-center">
+                      <p className="font-medium">{conn.subs_count || 0}</p>
+                      <p className="text-xs text-dark-muted">{t('connections.subs')}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-medium">
+                        {getConnectionDuration(conn.connected_at || '')}
+                      </p>
+                      <p className="text-xs text-dark-muted">{t('connections.duration')}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={async () => {
+                        const ok = await confirm({
+                          title: t('connections.terminateConnection'),
+                          message: t('connections.terminateConfirm', { cid: String(conn.cid) }),
+                          confirmLabel: t('connections.terminate'),
+                          variant: "danger"
+                        })
+                        if (ok) {
+                          HealthService.deleteConnections(
+                            String(conn.cid || ''),
+                          )
+                            .then(() => refetch())
+                            .catch(() =>
+                              toast(
+                                'error',
+                                t('connections.terminateFailed'),
+                              ),
+                            )
+                        }
+                      }}
+                      className="p-2 hover:bg-dark-bg rounded-lg transition-colors text-status-error"
+                      title={t('connections.terminateConnection')}
+                    >
+                      <XCircle className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-              )
-            })}
-          </div>
-        )}
-        <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted">
-          {t('connections.showingConnections', { filtered: filteredConnections.length, total: connections.length })}
-        </div>
-      </div>
+
+                {isExpanded && (
+                  <div className="mt-4 pl-8 space-y-4">
+                    <div className="bg-dark-bg/50 rounded-lg p-4">
+                      <p className="text-xs text-dark-muted">
+                        {t('connections.connectedSince')}
+                      </p>
+                      <p className="font-medium text-sm">
+                        {conn.connected_at
+                          ? new Date(conn.connected_at).toLocaleString()
+                          : t('dashboard.na')}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        }}
+      />
     </div>
   )
 }

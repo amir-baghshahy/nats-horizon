@@ -1,5 +1,6 @@
 import { RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "../ui";
 
 interface DashboardHeaderProps {
   sseConnected: boolean;
@@ -35,13 +36,14 @@ export default function DashboardHeader({
             )}
           </div>
 
-          <button
-            onClick={onRefresh}
-            className="btn-secondary flex items-center gap-2 px-3 py-1.5 text-sm"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            {t('common.refresh')}
-          </button>
+           <Button
+             variant="secondary"
+             size="sm"
+             icon={<RefreshCw className="w-3.5 h-3.5" />}
+             onClick={onRefresh}
+           >
+             {t('common.refresh')}
+           </Button>
         </div>
       </div>
     </div>

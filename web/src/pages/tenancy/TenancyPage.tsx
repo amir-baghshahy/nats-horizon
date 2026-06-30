@@ -6,6 +6,9 @@ import {
   RefreshCw, Play, Globe, Star
 } from 'lucide-react'
 import { PageError, PageLoading } from '../../components/ui/PageState'
+import { StatCard, PanelCard } from '../../components/ui'
+import { ModalWrapper } from "../../components/ui/Modal";
+import { Button } from "../../components/ui";
 
 export default function TenancyPage({
   showModal,
@@ -70,70 +73,50 @@ export default function TenancyPage({
             {t('tenancy.subtitle')}
           </p>
         </div>
-        <button
+        <Button
+          variant="primary"
+          icon={<Plus className="w-4 h-4" />}
           onClick={() => {
             setEditingConnection(null)
             setShowModal(true)
           }}
-          className="btn-primary flex items-center gap-2"
         >
-          <Plus className="w-4 h-4" />
           {t('tenancy.addConnection')}
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
-              <Server className="w-5 h-5 text-primary-400" />
-            </div>
-            <div>
-              <p className="text-xl font-bold">{stats.total}</p>
-              <p className="text-xs text-dark-muted">{t('tenancy.totalServers')}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-green-400" />
-            </div>
-            <div>
-              <p className="text-xl font-bold">{stats.active}</p>
-              <p className="text-xs text-dark-muted">{t('tenancy.connected')}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-              <Play className="w-5 h-5 text-blue-400" />
-            </div>
-            <div>
-              <p className="text-xl font-bold">{stats.healthy}</p>
-              <p className="text-xs text-dark-muted">{t('tenancy.healthy')}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
-              <Star className="w-5 h-5 text-yellow-400" />
-            </div>
-            <div>
-              <p className="text-sm font-medium truncate">{stats.default}</p>
-              <p className="text-xs text-dark-muted">{t('tenancy.default')}</p>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          icon={Server}
+          value={stats.total}
+          label={t('tenancy.totalServers')}
+        />
+        <StatCard
+          icon={CheckCircle}
+          value={stats.active}
+          label={t('tenancy.connected')}
+          iconBg="bg-green-500/20"
+          iconColor="text-green-400"
+        />
+        <StatCard
+          icon={Play}
+          value={stats.healthy}
+          label={t('tenancy.healthy')}
+          iconBg="bg-blue-500/20"
+          iconColor="text-blue-400"
+        />
+        <StatCard
+          icon={Star}
+          value={stats.default}
+          label={t('tenancy.default')}
+          iconBg="bg-yellow-500/20"
+          iconColor="text-yellow-400"
+        />
       </div>
 
-      <div className="card">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Server className="w-5 h-5" />
-          {t('tenancy.serverConnections')}
-        </h3>
+      <PanelCard
+        header={<h3 className="text-lg font-semibold flex items-center gap-2"><Server className="w-5 h-5" /> {t('tenancy.serverConnections')}</h3>}
+      >
         <div className="space-y-4">
           {connections?.connections?.map((conn: ConnectionConfig) => {
             const connectionId = conn.id ?? conn.name ?? conn.url ?? ''
@@ -265,11 +248,12 @@ export default function TenancyPage({
             )
           })}
         </div>
-      </div>
+      </PanelCard>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="card max-w-md w-full">
+        <ModalWrapper isOpen={true}>
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+            <div className="card max-w-md w-full">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">
                 {editingConnection ? t('tenancy.editConnection') : t('tenancy.addConnection')}
@@ -332,23 +316,24 @@ export default function TenancyPage({
                 </label>
               </div>
               <div className="flex items-center gap-3 pt-4">
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={() => {
                     setShowModal(false)
                     setEditingConnection(null)
                   }}
-                  className="btn-secondary"
                 >
                   {t('common.cancel')}
-                </button>
-                <button type="submit" className="btn-primary">
+                </Button>
+                <Button variant="primary" type="submit">
                   {editingConnection ? t('tenancy.update') : t('tenancy.create')} Connection
-                </button>
+                </Button>
               </div>
             </form>
           </div>
-        </div>
+          </div>
+        </ModalWrapper>
       )}
     </div>
   )

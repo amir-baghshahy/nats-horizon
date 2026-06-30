@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, type ReactNode } from
 import { AlertTriangle, Trash2, Info } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ModalWrapper } from './ui/Modal'
+import { Button } from './ui'
 
 type Variant = 'danger' | 'warning' | 'info'
 
@@ -70,13 +71,13 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-6">
-              <button
+              <Button
                 onClick={() => handleClose(false)}
-                className="btn-secondary hover-lift"
+                variant="secondary"
                 autoFocus
               >
                 {t('common.cancel')}
-              </button>
+              </Button>
               <button
                 onClick={() => handleClose(true)}
                 className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold active-scale hover-scale focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-bg ${styles.btn}`}

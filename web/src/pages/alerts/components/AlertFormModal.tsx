@@ -1,10 +1,11 @@
 import type { Alert } from "../../../types";
-import { createPortal } from "react-dom";
+import { ModalWrapper } from "../../../components/ui/Modal";
 import { useTranslation } from "react-i18next";
 import { Mail, Webhook, Hash } from "lucide-react";
 import Select from "../../../components/ui/Select";
 import Button from "../../../components/ui/Button";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 interface AlertFormModalProps {
   isOpen: boolean;
@@ -59,6 +60,7 @@ export default function AlertFormModal({
   };
 
   return createPortal(
+    <ModalWrapper isOpen={true}>
     <div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
       onClick={onClose}
@@ -311,7 +313,8 @@ export default function AlertFormModal({
           </Button>
         </div>
       </div>
-    </div>,
+    </div>
+    </ModalWrapper>,
     document.body,
   );
 }

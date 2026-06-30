@@ -1,10 +1,12 @@
 import { UseSecurityReturn } from './hooks/useSecurity'
 import { useTranslation } from "react-i18next";
 import {
-  Shield, Lock, Users, Plus, Edit, Trash2,
+  Shield, Users, Plus, Edit, Trash2,
   Clock, FileText, Server, Activity, ToggleLeft, ToggleRight
 } from 'lucide-react'
 import { PageError, PageLoading } from '../../components/ui/PageState'
+import { PanelCard, ModalWrapper, Tabs } from '../../components/ui'
+import { Button } from '../../components/ui';
 
 export default function SecurityPage({
   activeTab,
@@ -67,44 +69,29 @@ export default function SecurityPage({
             {t('security.subtitle')}
           </p>
         </div>
-        <button
+        <Button
+          variant="primary"
+          icon={<Plus className="w-4 h-4" />}
           onClick={() => setShowUserModal(true)}
-          className="btn-primary flex items-center gap-2"
         >
-          <Plus className="w-4 h-4" />
           {t('security.newUser')}
-        </button>
+        </Button>
       </div>
 
-      <div className="flex items-center gap-1 mb-4 bg-dark-bg p-1 rounded-lg w-fit">
-        {[
+      <Tabs
+        tabs={[
           { id: 'overview', label: t('security.overview'), icon: Shield },
           { id: 'users', label: t('security.users'), icon: Users },
           { id: 'audit', label: t('security.auditLog'), icon: FileText },
           { id: 'connections', label: t('security.connections'), icon: Server },
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-              activeTab === tab.id
-                ? 'bg-primary-600 text-white'
-                : 'text-dark-muted hover:text-dark-text hover:bg-dark-border'
-            }`}
-          >
-            <tab.icon className="w-4 h-4" />
-            <span>{tab.label}</span>
-          </button>
-        ))}
-      </div>
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
       {activeTab === 'overview' && (
         <div className="space-y-6">
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              {t('security.accountInformation')}
-            </h3>
+          <PanelCard title={t('security.accountInformation')}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-dark-bg/50 rounded-lg p-4">
                 <p className="text-xs text-dark-muted">{t('security.accountName')}</p>
@@ -125,10 +112,9 @@ export default function SecurityPage({
                 </p>
               </div>
             </div>
-          </div>
+          </PanelCard>
 
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4">{t('security.resourceLimits')}</h3>
+          <PanelCard title={t('security.resourceLimits')}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-dark-bg/50 rounded-lg p-4">
                 <p className="text-xs text-dark-muted">{t('security.maxConnections')}</p>
@@ -147,13 +133,9 @@ export default function SecurityPage({
                 <p className="font-medium">{securityInfo?.limits?.payload ? formatBytes(securityInfo.limits.payload) : 'Unlimited'}</p>
               </div>
             </div>
-          </div>
+          </PanelCard>
 
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Lock className="w-5 h-5" />
-              {t('security.serverSecuritySettings')}
-            </h3>
+          <PanelCard title={t('security.serverSecuritySettings')}>
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-dark-bg/50 rounded-lg">
                 <span>{t('security.authenticationRequired')}</span>
@@ -186,19 +168,17 @@ export default function SecurityPage({
                 </span>
               </div>
             </div>
-          </div>
+          </PanelCard>
         </div>
       )}
 
       {activeTab === 'users' && (
-        <div className="card overflow-hidden flex flex-col max-h-[600px]">
-          <div className="p-4 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              {t('security.usersCount', { count: users?.length || 0 })}
-            </h3>
-          </div>
-          <div className="overflow-y-auto scrollbar-thin flex-1 p-4 space-y-4">
+        <PanelCard
+          title={t('security.usersCount', { count: users?.length || 0 })}
+          maxHeight={600}
+          footer={<span>{t('security.userCount', { count: users?.length || 0 })}</span>}
+        >
+          <div className="space-y-4">
             {users?.map((user) => (
               <div key={user.name} className="p-4 bg-dark-bg/50 rounded-lg">
                 <div className="flex items-start justify-between">
@@ -235,58 +215,53 @@ export default function SecurityPage({
                       </div>
                     </div>
                   </div>
-                   <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <button
+                         onClick={async () => {
+                           const ok = await confirm({ title: user.enabled ? t('security.disableUser') : t('security.enableUser'), message: t('security.toggleUserConfirm', { name: user.name }), confirmLabel: user.enabled ? t('security.disable') : t('security.enable'), variant: "warning" })
+                          if (ok) updateUserMutation.mutate({ name: user.name, data: { enabled: !user.enabled } })
+                        }}
+                        className="p-2 hover:bg-dark-border rounded-lg"
+                      >
+                        {user.enabled ? (
+                          <ToggleRight className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <ToggleLeft className="w-4 h-4 text-dark-muted" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedUser(user)
+                          setShowUserModal(true)
+                        }}
+                        className="p-2 hover:bg-dark-border rounded-lg"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
                      <button
                         onClick={async () => {
-                          const ok = await confirm({ title: user.enabled ? t('security.disableUser') : t('security.enableUser'), message: t('security.toggleUserConfirm', { name: user.name }), confirmLabel: user.enabled ? t('security.disable') : t('security.enable'), variant: "warning" })
-                         if (ok) updateUserMutation.mutate({ name: user.name, data: { enabled: !user.enabled } })
+                          const ok = await confirm({ title: t('security.deleteUser'), message: t('security.deleteUserConfirm', { name: user.name }), confirmLabel: t('security.delete'), variant: "danger" })
+                         if (ok) deleteUserMutation.mutate(user.name)
                        }}
-                       className="p-2 hover:bg-dark-border rounded-lg"
+                       className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg"
                      >
-                       {user.enabled ? (
-                         <ToggleRight className="w-4 h-4 text-green-400" />
-                       ) : (
-                         <ToggleLeft className="w-4 h-4 text-dark-muted" />
-                       )}
+                       <Trash2 className="w-4 h-4" />
                      </button>
-                     <button
-                       onClick={() => {
-                         setSelectedUser(user)
-                         setShowUserModal(true)
-                       }}
-                       className="p-2 hover:bg-dark-border rounded-lg"
-                     >
-                       <Edit className="w-4 h-4" />
-                     </button>
-                    <button
-                       onClick={async () => {
-                         const ok = await confirm({ title: t('security.deleteUser'), message: t('security.deleteUserConfirm', { name: user.name }), confirmLabel: t('security.delete'), variant: "danger" })
-                        if (ok) deleteUserMutation.mutate(user.name)
-                      }}
-                      className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                    </div>
                 </div>
               </div>
             ))}
             </div>
-            <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-              {t('security.userCount', { count: users?.length || 0 })}
-            </div>
-        </div>
+        </PanelCard>
       )}
 
       {activeTab === 'audit' && (
-        <div className="card overflow-hidden flex flex-col max-h-[600px]">
-          <div className="p-4 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              {t('security.auditLogTitle')}
-            </h3>
-          </div>
-          <div className="overflow-y-auto scrollbar-thin flex-1 p-4 space-y-3">
+        <PanelCard
+          title={t('security.auditLogTitle')}
+          maxHeight={600}
+          footer={<span>{t('security.entriesCount', { count: auditLogs?.length || 0 })}</span>}
+        >
+          <div className="space-y-3">
             {auditLogs?.map((log: any, index: number) => (
               <div key={index} className="p-4 bg-dark-bg/50 rounded-lg">
                 <div className="flex items-start gap-4">
@@ -306,18 +281,11 @@ export default function SecurityPage({
               </div>
             ))}
             </div>
-            <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
-              {t('security.entriesCount', { count: auditLogs?.length || 0 })}
-            </div>
-        </div>
+        </PanelCard>
       )}
 
       {activeTab === 'connections' && (
-        <div className="card">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Server className="w-5 h-5" />
-              {t('security.connectionSecurityStatus')}
-            </h3>
+        <PanelCard title={t('security.connectionSecurityStatus')}>
           <div className="space-y-4">
             <div className="p-4 bg-dark-bg/50 rounded-lg">
               <p className="text-sm text-dark-muted">Server</p>
@@ -338,12 +306,13 @@ export default function SecurityPage({
               </p>
             </div>
           </div>
-        </div>
+        </PanelCard>
       )}
 
       {showUserModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="card max-w-md w-full">
+        <ModalWrapper isOpen={true}>
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+            <div className="card max-w-md w-full">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">{selectedUser ? t('security.editUser') : t('security.createUser')}</h2>
               <button
@@ -429,16 +398,17 @@ export default function SecurityPage({
                 <label htmlFor="user-enabled" className="text-sm">{t('security.enableUserCheckbox')}</label>
               </div>
               <div className="flex items-center gap-3 pt-4">
-                <button type="button" onClick={() => setShowUserModal(false)} className="btn-secondary">
-                  {t('common.cancel')}
-                </button>
-                <button type="submit" disabled={createUserMutation.isPending} className="btn-primary">
-                  {createUserMutation.isPending ? t('security.creating') : t('security.createUser')}
-                </button>
+                 <Button type="button" variant="secondary" onClick={() => setShowUserModal(false)}>
+                   {t('common.cancel')}
+                 </Button>
+                 <Button type="submit" variant="primary" loading={createUserMutation.isPending}>
+                   {createUserMutation.isPending ? t('security.creating') : t('security.createUser')}
+                 </Button>
               </div>
             </form>
           </div>
-        </div>
+          </div>
+        </ModalWrapper>
       )}
     </div>
   )

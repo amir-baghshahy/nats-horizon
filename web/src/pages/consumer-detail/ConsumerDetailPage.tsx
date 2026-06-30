@@ -25,6 +25,8 @@ import { Link } from "react-router-dom";
 import { useConsumerDetail } from "./hooks/useConsumerDetail";
 import EditConsumerModal from "./components/EditConsumerModal";
 import CloneConsumerModal from "./components/CloneConsumerModal";
+import { StatCard, PanelCard, Tabs } from "../../components/ui";
+import { Button } from "../../components/ui";
 
 export default function ConsumerDetailPage() {
   const { t } = useTranslation();
@@ -105,163 +107,125 @@ export default function ConsumerDetailPage() {
             </Link>
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handlePauseResume}
-            disabled={loadingAction !== null}
-            className={`btn-secondary flex items-center gap-2 ${consumerData.status === "stuck" ? "text-status-success" : ""} ${loadingAction === "pause-resume" ? "opacity-50" : ""}`}
-          >
-            {loadingAction === "pause-resume" ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : consumerData.status === "stuck" || consumerData.status === "paused" || isPaused ? (
-              <Play className="w-4 h-4" />
-            ) : (
-              <Pause className="w-4 h-4" />
-            )}
-          </button>
-          <button onClick={() => refetch()} className="btn-secondary">
-            <RefreshCw className="w-4 h-4" />
-          </button>
-          <button onClick={() => setActiveTab("messages")} className="btn-secondary flex items-center gap-2">
-            <Eye className="w-4 h-4" />
-            {t("consumers.peekMessages")}
-          </button>
-          <button onClick={() => setActiveTab("config")} className="btn-primary flex items-center gap-2">
-            <Settings className="w-4 h-4" />
-            {t("consumers.configure")}
-          </button>
-        </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              onClick={handlePauseResume}
+              disabled={loadingAction !== null}
+              icon={loadingAction === "pause-resume" ? <Loader2 className="w-4 h-4 animate-spin" /> : consumerData.status === "stuck" || consumerData.status === "paused" || isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+            />
+           <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={() => refetch()} />
+           <Button variant="secondary" icon={<Eye className="w-4 h-4" />} onClick={() => setActiveTab("messages")}>
+             {t("consumers.peekMessages")}
+           </Button>
+           <Button variant="primary" icon={<Settings className="w-4 h-4" />} onClick={() => setActiveTab("config")}>
+             {t("consumers.configure")}
+           </Button>
+         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-orange-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{(consumerData.lag || 0).toLocaleString()}</p>
-              <p className="text-xs text-dark-muted">{t("consumers.totalLag")}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5 text-blue-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{(consumerData.num_pending || 0).toLocaleString()}</p>
-              <p className="text-xs text-dark-muted">{t("consumers.pending")}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-              <FastForward className="w-5 h-5 text-purple-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{(consumerData as any).num_delivered?.toLocaleString() ?? t("common.na")}</p>
-              <p className="text-xs text-dark-muted">{t("consumers.delivered")}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-cyan-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{(consumerData as any).ack_rate ?? t("common.na")}</p>
-              <p className="text-xs text-dark-muted">{t("consumers.avgAckRate")}</p>
-            </div>
-          </div>
-        </div>
-        <div className="card">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-primary-400" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{(consumerData as any).paused ? t("streams.paused") : t("consumers.active")}</p>
-              <p className="text-xs text-dark-muted">{t("consumers.state")}</p>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          icon={TrendingUp}
+          value={(consumerData.lag || 0).toLocaleString()}
+          label={t("consumers.totalLag")}
+          iconBg="bg-orange-500/20"
+          iconColor="text-orange-400"
+          formatValue={false}
+        />
+        <StatCard
+          icon={MessageSquare}
+          value={(consumerData.num_pending || 0).toLocaleString()}
+          label={t("consumers.pending")}
+          iconBg="bg-blue-500/20"
+          iconColor="text-blue-400"
+          formatValue={false}
+        />
+        <StatCard
+          icon={FastForward}
+          value={(consumerData as any).num_delivered?.toLocaleString() ?? t("common.na")}
+          label={t("consumers.delivered")}
+          iconBg="bg-purple-500/20"
+          iconColor="text-purple-400"
+          formatValue={false}
+        />
+        <StatCard
+          icon={CheckCircle}
+          value={(consumerData as any).ack_rate ?? t("common.na")}
+          label={t("consumers.avgAckRate")}
+          iconBg="bg-cyan-500/20"
+          iconColor="text-cyan-400"
+          formatValue={false}
+        />
+        <StatCard
+          icon={TrendingUp}
+          value={(consumerData as any).paused ? t("streams.paused") : t("consumers.active")}
+          label={t("consumers.state")}
+          formatValue={false}
+        />
       </div>
 
-      <div className="flex items-center gap-1 mb-4 bg-dark-bg p-1 rounded-lg w-fit">
-        {[
+      <Tabs
+        tabs={[
           { id: "overview", label: "Overview", icon: BarChart3 },
           { id: "messages", label: "Messages", icon: MessageSquare },
           { id: "config", label: "Configuration", icon: Settings },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as typeof activeTab)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-              activeTab === tab.id
-                ? "bg-primary-600 text-white"
-                : "text-dark-muted hover:text-dark-text hover:bg-dark-border"
-            }`}
-          >
-            <tab.icon className="w-4 h-4" />
-            <span>{tab.label}</span>
-          </button>
-        ))}
-      </div>
+        ]}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
       {activeTab === "overview" && (
         <div className="space-y-6">
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4">{t("consumers.quickActions")}</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <button
-                onClick={handleResetLag}
-                disabled={loadingAction === "reset-lag"}
-                className={`btn-secondary flex items-center gap-2 ${loadingAction === "reset-lag" ? "opacity-50" : ""}`}
-              >
-                {loadingAction === "reset-lag" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipBack className="w-4 h-4" />}
-                {t("consumers.resetLag")}
-              </button>
-              <button
-                onClick={handleReplayMessages}
-                disabled={loadingAction === "replay"}
-                className={`btn-secondary flex items-center gap-2 ${loadingAction === "replay" ? "opacity-50" : ""}`}
-              >
-                {loadingAction === "replay" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipForward className="w-4 h-4" />}
-                {t("consumers.replayMessages")}
-              </button>
-              <button onClick={() => setActiveTab("messages")} className="btn-secondary flex items-center gap-2">
-                <Eye className="w-4 h-4" />
-                {t("consumers.peekMessages")}
-              </button>
-              <button
-                onClick={handleDeleteConsumer}
-                disabled={loadingAction === "delete"}
-                className={`btn-secondary flex items-center gap-2 text-status-error ${loadingAction === "delete" ? "opacity-50" : ""}`}
-              >
-                {loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                {t("common.delete")}
-              </button>
-            </div>
-          </div>
+          <PanelCard title={t("consumers.quickActions")}>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+               <Button
+                 variant="secondary"
+                 onClick={handleResetLag}
+                 disabled={loadingAction === "reset-lag"}
+                 icon={loadingAction === "reset-lag" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipBack className="w-4 h-4" />}
+               >
+                 {t("consumers.resetLag")}
+               </Button>
+               <Button
+                 variant="secondary"
+                 onClick={handleReplayMessages}
+                 disabled={loadingAction === "replay"}
+                 icon={loadingAction === "replay" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipForward className="w-4 h-4" />}
+               >
+                 {t("consumers.replayMessages")}
+               </Button>
+               <Button variant="secondary" icon={<Eye className="w-4 h-4" />} onClick={() => setActiveTab("messages")}>
+                 {t("consumers.peekMessages")}
+               </Button>
+               <Button
+                 variant="secondary"
+                 onClick={handleDeleteConsumer}
+                 disabled={loadingAction === "delete"}
+                 className="text-status-error"
+                 icon={loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+               >
+                 {t("common.delete")}
+               </Button>
+             </div>
+          </PanelCard>
         </div>
       )}
 
       {activeTab === "messages" && (
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <MessageSquare className="w-5 h-5" />
-              {t("consumers.pendingMessages", { count: pendingMessages?.messages?.length || 0 })}
-            </h3>
-            <button onClick={() => refetchPending()} className="btn-secondary flex items-center gap-2">
-              <RefreshCw className="w-4 h-4" />
-              {t("common.refresh")}
-            </button>
-          </div>
+        <PanelCard
+          header={
+            <div className="flex items-center justify-between w-full">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
+                {t("consumers.pendingMessages", { count: pendingMessages?.messages?.length || 0 })}
+              </h3>
+               <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={() => refetchPending()}>
+                 {t("common.refresh")}
+               </Button>
+            </div>
+          }
+        >
 
           {!pendingMessages || !pendingMessages.messages || pendingMessages.messages.length === 0 ? (
             <div className="text-center py-12">
@@ -323,13 +287,12 @@ export default function ConsumerDetailPage() {
               ))}
             </div>
           )}
-        </div>
+        </PanelCard>
       )}
 
       {activeTab === "config" && (
         <div className="space-y-6">
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4">{t("consumers.consumerConfiguration")}</h3>
+          <PanelCard title={t("consumers.consumerConfiguration")}>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
@@ -372,47 +335,44 @@ export default function ConsumerDetailPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </PanelCard>
 
           {(consumerData.config as any)?.filter_subject && (
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-4">{t("consumers.filterSubject")}</h3>
+            <PanelCard title={t("consumers.filterSubject")}>
               <div className="p-3 bg-dark-bg/50 rounded-lg">
                 <p className="font-mono text-sm">{(consumerData.config as any).filter_subject}</p>
                 <p className="text-xs text-dark-muted mt-1">{t("consumers.filterSubjectHelp")}</p>
               </div>
-            </div>
+            </PanelCard>
           )}
 
-          <div className="card">
-            <h3 className="text-lg font-semibold mb-4">{t("consumers.consumerActions")}</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <button onClick={handleOpenEdit} className="btn-secondary flex items-center gap-2">
-                <Settings className="w-4 h-4" />
-                {t("consumers.editConsumer")}
-              </button>
-              <button
-                onClick={handleResetLag}
-                disabled={loadingAction === "reset-lag"}
-                className={`btn-secondary flex items-center gap-2 ${loadingAction === "reset-lag" ? "opacity-50" : ""}`}
-              >
-                {loadingAction === "reset-lag" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipBack className="w-4 h-4" />}
-                {t("consumers.resetLag")}
-              </button>
-              <button onClick={handleOpenClone} className="btn-secondary flex items-center gap-2">
-                <Copy className="w-4 h-4" />
-                {t("consumers.cloneConsumer")}
-              </button>
-              <button
-                onClick={handleDeleteConsumer}
-                disabled={loadingAction === "delete"}
-                className={`btn-secondary flex items-center gap-2 text-status-error ${loadingAction === "delete" ? "opacity-50" : ""}`}
-              >
-                {loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                {t("common.delete")}
-              </button>
-            </div>
-          </div>
+           <PanelCard title={t("consumers.consumerActions")}>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+               <Button variant="secondary" icon={<Settings className="w-4 h-4" />} onClick={handleOpenEdit}>
+                 {t("consumers.editConsumer")}
+               </Button>
+               <Button
+                 variant="secondary"
+                 onClick={handleResetLag}
+                 disabled={loadingAction === "reset-lag"}
+                 icon={loadingAction === "reset-lag" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipBack className="w-4 h-4" />}
+               >
+                 {t("consumers.resetLag")}
+               </Button>
+               <Button variant="secondary" icon={<Copy className="w-4 h-4" />} onClick={handleOpenClone}>
+                 {t("consumers.cloneConsumer")}
+               </Button>
+               <Button
+                 variant="secondary"
+                 onClick={handleDeleteConsumer}
+                 disabled={loadingAction === "delete"}
+                 className="text-status-error"
+                 icon={loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+               >
+                 {t("common.delete")}
+               </Button>
+             </div>
+           </PanelCard>
         </div>
       )}
 

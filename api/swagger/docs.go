@@ -1777,7 +1777,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Metric type (messages, bytes, lag)",
+                        "description": "Metric type (messages, bytes, lag, first_sequence, last_sequence, subject_count, consumer_count, deleted_messages, message_age_seconds, replicas, messages_rate, bytes_rate)",
                         "name": "type",
                         "in": "query"
                     },
@@ -3545,6 +3545,10 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "email_address": {
+                    "description": "Email address for email notifications",
+                    "type": "string"
+                },
                 "enabled": {
                     "type": "boolean"
                 },
@@ -3558,12 +3562,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "severity": {
-                    "$ref": "#/definitions/AlertSeverity"
+                    "type": "string"
+                },
+                "slack_webhook_url": {
+                    "description": "Slack webhook URL for Slack notifications",
+                    "type": "string"
                 },
                 "trigger_count": {
                     "type": "integer"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "webhook_url": {
+                    "description": "Webhook URL for webhook notifications",
                     "type": "string"
                 }
             }
@@ -3593,20 +3605,6 @@ const docTemplate = `{
                 }
             }
         },
-        "AlertSeverity": {
-            "description": "Severity level for alerts",
-            "type": "string",
-            "enum": [
-                "info",
-                "warning",
-                "critical"
-            ],
-            "x-enum-varnames": [
-                "SeverityInfo",
-                "SeverityWarning",
-                "SeverityCritical"
-            ]
-        },
         "AlertTrigger": {
             "type": "object",
             "properties": {
@@ -3633,7 +3631,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "severity": {
-                    "$ref": "#/definitions/AlertSeverity"
+                    "type": "string"
                 },
                 "triggered_at": {
                     "type": "string"
@@ -4174,10 +4172,16 @@ const docTemplate = `{
             "type": "integer",
             "format": "int64",
             "enum": [
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
                 1000000000,
+                60000000000,
+                3600000000000,
+                -9223372036854775808,
+                9223372036854775807,
                 1,
                 1000,
                 1000000,
@@ -4186,10 +4190,16 @@ const docTemplate = `{
                 3600000000000
             ],
             "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
                 "Second",
+                "Minute",
+                "Hour",
+                "minDuration",
+                "maxDuration",
                 "Nanosecond",
                 "Microsecond",
                 "Millisecond",
@@ -4385,13 +4395,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "label": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "message-rate"
                 },
                 "timestamp": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1625097600
                 },
                 "value": {
-                    "type": "number"
+                    "type": "number",
+                    "example": 1234.56
                 }
             }
         },
@@ -4408,10 +4421,14 @@ const docTemplate = `{
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
+                    },
+                    "example": {
+                        "{\"type\"": "\"messages\"}"
                     }
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "my-stream"
                 }
             }
         },
@@ -4437,7 +4454,8 @@ const docTemplate = `{
                     }
                 },
                 "timestamp": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1625097600
                 }
             }
         },

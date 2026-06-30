@@ -6,6 +6,8 @@ import {
   Zap, Globe
 } from 'lucide-react'
 import { PageError, PageLoading } from '../../components/ui/PageState'
+import { PanelCard } from '../../components/ui'
+import { Button } from '../../components/ui';
 
 export default function ClusterPage({
   selectedStream,
@@ -63,10 +65,9 @@ export default function ClusterPage({
               : t('cluster.standaloneMode')}
           </p>
         </div>
-        <button onClick={refreshAll} className="btn-secondary flex items-center gap-2">
-          <RefreshCw className="w-4 h-4" />
-          {t('common.refresh')}
-        </button>
+         <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={refreshAll}>
+           {t('common.refresh')}
+         </Button>
       </div>
 
       <div className={`card mb-4 border-l-4 ${
@@ -94,11 +95,10 @@ export default function ClusterPage({
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
-        <div className="card">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Server className="w-5 h-5 text-primary-400" />
-            {t('cluster.clusterInformation')}
-          </h2>
+        <PanelCard
+          title={t('cluster.clusterInformation')}
+          icon={<Server className="w-5 h-5 text-primary-400" />}
+        >
           <div className="space-y-4">
             <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
               <span className="text-dark-muted">{t('cluster.clusterName')}</span>
@@ -145,13 +145,12 @@ export default function ClusterPage({
               </div>
             )}
           </div>
-        </div>
+        </PanelCard>
 
-        <div className="card">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-primary-400" />
-            {t('cluster.systemHealth')}
-          </h2>
+        <PanelCard
+          title={t('cluster.systemHealth')}
+          icon={<Activity className="w-5 h-5 text-primary-400" />}
+        >
           <div className="space-y-4">
             <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
               <span className="text-dark-muted">{t('cluster.connectionStatus')}</span>
@@ -188,15 +187,15 @@ export default function ClusterPage({
               </div>
             )}
           </div>
-        </div>
+        </PanelCard>
       </div>
 
       {clusterNodes?.clustered && clusterNodes.nodes.length > 0 && (
-        <div className="card mt-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <HardDrive className="w-5 h-5 text-primary-400" />
-            {t('cluster.clusterNodes', { count: clusterNodes.nodes.length })}
-          </h2>
+        <PanelCard
+          title={t('cluster.clusterNodes', { count: clusterNodes.nodes.length })}
+          icon={<HardDrive className="w-5 h-5 text-primary-400" />}
+          className="mt-6"
+        >
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {clusterNodes.nodes.map((node: any) => (
               <div
@@ -258,16 +257,15 @@ export default function ClusterPage({
               </div>
             ))}
           </div>
-        </div>
+        </PanelCard>
       )}
 
       {clusterInfo?.is_clustered && (
-        <div className="card mt-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Database className="w-5 h-5 text-primary-400" />
-            {t('cluster.streamReplication')}
-          </h2>
-
+        <PanelCard
+          title={t('cluster.streamReplication')}
+          icon={<Database className="w-5 h-5 text-primary-400" />}
+          className="mt-6"
+        >
           <div className="grid lg:grid-cols-2 gap-4">
             <div>
               <h3 className="font-medium mb-3">{t('cluster.selectStream')}</h3>
@@ -395,11 +393,11 @@ export default function ClusterPage({
               </div>
             )}
           </div>
-        </div>
+        </PanelCard>
       )}
 
       {(!clusterInfo?.is_clustered) && (
-        <div className="card mt-6">
+        <PanelCard className="mt-6">
           <div className="flex items-start gap-4 p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
             <Info className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" />
             <div>
@@ -409,7 +407,7 @@ export default function ClusterPage({
               </p>
             </div>
           </div>
-        </div>
+        </PanelCard>
       )}
     </div>
   )

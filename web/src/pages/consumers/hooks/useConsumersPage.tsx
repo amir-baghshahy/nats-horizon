@@ -7,7 +7,7 @@ import type {
 } from "../../../types";
 import { ConsumersService, StreamsService } from "../../../types";
 import { useSSE } from "../../../hooks/useSSE";
-import { useExpansion, useSelection } from "../../../hooks";
+import { useExpansion, useSelection, usePersistedState } from "../../../hooks";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { useToast } from "../../../components/Toast";
 import {
@@ -69,9 +69,17 @@ export interface UseConsumersPageReturn {
 
 export function useConsumersPage(): UseConsumersPageReturn {
   const { t } = useTranslation();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStream, setSelectedStream] = useState("all");
-  const [filterStatus, setFilterStatus] = useState<ConsumerFilterStatus>("all");
+  const [searchQuery, setSearchQuery] = usePersistedState(
+    "consumers:search",
+    "",
+  );
+  const [selectedStream, setSelectedStream] = usePersistedState(
+    "consumers:stream",
+    "all",
+  );
+
+  const [filterStatus, setFilterStatus] =
+    usePersistedState<ConsumerFilterStatus>("consumers:status", "all");
   const [showMoreFilters, setShowMoreFilters] = useState(false);
 
   const {

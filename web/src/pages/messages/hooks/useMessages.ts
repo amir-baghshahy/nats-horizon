@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
@@ -7,6 +7,7 @@ import type { StreamResponse as Stream } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { useToast } from "../../../components/Toast";
 import { useSSE } from "../../../hooks/useSSE";
+import { usePersistedState } from "../../../hooks";
 import { deleteMessage } from "../../../utils/natsOperations";
 
 export interface UseMessagesReturn {
@@ -42,7 +43,11 @@ export interface UseMessagesReturn {
   toggleMessageExpansion: (sequence: number) => void;
   selectAllMessages: () => void;
   clearMessageSelection: () => void;
-  handlePublish: (data: { stream: string; subject: string; data: string }) => void;
+  handlePublish: (data: {
+    stream: string;
+    subject: string;
+    data: string;
+  }) => void;
   handleDeleteMessage: (sequence: number) => void;
   handleBulkDelete: () => Promise<void>;
   handleExportSelected: () => Promise<void>;
@@ -64,16 +69,38 @@ export function useMessages(): UseMessagesReturn {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Initialize state from URL parameters
-  const [selectedStream, setSelectedStream] = useState<string>(() => searchParams.get('stream') || "");
-  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('search') || "");
-  const [selectedMessages, setSelectedMessages] = useState<Set<number>>(new Set());
-  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set());
+  const [selectedStream, setSelectedStream] = useState<string>(
+    () => searchParams.get("stream") || "",
+  );
+  const [searchQuery, setSearchQuery] = useState(
+    () => searchParams.get("search") || "",
+  );
+  const [selectedMessages, setSelectedMessages] = useState<Set<number>>(
+    new Set(),
+  );
+  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(
+    new Set(),
+  );
   const [showPublishModal, setShowPublishModal] = useState(false);
-  const [activeMessageTab, setActiveMessageTab] = useState<"stream" | "core">("stream");
-  const [messagesPerPage, setMessagesPerPage] = useState(() => parseInt(searchParams.get('perPage') || '25'));
-  const [currentPage, setCurrentPage] = useState(() => parseInt(searchParams.get('page') || '1'));
-  const [showFilters, setShowFilters] = useState(false);
-  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [activeMessageTab, setActiveMessageTab] = usePersistedState<
+    "stream" | "core"
+  >("messages:tab", "stream");
+  const [messagesPerPage, setMessagesPerPage] = usePersistedState<number>(
+    "messages:perPage",
+    parseInt(searchParams.get("perPage") || "25"),
+  );
+  const [currentPage, setCurrentPage] = usePersistedState<number>(
+    "messages:page",
+    parseInt(searchParams.get("page") || "1"),
+  );
+  const [showFilters, setShowFilters] = usePersistedState<boolean>(
+    "messages:filters",
+    false,
+  );
+  const [viewMode, setViewMode] = usePersistedState<"list" | "grid">(
+    "messages:viewMode",
+    "list",
+  );
   const [copiedMessage, setCopiedMessage] = useState<number | null>(null);
 
   const queryClient = useQueryClient();
@@ -84,14 +111,20 @@ export function useMessages(): UseMessagesReturn {
   // Update URL when state changes
   useEffect(() => {
     const newParams = new URLSearchParams(searchParams);
-    if (selectedStream) newParams.set('stream', selectedStream);
-    else newParams.delete('stream');
-    if (searchQuery) newParams.set('search', searchQuery);
-    else newParams.delete('search');
-    newParams.set('page', currentPage.toString());
-    newParams.set('perPage', messagesPerPage.toString());
+    if (selectedStream) newParams.set("stream", selectedStream);
+    else newParams.delete("stream");
+    if (searchQuery) newParams.set("search", searchQuery);
+    else newParams.delete("search");
+    newParams.set("page", currentPage.toString());
+    newParams.set("perPage", messagesPerPage.toString());
     setSearchParams(newParams);
-  }, [selectedStream, searchQuery, currentPage, messagesPerPage, setSearchParams]);
+  }, [
+    selectedStream,
+    searchQuery,
+    currentPage,
+    messagesPerPage,
+    setSearchParams,
+  ]);
 
   // Create setters that update both state and URL
   const updateSelectedStream = (value: string) => {
@@ -114,10 +147,18 @@ export function useMessages(): UseMessagesReturn {
     queryFn: () => StreamsService.getStreams(),
   });
 
-  const { data: messagesData, isLoading, refetch } = useQuery({
+  const {
+    data: messagesData,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["messages", selectedStream, currentPage, messagesPerPage],
     queryFn: () =>
-      MessagesService.getMessagesPage(selectedStream, currentPage, messagesPerPage),
+      MessagesService.getMessagesPage(
+        selectedStream,
+        currentPage,
+        messagesPerPage,
+      ),
     enabled: !!selectedStream,
   });
 
@@ -132,7 +173,8 @@ export function useMessages(): UseMessagesReturn {
       setShowPublishModal(false);
       toast("success", "Message published");
     },
-    onError: (err: any) => toast("error", err.response?.data?.error || "Failed to publish"),
+    onError: (err: any) =>
+      toast("error", err.response?.data?.error || "Failed to publish"),
   });
 
   const deleteMutation = useMutation({
@@ -172,7 +214,11 @@ export function useMessages(): UseMessagesReturn {
     setSelectedMessages(new Set());
   };
 
-  const handlePublish = (data: { stream: string; subject: string; data: string }) => {
+  const handlePublish = (data: {
+    stream: string;
+    subject: string;
+    data: string;
+  }) => {
     publishMutation.mutate(data);
   };
 
@@ -182,9 +228,11 @@ export function useMessages(): UseMessagesReturn {
 
   const handleBulkDelete = async () => {
     const ok = await confirm({
-      title: t('messages.deleteMessages'),
-      message: t('messages.deleteMessagesConfirm', { count: selectedMessages.size }),
-      confirmLabel: t('common.delete'),
+      title: t("messages.deleteMessages"),
+      message: t("messages.deleteMessagesConfirm", {
+        count: selectedMessages.size,
+      }),
+      confirmLabel: t("common.delete"),
       variant: "danger",
     });
     if (ok) {
@@ -198,8 +246,12 @@ export function useMessages(): UseMessagesReturn {
       toast("error", "Select a stream first");
       return;
     }
-    const selectedMsgs = messages.filter((m: any) => selectedMessages.has(m.sequence));
-    const blob = new Blob([JSON.stringify(selectedMsgs, null, 2)], { type: "application/json" });
+    const selectedMsgs = messages.filter((m: any) =>
+      selectedMessages.has(m.sequence),
+    );
+    const blob = new Blob([JSON.stringify(selectedMsgs, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;

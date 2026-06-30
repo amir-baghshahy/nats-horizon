@@ -19,7 +19,11 @@ import {
 } from "../components/messaging";
 import { useToast } from "../components/Toast";
 import { PageError, PageLoading } from "../components/ui/PageState";
-import { useNATSSubscription, useMessageList } from "../hooks";
+import {
+  useNATSSubscription,
+  useMessageList,
+  usePersistedState,
+} from "../hooks";
 import { useSSE } from "../hooks/useSSE";
 import type { MessagingTab } from "../components/messaging/MessagingTabs";
 import type { ServiceInfo } from "../components/messaging/ServiceDiscoveryPanel";
@@ -49,9 +53,15 @@ export interface RequestForm {
 
 export function CoreMessagingContent() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<MessagingTab>("messages");
+  const [activeTab, setActiveTab] = usePersistedState<MessagingTab>(
+    "core:tab",
+    "messages",
+  );
   const [subscriptions, setSubscriptions] = useState<Set<string>>(new Set());
-  const [autoScroll, setAutoScroll] = useState(true);
+  const [autoScroll, setAutoScroll] = usePersistedState<boolean>(
+    "core:autoScroll",
+    true,
+  );
   const [publishForm, setPublishForm] = useState<PublishForm>({
     subject: "",
     payload: "",
@@ -143,11 +153,13 @@ export function CoreMessagingContent() {
       };
       await CoreNatsService.postCorePublish(request);
       setPublishForm({ subject: "", payload: "", replyTo: "", headers: "{}" });
-      toast("success", t('messages.messagePublished'));
+      toast("success", t("messages.messagePublished"));
     } catch (err: any) {
       toast(
         "error",
-        t('messages.publishFailed', { error: err?.response?.data?.error || err?.message }),
+        t("messages.publishFailed", {
+          error: err?.response?.data?.error || err?.message,
+        }),
       );
     }
   };
@@ -164,7 +176,10 @@ export function CoreMessagingContent() {
     } catch (err: any) {
       console.error("Request failed:", err);
       setRequestResponse({
-        error: err?.response?.data?.error || err?.message || t('messages.requestFailed'),
+        error:
+          err?.response?.data?.error ||
+          err?.message ||
+          t("messages.requestFailed"),
       });
     }
   };
@@ -187,7 +202,7 @@ export function CoreMessagingContent() {
     setMonitorEvents([]);
 
     if (subjects.length === 0) {
-      toast("error", t('messages.enterSubjectToMonitor'));
+      toast("error", t("messages.enterSubjectToMonitor"));
       return;
     }
 
@@ -218,7 +233,7 @@ export function CoreMessagingContent() {
     });
 
     source.onerror = () => {
-      toast("error", t('messages.trafficMonitorDisconnected'));
+      toast("error", t("messages.trafficMonitorDisconnected"));
       source.close();
       monitorSourceRef.current = null;
     };
@@ -235,7 +250,7 @@ export function CoreMessagingContent() {
 
   const getErrorMessage = (error: unknown) => {
     if (error instanceof Error) return error.message;
-    return t('messages.serviceDiscoveryError');
+    return t("messages.serviceDiscoveryError");
   };
 
   const knownSubjects = Array.from(
@@ -250,7 +265,7 @@ export function CoreMessagingContent() {
   );
 
   if (serviceInfoLoading) {
-    return <PageLoading text={t('messages.loadingCoreMessaging')} />;
+    return <PageLoading text={t("messages.loadingCoreMessaging")} />;
   }
 
   if (serviceInfoError) {

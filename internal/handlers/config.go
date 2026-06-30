@@ -1,7 +1,11 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
+	"os"
+	"syscall"
+	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/config"
 	"github.com/gin-gonic/gin"
@@ -13,6 +17,39 @@ type ConfigHandler struct{}
 // NewConfigHandler creates a new config handler
 func NewConfigHandler() *ConfigHandler {
 	return &ConfigHandler{}
+}
+
+// RestartServer triggers a server restart by re-executing the binary
+func (h *ConfigHandler) RestartServer(c *gin.Context) {
+	cfg := config.Get()
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Server restart initiated. Please wait...",
+		"nats_url": cfg.NATSURL,
+	})
+
+	// Restart the server after a short delay to allow response to be sent
+	go func() {
+		time.Sleep(500 * time.Millisecond)
+
+		// Get the path to the current binary
+		exe, err := os.Executable()
+		if err != nil {
+			log.Printf("Failed to get executable path: %v", err)
+			return
+		}
+
+		// Prepare the same arguments that were used originally
+		args := os.Args[1:]
+
+		// Replace the current process with a new one
+		env := os.Environ()
+
+		err = syscall.Exec(exe, append([]string{exe}, args...), env)
+		if err != nil {
+			log.Printf("Failed to restart server: %v", err)
+		}
+	}()
 }
 
 // GetConfig returns current configuration
@@ -36,7 +73,7 @@ func (h *ConfigHandler) UpdateConfig(c *gin.Context) {
 	var req struct {
 		ServerPort         int    `json:"server_port"`
 		GinMode            string `json:"gin_mode"`
-		NATSURL            string `json:"nats_url" binding:"required"`
+		NATSURL            string `json:"nats_url"`
 		SMTPHost           string `json:"smtp_host"`
 		SMTPPort           int    `json:"smtp_port"`
 		SMTPUsername       string `json:"smtp_username"`
@@ -51,6 +88,8 @@ func (h *ConfigHandler) UpdateConfig(c *gin.Context) {
 	}
 
 	cfg := config.Get()
+
+	oldNATSURL := cfg.NATSURL
 
 	if req.ServerPort > 0 {
 		cfg.ServerPort = req.ServerPort
@@ -85,8 +124,11 @@ func (h *ConfigHandler) UpdateConfig(c *gin.Context) {
 		return
 	}
 
+	natsChanged := req.NATSURL != "" && req.NATSURL != oldNATSURL
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Configuration saved successfully",
+		"message":      "Configuration saved successfully",
+		"nats_changed": natsChanged,
 		"config": gin.H{
 			"server_port": cfg.ServerPort,
 			"nats_url":    cfg.NATSURL,

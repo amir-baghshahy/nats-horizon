@@ -320,6 +320,7 @@ func main() {
 		apiGroup.PUT("/config", configHandler.UpdateConfig)
 		apiGroup.GET("/config/setup", configHandler.CheckSetup)
 		apiGroup.POST("/config/setup/complete", configHandler.CompleteSetup)
+		apiGroup.POST("/config/restart", configHandler.RestartServer)
 
 		// Export routes
 		apiGroup.GET("/export/streams", exportHandler.ExportAllStreams)

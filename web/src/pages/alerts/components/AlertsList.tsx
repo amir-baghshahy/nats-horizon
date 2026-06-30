@@ -19,7 +19,7 @@ interface AlertsListProps {
   confirm: (options: any) => Promise<boolean>;
 }
 
-const SEVERITY_COLORS = {
+const SEVERITY_COLORS: Record<string, string> = {
   info: "bg-blue-500/20 text-blue-400 border-blue-500/50",
   warning: "bg-yellow-500/20 text-yellow-400 border-yellow-500/50",
   critical: "bg-red-500/20 text-red-400 border-red-500/50",

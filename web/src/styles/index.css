@@ -8,7 +8,7 @@
   }
 
   html {
-    @apply scroll-smooth;
+    scroll-behavior: auto;
   }
 
   html[lang="fa"],
@@ -22,10 +22,6 @@
       radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 32rem),
       radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.12), transparent 28rem),
       linear-gradient(135deg, #0f172a 0%, #111827 48%, #0b1120 100%);
-  }
-
-  * {
-    @apply transition-colors duration-200;
   }
 
   ::selection {

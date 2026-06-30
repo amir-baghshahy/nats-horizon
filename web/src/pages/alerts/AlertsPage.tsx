@@ -85,7 +85,7 @@ export default function AlertsPage() {
   };
 
   return (
-    <div className="p-3 md:p-4 lg:p-6">
+    <div className="p-2 md:p-3 lg:p-4">
       <AlertsHeader
         onNewAlert={() => {
           setSelectedAlert(null);

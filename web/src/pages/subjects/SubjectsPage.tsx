@@ -83,7 +83,7 @@ export default function SubjectsPage({
   };
 
   return (
-    <div className="p-3 md:p-4 lg:p-6">
+    <div className="p-2 md:p-3 lg:p-4">
       <PageHeader
         title={t("subjects.title")}
         subtitle={t("subjects.subtitle")}

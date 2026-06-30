@@ -78,7 +78,7 @@ export default function ConsumerDetailPage() {
   })();
 
   return (
-    <div className="p-3 md:p-4 lg:p-6">
+    <div className="p-2 md:p-3 lg:p-4">
       <div className="flex items-center gap-4 mb-4">
         <Link to="/consumers" className="p-2 hover:bg-dark-bg rounded-lg transition-colors">
           <ArrowLeft className="w-5 h-5" />

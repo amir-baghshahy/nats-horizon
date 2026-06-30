@@ -140,8 +140,8 @@ export default function MetricsPage({
   }
 
   return (
-    <div className="p-3 md:p-4 lg:p-6">
-      <div className="mb-4 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+    <div className="p-2 md:p-3 lg:p-4">
+      <div className="mb-4 flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
         <div>
           <h1 className="text-xl font-bold md:text-3xl">
             {t("metrics.title")}
@@ -178,7 +178,7 @@ export default function MetricsPage({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           icon={MessageSquare}
           value={formatNumber(totalMessages)}
@@ -210,9 +210,9 @@ export default function MetricsPage({
         />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr] mt-6">
+      <div className="grid gap-3 xl:grid-cols-[1.2fr_0.8fr] mt-4">
         <PanelCard title={t("metrics.systemMetrics")}>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2">
             <div className="rounded-xl bg-dark-bg/50 p-4">
               <p className="text-xs text-dark-muted">
                 {t("metrics.memoryUsed")}
@@ -300,7 +300,7 @@ export default function MetricsPage({
         </PanelCard>
       </div>
 
-      <div className="mb-4 mt-8">
+      <div className="mb-4 mt-4">
         <PanelCard
           maxHeight={800}
           header={
@@ -323,7 +323,7 @@ export default function MetricsPage({
             </span>
           }
         >
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-3 lg:grid-cols-2">
             {streamNames.map((streamName) => {
               const messageSeries = getSeries(metrics, streamName, "messages");
               const bytesSeries = getSeries(metrics, streamName, "bytes");

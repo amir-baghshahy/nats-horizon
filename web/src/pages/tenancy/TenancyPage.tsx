@@ -62,7 +62,7 @@ export default function TenancyPage({
   }
 
   return (
-    <div className="p-3 md:p-4 lg:p-6">
+    <div className="p-2 md:p-3 lg:p-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
         <div>
           <h1 className="text-xl md:text-xl font-bold flex items-center gap-3">

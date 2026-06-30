@@ -17,7 +17,7 @@
   }
 
   body {
-    @apply min-h-screen bg-dark-bg text-dark-text antialiased;
+    @apply min-h-screen bg-dark-bg text-dark-text antialiased text-sm;
     background:
       radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 32rem),
       radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.12), transparent 28rem),
@@ -31,7 +31,7 @@
 
 @layer components {
   .card {
-    @apply relative overflow-hidden rounded-2xl border border-dark-border/60 bg-dark-card/75 p-6 shadow-xl shadow-black/10 backdrop-blur-xl;
+    @apply relative overflow-hidden rounded-xl border border-dark-border/60 bg-dark-card/75 p-4 shadow-lg shadow-black/10 backdrop-blur-xl;
   }
 
   .card::before {
@@ -45,11 +45,11 @@
 
   .btn-primary,
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-dark-bg disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-dark-bg disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none transition-all duration-200;
   }
 
   .btn-primary {
-    @apply bg-primary-600 text-white shadow-lg shadow-primary-500/20 hover:bg-primary-500 hover:shadow-primary-500/30 active:scale-[0.98];
+    @apply bg-primary-600 text-white shadow-md shadow-primary-500/20 hover:bg-primary-500 hover:shadow-primary-500/30 active:scale-[0.98];
   }
 
   .btn-secondary {
@@ -57,7 +57,7 @@
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white shadow-lg shadow-red-500/20 hover:bg-red-500 hover:shadow-red-500/30 active:scale-[0.98];
+    @apply bg-red-600 text-white shadow-md shadow-red-500/20 hover:bg-red-500 hover:shadow-red-500/30 active:scale-[0.98];
   }
 
   .btn-ghost {
@@ -65,7 +65,7 @@
   }
 
   .input {
-    @apply w-full rounded-xl border border-dark-border/70 bg-dark-bg/55 px-4 py-2.5 text-sm text-dark-text shadow-sm outline-none placeholder:text-dark-muted/70 backdrop-blur transition-all duration-200;
+    @apply w-full rounded-lg border border-dark-border/70 bg-dark-bg/55 px-3 py-2 text-xs text-dark-text shadow-sm outline-none placeholder:text-dark-muted/70 backdrop-blur transition-all duration-200;
     @apply focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:bg-dark-bg/80;
     @apply disabled:cursor-not-allowed disabled:opacity-60;
   }

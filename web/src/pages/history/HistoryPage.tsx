@@ -20,7 +20,7 @@ export default function HistoryPage({
 }: UseHistoryReturn) {
   const { t } = useTranslation();
   return (
-    <div className="p-3 md:p-4 lg:p-6">
+    <div className="p-2 md:p-3 lg:p-4">
       <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-xl font-bold md:text-2xl">{t('history.title')}</h1>

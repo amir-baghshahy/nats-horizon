@@ -32,17 +32,17 @@ export default function PanelCard({
     >
       {/* Header */}
       {(header || title) && (
-        <div className="p-4 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
+        <div className="px-3 py-2.5 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
           {header || (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {icon && (
-                <div className="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-primary-500/20 flex items-center justify-center shrink-0">
                   {icon}
                 </div>
               )}
               <div>
-                <h3 className="text-base font-semibold">{title}</h3>
-                {subtitle && <p className="text-xs text-dark-muted">{subtitle}</p>}
+                <h3 className="text-xs font-semibold">{title}</h3>
+                {subtitle && <p className="text-[10px] text-dark-muted">{subtitle}</p>}
               </div>
             </div>
           )}
@@ -51,20 +51,20 @@ export default function PanelCard({
 
       {/* Content */}
       {loading ? (
-        <div className="flex-1 flex items-center justify-center p-8">
-          <div className="animate-spin w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full" />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
         </div>
       ) : empty ? (
-        <div className="flex-1 flex items-center justify-center p-8">
+        <div className="flex-1 flex items-center justify-center p-4">
           {emptyState}
         </div>
       ) : (
-        <div className="overflow-y-auto scrollbar-thin flex-1 p-4">{children}</div>
+        <div className="overflow-y-auto scrollbar-thin flex-1 p-3">{children}</div>
       )}
 
       {/* Footer */}
       {footer && (
-        <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
+        <div className="px-3 py-2 border-t border-dark-border bg-dark-bg/50 text-center text-[10px] text-dark-muted flex-shrink-0">
           {footer}
         </div>
       )}

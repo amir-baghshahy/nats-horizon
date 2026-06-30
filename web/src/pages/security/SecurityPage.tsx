@@ -58,7 +58,7 @@ export default function SecurityPage({
   }
 
   return (
-    <div className="p-3 md:p-4 lg:p-6">
+    <div className="p-2 md:p-3 lg:p-4">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-3">

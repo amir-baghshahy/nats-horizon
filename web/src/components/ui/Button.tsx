@@ -26,17 +26,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseStyles = "inline-flex items-center justify-center gap-2 font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-dark-bg disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none transition-all duration-200";
+    const baseStyles = "inline-flex items-center justify-center gap-2 font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-border-focus focus:ring-offset-2 focus:ring-offset-surface-primary disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none transition-all duration-200";
 
     const variantStyles = {
       primary:
-        "bg-primary-600 text-white shadow-lg shadow-primary-500/20 hover:bg-primary-500 hover:shadow-primary-500/30 active:scale-[0.98]",
+        "bg-primary-600 text-white shadow-lg shadow-glow-primary/20 hover:bg-primary-500 hover:shadow-glow-primary/30 active:scale-[0.98]",
       secondary:
-        "border border-dark-border/70 bg-dark-card/70 text-dark-text hover:border-primary-500/40 hover:bg-dark-border/70 active:scale-[0.98]",
+        "border border-border-default/70 bg-surface-secondary/70 text-content-primary hover:border-border-interactive/40 hover:bg-surface-tertiary/70 active:scale-[0.98]",
       danger:
-        "bg-red-600 text-white shadow-lg shadow-red-500/20 hover:bg-red-500 hover:shadow-red-500/30 active:scale-[0.98]",
+        "bg-red-600 text-white shadow-lg shadow-glow-error/20 hover:bg-red-500 hover:shadow-glow-error/30 active:scale-[0.98]",
       ghost:
-        "bg-transparent text-dark-text hover:bg-dark-bg/50 active:scale-[0.98]",
+        "bg-transparent text-content-primary hover:bg-interactive-hover active:scale-[0.98]",
     };
 
     const sizeStyles = {

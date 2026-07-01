@@ -4,7 +4,7 @@
 
 @layer base {
   * {
-    @apply border-dark-border;
+    @apply border-border-default;
   }
 
   html {
@@ -24,7 +24,7 @@
   }
 
   body {
-    @apply min-h-screen bg-dark-bg text-dark-text antialiased text-sm;
+    @apply min-h-screen bg-surface-primary text-content-primary antialiased text-sm;
     background:
       radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 32rem),
       radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.12), transparent 28rem),
@@ -32,13 +32,13 @@
   }
 
   ::selection {
-    @apply bg-primary-500/30 text-white;
+    @apply bg-interactive-highlight text-white;
   }
 }
 
 @layer components {
   .card {
-    @apply relative overflow-hidden rounded-xl border border-dark-border/60 bg-dark-card/75 p-3 shadow-lg shadow-black/10 backdrop-blur-xl;
+    @apply relative overflow-hidden rounded-xl border border-border-default/60 bg-surface-secondary/75 p-3 shadow-lg shadow-black/10 backdrop-blur-xl;
   }
 
   .card::before {
@@ -52,28 +52,28 @@
 
   .btn-primary,
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-dark-bg disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-border-focus focus:ring-offset-2 focus:ring-offset-surface-primary disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none transition-all duration-200;
   }
 
   .btn-primary {
-    @apply bg-primary-600 text-white shadow-md shadow-primary-500/20 hover:bg-primary-500 hover:shadow-primary-500/30 active:scale-[0.98];
+    @apply bg-primary-600 text-white shadow-md shadow-glow-primary/20 hover:bg-primary-500 hover:shadow-glow-primary/30 active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply border border-dark-border/70 bg-dark-card/70 text-dark-text hover:border-primary-500/40 hover:bg-dark-border/70 active:scale-[0.98];
+    @apply border border-border-default/70 bg-surface-secondary/70 text-content-primary hover:border-border-interactive/40 hover:bg-surface-tertiary/70 active:scale-[0.98];
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white shadow-md shadow-red-500/20 hover:bg-red-500 hover:shadow-red-500/30 active:scale-[0.98];
+    @apply bg-red-600 text-white shadow-md shadow-glow-error/20 hover:bg-red-500 hover:shadow-glow-error/30 active:scale-[0.98];
   }
 
   .btn-ghost {
-    @apply bg-transparent text-dark-text hover:bg-dark-bg/50 active:scale-[0.98];
+    @apply bg-transparent text-content-primary hover:bg-interactive-hover active:scale-[0.98];
   }
 
   .input {
-    @apply w-full rounded-lg border border-dark-border/70 bg-dark-bg/55 px-3 py-2 text-xs text-dark-text shadow-sm outline-none placeholder:text-dark-muted/70 backdrop-blur transition-all duration-200;
-    @apply focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:bg-dark-bg/80;
+    @apply w-full rounded-lg border border-border-default/70 bg-surface-primary/55 px-3 py-2 text-xs text-content-primary shadow-sm outline-none placeholder:text-content-tertiary/70 backdrop-blur transition-all duration-200;
+    @apply focus:border-border-focus focus:ring-2 focus:ring-interactive-focus focus:bg-surface-primary/80;
     @apply disabled:cursor-not-allowed disabled:opacity-60;
   }
 
@@ -110,11 +110,11 @@
   }
 
   .table th {
-    @apply border-b border-dark-border bg-dark-bg/40 p-3 text-start text-xs font-semibold uppercase tracking-wide text-dark-muted;
+    @apply border-b border-border-default bg-surface-primary/40 p-3 text-start text-xs font-semibold uppercase tracking-wide text-content-tertiary;
   }
 
   .table td {
-    @apply border-b border-dark-border/60 p-3 text-sm;
+    @apply border-b border-border-default/60 p-3 text-sm;
   }
 
   .table tr:last-child td {
@@ -126,7 +126,7 @@
   }
 
   .table tr:hover td {
-    @apply bg-dark-bg/45;
+    @apply bg-interactive-hover;
   }
 
   .scrollbar-thin {

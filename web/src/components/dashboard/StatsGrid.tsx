@@ -11,7 +11,7 @@ export default function StatsGrid({ stats }: StatsGridProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
       <StatCard
         icon={Database}
         value={stats.streams || 0}

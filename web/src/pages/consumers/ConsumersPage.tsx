@@ -47,59 +47,71 @@ export default function ConsumersPage() {
   } = useConsumersPage();
 
   return (
-    <div className="p-4 md:p-6">
-      <ConsumersHeader
-        sseConnected={sseConnected}
-        selectedCount={selectedConsumers.size}
-        pauseResumePending={pauseResumePending}
-        deletePending={deletePending}
-        onBulkResume={handleBulkResume}
-        onBulkPause={handleBulkPause}
-        onBulkDelete={handleBulkDelete}
-        onRefetch={refetch}
-        onNavigateStreams={() => navigate("/streams")}
-      />
+    <div className="p-4 md:p-6 animate-fade-in">
+      {/* Header Section */}
+      <section className="mb-6">
+        <ConsumersHeader
+          sseConnected={sseConnected}
+          selectedCount={selectedConsumers.size}
+          pauseResumePending={pauseResumePending}
+          deletePending={deletePending}
+          onBulkResume={handleBulkResume}
+          onBulkPause={handleBulkPause}
+          onBulkDelete={handleBulkDelete}
+          onRefetch={refetch}
+          onNavigateStreams={() => navigate("/streams")}
+        />
+      </section>
 
-      <ConsumersStats stats={stats} />
+      {/* Stats Section */}
+      <section className="mb-6 animate-slide-up">
+        <ConsumersStats stats={stats} />
+      </section>
 
-      <ConsumersFilters
-        searchQuery={searchQuery}
-        selectedStream={selectedStream}
-        filterStatus={filterStatus}
-        showMoreFilters={showMoreFilters}
-        streamOptions={streamOptions}
-        activeFilterCount={activeFilterCount}
-        onSearchChange={setSearchQuery}
-        onStreamChange={setSelectedStream}
-        onStatusChange={setFilterStatus}
-        onShowMoreFiltersToggle={() => setShowMoreFilters(!showMoreFilters)}
-        onClear={clearFilters}
-        getStatusLabel={getStatusLabel}
-      />
+      {/* Divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-dark-border/50 to-transparent mb-6" />
 
-      <ConsumersList
-        consumers={filteredConsumers}
-        isLoading={isLoading}
-        selectedConsumers={selectedConsumers}
-        resetLagPending={resetLagPending}
-        onToggleAll={toggleAll}
-        onToggleSelection={toggleConsumerSelection}
-        onToggleExpansion={toggleExpand}
-        isConsumerExpanded={isConsumerExpanded}
-        onTogglePauseResume={handleTogglePauseResume}
-        onViewDetails={(name) => navigate(`/consumers/${encodeURIComponent(name)}`)}
-        onResetLag={handleResetLag}
-        onDelete={handleDeleteConsumer}
-        getStatusIcon={getStatusIcon}
-        getStatusLabel={getStatusLabel}
-        getLagColor={getLagColor}
-      />
+      {/* Filters & List Section */}
+      <section className="space-y-4 animate-slide-up animate-delay-100">
+        <ConsumersFilters
+          searchQuery={searchQuery}
+          selectedStream={selectedStream}
+          filterStatus={filterStatus}
+          showMoreFilters={showMoreFilters}
+          streamOptions={streamOptions}
+          activeFilterCount={activeFilterCount}
+          onSearchChange={setSearchQuery}
+          onStreamChange={setSelectedStream}
+          onStatusChange={setFilterStatus}
+          onShowMoreFiltersToggle={() => setShowMoreFilters(!showMoreFilters)}
+          onClear={clearFilters}
+          getStatusLabel={getStatusLabel}
+        />
 
-      <div className="mt-4 flex items-center justify-between text-sm text-dark-muted">
-        <span>
-          {t('consumers.showingConsumers', { filtered: filteredConsumers.length, total: totalConsumers })}
-        </span>
-      </div>
+        <ConsumersList
+          consumers={filteredConsumers}
+          isLoading={isLoading}
+          selectedConsumers={selectedConsumers}
+          resetLagPending={resetLagPending}
+          onToggleAll={toggleAll}
+          onToggleSelection={toggleConsumerSelection}
+          onToggleExpansion={toggleExpand}
+          isConsumerExpanded={isConsumerExpanded}
+          onTogglePauseResume={handleTogglePauseResume}
+          onViewDetails={(name) => navigate(`/consumers/${encodeURIComponent(name)}`)}
+          onResetLag={handleResetLag}
+          onDelete={handleDeleteConsumer}
+          getStatusIcon={getStatusIcon}
+          getStatusLabel={getStatusLabel}
+          getLagColor={getLagColor}
+        />
+
+        <div className="flex items-center justify-between text-sm text-dark-muted">
+          <span>
+            {t('consumers.showingConsumers', { filtered: filteredConsumers.length, total: totalConsumers })}
+          </span>
+        </div>
+      </section>
     </div>
   );
 }

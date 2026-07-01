@@ -53,29 +53,45 @@ export default function DashboardPage({
         onRefresh={() => refetch()}
       />
 
-      <StatsGrid stats={stats} />
+      {/* Primary Stats Section */}
+      <section className="mb-6 animate-slide-up">
+        <StatsGrid stats={stats} />
+      </section>
 
-      <div className="mb-3 mt-3 animate-slide-up animate-delay-100">
-        <h2 className="text-xs font-semibold mb-2">{t('dashboard.realTimeMetrics')}</h2>
+      {/* Divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-dark-border/50 to-transparent mb-6" />
+
+      {/* Real-time Metrics Section */}
+      <section className="mb-6 animate-slide-up animate-delay-100">
+        <h2 className="text-sm font-semibold mb-3 text-dark-text">{t('dashboard.realTimeMetrics')}</h2>
         <SystemMetrics />
-      </div>
+      </section>
 
-      <SecondaryStatsGrid account={accountInfo} />
+      {/* Secondary Stats Section */}
+      <section className="mb-6 animate-slide-up animate-delay-200">
+        <SecondaryStatsGrid account={accountInfo} />
+      </section>
 
-      <ConnectionStatus
-        connected={stats.server_status === 'connected'}
-        connections={connections?.connections || []}
-      />
+      {/* Divider */}
+      <div className="h-px bg-gradient-to-r from-transparent via-dark-border/50 to-transparent mb-6" />
 
-      {hasData ? (
-        <ConsumerHealth consumers={consumers} />
-      ) : (
-        <EmptyState
-          icon={Database}
-          title={t('common.noData')}
-          description={t('dashboard.noDataDescription')}
+      {/* Connection & Consumer Health Section */}
+      <section className="space-y-4 animate-slide-up animate-delay-300">
+        <ConnectionStatus
+          connected={stats.server_status === 'connected'}
+          connections={connections?.connections || []}
         />
-      )}
+
+        {hasData ? (
+          <ConsumerHealth consumers={consumers} />
+        ) : (
+          <EmptyState
+            icon={Database}
+            title={t('common.noData')}
+            description={t('dashboard.noDataDescription')}
+          />
+        )}
+      </section>
     </div>
   )
 }

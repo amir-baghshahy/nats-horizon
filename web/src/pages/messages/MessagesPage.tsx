@@ -68,24 +68,30 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="p-4 md:p-6">
-      <MessagesHeader
-        title={t('messages.messageBrowser')}
-        description={t('messages.messageBrowserDescription')}
-        selectedCount={selectedMessages.size}
-        onExport={handleExportSelected}
-        onDelete={handleBulkDelete}
-        onPublish={() => setShowPublishModal(true)}
-        isDeletePending={deletePending}
-      />
+    <div className="p-4 md:p-6 animate-fade-in">
+      {/* Header Section */}
+      <section className="mb-6">
+        <MessagesHeader
+          title={t('messages.messageBrowser')}
+          description={t('messages.messageBrowserDescription')}
+          selectedCount={selectedMessages.size}
+          onExport={handleExportSelected}
+          onDelete={handleBulkDelete}
+          onPublish={() => setShowPublishModal(true)}
+          isDeletePending={deletePending}
+        />
+      </section>
 
-      <MessagesTabs
-        activeTab={activeMessageTab}
-        onTabChange={setActiveMessageTab}
-      />
+      {/* Tabs Section */}
+      <section className="mb-6">
+        <MessagesTabs
+          activeTab={activeMessageTab}
+          onTabChange={setActiveMessageTab}
+        />
+      </section>
 
       {activeMessageTab === "stream" && (
-        <>
+        <section className="space-y-4 animate-slide-up">
           <StreamSelector
             streams={streams}
             selectedStream={selectedStream}
@@ -131,10 +137,14 @@ export default function MessagesPage() {
               onSubmit={handlePublish}
             />
           )}
-        </>
+        </section>
       )}
 
-      {activeMessageTab === "core" && <CoreMessagingContent />}
+      {activeMessageTab === "core" && (
+        <section className="animate-slide-up">
+          <CoreMessagingContent />
+        </section>
+      )}
     </div>
   );
 }

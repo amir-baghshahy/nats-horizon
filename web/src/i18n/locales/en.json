@@ -87,6 +87,12 @@
     "purge": "Purge"
   },
   "nav": {
+    "groups": {
+      "monitoring": "Monitoring",
+      "natsEntities": "NATS Entities",
+      "system": "System",
+      "administration": "Administration"
+    },
     "dashboard": "Dashboard",
     "streams": "Streams",
     "consumers": "Consumers",

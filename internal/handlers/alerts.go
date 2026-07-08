@@ -174,13 +174,35 @@ type CheckAlertsResponse struct {
 
 // checkAlerts evaluates all enabled alerts
 func (h *AlertsHandler) checkAlerts() (int, int) {
-	// Copy alert values (not pointers) under the read lock so the background
-	// goroutine and concurrent HTTP handlers cannot race on the same fields.
+	// Copy alert IDs and relevant evaluation data under read lock
 	h.mu.RLock()
-	snapshots := make([]Alert, 0, len(h.alerts))
+	type alertEvalData struct {
+		ID              string
+		Name            string
+		Condition       AlertCondition
+		LastTrigger     time.Time
+		Cooldown        time.Duration
+		Severity        AlertSeverity
+		Channels        []string
+		EmailAddress    string
+		WebhookURL      string
+		SlackWebhookURL string
+	}
+	evalData := make([]alertEvalData, 0, len(h.alerts))
 	for _, alert := range h.alerts {
 		if alert.Enabled {
-			snapshots = append(snapshots, *alert)
+			evalData = append(evalData, alertEvalData{
+				ID:              alert.ID,
+				Name:            alert.Name,
+				Condition:       alert.Condition,
+				LastTrigger:     alert.LastTrigger,
+				Cooldown:        alert.Cooldown,
+				Severity:        alert.Severity,
+				Channels:        alert.Channels,
+				EmailAddress:    alert.EmailAddress,
+				WebhookURL:      alert.WebhookURL,
+				SlackWebhookURL: alert.SlackWebhookURL,
+			})
 		}
 	}
 	h.mu.RUnlock()
@@ -188,23 +210,22 @@ func (h *AlertsHandler) checkAlerts() (int, int) {
 	now := time.Now()
 	evaluated := 0
 	triggeredCount := 0
-	for i := range snapshots {
-		alert := &snapshots[i]
+	for _, data := range evalData {
 		// Check cooldown
-		if !alert.LastTrigger.IsZero() && now.Sub(alert.LastTrigger) < alert.Cooldown {
+		if !data.LastTrigger.IsZero() && now.Sub(data.LastTrigger) < data.Cooldown {
 			continue
 		}
 
 		evaluated++
 
 		// Evaluate condition
-		triggered, data, err := h.evaluateCondition(alert.Condition)
+		triggered, resultData, err := h.evaluateCondition(data.Condition)
 		if err != nil {
 			continue
 		}
 
 		if triggered {
-			h.triggerAlert(alert, fmt.Sprintf("%s: %s", alert.Condition.Type, formatConditionData(alert.Condition, data)), data)
+			h.triggerAlertByID(data.ID, data.Name, data.Severity, fmt.Sprintf("%s: %s", data.Condition.Type, formatConditionData(data.Condition, resultData)), resultData, data.Channels, data.EmailAddress, data.WebhookURL, data.SlackWebhookURL)
 			triggeredCount++
 		}
 	}
@@ -312,6 +333,48 @@ func (h *AlertsHandler) triggerAlert(alert *Alert, message string, data map[stri
 	}
 
 	h.sendNotifications(trigger, alert)
+}
+
+// triggerAlertByID triggers an alert using its ID (thread-safe for concurrent checks)
+func (h *AlertsHandler) triggerAlertByID(id, name string, severity AlertSeverity, message string, data map[string]interface{}, channels []string, email, webhook, slack string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	now := time.Now()
+	trigger := &AlertTrigger{
+		AlertID:     id,
+		AlertName:   name,
+		Severity:    severity,
+		Message:     message,
+		Data:        data,
+		TriggeredAt: now,
+		Acked:       false,
+	}
+
+	h.triggers = append(h.triggers, trigger)
+
+	// Update the original alert's trigger state
+	if original, ok := h.alerts[id]; ok {
+		original.LastTrigger = now
+		original.TriggerCount++
+		original.UpdatedAt = now
+	}
+
+	if len(h.triggers) > 1000 {
+		h.triggers = h.triggers[len(h.triggers)-1000:]
+	}
+
+	// Create a temporary alert for notification purposes
+	tempAlert := &Alert{
+		ID:              id,
+		Name:            name,
+		Severity:        severity,
+		Channels:        channels,
+		EmailAddress:    email,
+		WebhookURL:      webhook,
+		SlackWebhookURL: slack,
+	}
+	h.sendNotifications(trigger, tempAlert)
 }
 
 // sendNotifications sends alert notifications using the notification service

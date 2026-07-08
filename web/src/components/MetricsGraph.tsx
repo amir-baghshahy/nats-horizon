@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { HealthService, MetricsService } from '../types'
@@ -44,6 +44,10 @@ export function MetricsGraph({
   const { t } = useTranslation()
   const [dataPoints, setDataPoints] = useState<DataPoint[]>([])
 
+  // Store getValue in a ref to avoid re-creating useEffect when it changes
+  const getValueRef = useRef(getValue)
+  getValueRef.current = getValue
+
   const { data } = useQuery({
     queryKey,
     queryFn,
@@ -52,13 +56,17 @@ export function MetricsGraph({
 
   useEffect(() => {
     if (data == null) return
-    const value = getValue(data)
-    const now = Date.now()
-    setDataPoints(prev => {
-      const updated = [...prev, { timestamp: now, value }]
-      return updated.length > maxPoints ? updated.slice(-maxPoints) : updated
-    })
-  }, [data, getValue, maxPoints])
+    try {
+      const value = getValueRef.current(data)
+      const now = Date.now()
+      setDataPoints(prev => {
+        const updated = [...prev, { timestamp: now, value }]
+        return updated.length > maxPoints ? updated.slice(-maxPoints) : updated
+      })
+    } catch (err) {
+      console.error('Failed to extract value for metrics graph:', err)
+    }
+  }, [data, maxPoints])
 
   const currentValue = dataPoints.length > 0 ? dataPoints[dataPoints.length - 1].value : 0
   const previousValue = dataPoints.length > 1 ? dataPoints[dataPoints.length - 2].value : currentValue

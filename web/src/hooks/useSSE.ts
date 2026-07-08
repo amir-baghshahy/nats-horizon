@@ -55,7 +55,7 @@ export function useSSE(channel: string) {
     return () => {
       eventSource.close()
     }
-  }, [channel])
+  }, [channel, queryClient])
 
   return { connected, lastEvent }
 }

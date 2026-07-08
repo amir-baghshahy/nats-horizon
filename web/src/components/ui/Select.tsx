@@ -43,7 +43,7 @@ export default function Select({
 
   // Calculate dropdown position when opened
   const updateDropdownPosition = () => {
-    if (buttonRef.current) {
+    if (buttonRef.current && typeof window !== 'undefined') {
       const rect = buttonRef.current.getBoundingClientRect();
       setDropdownPosition({
         top: rect.bottom + 4, // 4px gap
@@ -130,6 +130,7 @@ export default function Select({
 
       {isOpen &&
         !disabled &&
+        typeof window !== 'undefined' &&
         createPortal(
           <div
             ref={dropdownRef}

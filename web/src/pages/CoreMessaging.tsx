@@ -96,14 +96,23 @@ export function CoreMessagingContent() {
   }, [getSubscriptions]);
 
   const parseHeaders = (headersText: string) => {
-    const headers = headersText ? JSON.parse(headersText) : {};
+    if (!headersText || headersText.trim() === "{}") {
+      return {};
+    }
 
-    return Object.fromEntries(
-      Object.entries(headers).map(([key, value]) => [
-        key,
-        Array.isArray(value) ? value : [String(value)],
-      ]),
-    );
+    try {
+      const headers = JSON.parse(headersText);
+      return Object.fromEntries(
+        Object.entries(headers).map(([key, value]) => [
+          key,
+          Array.isArray(value) ? value : [String(value)],
+        ]),
+      );
+    } catch (err) {
+      console.error("Failed to parse headers JSON:", err);
+      toast("error", t("messages.invalidHeadersJson"));
+      return {};
+    }
   };
 
   const {

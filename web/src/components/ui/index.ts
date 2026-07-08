@@ -10,5 +10,6 @@ export { default as PanelCard } from "./PanelCard";
 export { default as DataList } from "./DataList";
 export { default as Tabs } from "./Tabs";
 export { default as Badge } from "./Badge";
+export { default as Card } from "./Card";
 export { ErrorBoundary } from "../ErrorBoundary";
 export { ModalWrapper } from "./Modal";

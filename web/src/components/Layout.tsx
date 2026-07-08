@@ -131,6 +131,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       {/* Mobile menu button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label={sidebarOpen ? t("common.closeMenu") : t("common.openMenu")}
+        aria-expanded={sidebarOpen}
         className="md:hidden fixed top-3 left-3 z-50 p-1.5 rounded-lg bg-dark-card border border-dark-border text-dark-text hover:bg-dark-bg transition-colors"
       >
         {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

@@ -215,16 +215,28 @@ export function useConsumersPage(): UseConsumersPageReturn {
       variant: "info",
     });
     if (ok) {
-      filteredConsumers.forEach((consumer) => {
-        if (!consumer.name || !consumer.stream) return;
-        if (selectedConsumers.has(consumer.name) && consumer.paused) {
-          pauseResumeMutation.mutate({
-            stream: consumer.stream,
-            name: consumer.name,
+      const consumersToResume = filteredConsumers.filter(
+        (consumer) => consumer.name && consumer.stream && selectedConsumers.has(consumer.name) && consumer.paused
+      );
+
+      if (consumersToResume.length === 0) {
+        toast("info", t("consumers.noConsumersToResume"));
+        return;
+      }
+
+      // Execute all mutations in parallel and wait for all to complete
+      await Promise.allSettled(
+        consumersToResume.map((consumer) =>
+          pauseResumeMutation.mutateAsync({
+            stream: consumer.stream!,
+            name: consumer.name!,
             paused: false,
-          });
-        }
-      });
+          })
+        )
+      );
+
+      toast("success", t("consumers.bulkResumeSuccess", { count: consumersToResume.length }));
+      clearConsumerSelection();
     }
   };
 
@@ -238,16 +250,28 @@ export function useConsumersPage(): UseConsumersPageReturn {
       variant: "warning",
     });
     if (ok) {
-      filteredConsumers.forEach((consumer) => {
-        if (!consumer.name || !consumer.stream) return;
-        if (selectedConsumers.has(consumer.name) && !consumer.paused) {
-          pauseResumeMutation.mutate({
-            stream: consumer.stream,
-            name: consumer.name,
+      const consumersToPause = filteredConsumers.filter(
+        (consumer) => consumer.name && consumer.stream && selectedConsumers.has(consumer.name) && !consumer.paused
+      );
+
+      if (consumersToPause.length === 0) {
+        toast("info", t("consumers.noConsumersToPause"));
+        return;
+      }
+
+      // Execute all mutations in parallel and wait for all to complete
+      await Promise.allSettled(
+        consumersToPause.map((consumer) =>
+          pauseResumeMutation.mutateAsync({
+            stream: consumer.stream!,
+            name: consumer.name!,
             paused: true,
-          });
-        }
-      });
+          })
+        )
+      );
+
+      toast("success", t("consumers.bulkPauseSuccess", { count: consumersToPause.length }));
+      clearConsumerSelection();
     }
   };
 
@@ -261,15 +285,33 @@ export function useConsumersPage(): UseConsumersPageReturn {
       variant: "danger",
     });
     if (ok) {
-      filteredConsumers.forEach((consumer) => {
-        if (!consumer.name || !consumer.stream) return;
-        if (selectedConsumers.has(consumer.name)) {
-          deleteMutation.mutate({
-            stream: consumer.stream,
-            name: consumer.name,
-          });
-        }
-      });
+      const consumersToDelete = filteredConsumers.filter(
+        (consumer) => consumer.name && consumer.stream && selectedConsumers.has(consumer.name)
+      );
+
+      if (consumersToDelete.length === 0) {
+        toast("info", t("consumers.noConsumersToDelete"));
+        return;
+      }
+
+      const results = await Promise.allSettled(
+        consumersToDelete.map((consumer) =>
+          deleteMutation.mutateAsync({
+            stream: consumer.stream!,
+            name: consumer.name!,
+          })
+        )
+      );
+
+      const succeeded = results.filter((r) => r.status === "fulfilled").length;
+      const failed = results.filter((r) => r.status === "rejected").length;
+
+      if (failed > 0) {
+        toast("warning", t("consumers.partialDeleteSuccess", { succeeded, failed }));
+      } else {
+        toast("success", t("consumers.bulkDeleteSuccess", { count: succeeded }));
+      }
+      clearConsumerSelection();
     }
   };
 

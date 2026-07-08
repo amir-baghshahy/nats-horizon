@@ -306,7 +306,11 @@ func (h *SSEHub) MonitorConsumers() {
 					if err := json.Unmarshal(consumerMsg.Data, &consumerResponse); err != nil {
 						return
 					}
-					results <- consumerResult{streamName: streamName, response: consumerResponse}
+					select {
+					case <-h.ctx.Done():
+						return
+					case results <- consumerResult{streamName: streamName, response: consumerResponse}:
+					}
 				}(stream.Config.Name)
 			}
 
@@ -459,8 +463,8 @@ func (h *SSEHub) BroadcastDashboardStats() {
 		totalMessages += stream.State.Messages
 		newCount := consumerCount + int(stream.State.Consumers)
 		if newCount < consumerCount {
-			// Integer overflow detected
-			consumerCount = math.MaxInt32
+			// Integer overflow detected - cap at MaxInt to prevent overflow
+			consumerCount = math.MaxInt
 		} else {
 			consumerCount = newCount
 		}

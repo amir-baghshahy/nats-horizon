@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import { Loader2 } from "lucide-react";
+import { cn } from "../../utils/designTokens";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "danger" | "ghost";
@@ -26,23 +27,41 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseStyles = "inline-flex items-center justify-center gap-2 font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-border-focus focus:ring-offset-2 focus:ring-offset-surface-primary disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none transition-all duration-200";
+    // Base button styles (from design system)
+    const baseStyles = cn(
+      "inline-flex items-center justify-center",
+      "font-semibold",
+      "shadow-sm",
+      "transition-all duration-200",
+      "disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
+      "rounded-lg", // Consistent border radius
+      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-primary"
+    );
 
+    // Variant styles (from design system)
     const variantStyles = {
       primary:
-        "bg-primary-600 text-white shadow-lg shadow-glow-primary/20 hover:bg-primary-500 hover:shadow-glow-primary/30 active:scale-[0.98]",
+        "bg-primary-600 text-white hover:bg-primary-500 shadow-sm focus:ring-primary-500",
       secondary:
-        "border border-border-default/70 bg-surface-secondary/70 text-content-primary hover:border-border-interactive/40 hover:bg-surface-tertiary/70 active:scale-[0.98]",
+        "bg-surface-secondary text-content-primary border border-border-default hover:bg-surface-tertiary focus:ring-primary-500",
       danger:
-        "bg-red-600 text-white shadow-lg shadow-glow-error/20 hover:bg-red-500 hover:shadow-glow-error/30 active:scale-[0.98]",
+        "bg-red-600 text-white hover:bg-red-500 shadow-sm focus:ring-red-500",
       ghost:
-        "bg-transparent text-content-primary hover:bg-interactive-hover active:scale-[0.98]",
+        "bg-transparent text-content-primary hover:bg-surface-tertiary focus:ring-primary-500",
     };
 
+    // Size styles (from design system)
     const sizeStyles = {
-      sm: "px-3 py-1.5 text-sm rounded-lg",
-      md: "px-4 py-2 text-sm rounded-xl",
-      lg: "px-6 py-3 text-base rounded-2xl",
+      sm: "px-3 py-1.5 text-sm gap-1.5",
+      md: "px-4 py-2 text-sm gap-2",
+      lg: "px-5 py-2.5 text-base gap-2",
+    };
+
+    // Icon sizes based on button size
+    const iconSizes = {
+      sm: "w-3.5 h-3.5",
+      md: "w-4 h-4",
+      lg: "w-5 h-5",
     };
 
     const widthStyles = fullWidth ? "w-full" : "";
@@ -53,19 +72,30 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={isDisabled}
-        className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles} ${className}`}
+        className={cn(
+          baseStyles,
+          variantStyles[variant],
+          sizeStyles[size],
+          widthStyles,
+          loading && "opacity-70",
+          className
+        )}
         {...props}
       >
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className={cn("animate-spin", iconSizes[size])} />
             {children}
           </>
         ) : (
           <>
-            {icon && iconPosition === "left" && <span className="flex-shrink-0">{icon}</span>}
+            {icon && iconPosition === "left" && (
+              <span className={cn("flex-shrink-0", iconSizes[size])}>{icon}</span>
+            )}
             {children}
-            {icon && iconPosition === "right" && <span className="flex-shrink-0">{icon}</span>}
+            {icon && iconPosition === "right" && (
+              <span className={cn("flex-shrink-0", iconSizes[size])}>{icon}</span>
+            )}
           </>
         )}
       </button>

@@ -36,13 +36,13 @@ export default function PanelCard({
           {header || (
             <div className="flex items-center gap-2">
               {icon && (
-                <div className="w-7 h-7 rounded-lg bg-primary-500/20 flex items-center justify-center shrink-0">
+                <div className="icon-base rounded-lg bg-primary-500/20 flex items-center justify-center shrink-0">
                   {icon}
                 </div>
               )}
               <div>
-                <h3 className="text-xs font-semibold">{title}</h3>
-                {subtitle && <p className="text-[10px] text-dark-muted">{subtitle}</p>}
+                <h3 className="text-display-xs font-semibold">{title}</h3>
+                {subtitle && <p className="text-display-xs text-dark-muted">{subtitle}</p>}
               </div>
             </div>
           )}
@@ -52,7 +52,7 @@ export default function PanelCard({
       {/* Content */}
       {loading ? (
         <div className="flex-1 flex items-center justify-center p-4">
-          <div className="animate-spin w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full" />
+          <div className="animate-spin icon-md border-2 border-primary-500 border-t-transparent rounded-full" />
         </div>
       ) : empty ? (
         <div className="flex-1 flex items-center justify-center p-4">
@@ -64,7 +64,7 @@ export default function PanelCard({
 
       {/* Footer */}
       {footer && (
-        <div className="px-3 py-2 border-t border-dark-border bg-dark-bg/50 text-center text-[10px] text-dark-muted flex-shrink-0">
+        <div className="px-3 py-2 border-t border-dark-border bg-dark-bg/50 text-center text-display-xs text-dark-muted flex-shrink-0">
           {footer}
         </div>
       )}

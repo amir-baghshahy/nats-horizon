@@ -23,13 +23,13 @@ export default function PageHeader({
     <div className="flex items-center justify-between mb-4 gap-3">
       <div className="flex items-center gap-2.5 min-w-0">
         {Icon && (
-          <div className="w-8 h-8 rounded-lg bg-primary-500/20 flex items-center justify-center shrink-0">
-            <Icon className="w-4 h-4 text-primary-400" />
+          <div className="avatar rounded-lg bg-primary-500/20 flex items-center justify-center shrink-0">
+            <Icon className="icon-base text-primary-400" />
           </div>
         )}
         <div className="min-w-0">
-          <h1 className="text-lg font-bold leading-tight truncate">{title}</h1>
-          {subtitle && <p className="text-xs text-dark-muted truncate">{subtitle}</p>}
+          <h1 className="text-display-lg font-bold leading-tight truncate">{title}</h1>
+          {subtitle && <p className="text-display-xs text-dark-muted truncate">{subtitle}</p>}
         </div>
       </div>
 
@@ -39,12 +39,12 @@ export default function PageHeader({
             {sseConnected ? (
               <>
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs text-green-400">{sseLabel || "Live"}</span>
+                <span className="text-display-xs text-green-400">{sseLabel || "Live"}</span>
               </>
             ) : (
               <>
                 <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-                <span className="text-xs text-yellow-400">{sseDisconnectedLabel || "Connecting..."}</span>
+                <span className="text-display-xs text-yellow-400">{sseDisconnectedLabel || "Connecting..."}</span>
               </>
             )}
           </div>

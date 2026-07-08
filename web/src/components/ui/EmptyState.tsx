@@ -35,9 +35,9 @@ export default function EmptyState({
   };
 
   const titleSize = {
-    small: "text-base",
-    normal: "text-lg",
-    large: "text-xl",
+    small: "text-display-base",
+    normal: "text-display-lg",
+    large: "text-display-xl",
   };
 
   return (
@@ -51,7 +51,7 @@ export default function EmptyState({
         </div>
       )}
       <h3 className={cn(titleSize[size], "font-semibold text-content-primary")}>{title}</h3>
-      {description && <p className="mt-2 text-sm leading-6 text-content-secondary">{description}</p>}
+      {description && <p className="mt-2 text-display-sm leading-6 text-content-secondary">{description}</p>}
       {action && (
         <Button variant="primary" onClick={action.onClick} className="mt-6">
           {action.label}

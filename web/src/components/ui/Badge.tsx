@@ -14,8 +14,8 @@ const variantStyles = {
 };
 
 const sizeStyles = {
-  sm: "px-1.5 py-0.5 text-xs",
-  md: "px-2 py-1 text-xs",
+  sm: "px-1.5 py-0.5 text-display-xs",
+  md: "px-2 py-1 text-display-xs",
 };
 
 export default function Badge({

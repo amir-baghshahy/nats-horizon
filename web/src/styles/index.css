@@ -38,7 +38,7 @@
 
 @layer components {
   .card {
-    @apply relative overflow-hidden rounded-xl border border-border-default/60 bg-surface-secondary/75 p-3 shadow-lg shadow-black/10 backdrop-blur-xl;
+    @apply relative overflow-hidden rounded-xl border border-border-default/60 bg-surface-secondary/75 p-4 shadow-lg shadow-black/10 backdrop-blur-xl;
   }
 
   .card::before {
@@ -50,6 +50,19 @@
     @apply relative;
   }
 
+  /* Card variants */
+  .card-compact {
+    @apply card p-3;
+  }
+
+  .card-spacious {
+    @apply card p-6;
+  }
+
+  .card-interactive {
+    @apply card cursor-pointer hover:border-primary-500/50 transition-colors duration-200;
+  }
+
   .input {
     @apply w-full rounded-lg border border-border-default/70 bg-surface-primary/55 px-3 py-2.5 text-sm text-content-primary shadow-sm outline-none placeholder:text-content-tertiary/70 backdrop-blur transition-all duration-200;
     @apply focus:border-border-focus focus:ring-2 focus:ring-interactive-focus focus:bg-surface-primary/80;
@@ -58,6 +71,54 @@
 
   select.input {
     @apply cursor-pointer;
+  }
+
+  /* Button base styles */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold shadow-sm transition-all duration-200;
+    @apply rounded-lg disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-primary;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm gap-1.5;
+  }
+
+  .btn-md {
+    @apply px-4 py-2 text-sm gap-2;
+  }
+
+  .btn-lg {
+    @apply px-5 py-2.5 text-base gap-2;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-500 shadow-sm focus:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-secondary text-content-primary border border-border-default hover:bg-surface-tertiary focus:ring-primary-500;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-500 shadow-sm focus:ring-red-500;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-content-primary hover:bg-surface-tertiary focus:ring-primary-500;
+  }
+
+  /* Icon button */
+  .icon-btn {
+    @apply p-1.5 rounded-lg hover:scale-110 active:scale-95 transition-transform duration-200;
+  }
+
+  .icon-btn-default {
+    @apply icon-btn hover:bg-dark-bg text-dark-text;
+  }
+
+  .icon-btn-danger {
+    @apply icon-btn hover:bg-red-500/20 text-red-400;
   }
 
   @keyframes pulse-glow {
@@ -164,6 +225,46 @@
   left: 0;
   right: auto;
 }
+
+/* ============================================ */
+/* DESIGN SYSTEM UTILITIES                     */
+/* ============================================ */
+
+/* Standardized spacing utilities */
+.gap-xxs { gap: 0.125rem; }  /* 2px */
+.gap-xs { gap: 0.25rem; }    /* 4px */
+.gap-sm { gap: 0.5rem; }     /* 8px */
+.gap-md { gap: 0.75rem; }    /* 12px */
+.gap-base { gap: 1rem; }     /* 16px */
+.gap-lg { gap: 1.5rem; }     /* 24px */
+.gap-xl { gap: 2rem; }       /* 32px */
+
+/* Standardized icon sizes */
+.icon-xs { width: 0.75rem; height: 0.75rem; }  /* 12px */
+.icon-sm { width: 0.875rem; height: 0.875rem; } /* 14px */
+.icon-base { width: 1rem; height: 1rem; }   /* 16px */
+.icon-md { width: 1.25rem; height: 1.25rem; } /* 20px */
+.icon-lg { width: 1.5rem; height: 1.5rem; }    /* 24px */
+
+/* Standardized text sizes */
+.text-display-xs { font-size: 0.75rem; }   /* 12px */
+.text-display-sm { font-size: 0.875rem; }  /* 14px */
+.text-display-base { font-size: 1rem; }     /* 16px */
+.text-display-lg { font-size: 1.125rem; }   /* 18px */
+.text-display-xl { font-size: 1.25rem; }    /* 20px */
+.text-display-2xl { font-size: 1.5rem; }   /* 24px */
+.text-display-3xl { font-size: 1.875rem; } /* 30px */
+
+/* Standardized border radius */
+.rounded-card { border-radius: 0.75rem; }  /* 12px */
+.rounded-btn { border-radius: 0.5rem; }     /* 8px */
+.rounded-input { border-radius: 0.5rem; }  /* 8px */
+.rounded-pill { border-radius: 9999px; }    /* Full */
+
+/* Standardized transitions */
+.transition-fast { transition-duration: 150ms; }
+.transition-base { transition-duration: 200ms; }
+.transition-slow { transition-duration: 300ms; }
 
 .recharts-tooltip-wrapper {
   outline: none !important;

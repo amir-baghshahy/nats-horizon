@@ -33,7 +33,7 @@ export default function FilterBar({
         {/* Search and filters row */}
         <div className="flex flex-col lg:flex-row lg:items-center gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 icon-base text-dark-muted" />
             <input
               type="text"
               value={searchValue}
@@ -46,7 +46,7 @@ export default function FilterBar({
                 onClick={() => onSearchChange("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-muted hover:text-dark-text"
               >
-                <X className="w-4 h-4" />
+                <X className="icon-base" />
               </button>
             )}
           </div>
@@ -60,7 +60,7 @@ export default function FilterBar({
               {badges?.map((badge, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-500/15 text-xs text-primary-300"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-500/15 text-display-xs text-primary-300"
                 >
                   <span className="text-dark-muted">{badge.label}:</span>
                   {badge.value}
@@ -69,7 +69,7 @@ export default function FilterBar({
                       onClick={badge.onRemove}
                       className="ml-1 hover:text-dark-text"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="icon-sm" />
                     </button>
                   )}
                 </span>
@@ -77,7 +77,7 @@ export default function FilterBar({
               {hasActiveBadges && onClearFilters && (
                 <button
                   onClick={onClearFilters}
-                  className="text-xs text-dark-muted hover:text-dark-text"
+                  className="text-display-xs text-dark-muted hover:text-dark-text"
                 >
                   Clear all
                 </button>

@@ -27,7 +27,7 @@ export default function ServiceDiscoveryPanel({
     <div className="space-y-6">
       <div className="card">
         <div className="mb-6 flex items-center justify-between gap-4">
-          <h2 className="flex items-center gap-2 text-xl font-bold">
+          <h2 className="flex items-center gap-2 text-display-xl font-bold">
             <Server className="h-5 w-5" />
             {t('messages.serviceDiscovery')}
           </h2>
@@ -38,20 +38,20 @@ export default function ServiceDiscoveryPanel({
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl bg-dark-bg/50 p-4">
-            <p className="text-xs text-dark-muted">{t('messages.serverName')}</p>
-            <p className="mt-1 truncate text-sm font-mono">
+            <p className="text-display-xs text-dark-muted">{t('messages.serverName')}</p>
+            <p className="mt-1 truncate text-display-sm font-mono">
               {serviceInfo?.server_name || t('messages.natsServer')}
             </p>
           </div>
           <div className="rounded-xl bg-dark-bg/50 p-4">
-            <p className="text-xs text-dark-muted">{t('messages.version')}</p>
-            <p className="mt-1 text-sm">
+            <p className="text-display-xs text-dark-muted">{t('messages.version')}</p>
+            <p className="mt-1 text-display-sm">
               {serviceInfo?.version || t('messages.notAvailable')}
             </p>
           </div>
           <div className="rounded-xl bg-dark-bg/50 p-4">
-            <p className="text-xs text-dark-muted">{t('messages.maxPayload')}</p>
-            <p className="mt-1 text-sm">
+            <p className="text-display-xs text-dark-muted">{t('messages.maxPayload')}</p>
+            <p className="mt-1 text-display-sm">
               {serviceInfo?.max_payload
                 ? `${(serviceInfo.max_payload / 1024).toFixed(0)} KB`
                 : t('messages.notAvailable')}
@@ -61,7 +61,7 @@ export default function ServiceDiscoveryPanel({
       </div>
 
       <div className="card">
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+        <h3 className="mb-4 flex items-center gap-2 text-display-lg font-semibold">
           <Network className="h-5 w-5 text-primary-400" />
           {t('messages.activeSubscriptions')}
         </h3>
@@ -70,7 +70,7 @@ export default function ServiceDiscoveryPanel({
             {subscriptionList.map((subject) => (
               <span
                 key={subject}
-                className="rounded-xl border border-dark-border/70 bg-dark-bg/50 px-3 py-2 font-mono text-sm text-primary-300"
+                className="rounded-xl border border-dark-border/70 bg-dark-bg/50 px-3 py-2 font-mono text-display-sm text-primary-300"
               >
                 {subject}
               </span>

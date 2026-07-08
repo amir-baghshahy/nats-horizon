@@ -117,9 +117,9 @@ export default function MessagesList({
                 type="checkbox"
                 checked={selected.size === messages.length && messages.length > 0}
                 onChange={onSelectAll}
-                className="w-4 h-4 rounded"
+                className="icon-base rounded"
               />
-              <span className="text-sm text-dark-muted">
+              <span className="text-display-sm text-dark-muted">
                 {selected.size > 0
                   ? `${selected.size} ${t('common.selected')}`
                   : `${messages.length} ${t('messages.messageCount', { count: messages.length })}`}
@@ -134,7 +134,7 @@ export default function MessagesList({
                     : "hover:bg-dark-bg"
                 }`}
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="icon-base" />
               </button>
               <button
                 onClick={() => setViewMode("grid")}
@@ -144,7 +144,7 @@ export default function MessagesList({
                     : "hover:bg-dark-bg"
                 }`}
               >
-                <Code className="w-4 h-4" />
+                <Code className="icon-base" />
               </button>
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function MessagesList({
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => onToggleSelection(sequence)}
-                    className="w-4 h-4 rounded mt-1"
+                    className="icon-base rounded mt-1"
                   />
 
                   {/* Expand Button */}
@@ -186,28 +186,28 @@ export default function MessagesList({
                     className="p-1 hover:bg-dark-bg rounded transition-colors mt-0.5"
                   >
                     {isExpanded ? (
-                      <ChevronDown className="w-4 h-4 text-dark-muted" />
+                      <ChevronDown className="icon-base text-dark-muted" />
                     ) : (
-                      <ChevronRight className="w-4 h-4 text-dark-muted" />
+                      <ChevronRight className="icon-base text-dark-muted" />
                     )}
                   </button>
 
                   {/* Message Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="font-mono text-sm text-primary-400">
+                      <span className="font-mono text-display-sm text-primary-400">
                         #{sequence}
                       </span>
-                      <span className="text-sm font-medium">{message.subject}</span>
-                      <span className="text-xs text-dark-muted">
+                      <span className="text-display-sm font-medium">{message.subject}</span>
+                      <span className="text-display-xs text-dark-muted">
                         {formatBytes(message.size || 0)}
                       </span>
-                      <span className="text-xs text-dark-muted flex items-center gap-1">
+                      <span className="text-display-xs text-dark-muted flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {formatTimestamp(message.timestamp)}
                       </span>
                     </div>
-                    <div className="text-sm text-dark-muted truncate">
+                    <div className="text-display-sm text-dark-muted truncate">
                       {messageData.substring(0, 100)}...
                     </div>
                   </div>
@@ -219,7 +219,7 @@ export default function MessagesList({
                       className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale"
                       title={t('messages.viewFullMessage')}
                     >
-                      <Eye className="w-4 h-4 text-dark-muted" />
+                      <Eye className="icon-base text-dark-muted" />
                     </button>
                     <button
                       onClick={() => onCopy(messageData, sequence)}
@@ -227,9 +227,9 @@ export default function MessagesList({
                       title={t('messages.copyMessage')}
                     >
                       {copiedMessage === sequence ? (
-                        <Check className="w-4 h-4 text-green- animate-bounce-in" />
+                        <Check className="icon-base text-green- animate-bounce-in" />
                       ) : (
-                        <CopyIcon className="w-4 h-4 text-dark-muted" />
+                        <CopyIcon className="icon-base text-dark-muted" />
                       )}
                     </button>
                     <button
@@ -238,7 +238,7 @@ export default function MessagesList({
                       className="p-2 hover:bg-red-500/20 rounded-lg hover-lift active-scale text-status-error"
                       title={t('messages.deleteMessage')}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="icon-base" />
                     </button>
                   </div>
                 </div>
@@ -248,15 +248,15 @@ export default function MessagesList({
                   <div className="mt-4 pl-8 space-y-4 animate-fade-in-down">
                     {/* Headers */}
                     <div className="bg-dark-bg/50 rounded-lg p-4 hover-scale">
-                      <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
+                      <h4 className="text-display-sm font-medium mb-3 flex items-center gap-2">
+                        <FileText className="icon-base" />
                         {t('messages.headers')}
                       </h4>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="grid grid-cols-2 gap-2 text-display-sm">
                         {Object.entries(headers).map(([key, value]) => (
                           <div key={key} className="flex">
                             <span className="text-dark-muted mr-2">{key}:</span>
-                            <span className="font-mono text-xs">
+                            <span className="font-mono text-display-xs">
                               {String(value)}
                             </span>
                           </div>
@@ -267,19 +267,19 @@ export default function MessagesList({
                     {/* Payload */}
                     <div className="bg-dark-bg/50 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-sm font-medium flex items-center gap-2">
-                          <Code className="w-4 h-4" />
+                        <h4 className="text-display-sm font-medium flex items-center gap-2">
+                          <Code className="icon-base" />
                           {t('messages.payload')}
                         </h4>
                         <button
                           onClick={() => onToggleExpand(sequence)}
-                          className="text-xs text-primary-400 hover:underline flex items-center gap-1"
+                          className="text-display-xs text-primary-400 hover:underline flex items-center gap-1"
                         >
                           <Maximize2 className="w-3 h-3" />
                           {t('messages.collapse')}
                         </button>
                       </div>
-                      <pre className="text-sm bg-dark-bg p-3 rounded overflow-x-auto">
+                      <pre className="text-display-sm bg-dark-bg p-3 rounded overflow-x-auto">
                         <code className="text-green-400">
                           {messageData.length > MAX_DISPLAY_PAYLOAD_SIZE
                             ? messageData.slice(0, MAX_DISPLAY_PAYLOAD_SIZE) +
@@ -292,22 +292,22 @@ export default function MessagesList({
                     {/* Metadata */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-xs text-dark-muted">{t('messages.sequence')}</p>
-                        <p className="font-mono text-sm">{sequence.toLocaleString()}</p>
+                        <p className="text-display-xs text-dark-muted">{t('messages.sequence')}</p>
+                        <p className="font-mono text-display-sm">{sequence.toLocaleString()}</p>
                       </div>
                       <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-xs text-dark-muted">{t('messages.timestamp')}</p>
-                        <p className="text-sm">
+                        <p className="text-display-xs text-dark-muted">{t('messages.timestamp')}</p>
+                        <p className="text-display-sm">
                           {new Date(message.timestamp || Date.now()).toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-xs text-dark-muted">{t('common.size')}</p>
-                        <p className="text-sm">{formatBytes(message.size || 0)}</p>
+                        <p className="text-display-xs text-dark-muted">{t('common.size')}</p>
+                        <p className="text-display-sm">{formatBytes(message.size || 0)}</p>
                       </div>
                       <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-xs text-dark-muted">{t('messages.subject')}</p>
-                        <p className="text-sm font-mono truncate">{message.subject}</p>
+                        <p className="text-display-xs text-dark-muted">{t('messages.subject')}</p>
+                        <p className="text-display-sm font-mono truncate">{message.subject}</p>
                       </div>
                     </div>
 

@@ -49,15 +49,15 @@ export default function PublishForm({
 
   return (
     <div className="card max-w-2xl">
-      <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <Send className="w-5 h-5" />
+      <h2 className="text-display-xl font-bold mb-6 flex items-center gap-2">
+        <Send className="icon-md" />
         {t('messages.publishMessage')}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2">{t('messages.subject')}</label>
-          <p className="text-xs text-dark-muted mb-2">
+          <label className="block text-display-sm font-medium mb-2">{t('messages.subject')}</label>
+          <p className="text-display-xs text-dark-muted mb-2">
             {t('messages.subjectHelp')}
           </p>
           <input
@@ -69,12 +69,12 @@ export default function PublishForm({
             required
           />
           {errors.subject && (
-            <p className="text-red-400 text-xs mt-1">{errors.subject}</p>
+            <p className="text-red-400 text-display-xs mt-1">{errors.subject}</p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">
+          <label className="block text-display-sm font-medium mb-2">
             {t('messages.replyTo')} ({t('common.optional')})
           </label>
           <input
@@ -87,7 +87,7 @@ export default function PublishForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">
+          <label className="block text-display-sm font-medium mb-2">
             {t('messages.headers')} ({t('common.optional')})
           </label>
           <textarea
@@ -97,12 +97,12 @@ export default function PublishForm({
             className="input w-full font-mono h-20"
           />
           {errors.headers && (
-            <p className="text-red-400 text-xs mt-1">{errors.headers}</p>
+            <p className="text-red-400 text-display-xs mt-1">{errors.headers}</p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">{t('messages.payload')}</label>
+          <label className="block text-display-sm font-medium mb-2">{t('messages.payload')}</label>
           <textarea
             placeholder={t('messages.payloadPlaceholder')}
             value={form.payload}
@@ -111,12 +111,12 @@ export default function PublishForm({
             required
           />
           {errors.payload && (
-            <p className="text-red-400 text-xs mt-1">{errors.payload}</p>
+            <p className="text-red-400 text-display-xs mt-1">{errors.payload}</p>
           )}
         </div>
 
         <div className="flex items-center gap-3 pt-4">
-          <Button type="submit" variant="primary" icon={<Send className="w-4 h-4" />}>
+          <Button type="submit" variant="primary" icon={<Send className="icon-base" />}>
             {t('messages.publish')}
           </Button>
 

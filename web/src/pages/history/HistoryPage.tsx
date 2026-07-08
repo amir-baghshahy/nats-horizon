@@ -62,7 +62,7 @@ export default function HistoryPage({
             <button
               key={d}
               onClick={() => setDuration(d)}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+              className={`rounded-md px-3 py-1 text-display-xs font-medium transition-colors ${
                 duration === d
                   ? "bg-primary-600 text-white shadow-sm"
                   : "text-dark-muted hover:text-dark-text"
@@ -91,8 +91,8 @@ export default function HistoryPage({
         <div className="lg:col-span-2 card">
           <div className="flex items-center gap-2 mb-3">
             <HistoryIcon className="h-4 w-4 text-primary-400" />
-            <h3 className="text-sm font-semibold">{t("history.streamSummary")}</h3>
-            <span className="ml-auto text-[11px] text-dark-muted">
+            <h3 className="text-display-sm font-semibold">{t("history.streamSummary")}</h3>
+            <span className="ml-auto text-display-xs text-dark-muted">
               {historyStreams.length} {t("common.streams") || "streams"}
             </span>
           </div>
@@ -124,12 +124,12 @@ export default function HistoryPage({
                     onClick={() => setSelectedStream(stream.name || "all")}
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-medium truncate max-w-[120px]" title={stream.name}>
+                      <span className="text-display-xs font-medium truncate max-w-[120px]" title={stream.name}>
                         {stream.name}
                       </span>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <TrendIcon className={`h-3 w-3 ${trendColor}`} />
-                        <span className="text-[11px] tabular-nums text-dark-muted">
+                        <span className="text-display-xs tabular-nums text-dark-muted">
                           {(stream.messages || 0).toLocaleString()}
                         </span>
                       </div>
@@ -142,8 +142,8 @@ export default function HistoryPage({
                       />
                     </div>
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-[10px] text-dark-muted/70">{formatBytes(stream.bytes || 0)}</span>
-                      <span className="text-[10px] text-dark-muted/70">{pct}%</span>
+                      <span className="text-display-xs text-dark-muted/70">{formatBytes(stream.bytes || 0)}</span>
+                      <span className="text-display-xs text-dark-muted/70">{pct}%</span>
                     </div>
                   </div>
                 );
@@ -156,13 +156,13 @@ export default function HistoryPage({
         <div className="lg:col-span-3 card">
           <div className="flex items-center gap-2 mb-3">
             <BarChart3 className="h-4 w-4 text-primary-400" />
-            <h3 className="text-sm font-semibold">{t("history.messagesTrend")}</h3>
+            <h3 className="text-display-sm font-semibold">{t("history.messagesTrend")}</h3>
             {selectedStream !== "all" && (
-              <span className="ml-1 text-[11px] px-2 py-0.5 rounded-full bg-primary-500/15 text-primary-400">
+              <span className="ml-1 text-display-xs px-2 py-0.5 rounded-full bg-primary-500/15 text-primary-400">
                 {selectedStream}
               </span>
             )}
-            <span className="ml-auto text-[11px] text-dark-muted">
+            <span className="ml-auto text-display-xs text-dark-muted">
               {chartData.length} {t("history.dataPoints") || "points"}
             </span>
           </div>
@@ -208,7 +208,7 @@ export default function HistoryPage({
                     content={({ active, payload, label }) => {
                       if (!active || !payload?.length) return null;
                       return (
-                        <div className="rounded-lg border border-dark-border bg-dark-card/95 px-3 py-2 text-xs shadow-lg backdrop-blur">
+                        <div className="rounded-lg border border-dark-border bg-dark-card/95 px-3 py-2 text-display-xs shadow-lg backdrop-blur">
                           <p className="text-dark-muted mb-1">{label}</p>
                           <p className="font-semibold text-primary-400 tabular-nums">
                             {(payload[0].value as number).toLocaleString()} {t("common.messages") || "messages"}
@@ -248,8 +248,8 @@ export default function HistoryPage({
                   { label: "Latest", value: last.toLocaleString() },
                 ].map(({ label, value }) => (
                   <div key={label} className="text-center">
-                    <p className="text-[10px] text-dark-muted">{label}</p>
-                    <p className="text-xs font-semibold tabular-nums mt-0.5">{value}</p>
+                    <p className="text-display-xs text-dark-muted">{label}</p>
+                    <p className="text-display-xs font-semibold tabular-nums mt-0.5">{value}</p>
                   </div>
                 ))}
               </div>

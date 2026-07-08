@@ -152,7 +152,7 @@ export default function Select({
                 disabled={option.disabled}
                 onClick={() => !option.disabled && handleSelect(option.value)}
                 className={`
-                  w-full px-4 py-2.5 text-start text-sm transition-colors
+                  w-full px-4 py-2.5 text-start text-display-sm transition-colors
                   ${
                     option.disabled
                       ? "cursor-not-allowed opacity-50"

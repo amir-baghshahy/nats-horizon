@@ -60,7 +60,7 @@ function App() {
   if (setupCompleted === null) {
     return (
       <div className="min-h-screen bg-dark-bg flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full" />
+        <div className="animate-spin avatar border-2 border-primary-500 border-t-transparent rounded-full" />
       </div>
     );
   }

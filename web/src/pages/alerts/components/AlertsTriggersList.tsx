@@ -59,21 +59,21 @@ export default function AlertsTriggersList({
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="font-semibold">{trigger.alert_name}</h3>
                   <span
-                    className={`text-xs px-2 py-1 rounded border ${
+                    className={`text-display-xs px-2 py-1 rounded border ${
                       SEVERITY_COLORS[trigger.severity || "info"]
                     }`}
                   >
                     {trigger.severity}
                   </span>
                   {trigger.acked && (
-                    <span className="text-xs flex items-center gap-1 text-green-400">
+                    <span className="text-display-xs flex items-center gap-1 text-green-400">
                       <CheckCircle className="w-3 h-3" />
                       {t("alerts.acknowledged")}
                     </span>
                   )}
                 </div>
-                <p className="text-sm mb-2">{trigger.message}</p>
-                <div className="flex items-center gap-4 text-xs text-dark-muted">
+                <p className="text-display-sm mb-2">{trigger.message}</p>
+                <div className="flex items-center gap-4 text-display-xs text-dark-muted">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {formatTimestamp(trigger.triggered_at || "")}

@@ -74,8 +74,8 @@ class ErrorBoundary extends Component<Props, State> {
         <div className="flex items-center justify-center h-full p-8">
           <div className="card text-center max-w-md">
             <div className="text-red-400 text-4xl mb-4">!</div>
-            <h2 className="text-lg font-semibold mb-2">{t('somethingWentWrong')}</h2>
-            <p className="text-dark-muted text-sm mb-4">
+            <h2 className="text-display-lg font-semibold mb-2">{t('somethingWentWrong')}</h2>
+            <p className="text-dark-muted text-display-sm mb-4">
               {this.state.error?.message || t('unexpectedError')}
             </p>
             <Button

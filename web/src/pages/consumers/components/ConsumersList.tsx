@@ -57,9 +57,9 @@ export default function ConsumersList({
                   selectedConsumers.size === consumers.length && consumers.length > 0
                 }
                 onChange={onToggleAll}
-                className="w-4 h-4 rounded"
+                className="icon-base rounded"
               />
-              <span className="text-sm text-dark-muted">
+              <span className="text-display-sm text-dark-muted">
                 {selectedConsumers.size > 0
                   ? t("consumers.selectedCount", { count: selectedConsumers.size })
                   : t("consumers.consumerCount", { count: consumers.length })}

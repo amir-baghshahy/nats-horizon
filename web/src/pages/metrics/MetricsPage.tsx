@@ -30,7 +30,7 @@ function MiniChart({ data, color }: { data: { value?: number }[]; color: string 
   const chartData = data.map((p, i) => ({ i, v: p.value || 0 }));
   if (chartData.length < 2) {
     return (
-      <div className="flex h-10 items-center justify-center text-[10px] text-dark-muted/60">
+      <div className="flex h-10 items-center justify-center text-display-xs text-dark-muted/60">
         {t("common.collectingData")}
       </div>
     );
@@ -167,13 +167,13 @@ export default function MetricsPage({
         <PanelCard title={t("metrics.systemMetrics")}>
           <div className="grid gap-3 md:grid-cols-2">
             <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-xs text-dark-muted">
+              <p className="text-display-xs text-dark-muted">
                 {t("metrics.memoryUsed")}
               </p>
-              <p className="mt-1 text-lg font-medium">
+              <p className="mt-1 text-display-lg font-medium">
                 {formatBytes(systemMetrics?.memory?.used || 0)}
               </p>
-              <p className="text-xs text-dark-muted">
+              <p className="text-display-xs text-dark-muted">
                 {systemMetrics?.memory?.max
                   ? `${systemMetrics.memory.usage || 0}% of ${formatBytes(systemMetrics.memory.max)}`
                   : systemMetrics?.memory?.usage !== undefined
@@ -182,13 +182,13 @@ export default function MetricsPage({
               </p>
             </div>
             <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-xs text-dark-muted">
+              <p className="text-display-xs text-dark-muted">
                 {t("metrics.storageUsed")}
               </p>
-              <p className="mt-1 text-lg font-medium">
+              <p className="mt-1 text-display-lg font-medium">
                 {formatBytes(systemMetrics?.storage?.used || 0)}
               </p>
-              <p className="text-xs text-dark-muted">
+              <p className="text-display-xs text-dark-muted">
                 {systemMetrics?.storage?.max
                   ? `${systemMetrics.storage.usage || 0}% of ${formatBytes(systemMetrics.storage.max)}`
                   : systemMetrics?.storage?.usage !== undefined
@@ -197,25 +197,25 @@ export default function MetricsPage({
               </p>
             </div>
             <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-xs text-dark-muted">
+              <p className="text-display-xs text-dark-muted">
                 {t("metrics.connections")}
               </p>
-              <p className="mt-1 text-lg font-medium">
+              <p className="mt-1 text-display-lg font-medium">
                 {systemMetrics?.connections || 0}
               </p>
-              <p className="text-xs text-dark-muted">
+              <p className="text-display-xs text-dark-muted">
                 {systemMetrics?.streams || 0} streams ·{" "}
                 {systemMetrics?.consumers || 0} consumers
               </p>
             </div>
             <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-xs text-dark-muted">
+              <p className="text-display-xs text-dark-muted">
                 {t("metrics.rateWindow")}
               </p>
-              <p className="mt-1 text-lg font-medium">
+              <p className="mt-1 text-display-lg font-medium">
                 {formatBytes(rateTotalBytes)} / {rates?.duration || 60}s
               </p>
-              <p className="text-xs text-dark-muted">
+              <p className="text-display-xs text-dark-muted">
                 {formatNumber(rateTotalMessages)} messages
               </p>
             </div>
@@ -242,8 +242,8 @@ export default function MetricsPage({
           {rateStreams.map((stream: any) => (
             <div key={stream.name} className="rounded-xl bg-dark-bg/50 p-4">
               <div className="flex items-center justify-between gap-3">
-                <p className="font-mono text-sm truncate">{stream.name}</p>
-                <p className="text-xs text-dark-muted whitespace-nowrap">
+                <p className="font-mono text-display-sm truncate">{stream.name}</p>
+                <p className="text-display-xs text-dark-muted whitespace-nowrap">
                   {formatNumber(stream.messages || 0)} msgs ·{" "}
                   {formatBytes(stream.bytes || 0)}
                 </p>
@@ -293,7 +293,7 @@ export default function MetricsPage({
                     className="rounded-xl bg-dark-bg/50 p-4"
                   >
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-sm text-dark-muted whitespace-nowrap">
+                      <span className="text-display-sm text-dark-muted whitespace-nowrap">
                         {t("metrics.messages")}
                       </span>
                       <span className="font-medium tabular-nums whitespace-nowrap">
@@ -311,7 +311,7 @@ export default function MetricsPage({
                     className="rounded-xl bg-dark-bg/50 p-4"
                   >
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-sm text-dark-muted whitespace-nowrap">
+                      <span className="text-display-sm text-dark-muted whitespace-nowrap">
                         {t("metrics.storage")}
                       </span>
                       <span className="font-medium tabular-nums whitespace-nowrap">

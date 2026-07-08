@@ -32,7 +32,7 @@ export default function BulkActions({
 
   return (
     <div className="flex items-center justify-between p-4 bg-primary-500/10 border border-primary-500/30 rounded-lg mb-4">
-      <div className="text-sm">
+      <div className="text-display-sm">
         <span className="font-medium">{selectedCount}</span>
         <span className="text-dark-muted mx-2">of</span>
         <span className="text-dark-muted">{totalCount}</span>
@@ -48,14 +48,14 @@ export default function BulkActions({
               variantClasses[action.variant || "secondary"]
             }`}
           >
-            <action.icon className="w-4 h-4" />
-            <span className="text-sm">{action.label}</span>
+            <action.icon className="icon-base" />
+            <span className="text-display-sm">{action.label}</span>
           </button>
         ))}
 
         <button
           onClick={onClearSelection}
-          className="text-sm text-dark-muted hover:text-dark-text transition-colors"
+          className="text-display-sm text-dark-muted hover:text-dark-text transition-colors"
         >
           Clear selection
         </button>

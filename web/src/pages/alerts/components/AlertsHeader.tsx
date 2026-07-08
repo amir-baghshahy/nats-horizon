@@ -26,14 +26,14 @@ export default function AlertsHeader({
         <>
            <Button
              variant="primary"
-             icon={<Plus className="w-4 h-4" />}
+             icon={<Plus className="icon-base" />}
              onClick={onNewAlert}
            >
              {t("alerts.newAlert")}
            </Button>
            <Button
              variant="secondary"
-             icon={<Zap className="w-4 h-4" />}
+             icon={<Zap className="icon-base" />}
              onClick={onCheckAlerts}
              loading={isChecking}
            >

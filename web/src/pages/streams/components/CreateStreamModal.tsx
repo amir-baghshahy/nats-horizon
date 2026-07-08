@@ -45,14 +45,14 @@ export default function CreateStreamModal({
       >
         <div className="card max-w-md w-full" role="dialog" aria-modal="true" aria-labelledby="create-stream-title">
           <div className="flex items-center justify-between mb-4">
-            <h2 id="create-stream-title" className="text-sm font-bold">{t("streams.createStream")}</h2>
-            <button type="button" onClick={onClose} className="p-1.5 hover:bg-dark-bg rounded-lg">
-              <X className="w-4 h-4" />
+            <h2 id="create-stream-title" className="text-display-base font-semibold">{t("streams.createStream")}</h2>
+            <button type="button" onClick={onClose} className="p-1.5 hover:bg-dark-bg rounded-lg transition-colors">
+              <X className="icon-base" />
             </button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-               <label className="block text-sm font-medium mb-2">
+               <label className="block text-display-sm font-medium mb-2">
                {t("streams.streamName")}
              </label>
               <input
@@ -65,7 +65,7 @@ export default function CreateStreamModal({
               />
             </div>
             <div>
-               <label className="block text-sm font-medium mb-2">{t("streams.subjects")}</label>
+               <label className="block text-display-sm font-medium mb-2">{t("streams.subjects")}</label>
               <input
                 type="text"
                 value={subjects}
@@ -74,10 +74,10 @@ export default function CreateStreamModal({
                 className="input w-full"
                 required
               />
-               <p className="text-xs text-dark-muted mt-1">{t("streams.subjectsHelp")}</p>
+               <p className="text-display-xs text-dark-muted mt-1">{t("streams.subjectsHelp")}</p>
             </div>
             <div>
-               <label className="block text-sm font-medium mb-2">{t("streams.storage")}</label>
+               <label className="block text-display-sm font-medium mb-2">{t("streams.storage")}</label>
               <Select
                 value={storage}
                 onChange={(value) => setStorage(value as "file" | "memory")}
@@ -90,7 +90,7 @@ export default function CreateStreamModal({
               />
             </div>
             <div>
-               <label className="block text-sm font-medium mb-2">{t("streams.replicas")}</label>
+               <label className="block text-display-sm font-medium mb-2">{t("streams.replicas")}</label>
               <input
                 type="number"
                 value={replicas}

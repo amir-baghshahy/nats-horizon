@@ -44,15 +44,15 @@ export default function DataList<T>({
       {/* Loading state */}
       {isLoading ? (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-dark-muted">
-          <div className="animate-spin w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full mb-3" />
-          <span className="text-sm">Loading...</span>
+          <div className="animate-spin icon-lg border-2 border-primary-500 border-t-transparent rounded-full mb-3" />
+          <span className="text-display-sm">Loading...</span>
         </div>
       ) : isEmpty ? (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-dark-muted">
-          {EmptyIcon && <EmptyIcon className="w-12 h-12 mb-4 opacity-50" />}
-          <h3 className="text-lg font-semibold mb-1">{emptyTitle}</h3>
+          {EmptyIcon && <EmptyIcon className="icon-lg mb-4 opacity-50" />}
+          <h3 className="text-display-lg font-semibold mb-1">{emptyTitle}</h3>
           {emptyDescription && (
-            <p className="text-sm text-center max-w-sm mb-4">{emptyDescription}</p>
+            <p className="text-display-sm text-center max-w-sm mb-4">{emptyDescription}</p>
           )}
           {emptyAction}
         </div>
@@ -71,7 +71,7 @@ export default function DataList<T>({
 
       {/* Footer */}
       {footer && (
-        <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
+        <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-display-sm text-dark-muted flex-shrink-0">
           {footer}
         </div>
       )}

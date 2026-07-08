@@ -85,9 +85,9 @@ export default function TrafficMonitorPanel({
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <Activity className="h-5 w-5 text-primary-400" />
-              <h2 className="text-xl font-bold">{t('messages.trafficMonitor')}</h2>
+              <h2 className="text-display-xl font-bold">{t('messages.trafficMonitor')}</h2>
             </div>
-            <p className="text-sm leading-6 text-dark-muted">
+            <p className="text-display-sm leading-6 text-dark-muted">
               {t('messages.trafficMonitorDescription')}
             </p>
           </div>
@@ -103,7 +103,7 @@ export default function TrafficMonitorPanel({
         </div>
 
         <div className="mt-5">
-          <label className="block text-sm font-medium mb-2">{t('messages.subjects')}</label>
+          <label className="block text-display-sm font-medium mb-2">{t('messages.subjects')}</label>
           <div className="flex flex-col gap-3 md:flex-row">
             <input
               type="text"
@@ -117,7 +117,7 @@ export default function TrafficMonitorPanel({
               {t('messages.restart')}
             </Button>
           </div>
-          <p className="mt-2 text-xs text-dark-muted">
+          <p className="mt-2 text-display-xs text-dark-muted">
             {t('messages.subjectsHelp')}
           </p>
         </div>
@@ -125,20 +125,20 @@ export default function TrafficMonitorPanel({
 
       <div className="grid gap-4 md:grid-cols-4">
         <div className="card">
-          <p className="text-xs text-dark-muted">{t('messages.status')}</p>
-          <p className="mt-2 text-2xl font-bold">{isMonitoring ? t('messages.live') : t('messages.idle')}</p>
+          <p className="text-display-xs text-dark-muted">{t('messages.status')}</p>
+          <p className="mt-2 text-display-2xl font-bold">{isMonitoring ? t('messages.live') : t('messages.idle')}</p>
         </div>
         <div className="card">
-          <p className="text-xs text-dark-muted">{t('messages.subjects')}</p>
-          <p className="mt-2 text-2xl font-bold">{subjectStats.length}</p>
+          <p className="text-display-xs text-dark-muted">{t('messages.subjects')}</p>
+          <p className="mt-2 text-display-2xl font-bold">{subjectStats.length}</p>
         </div>
         <div className="card">
-          <p className="text-xs text-dark-muted">{t('messages.messagesLabel')}</p>
-          <p className="mt-2 text-2xl font-bold">{totalMessages.toLocaleString()}</p>
+          <p className="text-display-xs text-dark-muted">{t('messages.messagesLabel')}</p>
+          <p className="mt-2 text-display-2xl font-bold">{totalMessages.toLocaleString()}</p>
         </div>
         <div className="card">
-          <p className="text-xs text-dark-muted">{t('messages.bytes')}</p>
-          <p className="mt-2 text-2xl font-bold">{formatBytes(totalBytes)}</p>
+          <p className="text-display-xs text-dark-muted">{t('messages.bytes')}</p>
+          <p className="mt-2 text-display-2xl font-bold">{formatBytes(totalBytes)}</p>
         </div>
       </div>
 
@@ -152,12 +152,12 @@ export default function TrafficMonitorPanel({
               <div key={stat.subject} className="p-4">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div className="min-w-0">
-                    <p className="font-mono text-sm font-medium truncate">{stat.subject}</p>
-                    <p className="mt-1 text-xs text-dark-muted">
+                    <p className="font-mono text-display-sm font-medium truncate">{stat.subject}</p>
+                    <p className="mt-1 text-display-xs text-dark-muted">
                       {t('messages.lastSeen')} {formatTimestamp(stat.last_seen)}
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-3 text-sm">
+                  <div className="flex flex-wrap gap-3 text-display-sm">
                     <span>
                       <span className="text-dark-muted">{t('messages.messagesLabel')}:</span>{" "}
                       <span className="font-mono">{stat.count.toLocaleString()}</span>
@@ -175,7 +175,7 @@ export default function TrafficMonitorPanel({
           <div className="p-8 text-center text-dark-muted">
             <Activity className="mx-auto mb-3 h-12 w-12 opacity-50" />
             <p>{t('messages.noTrafficCaptured')}</p>
-            <p className="mt-1 text-sm">{t('messages.noTrafficCapturedDescription')}</p>
+            <p className="mt-1 text-display-sm">{t('messages.noTrafficCapturedDescription')}</p>
           </div>
         )}
       </div>
@@ -190,7 +190,7 @@ export default function TrafficMonitorPanel({
               <div key={`${event.type}-${event.subject}-${event.timestamp}-${index}`} className="p-4">
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    <span className={`rounded-full px-2 py-0.5 text-display-xs font-medium ${
                       event.type === "message"
                         ? "bg-primary-500/15 text-primary-300"
                         : "bg-blue-500/15 text-blue-300"
@@ -198,17 +198,17 @@ export default function TrafficMonitorPanel({
                       {event.type || t('messages.event')}
                     </span>
                     {event.subject && (
-                      <span className="font-mono text-sm text-primary-300 truncate">
+                      <span className="font-mono text-display-sm text-primary-300 truncate">
                         {event.subject}
                       </span>
                     )}
-                    <span className="text-xs text-dark-muted">
+                    <span className="text-display-xs text-dark-muted">
                       {formatTimestamp(event.timestamp)}
                     </span>
                   </div>
 
                   {event.type === "message" && (
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-2 text-display-sm">
                       {event.reply && (
                         <p className="text-dark-muted">
                           {t('messages.replyLabel')}: <span className="font-mono">{event.reply}</span>
@@ -220,7 +220,7 @@ export default function TrafficMonitorPanel({
                         </p>
                       )}
                       {event.data && (
-                        <pre className="max-h-32 overflow-auto rounded-lg bg-dark-bg p-3 text-xs">
+                        <pre className="max-h-32 overflow-auto rounded-lg bg-dark-bg p-3 text-display-xs">
                           <code>{event.data}</code>
                         </pre>
                       )}
@@ -230,7 +230,7 @@ export default function TrafficMonitorPanel({
                   {event.type === "stats" && event.stats && (
                     <div className="grid gap-2 md:grid-cols-2">
                       {event.stats.map((stat) => (
-                        <div key={stat.subject} className="rounded-lg bg-dark-bg p-3 text-sm">
+                        <div key={stat.subject} className="rounded-lg bg-dark-bg p-3 text-display-sm">
                           <p className="font-mono text-primary-300 truncate">{stat.subject}</p>
                           <p className="mt-1 text-dark-muted">
                             {stat.count.toLocaleString()} {t('messages.messagesAnd')} {formatBytes(stat.bytes)}

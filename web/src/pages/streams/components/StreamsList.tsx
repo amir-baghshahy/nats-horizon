@@ -76,7 +76,7 @@ export default function StreamsList({
   if (isLoading) {
     return (
       <div className="p-8 flex items-center justify-center min-h-[400px]">
-        <RefreshCw className="w-8 h-8 animate-spin text-primary-400" />
+        <RefreshCw className="avatar animate-spin text-primary-400" />
       </div>
     );
   }
@@ -138,7 +138,7 @@ export default function StreamsList({
             );
           })}
         </div>
-        <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-sm text-dark-muted flex-shrink-0">
+        <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-display-sm text-dark-muted flex-shrink-0">
           {t("streams.streamCount", { count: streams.length })}
         </div>
       </div>

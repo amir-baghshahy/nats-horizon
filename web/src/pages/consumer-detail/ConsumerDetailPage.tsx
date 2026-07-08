@@ -81,11 +81,11 @@ export default function ConsumerDetailPage() {
     <div className="p-4 md:p-6">
       <div className="flex items-center gap-4 mb-4">
         <Link to="/consumers" className="p-2 hover:bg-dark-bg rounded-lg transition-colors">
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="icon-md" />
         </Link>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold">{name}</h1>
+            <h1 className="text-display-xl font-bold">{name}</h1>
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${
               consumerData.status === "active"
                 ? "bg-status-success/20 text-status-success"
@@ -93,11 +93,11 @@ export default function ConsumerDetailPage() {
                   ? "bg-status-error/20 text-status-error"
                   : "bg-status-warning/20 text-status-warning"
             }`}>
-              <StatusIcon className="w-4 h-4" />
-              <span className="text-sm font-medium capitalize">{consumerData.status}</span>
+              <StatusIcon className="icon-base" />
+              <span className="text-display-sm font-medium capitalize">{consumerData.status}</span>
             </div>
             {consumerData.config?.durable && (
-              <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-sm">Durable</span>
+              <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-display-sm">Durable</span>
             )}
           </div>
           <p className="text-dark-muted mt-1">
@@ -112,13 +112,13 @@ export default function ConsumerDetailPage() {
               variant="secondary"
               onClick={handlePauseResume}
               disabled={loadingAction !== null}
-              icon={loadingAction === "pause-resume" ? <Loader2 className="w-4 h-4 animate-spin" /> : consumerData.status === "stuck" || consumerData.status === "paused" || isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+              icon={loadingAction === "pause-resume" ? <Loader2 className="icon-base animate-spin" /> : consumerData.status === "stuck" || consumerData.status === "paused" || isPaused ? <Play className="icon-base" /> : <Pause className="icon-base" />}
             />
-           <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={() => refetch()} />
-           <Button variant="secondary" icon={<Eye className="w-4 h-4" />} onClick={() => setActiveTab("messages")}>
+           <Button variant="secondary" icon={<RefreshCw className="icon-base" />} onClick={() => refetch()} />
+           <Button variant="secondary" icon={<Eye className="icon-base" />} onClick={() => setActiveTab("messages")}>
              {t("consumers.peekMessages")}
            </Button>
-           <Button variant="primary" icon={<Settings className="w-4 h-4" />} onClick={() => setActiveTab("config")}>
+           <Button variant="primary" icon={<Settings className="icon-base" />} onClick={() => setActiveTab("config")}>
              {t("consumers.configure")}
            </Button>
          </div>
@@ -183,7 +183,7 @@ export default function ConsumerDetailPage() {
                  variant="secondary"
                  onClick={handleResetLag}
                  disabled={loadingAction === "reset-lag"}
-                 icon={loadingAction === "reset-lag" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipBack className="w-4 h-4" />}
+                 icon={loadingAction === "reset-lag" ? <Loader2 className="icon-base animate-spin" /> : <SkipBack className="icon-base" />}
                >
                  {t("consumers.resetLag")}
                </Button>
@@ -191,11 +191,11 @@ export default function ConsumerDetailPage() {
                  variant="secondary"
                  onClick={handleReplayMessages}
                  disabled={loadingAction === "replay"}
-                 icon={loadingAction === "replay" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipForward className="w-4 h-4" />}
+                 icon={loadingAction === "replay" ? <Loader2 className="icon-base animate-spin" /> : <SkipForward className="icon-base" />}
                >
                  {t("consumers.replayMessages")}
                </Button>
-               <Button variant="secondary" icon={<Eye className="w-4 h-4" />} onClick={() => setActiveTab("messages")}>
+               <Button variant="secondary" icon={<Eye className="icon-base" />} onClick={() => setActiveTab("messages")}>
                  {t("consumers.peekMessages")}
                </Button>
                <Button
@@ -203,7 +203,7 @@ export default function ConsumerDetailPage() {
                  onClick={handleDeleteConsumer}
                  disabled={loadingAction === "delete"}
                  className="text-status-error"
-                 icon={loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                 icon={loadingAction === "delete" ? <Loader2 className="icon-base animate-spin" /> : <Trash2 className="icon-base" />}
                >
                  {t("common.delete")}
                </Button>
@@ -216,11 +216,11 @@ export default function ConsumerDetailPage() {
         <PanelCard
           header={
             <div className="flex items-center justify-between w-full">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
+              <h3 className="text-display-lg font-semibold flex items-center gap-2">
+                <MessageSquare className="icon-md" />
                 {t("consumers.pendingMessages", { count: pendingMessages?.messages?.length || 0 })}
               </h3>
-               <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={() => refetchPending()}>
+               <Button variant="secondary" icon={<RefreshCw className="icon-base" />} onClick={() => refetchPending()}>
                  {t("common.refresh")}
                </Button>
             </div>
@@ -230,7 +230,7 @@ export default function ConsumerDetailPage() {
           {!pendingMessages || !pendingMessages.messages || pendingMessages.messages.length === 0 ? (
             <div className="text-center py-12">
               <MessageSquare className="w-16 h-16 mx-auto mb-4 text-dark-muted opacity-50" />
-              <h3 className="text-lg font-semibold mb-2">{t("consumers.noPendingMessages")}</h3>
+              <h3 className="text-display-lg font-semibold mb-2">{t("consumers.noPendingMessages")}</h3>
               <p className="text-dark-muted">
                 {consumerData.num_pending && consumerData.num_pending > 0
                   ? t("consumers.noPendingMessagesDescription", { count: consumerData.num_pending })
@@ -244,15 +244,15 @@ export default function ConsumerDetailPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="font-mono text-sm text-primary-400">#{msg.sequence}</span>
-                        <span className="text-sm font-mono text-dark-muted">{msg.subject}</span>
-                        <span className="text-xs text-dark-muted flex items-center gap-1">
+                        <span className="font-mono text-display-sm text-primary-400">#{msg.sequence}</span>
+                        <span className="text-display-sm font-mono text-dark-muted">{msg.subject}</span>
+                        <span className="text-display-xs text-dark-muted flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {new Date(msg.timestamp).toLocaleString()}
                         </span>
-                        <span className="text-xs text-dark-muted">{t("consumers.deliveredCount", { count: msg.num_delivered })}</span>
+                        <span className="text-display-xs text-dark-muted">{t("consumers.deliveredCount", { count: msg.num_delivered })}</span>
                       </div>
-                      <pre className="text-sm p-3 bg-dark-bg rounded overflow-x-auto max-h-32">
+                      <pre className="text-display-sm p-3 bg-dark-bg rounded overflow-x-auto max-h-32">
                         <code className="text-green-400">{msg.data}</code>
                       </pre>
                     </div>
@@ -263,7 +263,7 @@ export default function ConsumerDetailPage() {
                         className="p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30"
                         title={t("consumers.ack")}
                       >
-                        <Check className="w-4 h-4" />
+                        <Check className="icon-base" />
                       </button>
                       <button
                         onClick={() => handleNack(msg.sequence)}
@@ -271,7 +271,7 @@ export default function ConsumerDetailPage() {
                         className="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/30"
                         title={t("consumers.nack")}
                       >
-                        <X className="w-4 h-4" />
+                        <X className="icon-base" />
                       </button>
                       <button
                         onClick={() => handleTerm(msg.sequence)}
@@ -279,7 +279,7 @@ export default function ConsumerDetailPage() {
                         className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
                         title={t("consumers.ackTerm")}
                       >
-                        <FastForward className="w-4 h-4" />
+                        <FastForward className="icon-base" />
                       </button>
                     </div>
                   </div>
@@ -297,7 +297,7 @@ export default function ConsumerDetailPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
                   <span className="text-dark-muted">Durable</span>
-                  <span className={`px-2 py-1 rounded text-xs ${consumerData.config?.durable ? "bg-green-500/20 text-green-400" : "bg-dark-border"}`}>
+                  <span className={`px-2 py-1 rounded text-display-xs ${consumerData.config?.durable ? "bg-green-500/20 text-green-400" : "bg-dark-border"}`}>
                     {consumerData.config?.durable ? t("consumers.yes") : t("consumers.no")}
                   </span>
                 </div>
@@ -340,26 +340,26 @@ export default function ConsumerDetailPage() {
           {(consumerData.config as any)?.filter_subject && (
             <PanelCard title={t("consumers.filterSubject")}>
               <div className="p-3 bg-dark-bg/50 rounded-lg">
-                <p className="font-mono text-sm">{(consumerData.config as any).filter_subject}</p>
-                <p className="text-xs text-dark-muted mt-1">{t("consumers.filterSubjectHelp")}</p>
+                <p className="font-mono text-display-sm">{(consumerData.config as any).filter_subject}</p>
+                <p className="text-display-xs text-dark-muted mt-1">{t("consumers.filterSubjectHelp")}</p>
               </div>
             </PanelCard>
           )}
 
            <PanelCard title={t("consumers.consumerActions")}>
              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-               <Button variant="secondary" icon={<Settings className="w-4 h-4" />} onClick={handleOpenEdit}>
+               <Button variant="secondary" icon={<Settings className="icon-base" />} onClick={handleOpenEdit}>
                  {t("consumers.editConsumer")}
                </Button>
                <Button
                  variant="secondary"
                  onClick={handleResetLag}
                  disabled={loadingAction === "reset-lag"}
-                 icon={loadingAction === "reset-lag" ? <Loader2 className="w-4 h-4 animate-spin" /> : <SkipBack className="w-4 h-4" />}
+                 icon={loadingAction === "reset-lag" ? <Loader2 className="icon-base animate-spin" /> : <SkipBack className="icon-base" />}
                >
                  {t("consumers.resetLag")}
                </Button>
-               <Button variant="secondary" icon={<Copy className="w-4 h-4" />} onClick={handleOpenClone}>
+               <Button variant="secondary" icon={<Copy className="icon-base" />} onClick={handleOpenClone}>
                  {t("consumers.cloneConsumer")}
                </Button>
                <Button
@@ -367,7 +367,7 @@ export default function ConsumerDetailPage() {
                  onClick={handleDeleteConsumer}
                  disabled={loadingAction === "delete"}
                  className="text-status-error"
-                 icon={loadingAction === "delete" ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                 icon={loadingAction === "delete" ? <Loader2 className="icon-base animate-spin" /> : <Trash2 className="icon-base" />}
                >
                  {t("common.delete")}
                </Button>

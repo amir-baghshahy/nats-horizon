@@ -23,7 +23,7 @@ export default function SearchBar({
 
   return (
     <div className={`relative ${className}`}>
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 icon-base text-dark-muted" />
       <input
         type="text"
         placeholder={defaultPlaceholder}

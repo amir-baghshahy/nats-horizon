@@ -56,13 +56,13 @@ export default function MessageList({
         <div className="flex items-center gap-2 px-4 py-2 bg-dark-bg rounded-lg border border-dark-border">
           {sseConnected ? (
             <>
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <span className="text-sm text-green-400">{t('common.sseConnected')}</span>
+              <CheckCircle className="icon-base text-green-400" />
+              <span className="text-display-sm text-green-400">{t('common.sseConnected')}</span>
             </>
           ) : (
             <>
-              <Zap className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm text-yellow-400">{t('common.polling')}</span>
+              <Zap className="icon-base text-yellow-400" />
+              <span className="text-display-sm text-yellow-400">{t('common.polling')}</span>
             </>
           )}
         </div>
@@ -77,7 +77,7 @@ export default function MessageList({
             {t('messages.autoScroll')}: {autoScroll ? t('common.on') : t('common.off')}
           </button>
 
-          <Button variant="secondary" onClick={onClearMessages} icon={<Trash2 className="w-4 h-4" />}>
+          <Button variant="secondary" onClick={onClearMessages} icon={<Trash2 className="icon-base" />}>
             {t('common.clear')}
           </Button>
         </div>
@@ -113,7 +113,7 @@ export default function MessageList({
       </div>
 
       {messages.length > maxDisplayed && (
-        <div className="p-3 bg-dark-bg border-t border-dark-border text-center text-sm text-dark-muted">
+        <div className="p-3 bg-dark-bg border-t border-dark-border text-center text-display-sm text-dark-muted">
           {t('messages.showingCount', { shown: maxDisplayed, total: messages.length, hidden: messages.length - maxDisplayed })}
         </div>
       )}

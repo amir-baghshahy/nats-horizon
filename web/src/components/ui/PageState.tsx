@@ -27,8 +27,8 @@ export function PageError({ message, onRetry }: { message: string; onRetry?: () 
             <AlertCircle className="h-6 w-6" />
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-semibold text-dark-text">{t('common.unableToLoadData')}</h2>
-            <p className="mt-2 text-sm leading-6 text-dark-muted">{message}</p>
+            <h2 className="text-display-lg font-semibold text-dark-text">{t('common.unableToLoadData')}</h2>
+            <p className="mt-2 text-display-sm leading-6 text-dark-muted">{message}</p>
             {onRetry && (
               <Button variant="secondary" onClick={onRetry} className="mt-5">
                 {t('common.tryAgain')}

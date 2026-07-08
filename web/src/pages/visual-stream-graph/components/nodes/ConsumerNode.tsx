@@ -36,14 +36,14 @@ export function ConsumerNode({ data, selected }: NodeProps) {
             <Users className="h-3.5 w-3.5 text-blue-400" />
           </div>
           <h4
-            className="font-medium text-dark-text text-sm truncate max-w-[120px]"
+            className="font-medium text-dark-text text-display-sm truncate max-w-[120px]"
             title={data.name}
           >
             {data.name}
           </h4>
         </div>
 
-        <div className="space-y-1.5 text-xs">
+        <div className="space-y-1.5 text-display-xs">
           <div className="flex items-center justify-between">
             <span className="text-dark-muted">Lag:</span>
             <span className={`font-medium tabular-nums ${healthColor}`}>

@@ -52,10 +52,10 @@ function EnhancedChart({
   if (chartData.length < 2) {
     return (
       <div className="flex flex-col items-center justify-center h-32 text-center">
-        <div className="w-12 h-12 rounded-full bg-dark-border/30 flex items-center justify-center mb-3">
-          <Activity className="w-5 h-5 text-dark-muted/50" />
+        <div className="icon-lg rounded-full bg-dark-border/30 flex items-center justify-center mb-3">
+          <Activity className="icon-md text-dark-muted/50" />
         </div>
-        <p className="text-xs text-dark-muted/60">{t("common.collectingData")}</p>
+        <p className="text-display-xs text-dark-muted/60">{t("common.collectingData")}</p>
       </div>
     );
   }
@@ -76,16 +76,16 @@ function EnhancedChart({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-dark-muted">{label}</span>
+        <span className="text-display-sm text-dark-muted">{label}</span>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold tabular-nums">
+          <span className="text-display-sm font-semibold tabular-nums">
             {unit === "bytes"
               ? formatBytes(currentValue)
               : unit === "number"
               ? formatNumber(currentValue)
               : currentValue.toFixed(2)}
           </span>
-          <div className={`flex items-center gap-0.5 text-xs font-medium ${changeColor}`}>
+          <div className={`flex items-center gap-0.5 text-display-xs font-medium ${changeColor}`}>
             <ChangeIcon className="w-3 h-3" />
             <span>{Math.abs(changePercent).toFixed(1)}%</span>
           </div>
@@ -106,7 +106,7 @@ function EnhancedChart({
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 return (
-                  <div className="rounded-lg border border-dark-border bg-dark-card/95 px-3 py-2 text-xs shadow-xl backdrop-blur">
+                  <div className="rounded-lg border border-dark-border bg-dark-card/95 px-3 py-2 text-display-xs shadow-xl backdrop-blur">
                     <p className="text-dark-muted mb-1">{label}</p>
                     <p className="font-mono font-semibold" style={{ color: hexColor }}>
                       {unit === "bytes"
@@ -166,17 +166,17 @@ function ModernStatCard({
       <div className={`card hover-lift ${iconBg}/10 border-l-4`}>
         <div className="flex items-start justify-between">
           <div className={`p-2.5 rounded-xl ${iconBg} mb-3`}>
-            <Icon className={`w-5 h-5 ${iconColor}`} />
+            <Icon className={`icon-md ${iconColor}`} />
           </div>
           {previousValue !== undefined && (
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-full bg-dark-bg/50 ${changeColor} text-xs font-medium`}>
+            <div className={`flex items-center gap-1 px-2 py-1 rounded-full bg-dark-bg/50 ${changeColor} text-display-xs font-medium`}>
               <ChangeIcon className="w-3 h-3" />
               <span>{Math.abs(changePercent).toFixed(1)}%</span>
             </div>
           )}
         </div>
-        <p className="text-sm text-dark-muted mb-1">{label}</p>
-        <p className="text-2xl font-bold tabular-nums">
+        <p className="text-display-sm text-dark-muted mb-1">{label}</p>
+        <p className="text-display-2xl font-bold tabular-nums">
           {formatType === "bytes" ? formatBytes(value) : formatNumber(value)}
         </p>
       </div>
@@ -306,11 +306,11 @@ export default function MetricsPage({
             <div className="card p-4 hover-lift">
               <div className="flex items-center gap-2 mb-3">
                 <div className="p-2 rounded-lg bg-blue-500/20">
-                  <Database className="w-4 h-4 text-blue-400" />
+                  <Database className="icon-base text-blue-400" />
                 </div>
-                <span className="text-sm text-dark-muted">{t("metrics.memoryUsed")}</span>
+                <span className="text-display-sm text-dark-muted">{t("metrics.memoryUsed")}</span>
               </div>
-              <p className="text-xl font-bold mb-1">
+              <p className="text-display-xl font-bold mb-1">
                 {formatBytes(systemMetrics?.memory?.used || 0)}
               </p>
               <div className="flex items-center gap-2">
@@ -326,7 +326,7 @@ export default function MetricsPage({
                     style={{ width: `${Math.min(systemMetrics?.memory?.usage || 0, 100)}%` }}
                   />
                 </div>
-                <span className="text-xs text-dark-muted w-12 text-right">
+                <span className="text-display-xs text-dark-muted w-12 text-right">
                   {systemMetrics?.memory?.usage?.toFixed(0)}%
                 </span>
               </div>
@@ -338,11 +338,11 @@ export default function MetricsPage({
             <div className="card p-4 hover-lift">
               <div className="flex items-center gap-2 mb-3">
                 <div className="p-2 rounded-lg bg-purple-500/20">
-                  <HardDrive className="w-4 h-4 text-purple-400" />
+                  <HardDrive className="icon-base text-purple-400" />
                 </div>
-                <span className="text-sm text-dark-muted">{t("metrics.storageUsed")}</span>
+                <span className="text-display-sm text-dark-muted">{t("metrics.storageUsed")}</span>
               </div>
-              <p className="text-xl font-bold mb-1">
+              <p className="text-display-xl font-bold mb-1">
                 {formatBytes(systemMetrics?.storage?.used || 0)}
               </p>
               <div className="flex items-center gap-2">
@@ -358,7 +358,7 @@ export default function MetricsPage({
                     style={{ width: `${Math.min(systemMetrics?.storage?.usage || 0, 100)}%` }}
                   />
                 </div>
-                <span className="text-xs text-dark-muted w-12 text-right">
+                <span className="text-display-xs text-dark-muted w-12 text-right">
                   {systemMetrics?.storage?.usage?.toFixed(0)}%
                 </span>
               </div>
@@ -370,12 +370,12 @@ export default function MetricsPage({
             <div className="card p-4 hover-lift">
               <div className="flex items-center gap-2 mb-3">
                 <div className="p-2 rounded-lg bg-emerald-500/20">
-                  <Activity className="w-4 h-4 text-emerald-400" />
+                  <Activity className="icon-base text-emerald-400" />
                 </div>
-                <span className="text-sm text-dark-muted">{t("metrics.connections")}</span>
+                <span className="text-display-sm text-dark-muted">{t("metrics.connections")}</span>
               </div>
-              <p className="text-xl font-bold">{systemMetrics?.connections || 0}</p>
-              <p className="text-xs text-dark-muted mt-1">
+              <p className="text-display-xl font-bold">{systemMetrics?.connections || 0}</p>
+              <p className="text-display-xs text-dark-muted mt-1">
                 {systemMetrics?.streams || 0} streams · {systemMetrics?.consumers || 0} consumers
               </p>
             </div>
@@ -386,15 +386,15 @@ export default function MetricsPage({
             <div className="card p-4 hover-lift">
               <div className="flex items-center gap-2 mb-3">
                 <div className="p-2 rounded-lg bg-amber-500/20">
-                  <Zap className="w-4 h-4 text-amber-400" />
+                  <Zap className="icon-base text-amber-400" />
                 </div>
-                <span className="text-sm text-dark-muted">{t("metrics.rateWindow")}</span>
+                <span className="text-display-sm text-dark-muted">{t("metrics.rateWindow")}</span>
               </div>
-              <p className="text-xl font-bold">
+              <p className="text-display-xl font-bold">
                 {formatBytes(rateTotalBytes)}
-                <span className="text-sm text-dark-muted ml-1">/ {rates?.duration || 60}s</span>
+                <span className="text-display-sm text-dark-muted ml-1">/ {rates?.duration || 60}s</span>
               </p>
-              <p className="text-xs text-dark-muted mt-1">{formatNumber(rateTotalMessages)} messages</p>
+              <p className="text-display-xs text-dark-muted mt-1">{formatNumber(rateTotalMessages)} messages</p>
             </div>
           </div>
         </div>
@@ -438,11 +438,11 @@ export default function MetricsPage({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="p-2 rounded-lg bg-primary-500/20">
-                        <MessageSquare className="w-4 h-4 text-primary-400" />
+                        <MessageSquare className="icon-base text-primary-400" />
                       </div>
-                      <h3 className="font-semibold text-sm truncate">{streamName}</h3>
+                      <h3 className="font-semibold text-display-sm truncate">{streamName}</h3>
                     </div>
-                    <Badge variant={messages > 0 ? "success" : "default"} className="text-xs">
+                    <Badge variant={messages > 0 ? "success" : "default"} className="text-display-xs">
                       {formatNumber(messages)} msgs
                     </Badge>
                   </div>
@@ -475,7 +475,7 @@ export default function MetricsPage({
           footer={
             <div className="flex items-center gap-2">
               <Badge variant="info">{rateStreams.length}</Badge>
-              <span className="text-sm text-dark-muted">
+              <span className="text-display-sm text-dark-muted">
                 {t("metrics.streamCount", { count: rateStreams.length })}
               </span>
             </div>
@@ -489,17 +489,17 @@ export default function MetricsPage({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="font-mono text-sm font-medium truncate mb-2 group-hover:text-primary-400 transition-colors">
+                    <p className="font-mono text-display-sm font-medium truncate mb-2 group-hover:text-primary-400 transition-colors">
                       {stream.name}
                     </p>
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-dark-muted">
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-display-xs text-dark-muted">
                       <span>{formatNumber(stream.messages || 0)} msgs</span>
                       <span>·</span>
                       <span>{formatBytes(stream.bytes || 0)}</span>
                     </div>
                   </div>
                   <div className="p-1.5 rounded-lg bg-primary-500/20 group-hover:bg-primary-500/30 transition-colors">
-                    <TrendingUp className="w-4 h-4 text-primary-400" />
+                    <TrendingUp className="icon-base text-primary-400" />
                   </div>
                 </div>
               </div>

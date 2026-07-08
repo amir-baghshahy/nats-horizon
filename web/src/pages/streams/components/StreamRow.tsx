@@ -49,7 +49,7 @@ export default function StreamRow({
             type="checkbox"
             checked={isItemSelected}
             onChange={() => toggleSelection(streamName)}
-            className="w-4 h-4"
+            className="icon-base"
           />
 
           <button
@@ -57,9 +57,9 @@ export default function StreamRow({
             className="p-1 hover:bg-dark-bg rounded transition-colors"
           >
             {isItemExpanded ? (
-              <ChevronDown className="w-4 h-4 text-dark-muted" />
+              <ChevronDown className="icon-base text-dark-muted" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-dark-muted" />
+              <ChevronRight className="icon-base text-dark-muted" />
             )}
           </button>
 
@@ -67,7 +67,7 @@ export default function StreamRow({
             <div className="flex items-center gap-3 mb-2">
               <Link
                 to={`/streams/${encodeURIComponent(streamName)}`}
-                className="font-mono text-sm text-primary-400 hover:underline"
+                className="font-mono text-display-sm text-primary-400 hover:underline"
               >
                 {streamName}
               </Link>
@@ -83,12 +83,12 @@ export default function StreamRow({
                 size="small"
               />
 
-              <span className="text-xs text-dark-muted">
+              <span className="text-display-xs text-dark-muted">
                 {stream.config?.storage === "file" ? "File" : "Memory"}
               </span>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-dark-muted">
+            <div className="flex items-center gap-4 text-display-sm text-dark-muted">
               <span>{stream.state?.messages?.toLocaleString() || 0} messages</span>
               <span>{formatBytes(stream.state?.bytes || 0)}</span>
               <span>{stream.state?.consumers || 0} consumers</span>
@@ -107,7 +107,7 @@ export default function StreamRow({
               className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale transition-colors"
               title="View details"
             >
-              <Eye className="w-4 h-4 text-dark-muted" />
+              <Eye className="icon-base text-dark-muted" />
             </button>
 
             <button
@@ -115,7 +115,7 @@ export default function StreamRow({
               className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale transition-colors"
               title="Export stream"
             >
-              <Download className="w-4 h-4 text-dark-muted" />
+              <Download className="icon-base text-dark-muted" />
             </button>
 
             <button
@@ -123,7 +123,7 @@ export default function StreamRow({
               className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale transition-colors"
               title="Export messages"
             >
-              <MessageSquare className="w-4 h-4 text-dark-muted" />
+              <MessageSquare className="icon-base text-dark-muted" />
             </button>
 
             <button
@@ -131,7 +131,7 @@ export default function StreamRow({
               className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale transition-colors"
               title="Purge messages"
             >
-              <RefreshCw className="w-4 h-4 text-dark-muted" />
+              <RefreshCw className="icon-base text-dark-muted" />
             </button>
 
             <button
@@ -139,18 +139,18 @@ export default function StreamRow({
               className="p-2 hover:bg-red-500/20 rounded-lg hover-lift active-scale transition-colors"
               title="Delete stream"
             >
-              <Trash2 className="w-4 h-4 text-dark-muted hover:text-red-400" />
+              <Trash2 className="icon-base text-dark-muted hover:text-red-400" />
             </button>
           </div>
         </div>
 
         {isItemExpanded && (
-          <div className="mt-4 pl-10 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm animate-fade-in-down">
+          <div className="mt-4 pl-10 grid grid-cols-1 md:grid-cols-3 gap-4 text-display-sm animate-fade-in-down">
             <div className="bg-dark-bg/50 rounded-lg p-3 hover-scale">
-              <p className="text-xs text-dark-muted mb-1">Subjects</p>
+              <p className="text-display-xs text-dark-muted mb-1">Subjects</p>
               <div className="space-y-1">
                 {stream.config?.subjects?.map((subject: string) => (
-                  <code key={subject} className="text-xs text-primary-400">
+                  <code key={subject} className="text-display-xs text-primary-400">
                     {subject}
                   </code>
                 ))}
@@ -158,7 +158,7 @@ export default function StreamRow({
             </div>
 
             <div className="bg-dark-bg/50 rounded-lg p-3 hover-scale">
-              <p className="text-xs text-dark-muted mb-1">Configuration</p>
+              <p className="text-display-xs text-dark-muted mb-1">Configuration</p>
               <div className="space-y-1">
                 <p>Replicas: {stream.config?.replicas}</p>
                 <p>Retention: {stream.config?.retention}</p>
@@ -167,7 +167,7 @@ export default function StreamRow({
             </div>
 
             <div className="bg-dark-bg/50 rounded-lg p-3 hover-scale">
-              <p className="text-xs text-dark-muted mb-1">State</p>
+              <p className="text-display-xs text-dark-muted mb-1">State</p>
               <div className="space-y-1">
                 <p>First Seq: {stream.state?.first_seq?.toLocaleString() || 0}</p>
                 <p>Last Seq: {stream.state?.last_seq?.toLocaleString() || 0}</p>

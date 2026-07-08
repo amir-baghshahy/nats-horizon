@@ -25,7 +25,7 @@ export function NodeDetailsPanel({ node, onClose }: NodeDetailsPanelProps) {
           ) : (
             <Users className="h-5 w-5 text-blue-400" />
           )}
-          <h2 className="text-lg font-semibold text-dark-text truncate max-w-[200px]">
+          <h2 className="text-display-lg font-semibold text-dark-text truncate max-w-[200px]">
             {node.data.name}
           </h2>
         </div>
@@ -55,8 +55,8 @@ function StreamDetails({ data }: { data: any }) {
       {/* Health Status */}
       <div className="rounded-xl border border-dark-border/60 bg-dark-bg/50 p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-dark-muted">Health Status</span>
-          <span className={`text-xs font-medium capitalize ${
+          <span className="text-display-sm text-dark-muted">Health Status</span>
+          <span className={`text-display-xs font-medium capitalize ${
             data.health === 'critical' ? 'text-red-400' :
             data.health === 'warning' ? 'text-orange-400' :
             'text-green-400'
@@ -68,11 +68,11 @@ function StreamDetails({ data }: { data: any }) {
 
       {/* Statistics */}
       <div className="rounded-xl border border-dark-border/60 bg-dark-bg/50 p-4">
-        <h3 className="text-sm font-medium text-dark-text mb-3 flex items-center gap-2">
+        <h3 className="text-display-sm font-medium text-dark-text mb-3 flex items-center gap-2">
           <Activity className="h-4 w-4 text-primary-400" />
           Statistics
         </h3>
-        <div className="space-y-3 text-sm">
+        <div className="space-y-3 text-display-sm">
           <div className="flex items-center justify-between">
             <span className="text-dark-muted">Messages</span>
             <span className="font-medium text-dark-text tabular-nums">
@@ -99,7 +99,7 @@ function StreamDetails({ data }: { data: any }) {
       {/* Subjects */}
       {data.subjects && data.subjects.length > 0 && (
         <div className="rounded-xl border border-dark-border/60 bg-dark-bg/50 p-4">
-          <h3 className="text-sm font-medium text-dark-text mb-3 flex items-center gap-2">
+          <h3 className="text-display-sm font-medium text-dark-text mb-3 flex items-center gap-2">
             <Globe className="h-4 w-4 text-blue-400" />
             Subjects ({data.subjects.length})
           </h3>
@@ -107,7 +107,7 @@ function StreamDetails({ data }: { data: any }) {
             {data.subjects.map((subject: string, idx: number) => (
               <div
                 key={idx}
-                className="px-3 py-2 rounded-lg bg-dark-bg border border-dark-border/40 font-mono text-xs text-dark-muted break-all"
+                className="px-3 py-2 rounded-lg bg-dark-bg border border-dark-border/40 font-mono text-display-xs text-dark-muted break-all"
               >
                 {subject}
               </div>
@@ -125,8 +125,8 @@ function ConsumerDetails({ data }: { data: any }) {
       {/* Health Status */}
       <div className="rounded-xl border border-dark-border/60 bg-dark-bg/50 p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-dark-muted">Health Status</span>
-          <span className={`text-xs font-medium capitalize ${
+          <span className="text-display-sm text-dark-muted">Health Status</span>
+          <span className={`text-display-xs font-medium capitalize ${
             data.health === 'critical' ? 'text-red-400' :
             data.health === 'warning' ? 'text-orange-400' :
             'text-green-400'
@@ -138,11 +138,11 @@ function ConsumerDetails({ data }: { data: any }) {
 
       {/* Performance */}
       <div className="rounded-xl border border-dark-border/60 bg-dark-bg/50 p-4">
-        <h3 className="text-sm font-medium text-dark-text mb-3 flex items-center gap-2">
+        <h3 className="text-display-sm font-medium text-dark-text mb-3 flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-primary-400" />
           Performance
         </h3>
-        <div className="space-y-3 text-sm">
+        <div className="space-y-3 text-display-sm">
           <div className="flex items-center justify-between">
             <span className="text-dark-muted">Consumer Lag</span>
             <span className={`font-medium tabular-nums ${

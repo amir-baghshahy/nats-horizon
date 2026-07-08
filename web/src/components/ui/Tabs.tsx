@@ -79,8 +79,8 @@ export default function Tabs({
                   : "text-dark-muted hover:text-dark-text hover:bg-dark-bg/50"
               }`}
             >
-              {Icon && <Icon className="w-4 h-4" />}
-              <span className="text-sm font-medium">{tab.label}</span>
+              {Icon && <Icon className="icon-base" />}
+              <span className="text-display-sm font-medium">{tab.label}</span>
               {tab.badge !== undefined && tab.badge > 0 && (
                 <Badge variant="danger" size="sm">
                   {tab.badge}
@@ -119,10 +119,10 @@ export default function Tabs({
                 : "text-dark-muted hover:text-dark-text"
             }`}
           >
-            {Icon && <Icon className="w-4 h-4" />}
+            {Icon && <Icon className="icon-base" />}
             <span>{tab.label}</span>
             {tab.badge !== undefined && tab.badge > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center text-white">
+              <span className="absolute -top-1 -right-1 icon-md bg-red-500 rounded-full text-display-xs flex items-center justify-center text-white">
                 {Math.min(tab.badge, 99)}
               </span>
             )}

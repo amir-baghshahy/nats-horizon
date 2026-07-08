@@ -56,7 +56,7 @@ export default function ConsumersHeader({
                 onClick={onBulkResume}
                 disabled={pauseResumePending}
                 variant="secondary"
-                icon={<Play className="w-4 h-4" />}
+                icon={<Play className="icon-base" />}
               >
                 {t('consumers.resume', { count: selectedCount })}
               </Button>
@@ -64,7 +64,7 @@ export default function ConsumersHeader({
                 onClick={onBulkPause}
                 disabled={pauseResumePending}
                 variant="secondary"
-                icon={<Pause className="w-4 h-4" />}
+                icon={<Pause className="icon-base" />}
               >
                 {t('consumers.pause', { count: selectedCount })}
               </Button>
@@ -72,7 +72,7 @@ export default function ConsumersHeader({
                 onClick={onBulkDelete}
                 disabled={deletePending}
                 variant="secondary"
-                icon={<Trash2 className="w-4 h-4" />}
+                icon={<Trash2 className="icon-base" />}
                 className="text-status-error"
               >
                 {t('consumers.deleteSelected', { count: selectedCount })}
@@ -82,12 +82,12 @@ export default function ConsumersHeader({
           <Button
             onClick={onRefetch}
             variant="secondary"
-            icon={<RefreshCw className="w-4 h-4" />}
+            icon={<RefreshCw className="icon-base" />}
           />
           <Button
             onClick={onNavigateStreams}
             variant="primary"
-            icon={<Plus className="w-4 h-4" />}
+            icon={<Plus className="icon-base" />}
           >
             {t('consumers.createConsumer')}
           </Button>

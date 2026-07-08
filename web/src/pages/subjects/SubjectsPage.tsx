@@ -40,24 +40,24 @@ export default function SubjectsPage({
         >
           {hasChildren ? (
             isExpanded ? (
-              <ChevronDown className="w-4 h-4 text-dark-muted" />
+              <ChevronDown className="icon-base text-dark-muted" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-dark-muted" />
+              <ChevronRight className="icon-base text-dark-muted" />
             )
           ) : (
             <div className="w-4" />
           )}
 
           {node.name.includes(">") ? (
-            <Globe className="w-4 h-4 text-primary-400" />
+            <Globe className="icon-base text-primary-400" />
           ) : (
-            <Activity className="w-4 h-4 text-dark-muted" />
+            <Activity className="icon-base text-dark-muted" />
           )}
 
           <span className={depth === 0 ? "font-semibold" : ""}>
             {node.name}
           </span>
-          <span className="ml-auto text-xs text-dark-muted">
+          <span className="ml-auto text-display-xs text-dark-muted">
             {t("subjects.messageCount", { count: node.count })}
           </span>
         </div>
@@ -67,11 +67,11 @@ export default function SubjectsPage({
             {node.children.map((child: SubjectInfo) => (
               <div
                 key={child.name}
-                className="flex items-center gap-2 p-2 pl-8 text-sm text-dark-muted"
+                className="flex items-center gap-2 p-2 pl-8 text-display-sm text-dark-muted"
               >
-                <Activity className="w-4 h-4" />
+                <Activity className="icon-base" />
                 <span className="font-mono">{child.name}</span>
-                <span className="ml-auto text-xs">
+                <span className="ml-auto text-display-xs">
                   {(child.count || 0).toLocaleString()}
                 </span>
               </div>
@@ -88,7 +88,7 @@ export default function SubjectsPage({
         title={t("subjects.title")}
         subtitle={t("subjects.subtitle")}
         actions={
-           <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={() => refetch()} />
+           <Button variant="secondary" icon={<RefreshCw className="icon-base" />} onClick={() => refetch()} />
         }
       />
 
@@ -106,7 +106,7 @@ export default function SubjectsPage({
                   : "text-dark-muted"
               }`}
             >
-              <FolderOpen className="w-4 h-4 inline mr-2" />
+              <FolderOpen className="icon-base inline mr-2" />
               {t("subjects.tree")}
             </button>
             <button
@@ -117,7 +117,7 @@ export default function SubjectsPage({
                   : "text-dark-muted"
               }`}
             >
-              <MessageSquare className="w-4 h-4 inline mr-2" />
+              <MessageSquare className="icon-base inline mr-2" />
               {t("subjects.list")}
             </button>
           </div>
@@ -158,9 +158,9 @@ export default function SubjectsPage({
                         <td>
                           <div className="flex items-center gap-2">
                             {(s.name || "").includes(">") ? (
-                              <Globe className="w-4 h-4 text-primary-400" />
+                              <Globe className="icon-base text-primary-400" />
                             ) : (
-                              <Activity className="w-4 h-4 text-dark-muted" />
+                              <Activity className="icon-base text-dark-muted" />
                             )}
                             <span className="font-mono">{s.name}</span>
                           </div>

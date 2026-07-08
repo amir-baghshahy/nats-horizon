@@ -25,10 +25,10 @@ export default function StreamsHeader({
       sseDisconnectedLabel={t("common.connecting")}
        actions={
          <>
-           <Button variant="secondary" icon={<RefreshCw className="w-4 h-4" />} onClick={onRefetch}>
+           <Button variant="secondary" icon={<RefreshCw className="icon-base" />} onClick={onRefetch}>
              {t("common.refresh")}
            </Button>
-           <Button variant="primary" icon={<Plus className="w-4 h-4" />} onClick={onShowCreateModal}>
+           <Button variant="primary" icon={<Plus className="icon-base" />} onClick={onShowCreateModal}>
              {t("streams.createStream")}
            </Button>
          </>

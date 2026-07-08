@@ -43,19 +43,19 @@ export default function PublishModal({
       >
         <div className="card max-w-2xl w-full max-h-[90vh] overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="publish-modal-title">
           <div className="flex items-center justify-between mb-4">
-            <h2 id="publish-modal-title" className="text-sm font-bold">{t('messages.publishMessage')}</h2>
+            <h2 id="publish-modal-title" className="text-display-sm font-bold">{t('messages.publishMessage')}</h2>
             <button
               type="button"
               onClick={onClose}
               className="p-1.5 hover:bg-dark-bg rounded-lg"
             >
-              <X className="w-4 h-4" />
+              <X className="icon-base" />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">{t('messages.stream')}</label>
+              <label className="block text-display-sm font-medium mb-2">{t('messages.stream')}</label>
               <Select
                 value={selectedStream}
                 onChange={setSelectedStream}
@@ -70,7 +70,7 @@ export default function PublishModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">{t('messages.subject')}</label>
+              <label className="block text-display-sm font-medium mb-2">{t('messages.subject')}</label>
               <input
                 type="text"
                 name="subject"
@@ -81,7 +81,7 @@ export default function PublishModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-display-sm font-medium mb-2">
                 {t('messages.payloadJson')}
               </label>
               <textarea
@@ -105,7 +105,7 @@ export default function PublishModal({
                 disabled={isPending}
                 variant="primary"
                 loading={isPending}
-                icon={<Send className="w-4 h-4" />}
+                icon={<Send className="icon-base" />}
               >
                 {isPending ? t('messages.publishing') : t('messages.publish')}
               </Button>

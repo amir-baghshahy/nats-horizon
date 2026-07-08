@@ -62,11 +62,11 @@ export default function StreamDetailPage() {
           to="/streams"
           className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="icon-md" />
         </Link>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold">{name}</h1>
+            <h1 className="text-display-xl font-bold">{name}</h1>
             <div
               className={`flex items-center gap-2 px-3 py-1 rounded-full ${
                 (streamData.state?.num_pending || 0) > 1000
@@ -77,7 +77,7 @@ export default function StreamDetailPage() {
               <div
                 className={`w-2 h-2 rounded-full ${isPaused ? "" : "animate-pulse"}`}
               />
-              <span className="text-sm font-medium">
+              <span className="text-display-sm font-medium">
                 {isPaused
                   ? t("streams.paused")
                   : (streamData.state?.num_pending || 0) > 1000
@@ -95,21 +95,21 @@ export default function StreamDetailPage() {
             variant="secondary"
             icon={
               isPaused ? (
-                <Play className="w-4 h-4" />
+                <Play className="icon-base" />
               ) : (
-                <Pause className="w-4 h-4" />
+                <Pause className="icon-base" />
               )
             }
             onClick={() => setIsPaused(!isPaused)}
           />
           <Button
             variant="secondary"
-            icon={<RefreshCw className="w-4 h-4" />}
+            icon={<RefreshCw className="icon-base" />}
             onClick={() => refetch()}
           />
           <Button
             variant="secondary"
-            icon={<Download className="w-4 h-4" />}
+            icon={<Download className="icon-base" />}
             onClick={() =>
               window.open(
                 `/api/export/streams/${encodeURIComponent(name)}`,
@@ -121,7 +121,7 @@ export default function StreamDetailPage() {
           </Button>
           <Button
             variant="primary"
-            icon={<Plus className="w-4 h-4" />}
+            icon={<Plus className="icon-base" />}
             onClick={() => setActiveTab("consumers")}
           >
             {t("streams.addConsumer")}
@@ -196,7 +196,7 @@ export default function StreamDetailPage() {
           <PanelCard title={t("streams.streamInformation")}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-xs text-dark-muted mb-1">
+                <p className="text-display-xs text-dark-muted mb-1">
                   {t("streams.firstSequence")}
                 </p>
                 <p className="font-mono font-medium">
@@ -204,7 +204,7 @@ export default function StreamDetailPage() {
                 </p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-xs text-dark-muted mb-1">
+                <p className="text-display-xs text-dark-muted mb-1">
                   {t("streams.lastSequence")}
                 </p>
                 <p className="font-mono font-medium">
@@ -212,20 +212,20 @@ export default function StreamDetailPage() {
                 </p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-xs text-dark-muted mb-1">
+                <p className="text-display-xs text-dark-muted mb-1">
                   {t("streams.created")}
                 </p>
-                <p className="text-sm">
+                <p className="text-display-sm">
                   {streamData.state?.first_ts
                     ? new Date(streamData.state?.first_ts).toLocaleDateString()
                     : "N/A"}
                 </p>
               </div>
               <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-xs text-dark-muted mb-1">
+                <p className="text-display-xs text-dark-muted mb-1">
                   {t("streams.lastMessage")}
                 </p>
-                <p className="text-sm">
+                <p className="text-display-sm">
                   {streamData.state?.last_ts
                     ? new Date(streamData.state?.last_ts).toLocaleString()
                     : "N/A"}
@@ -242,7 +242,7 @@ export default function StreamDetailPage() {
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-muted" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 icon-base text-dark-muted" />
                   <input
                     type="text"
                     placeholder={t("streams.searchMessagesPlaceholder")}
@@ -251,7 +251,7 @@ export default function StreamDetailPage() {
                 </div>
                 <Button
                   variant="secondary"
-                  icon={<Filter className="w-4 h-4" />}
+                  icon={<Filter className="icon-base" />}
                   onClick={() => navigate(`/messages`)}
                 >
                   Filters
@@ -261,10 +261,10 @@ export default function StreamDetailPage() {
           }
         >
           <div className="text-center py-8 text-dark-muted">
-            <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <MessageSquare className="icon-lg mx-auto mb-3 opacity-50" />
             <p>{t("streams.useMessageBrowser")}</p>
             <div className="flex items-center justify-center gap-4 mt-4">
-              <span className="text-sm text-dark-muted">
+              <span className="text-display-sm text-dark-muted">
                 {(streamData.state?.messages || 0).toLocaleString()}{" "}
                 {t("streams.messages")}
               </span>
@@ -307,7 +307,7 @@ export default function StreamDetailPage() {
                       >
                         {consumer.name}
                       </Link>
-                      <p className="text-xs text-dark-muted mt-1">
+                      <p className="text-display-xs text-dark-muted mt-1">
                         {consumer.config?.durable
                           ? t("streams.durable")
                           : t("streams.ephemeral")}
@@ -319,7 +319,7 @@ export default function StreamDetailPage() {
                       <p className="font-medium">
                         {(consumer.lag || 0).toLocaleString()}
                       </p>
-                      <p className="text-xs text-dark-muted">
+                      <p className="text-display-xs text-dark-muted">
                         {t("streams.lag")}
                       </p>
                     </div>
@@ -327,7 +327,7 @@ export default function StreamDetailPage() {
                       <p className="font-medium">
                         {consumer.ack_rate || "N/A"}
                       </p>
-                      <p className="text-xs text-dark-muted">
+                      <p className="text-display-xs text-dark-muted">
                         {t("streams.ackRate")}
                       </p>
                     </div>
@@ -413,7 +413,7 @@ export default function StreamDetailPage() {
                   <span className="text-dark-muted">
                     {t("streams.subjects")}
                   </span>
-                  <span className="font-mono text-sm">
+                  <span className="font-mono text-display-sm">
                     {streamData.config?.subjects?.join(", ")}
                   </span>
                 </div>
@@ -425,7 +425,7 @@ export default function StreamDetailPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <Button
                 variant="secondary"
-                icon={<FileText className="w-4 h-4" />}
+                icon={<FileText className="icon-base" />}
                 onClick={handleEditConfig}
               >
                 {t("streams.editConfig")}
@@ -436,9 +436,9 @@ export default function StreamDetailPage() {
                 disabled={loadingAction === "purge"}
                 icon={
                   loadingAction === "purge" ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="icon-base animate-spin" />
                   ) : (
-                    <Zap className="w-4 h-4" />
+                    <Zap className="icon-base" />
                   )
                 }
               >
@@ -451,9 +451,9 @@ export default function StreamDetailPage() {
                 className="text-status-error"
                 icon={
                   loadingAction === "delete" ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="icon-base animate-spin" />
                   ) : (
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="icon-base" />
                   )
                 }
               >
@@ -461,7 +461,7 @@ export default function StreamDetailPage() {
               </Button>
               <Button
                 variant="secondary"
-                icon={<CopyIcon className="w-4 h-4" />}
+                icon={<CopyIcon className="icon-base" />}
                 onClick={handleCloneStream}
               >
                 {t("streams.cloneStream")}

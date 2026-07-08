@@ -15,7 +15,7 @@ export default function AlertsFilters({
   return (
     <div className="flex items-center gap-4 mb-4">
       <div className="flex items-center gap-2">
-        <Filter className="w-4 h-4 text-dark-muted" />
+        <Filter className="icon-base text-dark-muted" />
         <Select
           value={filterSeverity}
           onChange={(value) => onFilterChange(value as any)}

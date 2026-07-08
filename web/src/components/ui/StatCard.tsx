@@ -65,10 +65,10 @@ export default function StatCard({
   const displayValue =
     typeof value === "number" && formatValue ? formatNumber(value) : value;
 
-  const iconSize = size === "small" ? "w-3.5 h-3.5" : "w-4 h-4";
-  const valueSize = size === "small" ? "text-base" : "text-xl";
-  const labelSize = "text-[11px]";
-  const containerSize = size === "small" ? "w-7 h-7" : "w-8 h-8";
+  const iconSize = size === "small" ? "icon-sm" : "icon-base";
+  const valueSize = size === "small" ? "text-display-base" : "text-display-xl";
+  const labelSize = "text-display-xs";
+  const containerSize = size === "small" ? "w-7 h-7" : "avatar";
 
   const card = (
     <div className="card">

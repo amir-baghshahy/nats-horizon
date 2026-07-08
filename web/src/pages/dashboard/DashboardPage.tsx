@@ -63,7 +63,7 @@ export default function DashboardPage({
 
       {/* Real-time Metrics Section */}
       <section className="mb-6 animate-slide-up animate-delay-100">
-        <h2 className="text-sm font-semibold mb-3 text-dark-text">{t('dashboard.realTimeMetrics')}</h2>
+        <h2 className="text-display-sm font-semibold mb-3 text-dark-text">{t('dashboard.realTimeMetrics')}</h2>
         <SystemMetrics />
       </section>
 

@@ -52,7 +52,7 @@ export default function StatusBadge({
   const [textColor, bgColor] = colors.split(" ");
 
   const sizeClasses =
-    size === "small" ? "text-xs px-2 py-0.5" : "text-sm px-3 py-1";
+    size === "small" ? "text-display-xs px-2 py-0.5" : "text-display-sm px-3 py-1";
 
   if (dotOnly) {
     return (

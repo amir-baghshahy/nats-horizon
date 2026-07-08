@@ -348,13 +348,13 @@ export function useConsumersPage(): UseConsumersPageReturn {
   const getStatusIcon = (consumer: Consumer) => {
     switch (consumer.status) {
       case "active":
-        return <CheckCircle className="w-4 h-4 status-success" />;
+        return <CheckCircle className="icon-base status-success" />;
       case "stuck":
-        return <AlertCircle className="w-4 h-4 status-error" />;
+        return <AlertCircle className="icon-base status-error" />;
       case "idle":
-        return <Clock className="w-4 h-4 status-warning" />;
+        return <Clock className="icon-base status-warning" />;
       default:
-        return <Activity className="w-4 h-4 status-info" />;
+        return <Activity className="icon-base status-info" />;
     }
   };
 

@@ -28,7 +28,7 @@ export default function EditStreamModal({
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
         <div className="card w-full max-w-lg">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">
+            <h2 className="text-display-xl font-bold">
               {t("streams.editStream")}: {name}
             </h2>
             <button
@@ -40,7 +40,7 @@ export default function EditStreamModal({
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-dark-muted mb-1">
+              <label className="block text-display-sm text-dark-muted mb-1">
                 {t("streams.editSubjects")}
               </label>
               <input
@@ -54,7 +54,7 @@ export default function EditStreamModal({
               />
             </div>
             <div>
-              <label className="block text-sm text-dark-muted mb-1">
+              <label className="block text-display-sm text-dark-muted mb-1">
                 {t("streams.replicas")}
               </label>
               <input
@@ -72,7 +72,7 @@ export default function EditStreamModal({
               />
             </div>
             <div>
-              <label className="block text-sm text-dark-muted mb-1">
+              <label className="block text-display-sm text-dark-muted mb-1">
                 {t("streams.maxAgeLabel")}
               </label>
               <input
@@ -86,7 +86,7 @@ export default function EditStreamModal({
               />
             </div>
             <div>
-              <label className="block text-sm text-dark-muted mb-1">
+              <label className="block text-display-sm text-dark-muted mb-1">
                 {t("streams.maxBytesLabel")}
               </label>
               <input

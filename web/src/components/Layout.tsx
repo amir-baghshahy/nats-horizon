@@ -135,7 +135,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         aria-expanded={sidebarOpen}
         className="md:hidden fixed top-3 left-3 z-50 p-1.5 rounded-lg bg-dark-card border border-dark-border text-dark-text hover:bg-dark-bg transition-colors"
       >
-        {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        {sidebarOpen ? <X className="icon-md" /> : <Menu className="icon-md" />}
       </button>
 
       {/* Sidebar */}
@@ -151,10 +151,10 @@ export default function Layout({ children }: { children: ReactNode }) {
               <Activity className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-sm font-bold tracking-tight text-dark-text truncate">
+              <h1 className="text-display-sm font-bold tracking-tight text-dark-text truncate">
                 {t("app.title")}
               </h1>
-              <p className="text-[10px] text-dark-muted truncate">{t("app.subtitle")}</p>
+              <p className="text-display-xs text-dark-muted truncate">{t("app.subtitle")}</p>
             </div>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 {/* Group Header */}
                 <button
                   onClick={() => toggleGroup(group.titleKey)}
-                  className={`w-full flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors duration-150 ${
+                  className={`w-full flex items-center gap-2 rounded-lg px-3 py-2 text-display-xs font-semibold uppercase tracking-wider transition-colors duration-150 ${
                     groupActive
                       ? "text-primary-400 bg-primary-500/10"
                       : "text-dark-muted hover:bg-dark-bg/60 hover:text-dark-text"
@@ -201,7 +201,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                           key={item.key}
                           to={item.href}
                           onClick={() => setSidebarOpen(false)}
-                          className={`group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 ${
+                          className={`group flex items-center gap-2.5 rounded-lg px-3 py-2 text-display-sm font-medium transition-colors duration-150 ${
                             isActive
                               ? "bg-primary-600 text-white shadow-sm shadow-primary-500/20"
                               : "text-dark-muted hover:bg-dark-bg/60 hover:text-dark-text"
@@ -232,7 +232,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 connected ? "bg-status-success animate-pulse" : "bg-status-error"
               }`}
             />
-            <span className="text-xs text-dark-muted truncate">
+            <span className="text-display-xs text-dark-muted truncate">
               {connected ? t("common.connected") : t("common.disconnected")}
             </span>
             {!connected && (

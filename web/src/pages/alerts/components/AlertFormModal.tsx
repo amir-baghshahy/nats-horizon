@@ -75,7 +75,7 @@ export default function AlertFormModal({
         >
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-dark-border flex-shrink-0">
-            <h2 id="alert-modal-title" className="text-sm font-bold">
+            <h2 id="alert-modal-title" className="text-display-sm font-bold">
               {alert ? t("alerts.editAlert") : t("alerts.createAlert")}
             </h2>
             <button
@@ -83,7 +83,7 @@ export default function AlertFormModal({
               onClick={onClose}
               className="p-1.5 hover:bg-dark-bg rounded-lg transition-colors"
             >
-              <X className="w-4 h-4" />
+              <X className="icon-base" />
             </button>
           </div>
 
@@ -93,7 +93,7 @@ export default function AlertFormModal({
               {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1.5">
+                  <label className="block text-display-sm font-medium mb-1.5">
                     {t("alerts.alertName")}
                   </label>
                   <input
@@ -106,7 +106,7 @@ export default function AlertFormModal({
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-1.5">
+                  <label className="block text-display-sm font-medium mb-1.5">
                     {t("alerts.description")}
                   </label>
                   <textarea
@@ -121,12 +121,12 @@ export default function AlertFormModal({
 
               {/* Condition */}
               <div className="border border-dark-border rounded-xl p-4 space-y-4">
-                <h3 className="text-sm font-semibold text-dark-muted uppercase tracking-wide">
+                <h3 className="text-display-sm font-semibold text-dark-muted uppercase tracking-wide">
                   {t("alerts.conditionType")}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-dark-muted mb-1">
                       Type
                     </label>
                     <Select
@@ -142,7 +142,7 @@ export default function AlertFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-dark-muted mb-1">
                       Operator
                     </label>
                     <Select
@@ -159,7 +159,7 @@ export default function AlertFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-dark-muted mb-1">
                       Threshold
                     </label>
                     <input
@@ -171,7 +171,7 @@ export default function AlertFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-dark-muted mb-1">
                       Severity
                     </label>
                     <Select
@@ -189,7 +189,7 @@ export default function AlertFormModal({
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-dark-muted mb-1">
                       {t("alerts.streamNameOptional")}
                     </label>
                     <input
@@ -201,7 +201,7 @@ export default function AlertFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-dark-muted mb-1">
                       {t("alerts.consumerNameOptional")}
                     </label>
                     <input
@@ -217,7 +217,7 @@ export default function AlertFormModal({
 
               {/* Notification Channels */}
               <div className="border border-dark-border rounded-xl p-4 space-y-4">
-                <h3 className="text-sm font-semibold text-dark-muted uppercase tracking-wide">
+                <h3 className="text-display-sm font-semibold text-dark-muted uppercase tracking-wide">
                   {t("alerts.notificationChannels")}
                 </h3>
 
@@ -230,10 +230,10 @@ export default function AlertFormModal({
                       defaultChecked={alert?.channels?.includes("email")}
                       className="rounded"
                     />
-                    <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                      <Mail className="w-4 h-4 text-blue-400" />
+                    <div className="avatar rounded-lg bg-blue-500/20 flex items-center justify-center">
+                      <Mail className="icon-base text-blue-400" />
                     </div>
-                    <span className="text-sm font-medium">
+                    <span className="text-display-sm font-medium">
                       {t("alerts.email")}
                     </span>
                   </label>
@@ -255,10 +255,10 @@ export default function AlertFormModal({
                       defaultChecked={alert?.channels?.includes("webhook")}
                       className="rounded"
                     />
-                    <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
-                      <Webhook className="w-4 h-4 text-green-400" />
+                    <div className="avatar rounded-lg bg-green-500/20 flex items-center justify-center">
+                      <Webhook className="icon-base text-green-400" />
                     </div>
-                    <span className="text-sm font-medium">
+                    <span className="text-display-sm font-medium">
                       {t("alerts.webhook")}
                     </span>
                   </label>
@@ -280,10 +280,10 @@ export default function AlertFormModal({
                       defaultChecked={alert?.channels?.includes("slack")}
                       className="rounded"
                     />
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                      <Hash className="w-4 h-4 text-purple-400" />
+                    <div className="avatar rounded-lg bg-purple-500/20 flex items-center justify-center">
+                      <Hash className="icon-base text-purple-400" />
                     </div>
-                    <span className="text-sm font-medium">
+                    <span className="text-display-sm font-medium">
                       {t("alerts.slack")}
                     </span>
                   </label>
@@ -306,7 +306,7 @@ export default function AlertFormModal({
                   defaultChecked={alert?.enabled ?? true}
                   value="true"
                 />
-                <label htmlFor="enabled" className="text-sm">
+                <label htmlFor="enabled" className="text-display-sm">
                   {t("alerts.enableAlert")}
                 </label>
               </div>

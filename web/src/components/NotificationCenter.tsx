@@ -19,10 +19,10 @@ import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 
 const icons = {
-  success: <CheckCircle className="w-4 h-4 text-green-400" />,
-  error: <XCircle className="w-4 h-4 text-red-400" />,
-  warning: <AlertTriangle className="w-4 h-4 text-yellow-400" />,
-  info: <Info className="w-4 h-4 text-blue-400" />,
+  success: <CheckCircle className="icon-base text-green-400" />,
+  error: <XCircle className="icon-base text-red-400" />,
+  warning: <AlertTriangle className="icon-base text-yellow-400" />,
+  info: <Info className="icon-base text-blue-400" />,
 };
 
 export function NotificationCenter() {
@@ -58,11 +58,11 @@ export function NotificationCenter() {
         className="relative p-2 rounded-lg hover:bg-dark-bg/60 transition-colors"
         aria-label={t("common.notifications")}
       >
-        <Bell className="w-5 h-5 text-dark-text" />
+        <Bell className="icon-md text-dark-text" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 flex h-5 w-5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 items-center justify-center text-[10px] font-bold text-white">
+            <span className="relative inline-flex rounded-full h-5 w-5 bg-red-500 items-center justify-center text-display-xs font-bold text-white">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           </span>
@@ -91,7 +91,7 @@ export function NotificationCenter() {
                         size="sm"
                         variant="ghost"
                         onClick={markAllAsRead}
-                        icon={<Check className="w-3.5 h-3.5" />}
+                        icon={<Check className="icon-sm" />}
                       >
                         {t("common.markAllRead")}
                       </Button>
@@ -99,7 +99,7 @@ export function NotificationCenter() {
                         size="sm"
                         variant="ghost"
                         onClick={clearAll}
-                        icon={<X className="w-3.5 h-3.5" />}
+                        icon={<X className="icon-sm" />}
                       ></Button>
                     </>
                   )}
@@ -110,8 +110,8 @@ export function NotificationCenter() {
               <div className="max-h-96 overflow-y-auto">
                 {notifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <Bell className="w-12 h-12 text-dark-muted/30 mb-3" />
-                    <p className="text-sm text-dark-muted">
+                    <Bell className="icon-lg text-dark-muted/30 mb-3" />
+                    <p className="text-display-sm text-dark-muted">
                       {t("common.noNotifications")}
                     </p>
                   </div>
@@ -130,11 +130,11 @@ export function NotificationCenter() {
                             {icons[notification.type]}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">
+                            <p className="text-display-sm font-medium truncate">
                               {notification.title}
                             </p>
                             {notification.message && (
-                              <p className="text-xs text-dark-muted mt-1 line-clamp-2">
+                              <p className="text-display-xs text-dark-muted mt-1 line-clamp-2">
                                 {notification.message}
                               </p>
                             )}
@@ -159,7 +159,7 @@ export function NotificationCenter() {
                             }}
                             className="p-1 hover:bg-dark-bg rounded transition-colors"
                           >
-                            <X className="w-3.5 h-3.5 text-dark-muted" />
+                            <X className="icon-sm text-dark-muted" />
                           </button>
                         </div>
                       </div>
@@ -173,7 +173,7 @@ export function NotificationCenter() {
                 <div className="p-3 border-t border-dark-border text-center">
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="text-xs text-dark-muted hover:text-dark-text transition-colors"
+                    className="text-display-xs text-dark-muted hover:text-dark-text transition-colors"
                   >
                     {t("common.close")}
                   </button>
@@ -196,7 +196,7 @@ export function NotificationBadge() {
   return (
     <Badge
       variant="danger"
-      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-[10px]"
+      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-display-xs"
     >
       {unreadCount > 9 ? "9+" : unreadCount}
     </Badge>

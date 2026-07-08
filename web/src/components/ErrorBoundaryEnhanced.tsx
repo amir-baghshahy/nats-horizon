@@ -114,11 +114,11 @@ function ErrorFallback({
       <Card className="max-w-lg w-full p-6 text-center">
         <div className="flex justify-center mb-4">
           <div className="p-4 rounded-full bg-red-500/20">
-            <AlertCircle className="w-8 h-8 text-red-400" />
+            <AlertCircle className="avatar text-red-400" />
           </div>
         </div>
 
-        <h2 className="text-xl font-semibold mb-2">
+        <h2 className="text-display-xl font-semibold mb-2">
           {t("common.somethingWentWrong")}
         </h2>
 
@@ -128,10 +128,10 @@ function ErrorFallback({
 
         {error?.stack && typeof window !== 'undefined' && (window as any).process?.env?.NODE_ENV === "development" && (
           <details className="mb-4 text-left">
-            <summary className="cursor-pointer text-xs text-dark-muted hover:text-dark-text mb-2">
+            <summary className="cursor-pointer text-display-xs text-dark-muted hover:text-dark-text mb-2">
               {t("common.errorDetails")}
             </summary>
-            <pre className="bg-dark-bg p-3 rounded-lg text-xs overflow-auto max-h-40 text-red-400">
+            <pre className="bg-dark-bg p-3 rounded-lg text-display-xs overflow-auto max-h-40 text-red-400">
               {error.stack}
             </pre>
           </details>
@@ -141,7 +141,7 @@ function ErrorFallback({
           {showRetry ? (
             <Button
               onClick={onRetry}
-              icon={<RefreshCw className="w-4 h-4" />}
+              icon={<RefreshCw className="icon-base" />}
               variant="primary"
             >
               {t("common.tryAgain")}
@@ -149,7 +149,7 @@ function ErrorFallback({
           ) : (
             <Button
               onClick={onGoHome}
-              icon={<Home className="w-4 h-4" />}
+              icon={<Home className="icon-base" />}
               variant="primary"
             >
               {t("common.goHome")}
@@ -158,7 +158,7 @@ function ErrorFallback({
         </div>
 
         {!showRetry && (
-          <p className="text-xs text-dark-muted mt-3">
+          <p className="text-display-xs text-dark-muted mt-3">
             {t("common.tooManyRetries")}
           </p>
         )}

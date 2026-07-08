@@ -46,7 +46,7 @@ export default function LanguageSwitcher() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-2 rounded-lg border border-dark-border/60 bg-dark-bg/45 px-3 py-2 text-xs text-dark-muted hover:text-dark-text hover:border-dark-border transition-colors"
+        className="flex w-full items-center gap-2 rounded-lg border border-dark-border/60 bg-dark-bg/45 px-3 py-2 text-display-xs text-dark-muted hover:text-dark-text hover:border-dark-border transition-colors"
         aria-label={t("language.select")}
       >
         <Globe className="h-3.5 w-3.5 shrink-0" />
@@ -62,13 +62,13 @@ export default function LanguageSwitcher() {
             <button
               key={lang}
               onClick={() => handleChange(lang)}
-              className={`flex w-full items-center gap-2.5 px-3 py-2 text-xs transition-colors ${
+              className={`flex w-full items-center gap-2.5 px-3 py-2 text-display-xs transition-colors ${
                 currentLang === lang
                   ? "bg-primary-600/20 text-primary-300"
                   : "text-dark-muted hover:bg-dark-bg/60 hover:text-dark-text"
               }`}
             >
-              <span className="w-6 text-[10px] font-mono font-semibold text-dark-muted/60 shrink-0">
+              <span className="w-6 text-display-xs font-mono font-semibold text-dark-muted/60 shrink-0">
                 {lang.toUpperCase()}
               </span>
               <span className="flex-1 text-left">{LANGUAGE_LABELS[lang]}</span>

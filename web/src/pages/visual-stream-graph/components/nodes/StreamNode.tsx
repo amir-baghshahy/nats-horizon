@@ -28,7 +28,7 @@ export function StreamNode({ data, selected }: NodeProps) {
           </h3>
         </div>
 
-        <div className="space-y-2 text-sm">
+        <div className="space-y-2 text-display-sm">
           <div className="flex items-center justify-between">
             <span className="text-dark-muted">Messages:</span>
             <span className="font-medium text-dark-text tabular-nums">
@@ -54,7 +54,7 @@ export function StreamNode({ data, selected }: NodeProps) {
 
           <div className="flex items-center gap-1.5 pt-2 border-t border-dark-border/60 mt-2">
             <HealthIcon className={`h-3.5 w-3.5 ${healthColor}`} />
-            <span className={`text-xs font-medium capitalize ${healthColor}`}>
+            <span className={`text-display-xs font-medium capitalize ${healthColor}`}>
               {data.health}
             </span>
           </div>
@@ -62,19 +62,19 @@ export function StreamNode({ data, selected }: NodeProps) {
 
         {data.subjects && data.subjects.length > 0 && (
           <div className="mt-3 pt-2 border-t border-dark-border/60">
-            <div className="text-xs text-dark-muted mb-1">Subjects:</div>
+            <div className="text-display-xs text-dark-muted mb-1">Subjects:</div>
             <div className="flex flex-wrap gap-1">
               {data.subjects.slice(0, 2).map((subject: string, idx: number) => (
                 <span
                   key={idx}
-                  className="text-xs px-1.5 py-0.5 rounded bg-dark-bg/50 text-dark-muted border border-dark-border/40"
+                  className="text-display-xs px-1.5 py-0.5 rounded bg-dark-bg/50 text-dark-muted border border-dark-border/40"
                   title={subject}
                 >
                   {subject.length > 12 ? `${subject.slice(0, 12)}...` : subject}
                 </span>
               ))}
               {data.subjects.length > 2 && (
-                <span className="text-xs px-1.5 py-0.5 rounded bg-dark-bg/50 text-dark-muted border border-dark-border/40">
+                <span className="text-display-xs px-1.5 py-0.5 rounded bg-dark-bg/50 text-dark-muted border border-dark-border/40">
                   +{data.subjects.length - 2}
                 </span>
               )}

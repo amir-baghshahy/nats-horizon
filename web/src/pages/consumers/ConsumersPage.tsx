@@ -106,7 +106,7 @@ export default function ConsumersPage() {
           getLagColor={getLagColor}
         />
 
-        <div className="flex items-center justify-between text-sm text-dark-muted">
+        <div className="flex items-center justify-between text-display-sm text-dark-muted">
           <span>
             {t('consumers.showingConsumers', { filtered: filteredConsumers.length, total: totalConsumers })}
           </span>

@@ -96,11 +96,11 @@ export function MetricsGraph({
             {icon}
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] text-dark-muted truncate leading-tight">{title}</p>
-            <p className="text-base font-bold leading-tight tabular-nums">{formatValue(currentValue)}</p>
+            <p className="text-display-xs text-dark-muted truncate leading-tight">{title}</p>
+            <p className="text-display-base font-bold leading-tight tabular-nums">{formatValue(currentValue)}</p>
           </div>
         </div>
-        <div className={`flex items-center gap-0.5 text-xs font-medium ${trendColor}`}>
+        <div className={`flex items-center gap-0.5 text-display-xs font-medium ${trendColor}`}>
           {change > 0 ? <TrendingUp className="w-3 h-3" /> : change < 0 ? <TrendingDown className="w-3 h-3" /> : null}
           <span>{change >= 0 ? '+' : ''}{changePercent.toFixed(1)}%</span>
         </div>
@@ -121,7 +121,7 @@ export function MetricsGraph({
                 content={({ active, payload }) => {
                   if (!active || !payload?.length) return null
                   return (
-                    <div className="rounded-lg border border-dark-border bg-dark-card/95 px-2 py-1 text-xs shadow-lg">
+                    <div className="rounded-lg border border-dark-border bg-dark-card/95 px-2 py-1 text-display-xs shadow-lg">
                       <span className="font-mono" style={{ color: hexColor }}>
                         {formatValue(payload[0].value as number)}
                       </span>
@@ -142,7 +142,7 @@ export function MetricsGraph({
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex h-full items-center justify-center text-[10px] text-dark-muted/60">
+          <div className="flex h-full items-center justify-center text-display-xs text-dark-muted/60">
             {t('common.collectingData') || 'Collecting data…'}
           </div>
         )}
@@ -165,7 +165,7 @@ export function SystemMetrics() {
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       <MetricsGraph
         title={t('messages.messagesLabel')}
-        icon={<Activity className="w-4 h-4 text-green-400" />}
+        icon={<Activity className="icon-base text-green-400" />}
         color="rgb(74, 222, 128)"
         queryKey={['dashboardStats']}
         queryFn={() => HealthService.getDashboardStats()}
@@ -173,7 +173,7 @@ export function SystemMetrics() {
       />
       <MetricsGraph
         title={t('common.memory')}
-        icon={<Cpu className="w-4 h-4 text-orange-400" />}
+        icon={<Cpu className="icon-base text-orange-400" />}
         color="rgb(251, 146, 60)"
         queryKey={['systemMetrics']}
         queryFn={() => MetricsService.getMetricsSystem()}
@@ -182,7 +182,7 @@ export function SystemMetrics() {
       />
       <MetricsGraph
         title={t('common.storage')}
-        icon={<HardDrive className="w-4 h-4 text-purple-400" />}
+        icon={<HardDrive className="icon-base text-purple-400" />}
         color="rgb(192, 132, 252)"
         queryKey={['systemMetrics-storage']}
         queryFn={() => MetricsService.getMetricsSystem()}
@@ -191,7 +191,7 @@ export function SystemMetrics() {
       />
       <MetricsGraph
         title={t('messages.messageRate')}
-        icon={<TrendingUp className="w-4 h-4 text-cyan-400" />}
+        icon={<TrendingUp className="icon-base text-cyan-400" />}
         color="rgb(34, 211, 238)"
         queryKey={['rateMetrics']}
         queryFn={() => MetricsService.getMetricsRates()}
@@ -212,8 +212,8 @@ export function ResourceUsageBar({
   return (
     <div className="bg-dark-bg rounded-lg p-3">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs font-medium">{label}</span>
-        <span className="text-xs text-dark-muted">{formatBytes(used)} / {formatBytes(max)}</span>
+        <span className="text-display-xs font-medium">{label}</span>
+        <span className="text-display-xs text-dark-muted">{formatBytes(used)} / {formatBytes(max)}</span>
       </div>
       <div className="w-full bg-dark-border rounded-full h-1.5 overflow-hidden">
         <div
@@ -222,10 +222,10 @@ export function ResourceUsageBar({
         />
       </div>
       <div className="flex items-center justify-between mt-1">
-        <span className={`text-[10px] ${percentage > 90 ? 'text-red-400' : percentage > 70 ? 'text-yellow-400' : 'text-green-400'}`}>
+        <span className={`text-display-xs ${percentage > 90 ? 'text-red-400' : percentage > 70 ? 'text-yellow-400' : 'text-green-400'}`}>
           {percentage.toFixed(1)}%
         </span>
-        <span className="text-[10px] text-dark-muted">
+        <span className="text-display-xs text-dark-muted">
           {percentage > 90 ? t('common.critical') : percentage > 70 ? t('common.warning') : t('common.healthy')}
         </span>
       </div>

@@ -70,7 +70,7 @@ export default function TenancyPage({
         actions={
           <Button
             variant="primary"
-            icon={<Plus className="w-4 h-4" />}
+            icon={<Plus className="icon-base" />}
             onClick={() => {
               setEditingConnection(null)
             setShowModal(true)
@@ -111,7 +111,7 @@ export default function TenancyPage({
       </div>
 
       <PanelCard
-        header={<h3 className="text-lg font-semibold flex items-center gap-2"><Server className="w-5 h-5" /> {t('tenancy.serverConnections')}</h3>}
+        header={<h3 className="text-display-lg font-semibold flex items-center gap-2"><Server className="icon-md" /> {t('tenancy.serverConnections')}</h3>}
       >
         <div className="space-y-4">
           {connections?.connections?.map((conn: ConnectionConfig) => {
@@ -134,35 +134,35 @@ export default function TenancyPage({
                     <div className="flex items-center gap-3 mb-2">
                       <h4 className="font-medium">{connectionName}</h4>
                       {conn.is_default && (
-                        <span className="text-xs px-2 py-1 rounded bg-yellow-500/20 text-yellow-400">
+                        <span className="text-display-xs px-2 py-1 rounded bg-yellow-500/20 text-yellow-400">
                           {t('tenancy.default')}
                         </span>
                       )}
                       {conn.enabled ? (
-                        <span className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">
+                        <span className="text-display-xs px-2 py-1 rounded bg-green-500/20 text-green-400">
                           {t('tenancy.enabled')}
                         </span>
                       ) : (
-                        <span className="text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">
+                        <span className="text-display-xs px-2 py-1 rounded bg-red-500/20 text-red-400">
                           {t('tenancy.disabled')}
                         </span>
                       )}
                       {status?.connected ? (
-                        <span className="flex items-center gap-1 text-xs text-green-400">
+                        <span className="flex items-center gap-1 text-display-xs text-green-400">
                           <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                           {t('tenancy.connected')}
                         </span>
                       ) : (
-                        <span className="flex items-center gap-1 text-xs text-red-400">
+                        <span className="flex items-center gap-1 text-display-xs text-red-400">
                           <XCircle className="w-3 h-3" />
                           {status?.error || t('tenancy.disconnected')}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-dark-muted mb-2">
+                    <p className="text-display-sm text-dark-muted mb-2">
                       {conn.description || t('tenancy.noDescription')}
                     </p>
-                    <div className="flex items-center gap-4 text-xs text-dark-muted">
+                    <div className="flex items-center gap-4 text-display-xs text-dark-muted">
                       <span className="font-mono">{connectionUrl}</span>
                       {status?.latency && (
                         <span>{t('tenancy.latency', { value: status.latency })}</span>
@@ -180,7 +180,7 @@ export default function TenancyPage({
                         className="p-1.5 hover:bg-yellow-500/20 text-yellow-400 rounded-lg"
                         title={t('tenancy.setDefault')}
                       >
-                        <Star className="w-3.5 h-3.5" />
+                        <Star className="icon-sm" />
                       </button>
                     )}
                     <button
@@ -190,7 +190,7 @@ export default function TenancyPage({
                       className="p-1.5 hover:bg-blue-500/20 text-blue-400 rounded-lg"
                       title={t('tenancy.testConnection')}
                     >
-                      <RefreshCw className={`w-3.5 h-3.5 ${testConnectionMutation.isPending && testingUrl === connectionUrl ? 'animate-spin' : ''}`} />
+                      <RefreshCw className={`icon-sm ${testConnectionMutation.isPending && testingUrl === connectionUrl ? 'animate-spin' : ''}`} />
                     </button>
                     <button
                       type="button"
@@ -198,7 +198,7 @@ export default function TenancyPage({
                       className="p-1.5 hover:bg-dark-border rounded-lg"
                       title={t('common.edit')}
                     >
-                      <Edit className="w-3.5 h-3.5" />
+                      <Edit className="icon-sm" />
                     </button>
                     {!conn.is_default && (
                       <button
@@ -210,7 +210,7 @@ export default function TenancyPage({
                         className="p-1.5 hover:bg-red-500/20 text-red-400 rounded-lg"
                         title={t('common.delete')}
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="icon-sm" />
                       </button>
                     )}
                   </div>
@@ -218,7 +218,7 @@ export default function TenancyPage({
 
                 {testResult && testingUrl === connectionUrl && (
                   <div
-                    className={`mt-3 p-3 rounded-lg text-sm ${
+                    className={`mt-3 p-3 rounded-lg text-display-sm ${
                       testResult.healthy
                         ? 'bg-green-500/10 text-green-400'
                         : 'bg-red-500/10 text-red-400'
@@ -226,14 +226,14 @@ export default function TenancyPage({
                   >
                     {testResult.healthy ? (
                       <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4" />
+                        <CheckCircle className="icon-base" />
                         <span>
                           {t('tenancy.connectionSuccessful', { latency: testResult.latency })}
                         </span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <XCircle className="w-4 h-4" />
+                        <XCircle className="icon-base" />
                         <span>{t('tenancy.connectionFailed', { error: testResult.error })}</span>
                       </div>
                     )}
@@ -253,7 +253,7 @@ export default function TenancyPage({
           >
             <div className="card max-w-md w-full" role="dialog" aria-modal="true" aria-labelledby="conn-modal-title">
             <div className="flex items-center justify-between mb-4">
-              <h2 id="conn-modal-title" className="text-sm font-bold">
+              <h2 id="conn-modal-title" className="text-display-sm font-bold">
                 {editingConnection ? t('tenancy.editConnection') : t('tenancy.addConnection')}
               </h2>
               <button
@@ -261,12 +261,12 @@ export default function TenancyPage({
                 onClick={() => { setShowModal(false); setEditingConnection(null); setTestResult(null); }}
                 className="p-1.5 hover:bg-dark-bg rounded-lg"
               >
-                <X className="w-4 h-4" />
+                <X className="icon-base" />
               </button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">{t('tenancy.name')}</label>
+                <label className="block text-display-sm font-medium mb-2">{t('tenancy.name')}</label>
                 <input
                   type="text"
                   name="name"
@@ -277,7 +277,7 @@ export default function TenancyPage({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">{t('tenancy.url')}</label>
+                <label className="block text-display-sm font-medium mb-2">{t('tenancy.url')}</label>
                 <input
                   type="text"
                   name="url"
@@ -288,7 +288,7 @@ export default function TenancyPage({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-display-sm font-medium mb-2">
                   {t('tenancy.description')}
                 </label>
                 <textarea
@@ -306,7 +306,7 @@ export default function TenancyPage({
                   name="enabled"
                   defaultChecked={editingConnection?.enabled ?? true}
                 />
-                <label htmlFor="enabled" className="text-sm">
+                <label htmlFor="enabled" className="text-display-sm">
                   {t('tenancy.enabled')}
                 </label>
               </div>

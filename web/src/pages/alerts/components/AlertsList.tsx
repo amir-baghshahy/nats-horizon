@@ -79,31 +79,31 @@ export default function AlertsList({
                     disabled={isTogglePending}
                   >
                     {alert.enabled ? (
-                      <ToggleRight className="w-5 h-5 text-green-400 animate-bounce-in" />
+                      <ToggleRight className="icon-md text-green-400 animate-bounce-in" />
                     ) : (
-                      <ToggleLeft className="w-5 h-5 text-dark-muted" />
+                      <ToggleLeft className="icon-md text-dark-muted" />
                     )}
                   </button>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-semibold">{alert.name}</h3>
                       <span
-                        className={`text-xs px-2 py-1 rounded border ${
+                        className={`text-display-xs px-2 py-1 rounded border ${
                           SEVERITY_COLORS[alert.severity || "info"]
                         }`}
                       >
                         {alert.severity}
                       </span>
                       {!alert.enabled && (
-                        <span className="text-xs text-dark-muted">
+                        <span className="text-display-xs text-dark-muted">
                           {t("alerts.disabled")}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-dark-muted mb-3">
+                    <p className="text-display-sm text-dark-muted mb-3">
                       {alert.description}
                     </p>
-                    <div className="flex items-center gap-4 text-xs text-dark-muted">
+                    <div className="flex items-center gap-4 text-display-xs text-dark-muted">
                       {alert.condition && (
                         <span className="font-mono bg-dark-bg px-2 py-1 rounded">
                           {alert.condition.type}: {alert.condition.operator}{" "}
@@ -140,7 +140,7 @@ export default function AlertsList({
                     className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale"
                     title={t("alerts.edit")}
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="icon-base" />
                   </button>
                   <button
                     onClick={async () => {
@@ -157,7 +157,7 @@ export default function AlertsList({
                     className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg hover-lift active-scale"
                     title={t("alerts.delete")}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="icon-base" />
                   </button>
                 </div>
               </div>

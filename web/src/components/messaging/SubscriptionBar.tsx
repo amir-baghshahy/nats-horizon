@@ -35,7 +35,7 @@ export default function SubscriptionBar({
             className="input w-full font-mono"
             onKeyPress={handleKeyPress}
           />
-          <p className="text-xs text-dark-muted mt-2">
+          <p className="text-display-xs text-dark-muted mt-2">
             {t('messages.subscriptionHelp')}
           </p>
         </div>
@@ -45,7 +45,7 @@ export default function SubscriptionBar({
             {Array.from(subscriptions).map((sub) => (
               <div
                 key={sub}
-                className="flex items-center gap-2 px-3 py-1 bg-primary-500/20 text-primary-400 rounded-lg text-sm font-mono"
+                className="flex items-center gap-2 px-3 py-1 bg-primary-500/20 text-primary-400 rounded-lg text-display-sm font-mono"
               >
                 <span>{sub}</span>
                 <button
@@ -62,7 +62,7 @@ export default function SubscriptionBar({
       </div>
 
       {subscriptions.size === 0 && (
-        <p className="text-xs text-dark-muted mt-2">
+        <p className="text-display-xs text-dark-muted mt-2">
           {t('messages.tip')}: {t('messages.tipSingle')}{" "}
           <code className="bg-dark-bg px-1 rounded">*</code> {t('messages.tipAll')}{" "}
           <code className="bg-dark-bg px-1 rounded">&gt;</code>

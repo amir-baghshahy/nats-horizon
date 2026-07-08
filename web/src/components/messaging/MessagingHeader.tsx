@@ -19,7 +19,7 @@ export default function MessagingHeader({
   return (
     <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
-        <h1 className="text-2xl font-bold md:text-3xl">{t('messages.title')}</h1>
+        <h1 className="text-display-2xl font-bold md:text-3xl">{t('messages.title')}</h1>
         <p className="mt-1 text-dark-muted">{t('messages.subtitle')}</p>
       </div>
 
@@ -28,12 +28,12 @@ export default function MessagingHeader({
           {sseConnected ? (
             <>
               <CheckCircle className="h-4 w-4 text-green-400" />
-              <span className="text-sm text-green-400">{t('common.sseConnected')}</span>
+              <span className="text-display-sm text-green-400">{t('common.sseConnected')}</span>
             </>
           ) : (
             <>
               <Zap className="h-4 w-4 text-yellow-400" />
-              <span className="text-sm text-yellow-400">{t('common.polling')}</span>
+              <span className="text-display-sm text-yellow-400">{t('common.polling')}</span>
             </>
           )}
         </div>

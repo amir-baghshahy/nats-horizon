@@ -22,7 +22,7 @@ export default function VisualStreamGraph() {
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <Database className="mx-auto mb-4 h-16 w-16 text-dark-muted opacity-50" />
-          <h3 className="mb-2 text-lg font-medium text-dark-text">
+          <h3 className="mb-2 text-display-lg font-medium text-dark-text">
             {t('visualStreamGraph.noStreams')}
           </h3>
           <p className="text-dark-muted">

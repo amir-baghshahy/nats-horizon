@@ -30,7 +30,7 @@ export default function StreamSelector({
     <PanelCard className="mb-4">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
-          <label className="block text-sm text-dark-muted mb-2">{t('messages.selectStream')}</label>
+          <label className="block text-display-sm text-dark-muted mb-2">{t('messages.selectStream')}</label>
           <Select
             value={selectedStream}
             onChange={onStreamChange}
@@ -43,8 +43,8 @@ export default function StreamSelector({
           />
         </div>
         <div className="flex-1 relative">
-          <label className="block text-sm text-dark-muted mb-2">{t('messages.searchMessages')}</label>
-          <Search className="absolute left-3 top-9 w-4 h-4 text-dark-muted" />
+          <label className="block text-display-sm text-dark-muted mb-2">{t('messages.searchMessages')}</label>
+          <Search className="absolute left-3 top-9 icon-base text-dark-muted" />
           <input
             type="text"
             placeholder={t('messages.searchMessagesPlaceholder')}
@@ -54,10 +54,10 @@ export default function StreamSelector({
           />
         </div>
         <div className="flex items-end gap-3">
-          <Button variant="secondary" onClick={onToggleFilters} icon={<Filter className="w-4 h-4" />}>
+          <Button variant="secondary" onClick={onToggleFilters} icon={<Filter className="icon-base" />}>
             {showFilters ? t('messages.lessFilters') : t('messages.filters')}
           </Button>
-          <Button variant="secondary" onClick={onRefresh} icon={<RefreshCw className="w-4 h-4" />} />
+          <Button variant="secondary" onClick={onRefresh} icon={<RefreshCw className="icon-base" />} />
         </div>
       </div>
     </PanelCard>

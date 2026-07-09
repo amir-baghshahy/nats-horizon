@@ -69,7 +69,7 @@ export default function ConsumersPage() {
       </section>
 
       {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-dark-border/50 to-transparent mb-6" />
+      <div className="h-px bg-gradient-to-r from-transparent via-border-default/50 to-transparent mb-6" />
 
       {/* Filters & List Section */}
       <section className="space-y-4 animate-slide-up animate-delay-100">
@@ -106,7 +106,7 @@ export default function ConsumersPage() {
           getLagColor={getLagColor}
         />
 
-        <div className="flex items-center justify-between text-display-sm text-dark-muted">
+        <div className="flex items-center justify-between text-display-sm text-content-tertiary">
           <span>
             {t('consumers.showingConsumers', { filtered: filteredConsumers.length, total: totalConsumers })}
           </span>

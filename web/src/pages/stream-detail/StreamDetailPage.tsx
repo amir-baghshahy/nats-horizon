@@ -60,7 +60,7 @@ export default function StreamDetailPage() {
       <div className="flex items-center gap-4 mb-4">
         <Link
           to="/streams"
-          className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
+          className="p-2 hover:bg-surface-primary rounded-lg transition-colors"
         >
           <ArrowLeft className="icon-md" />
         </Link>
@@ -86,7 +86,7 @@ export default function StreamDetailPage() {
               </span>
             </div>
           </div>
-          <p className="text-dark-muted mt-1">
+          <p className="text-content-tertiary mt-1">
             {streamData.config?.subjects?.join(", ")}
           </p>
         </div>
@@ -195,24 +195,24 @@ export default function StreamDetailPage() {
         <div className="space-y-6">
           <PanelCard title={t("streams.streamInformation")}>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted mb-1">
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary mb-1">
                   {t("streams.firstSequence")}
                 </p>
                 <p className="font-mono font-medium">
                   {streamData.state?.first_seq?.toLocaleString() || "N/A"}
                 </p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted mb-1">
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary mb-1">
                   {t("streams.lastSequence")}
                 </p>
                 <p className="font-mono font-medium">
                   {streamData.state?.last_seq?.toLocaleString() || "N/A"}
                 </p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted mb-1">
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary mb-1">
                   {t("streams.created")}
                 </p>
                 <p className="text-display-sm">
@@ -221,8 +221,8 @@ export default function StreamDetailPage() {
                     : "N/A"}
                 </p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted mb-1">
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary mb-1">
                   {t("streams.lastMessage")}
                 </p>
                 <p className="text-display-sm">
@@ -242,7 +242,7 @@ export default function StreamDetailPage() {
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 icon-base text-dark-muted" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 icon-base text-content-tertiary" />
                   <input
                     type="text"
                     placeholder={t("streams.searchMessagesPlaceholder")}
@@ -260,11 +260,11 @@ export default function StreamDetailPage() {
             </div>
           }
         >
-          <div className="text-center py-8 text-dark-muted">
+          <div className="text-center py-8 text-content-tertiary">
             <MessageSquare className="icon-lg mx-auto mb-3 opacity-50" />
             <p>{t("streams.useMessageBrowser")}</p>
             <div className="flex items-center justify-center gap-4 mt-4">
-              <span className="text-display-sm text-dark-muted">
+              <span className="text-display-sm text-content-tertiary">
                 {(streamData.state?.messages || 0).toLocaleString()}{" "}
                 {t("streams.messages")}
               </span>
@@ -307,7 +307,7 @@ export default function StreamDetailPage() {
                       >
                         {consumer.name}
                       </Link>
-                      <p className="text-display-xs text-dark-muted mt-1">
+                      <p className="text-display-xs text-content-tertiary mt-1">
                         {consumer.config?.durable
                           ? t("streams.durable")
                           : t("streams.ephemeral")}
@@ -319,7 +319,7 @@ export default function StreamDetailPage() {
                       <p className="font-medium">
                         {(consumer.lag || 0).toLocaleString()}
                       </p>
-                      <p className="text-display-xs text-dark-muted">
+                      <p className="text-display-xs text-content-tertiary">
                         {t("streams.lag")}
                       </p>
                     </div>
@@ -327,7 +327,7 @@ export default function StreamDetailPage() {
                       <p className="font-medium">
                         {consumer.ack_rate || "N/A"}
                       </p>
-                      <p className="text-display-xs text-dark-muted">
+                      <p className="text-display-xs text-content-tertiary">
                         {t("streams.ackRate")}
                       </p>
                     </div>
@@ -356,11 +356,11 @@ export default function StreamDetailPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">{t("streams.name")}</span>
+                  <span className="text-content-tertiary">{t("streams.name")}</span>
                   <span className="font-medium">{streamData.config?.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">
+                  <span className="text-content-tertiary">
                     {t("streams.storage")}
                   </span>
                   <span className="font-medium">
@@ -368,7 +368,7 @@ export default function StreamDetailPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">
+                  <span className="text-content-tertiary">
                     {t("streams.retention")}
                   </span>
                   <span className="font-medium">
@@ -376,7 +376,7 @@ export default function StreamDetailPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">
+                  <span className="text-content-tertiary">
                     {t("streams.replicas")}
                   </span>
                   <span className="font-medium">
@@ -386,7 +386,7 @@ export default function StreamDetailPage() {
               </div>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">{t("streams.maxAge")}</span>
+                  <span className="text-content-tertiary">{t("streams.maxAge")}</span>
                   <span className="font-medium">
                     {streamData.config?.max_age
                       ? streamData.config.max_age
@@ -394,7 +394,7 @@ export default function StreamDetailPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">
+                  <span className="text-content-tertiary">
                     {t("streams.maxBytes")}
                   </span>
                   <span className="font-medium">
@@ -402,7 +402,7 @@ export default function StreamDetailPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">
+                  <span className="text-content-tertiary">
                     {t("streams.maxMsgSize")}
                   </span>
                   <span className="font-medium">
@@ -410,7 +410,7 @@ export default function StreamDetailPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-dark-muted">
+                  <span className="text-content-tertiary">
                     {t("streams.subjects")}
                   </span>
                   <span className="font-mono text-display-sm">

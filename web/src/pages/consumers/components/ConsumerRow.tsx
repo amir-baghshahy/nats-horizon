@@ -48,7 +48,7 @@ export default function ConsumerRow({
 
   return (
     <div className="border-s-2 border-s-transparent hover:border-s-primary-500 transition-colors">
-      <div className="p-4 hover:bg-dark-bg/50 transition-colors">
+      <div className="p-4 hover:bg-surface-primary/50 transition-colors">
         <div className="flex items-center gap-4">
           <input
             type="checkbox"
@@ -59,12 +59,12 @@ export default function ConsumerRow({
 
           <button
             onClick={() => onToggleExpansion(consumerName)}
-            className="p-1 hover:bg-dark-bg rounded transition-colors"
+            className="p-1 hover:bg-surface-primary rounded transition-colors"
           >
             {isExpanded ? (
-              <ChevronDown className="icon-base text-dark-muted" />
+              <ChevronDown className="icon-base text-content-tertiary" />
             ) : (
-              <ChevronRight className="icon-base text-dark-muted" />
+              <ChevronRight className="icon-base text-content-tertiary" />
             )}
           </button>
 
@@ -95,22 +95,22 @@ export default function ConsumerRow({
               <p className={`font-medium ${getLagColor(consumer.lag || 0)}`}>
                 {(consumer.lag || 0).toLocaleString()}
               </p>
-              <p className="text-display-xs text-dark-muted">{t("consumers.totalLag")}</p>
+              <p className="text-display-xs text-content-tertiary">{t("consumers.totalLag")}</p>
             </div>
             <div className="text-center">
               <p className="font-medium">{consumer.ack_rate || t("common.na")}</p>
-              <p className="text-display-xs text-dark-muted">{t("consumers.avgAckRate")}</p>
+              <p className="text-display-xs text-content-tertiary">{t("consumers.avgAckRate")}</p>
             </div>
             <div className="text-center">
               <p className="font-medium">{consumer.num_pending || consumer.lag || 0}</p>
-              <p className="text-display-xs text-dark-muted">{t("consumers.pending")}</p>
+              <p className="text-display-xs text-content-tertiary">{t("consumers.pending")}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => onTogglePauseResume(consumer)}
-              className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
+              className="p-2 hover:bg-surface-primary rounded-lg transition-colors"
               title={
                 !consumer.paused
                   ? t("consumers.pauseConsumer")
@@ -118,17 +118,17 @@ export default function ConsumerRow({
               }
             >
               {!consumer.paused ? (
-                <Pause className="icon-base text-dark-muted" />
+                <Pause className="icon-base text-content-tertiary" />
               ) : (
-                <Play className="icon-base text-dark-muted" />
+                <Play className="icon-base text-content-tertiary" />
               )}
             </button>
             <Link
               to={`/consumers/${encodeURIComponent(consumer.name || "")}`}
-              className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
+              className="p-2 hover:bg-surface-primary rounded-lg transition-colors"
               title={t("common.viewDetails")}
             >
-              <Eye className="icon-base text-dark-muted" />
+              <Eye className="icon-base text-content-tertiary" />
             </Link>
           </div>
         </div>
@@ -136,20 +136,20 @@ export default function ConsumerRow({
         {isExpanded && (
           <div className="mt-4 ps-8 space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-display-xs text-dark-muted">{t("consumers.deliveryPolicy")}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-3">
+                <p className="text-display-xs text-content-tertiary">{t("consumers.deliveryPolicy")}</p>
                 <p className="font-medium">{(consumer.config as { delivery?: string })?.delivery || "all"}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-display-xs text-dark-muted">{t("consumers.ackPolicy")}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-3">
+                <p className="text-display-xs text-content-tertiary">{t("consumers.ackPolicy")}</p>
                 <p className="font-medium">{consumer.config?.ack_policy || "explicit"}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-display-xs text-dark-muted">{t("consumers.replayPolicy")}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-3">
+                <p className="text-display-xs text-content-tertiary">{t("consumers.replayPolicy")}</p>
                 <p className="font-medium">{consumer.config?.replay_policy || "instant"}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-display-xs text-dark-muted">{t("consumers.maxDeliveries")}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-3">
+                <p className="text-display-xs text-content-tertiary">{t("consumers.maxDeliveries")}</p>
                 <p className="font-medium">{consumer.config?.max_deliver || "-1"}</p>
               </div>
             </div>

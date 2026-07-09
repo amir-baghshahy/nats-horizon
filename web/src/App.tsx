@@ -1,24 +1,26 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { useDirection } from "./hooks/useDirection";
 import Layout from "./components/Layout";
-import Dashboard from "./pages/Dashboard";
-import Streams from "./pages/Streams";
-import Consumers from "./pages/Consumers";
-import Connections from "./pages/Connections";
-import Security from "./pages/Security";
-import Subjects from "./pages/Subjects";
-import StreamDetail from "./pages/StreamDetail";
-import ConsumerDetail from "./pages/ConsumerDetail";
-import Messages from "./pages/Messages";
-import KVStore from "./pages/KVStore";
-import Cluster from "./pages/Cluster";
-import Alerts from "./pages/Alerts";
-import Metrics from "./pages/Metrics";
-import History from "./pages/History";
-import Tenancy from "./pages/Tenancy";
-import VisualStreamGraph from "./pages/VisualStreamGraph";
+import { PageLoading } from "./components/ui/PageState";
 import SetupWizard from "./pages/setup/SetupWizard";
+
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Streams = lazy(() => import("./pages/Streams"));
+const Consumers = lazy(() => import("./pages/Consumers"));
+const Connections = lazy(() => import("./pages/Connections"));
+const Security = lazy(() => import("./pages/Security"));
+const Subjects = lazy(() => import("./pages/Subjects"));
+const StreamDetail = lazy(() => import("./pages/StreamDetail"));
+const ConsumerDetail = lazy(() => import("./pages/ConsumerDetail"));
+const Messages = lazy(() => import("./pages/Messages"));
+const KVStore = lazy(() => import("./pages/KVStore"));
+const Cluster = lazy(() => import("./pages/Cluster"));
+const Alerts = lazy(() => import("./pages/Alerts"));
+const Metrics = lazy(() => import("./pages/Metrics"));
+const History = lazy(() => import("./pages/History"));
+const Tenancy = lazy(() => import("./pages/Tenancy"));
+const VisualStreamGraph = lazy(() => import("./pages/VisualStreamGraph"));
 
 function App() {
   useDirection();
@@ -59,8 +61,8 @@ function App() {
   // Show loading while checking setup
   if (setupCompleted === null) {
     return (
-      <div className="min-h-screen bg-dark-bg flex items-center justify-center">
-        <div className="animate-spin avatar border-2 border-primary-500 border-t-transparent rounded-full" />
+      <div className="flex min-h-screen items-center justify-center bg-surface-primary">
+        <div className="avatar h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
       </div>
     );
   }
@@ -75,33 +77,35 @@ function App() {
       <div
         className={`transition-all duration-300 ease-out ${
           isTransitioning
-            ? "opacity-0 translate-y-4"
-            : "opacity-100 translate-y-0"
+            ? "translate-y-4 opacity-0"
+            : "translate-y-0 opacity-100"
         }`}
       >
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/streams" element={<Streams />} />
-          <Route path="/streams/:name" element={<StreamDetail />} />
-          <Route path="/consumers" element={<Consumers />} />
-          <Route path="/consumers/:name" element={<ConsumerDetail />} />
-          <Route path="/subjects" element={<Subjects />} />
-          <Route path="/connections" element={<Connections />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route
-            path="/core-messaging"
-            element={<Navigate to="/messages" replace />}
-          />
-          <Route path="/kv-store" element={<KVStore />} />
-          <Route path="/cluster" element={<Cluster />} />
-          <Route path="/alerts" element={<Alerts />} />
-          <Route path="/metrics" element={<Metrics />} />
-          <Route path="/visual-stream-graph" element={<VisualStreamGraph />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/security" element={<Security />} />
-          <Route path="/tenancy" element={<Tenancy />} />
-        </Routes>
+        <Suspense fallback={<PageLoading />}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/streams" element={<Streams />} />
+            <Route path="/streams/:name" element={<StreamDetail />} />
+            <Route path="/consumers" element={<Consumers />} />
+            <Route path="/consumers/:name" element={<ConsumerDetail />} />
+            <Route path="/subjects" element={<Subjects />} />
+            <Route path="/connections" element={<Connections />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route
+              path="/core-messaging"
+              element={<Navigate to="/messages" replace />}
+            />
+            <Route path="/kv-store" element={<KVStore />} />
+            <Route path="/cluster" element={<Cluster />} />
+            <Route path="/alerts" element={<Alerts />} />
+            <Route path="/metrics" element={<Metrics />} />
+            <Route path="/visual-stream-graph" element={<VisualStreamGraph />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/security" element={<Security />} />
+            <Route path="/tenancy" element={<Tenancy />} />
+          </Routes>
+        </Suspense>
       </div>
     </Layout>
   );

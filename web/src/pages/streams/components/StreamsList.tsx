@@ -106,7 +106,7 @@ export default function StreamsList({
       />
 
       <div className="card overflow-hidden flex flex-col max-h-[600px]">
-        <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-dark-border animate-fade-in">
+        <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-border-default animate-fade-in">
           {streams.map((stream, index) => {
             const streamName = getStreamName(stream);
             const healthStatus = getStreamHealthStatus(stream);
@@ -138,7 +138,7 @@ export default function StreamsList({
             );
           })}
         </div>
-        <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-display-sm text-dark-muted flex-shrink-0">
+        <div className="p-3 border-t border-border-default bg-surface-primary/50 text-center text-display-sm text-content-tertiary flex-shrink-0">
           {t("streams.streamCount", { count: streams.length })}
         </div>
       </div>

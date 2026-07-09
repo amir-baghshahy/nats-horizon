@@ -114,11 +114,11 @@ export default function SetupWizard() {
 
   if (restarting) {
     return (
-      <div className="min-h-screen bg-dark-bg flex items-center justify-center p-6">
+      <div className="min-h-screen bg-surface-primary flex items-center justify-center p-6">
         <div className="text-center">
           <div className="animate-spin icon-lg border-4 border-blue-400 border-t-transparent rounded-full mx-auto mb-4" />
-          <h2 className="text-display-xl font-bold text-dark-text">Restarting...</h2>
-          <p className="text-display-sm text-dark-muted">Please wait</p>
+          <h2 className="text-display-xl font-bold text-content-primary">Restarting...</h2>
+          <p className="text-display-sm text-content-tertiary">Please wait</p>
         </div>
       </div>
     );
@@ -127,7 +127,7 @@ export default function SetupWizard() {
   const CurrentIcon = step === 0 ? Globe : step === 1 ? Database : step === 2 ? Mail : Check;
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4 sm:p-6">
+    <div className="min-h-screen bg-surface-primary flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-lg">
         {/* Progress Indicator */}
         <div className="flex items-center justify-center mb-6">
@@ -136,13 +136,13 @@ export default function SetupWizard() {
               <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                 i < step ? "bg-green-500 text-white" :
                 i === step ? "bg-primary-600 text-white" :
-                "bg-dark-border text-dark-muted"
+                "bg-border-default text-content-tertiary"
               }`}>
                 {i < step ? <Check className="icon-md" /> : <CurrentIcon className="icon-md" />}
               </div>
               {i < 3 && (
                 <div className={`w-12 h-1 mx-2 rounded-full ${
-                  i < step ? "bg-green-500" : "bg-dark-border"
+                  i < step ? "bg-green-500" : "bg-border-default"
                 }`} />
               )}
             </div>
@@ -156,13 +156,13 @@ export default function SetupWizard() {
             <div className="icon-lg rounded-xl bg-primary-500/20 flex items-center justify-center mx-auto mb-2">
               <CurrentIcon className="w-6 h-6 text-primary-400" />
             </div>
-            <h2 className="text-display-lg sm:text-display-xl font-bold text-dark-text mb-1">
+            <h2 className="text-display-lg sm:text-display-xl font-bold text-content-primary mb-1">
               {step === 0 && t("setup.welcome")}
               {step === 1 && t("setup.nats")}
               {step === 2 && t("setup.smtp")}
               {step === 3 && t("setup.complete")}
             </h2>
-            <p className="text-display-xs sm:text-display-sm text-dark-muted">
+            <p className="text-display-xs sm:text-display-sm text-content-tertiary">
               {step === 0 && t("setup.welcomeDesc")}
               {step === 1 && t("setup.natsDesc")}
               {step === 2 && t("setup.smtpDesc")}
@@ -174,25 +174,25 @@ export default function SetupWizard() {
           <div className="mb-4">
             {step === 0 && (
               <div className="text-center py-4">
-                <p className="text-display-sm text-dark-muted mb-6">{t("setup.introText")}</p>
+                <p className="text-display-sm text-content-tertiary mb-6">{t("setup.introText")}</p>
                 <div className="flex gap-4 justify-center flex-wrap">
                   <div className="text-center">
                     <div className="icon-lg rounded-lg bg-blue-500/20 flex items-center justify-center mx-auto mb-2">
                       <Database className="w-6 h-6 text-blue-400" />
                     </div>
-                    <p className="text-display-xs text-dark-muted">{t("setup.feature1")}</p>
+                    <p className="text-display-xs text-content-tertiary">{t("setup.feature1")}</p>
                   </div>
                   <div className="text-center">
                     <div className="icon-lg rounded-lg bg-green-500/20 flex items-center justify-center mx-auto mb-2">
                       <Mail className="w-6 h-6 text-green-400" />
                     </div>
-                    <p className="text-display-xs text-dark-muted">{t("setup.feature2")}</p>
+                    <p className="text-display-xs text-content-tertiary">{t("setup.feature2")}</p>
                   </div>
                   <div className="text-center">
                     <div className="icon-lg rounded-lg bg-purple-500/20 flex items-center justify-center mx-auto mb-2">
                       <Globe className="w-6 h-6 text-purple-400" />
                     </div>
-                    <p className="text-display-xs text-dark-muted">{t("setup.feature3")}</p>
+                    <p className="text-display-xs text-content-tertiary">{t("setup.feature3")}</p>
                   </div>
                 </div>
               </div>
@@ -201,22 +201,22 @@ export default function SetupWizard() {
             {step === 1 && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-display-sm font-medium mb-2 text-dark-text">NATS URL</label>
+                  <label className="block text-display-sm font-medium mb-2 text-content-primary">NATS URL</label>
                   <input
                     type="text"
                     value={data.nats_url}
                     onChange={(e) => updateField("nats_url", e.target.value)}
                     placeholder="nats://localhost:4222"
-                    className="w-full px-4 py-3 rounded-lg border border-dark-border bg-dark-bg text-dark-text text-display-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-3 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-display-sm font-medium mb-2 text-dark-text">Server Port</label>
+                  <label className="block text-display-sm font-medium mb-2 text-content-primary">Server Port</label>
                   <input
                     type="number"
                     value={data.server_port}
                     onChange={(e) => updateField("server_port", parseInt(e.target.value) || 3000)}
-                    className="w-full px-4 py-3 rounded-lg border border-dark-border bg-dark-bg text-dark-text text-display-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-4 py-3 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
               </div>
@@ -224,35 +224,35 @@ export default function SetupWizard() {
 
             {step === 2 && (
               <div className="space-y-1.5">
-                <p className="text-display-xs text-dark-muted mb-1.5">{t("setup.smtpOptional")}</p>
+                <p className="text-display-xs text-content-tertiary mb-1.5">{t("setup.smtpOptional")}</p>
                 <div className="grid grid-cols-1 gap-1.5">
                   <input
                     type="text"
                     value={data.smtp_host}
                     onChange={(e) => updateField("smtp_host", e.target.value)}
                     placeholder={t("setup.smtpHost")}
-                    className="w-full px-3 py-2 rounded-lg border border-dark-border bg-dark-bg text-dark-text text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   <input
                     type="number"
                     value={data.smtp_port}
                     onChange={(e) => updateField("smtp_port", parseInt(e.target.value) || 587)}
                     placeholder={t("setup.smtpPort")}
-                    className="w-full px-3 py-2 rounded-lg border border-dark-border bg-dark-bg text-dark-text text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   <input
                     type="text"
                     value={data.smtp_username}
                     onChange={(e) => updateField("smtp_username", e.target.value)}
                     placeholder={t("setup.smtpUsername")}
-                    className="w-full px-3 py-2 rounded-lg border border-dark-border bg-dark-bg text-dark-text text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   <input
                     type="password"
                     value={data.smtp_password}
                     onChange={(e) => updateField("smtp_password", e.target.value)}
                     placeholder={t("setup.smtpPassword")}
-                    className="w-full px-3 py-2 rounded-lg border border-dark-border bg-dark-bg text-dark-text text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
               </div>
@@ -260,19 +260,19 @@ export default function SetupWizard() {
 
             {step === 3 && (
               <div className="space-y-4 py-2">
-                <div className="bg-dark-bg rounded-lg p-4 space-y-2">
+                <div className="bg-surface-primary rounded-lg p-4 space-y-2">
                   <div className="flex justify-between text-display-sm">
-                    <span className="text-dark-muted">NATS URL:</span>
-                    <span className="font-mono text-dark-text">{data.nats_url}</span>
+                    <span className="text-content-tertiary">NATS URL:</span>
+                    <span className="font-mono text-content-primary">{data.nats_url}</span>
                   </div>
                   <div className="flex justify-between text-display-sm">
-                    <span className="text-dark-muted">Server Port:</span>
-                    <span className="font-mono text-dark-text">{data.server_port}</span>
+                    <span className="text-content-tertiary">Server Port:</span>
+                    <span className="font-mono text-content-primary">{data.server_port}</span>
                   </div>
                   {data.smtp_host && (
                     <div className="flex justify-between text-display-sm">
-                      <span className="text-dark-muted">SMTP:</span>
-                      <span className="font-mono text-dark-text">{data.smtp_host}</span>
+                      <span className="text-content-tertiary">SMTP:</span>
+                      <span className="font-mono text-content-primary">{data.smtp_host}</span>
                     </div>
                   )}
                 </div>
@@ -293,7 +293,7 @@ export default function SetupWizard() {
             <button
               onClick={() => setStep(Math.max(0, step - 1))}
               disabled={step === 0}
-              className="px-6 py-2.5 rounded-lg border border-dark-border bg-dark-card text-dark-text hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed text-display-sm font-medium transition-colors"
+              className="px-6 py-2.5 rounded-lg border border-border-default bg-surface-secondary text-content-primary hover:bg-surface-primary disabled:opacity-50 disabled:cursor-not-allowed text-display-sm font-medium transition-colors"
             >
               {t("common.back")}
             </button>

@@ -6,6 +6,35 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: [
+          "Inter",
+          "Vazirmatn",
+          "system-ui",
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "sans-serif",
+        ],
+        mono: [
+          "JetBrains Mono",
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Monaco",
+          "Consolas",
+          "monospace",
+        ],
+      },
+      fontSize: {
+        xs: ["0.75rem", { lineHeight: "1rem" }],
+        sm: ["0.8125rem", { lineHeight: "1.125rem" }],
+        base: ["0.875rem", { lineHeight: "1.25rem" }],
+        lg: ["1rem", { lineHeight: "1.5rem" }],
+        xl: ["1.125rem", { lineHeight: "1.625rem" }],
+        "2xl": ["1.375rem", { lineHeight: "1.75rem" }],
+        "3xl": ["1.625rem", { lineHeight: "2rem" }],
+      },
       colors: {
         // Inspired by Grafana/Linear/Redpanda Console
         primary: {

@@ -65,17 +65,17 @@ export default function MessageItem({
 
     return (
     <div className="border-l-2 border-l-transparent hover:border-l-primary-500 transition-colors">
-      <div className="p-4 hover:bg-dark-bg/50 transition-colors">
+      <div className="p-4 hover:bg-surface-primary/50 transition-colors">
         <div className="flex items-start gap-4">
           <button
             onClick={onToggleExpand}
-            className="p-1 hover:bg-dark-bg rounded transition-colors mt-0.5"
+            className="p-1 hover:bg-surface-primary rounded transition-colors mt-0.5"
             aria-label={isExpanded ? t('messages.collapse') : t('messages.expand')}
           >
             {isExpanded ? (
-              <ChevronDown className="icon-base text-dark-muted" />
+              <ChevronDown className="icon-base text-content-tertiary" />
             ) : (
-              <ChevronRight className="icon-base text-dark-muted" />
+              <ChevronRight className="icon-base text-content-tertiary" />
             )}
           </button>
 
@@ -91,11 +91,11 @@ export default function MessageItem({
                 {format.toUpperCase()}
               </span>
 
-              <span className="text-display-xs text-dark-muted">
+              <span className="text-display-xs text-content-tertiary">
                 {formatBytes(message.size)}
               </span>
 
-              <span className="text-display-xs text-dark-muted flex items-center gap-1">
+              <span className="text-display-xs text-content-tertiary flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 {formatTimestamp(message.timestamp, { time: true })}
               </span>
@@ -107,7 +107,7 @@ export default function MessageItem({
               )}
             </div>
 
-            <div className="text-display-sm text-dark-muted truncate font-mono">
+            <div className="text-display-sm text-content-tertiary truncate font-mono">
               {formattedData.substring(0, 100)}...
             </div>
           </div>
@@ -115,7 +115,7 @@ export default function MessageItem({
           <div className="flex items-center gap-2">
             <button
               onClick={onCycleViewMode}
-              className="p-2 hover:bg-dark-bg rounded-lg transition-colors text-display-xs"
+              className="p-2 hover:bg-surface-primary rounded-lg transition-colors text-display-xs"
               title={`${t('messages.viewMode')}: ${viewMode}`}
             >
               {viewMode === "pretty"
@@ -127,17 +127,17 @@ export default function MessageItem({
 
             <button
               onClick={onCopy}
-              className="p-2 hover:bg-dark-bg rounded-lg transition-colors"
+              className="p-2 hover:bg-surface-primary rounded-lg transition-colors"
               title={t('messages.copyMessage')}
             >
-              <Copy className="icon-base text-dark-muted" />
+              <Copy className="icon-base text-content-tertiary" />
             </button>
           </div>
         </div>
 
         {isExpanded && (
           <div className="mt-4 pl-8 space-y-4">
-            <div className="bg-dark-bg/50 rounded-lg p-4">
+            <div className="bg-surface-primary/50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-display-sm font-medium flex items-center gap-2">
                   <Code className="icon-base" />
@@ -150,7 +150,7 @@ export default function MessageItem({
                   {t('messages.switchTo')} {nextViewModeLabel}
                 </button>
               </div>
-              <pre className={`text-display-sm p-3 rounded overflow-x-auto bg-dark-bg`}>
+              <pre className={`text-display-sm p-3 rounded overflow-x-auto bg-surface-primary`}>
                 <code
                   className={
                     format === "json"
@@ -166,7 +166,7 @@ export default function MessageItem({
             </div>
 
             {message.headers && Object.keys(message.headers).length > 0 && (
-              <div className="bg-dark-bg/50 rounded-lg p-4">
+              <div className="bg-surface-primary/50 rounded-lg p-4">
                 <h4 className="text-display-sm font-medium mb-3 flex items-center gap-2">
                   <FileText className="icon-base" />
                   {t('messages.headers')}
@@ -174,7 +174,7 @@ export default function MessageItem({
                 <div className="grid grid-cols-2 gap-2 text-display-sm">
                   {Object.entries(message.headers).map(([key, values]) => (
                     <div key={key} className="flex">
-                      <span className="text-dark-muted mr-2">{key}:</span>
+                      <span className="text-content-tertiary mr-2">{key}:</span>
                       <span className="font-mono text-display-xs">
                         {Array.isArray(values) ? values.join(", ") : values}
                       </span>
@@ -185,21 +185,21 @@ export default function MessageItem({
             )}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-display-xs text-dark-muted">{t('messages.subject')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-3">
+                <p className="text-display-xs text-content-tertiary">{t('messages.subject')}</p>
                 <p className="font-mono text-display-sm truncate">{message.subject}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-display-xs text-dark-muted">{t('common.size')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-3">
+                <p className="text-display-xs text-content-tertiary">{t('common.size')}</p>
                 <p className="text-display-sm">{formatBytes(message.size)}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-3">
-                <p className="text-display-xs text-dark-muted">{t('messages.timestamp')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-3">
+                <p className="text-display-xs text-content-tertiary">{t('messages.timestamp')}</p>
                 <p className="text-display-sm">{formatTimestamp(message.timestamp)}</p>
               </div>
               {message.reply && (
-                <div className="bg-dark-bg/50 rounded-lg p-3">
-                  <p className="text-display-xs text-dark-muted">{t('messages.replyTo')}</p>
+                <div className="bg-surface-primary/50 rounded-lg p-3">
+                  <p className="text-display-xs text-content-tertiary">{t('messages.replyTo')}</p>
                   <p className="font-mono text-display-sm truncate">{message.reply}</p>
                 </div>
               )}

@@ -73,7 +73,7 @@ export default function AlertsTriggersList({
                   )}
                 </div>
                 <p className="text-display-sm mb-2">{trigger.message}</p>
-                <div className="flex items-center gap-4 text-display-xs text-dark-muted">
+                <div className="flex items-center gap-4 text-display-xs text-content-tertiary">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {formatTimestamp(trigger.triggered_at || "")}

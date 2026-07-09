@@ -82,7 +82,7 @@ export default function ConsumersFilters({
         <PanelCard className="mb-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
-              <p className="text-display-xs font-medium text-dark-muted">
+              <p className="text-display-xs font-medium text-content-tertiary">
                 {t("consumers.quickStatus")}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -93,7 +93,7 @@ export default function ConsumersFilters({
                     className={`rounded-xl px-3 py-2 text-display-xs font-medium ring-1 transition-all ${
                       filterStatus === status
                         ? "bg-primary-600 text-white ring-primary-500/50"
-                        : "bg-dark-card text-dark-muted ring-dark-border hover:bg-dark-border hover:text-dark-text"
+                        : "bg-surface-secondary text-content-tertiary ring-border-default hover:bg-border-default hover:text-content-primary"
                     }`}
                   >
                     {status === "all" ? t("common.all") : getStatusLabel(status)}
@@ -103,7 +103,7 @@ export default function ConsumersFilters({
             </div>
 
             <div>
-              <p className="text-display-xs font-medium text-dark-muted">
+              <p className="text-display-xs font-medium text-content-tertiary">
                 {t("consumers.stream")}
               </p>
               <Select
@@ -122,7 +122,7 @@ export default function ConsumersFilters({
             </div>
 
             <div>
-              <p className="text-display-xs font-medium text-dark-muted">
+              <p className="text-display-xs font-medium text-content-tertiary">
                 {t("common.search").replace("...", "")}
               </p>
               <input

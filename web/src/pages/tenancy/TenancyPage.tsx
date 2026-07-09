@@ -126,7 +126,7 @@ export default function TenancyPage({
                 className={`p-4 rounded-lg border transition-colors ${
                   conn.is_default
                     ? 'border-primary-500/50 bg-primary-500/5'
-                    : 'border-dark-border bg-dark-bg/50'
+                    : 'border-border-default bg-surface-primary/50'
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -159,10 +159,10 @@ export default function TenancyPage({
                         </span>
                       )}
                     </div>
-                    <p className="text-display-sm text-dark-muted mb-2">
+                    <p className="text-display-sm text-content-tertiary mb-2">
                       {conn.description || t('tenancy.noDescription')}
                     </p>
-                    <div className="flex items-center gap-4 text-display-xs text-dark-muted">
+                    <div className="flex items-center gap-4 text-display-xs text-content-tertiary">
                       <span className="font-mono">{connectionUrl}</span>
                       {status?.latency && (
                         <span>{t('tenancy.latency', { value: status.latency })}</span>
@@ -195,7 +195,7 @@ export default function TenancyPage({
                     <button
                       type="button"
                       onClick={() => { setEditingConnection(conn); setShowModal(true); }}
-                      className="p-1.5 hover:bg-dark-border rounded-lg"
+                      className="p-1.5 hover:bg-border-default rounded-lg"
                       title={t('common.edit')}
                     >
                       <Edit className="icon-sm" />
@@ -259,7 +259,7 @@ export default function TenancyPage({
               <button
                 type="button"
                 onClick={() => { setShowModal(false); setEditingConnection(null); setTestResult(null); }}
-                className="p-1.5 hover:bg-dark-bg rounded-lg"
+                className="p-1.5 hover:bg-surface-primary rounded-lg"
               >
                 <X className="icon-base" />
               </button>

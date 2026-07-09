@@ -33,7 +33,7 @@ export function StreamGraph({ initialNodes, initialEdges, onNodeClick }: StreamG
   }, [onNodeClick])
 
   return (
-    <div className="h-full w-full bg-dark-bg">
+    <div className="h-full w-full bg-surface-primary">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -42,7 +42,8 @@ export function StreamGraph({ initialNodes, initialEdges, onNodeClick }: StreamG
         onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
         fitView
-        minZoom={0.3}
+        fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.1}
         maxZoom={1.5}
         defaultEdgeOptions={{
           animated: true,
@@ -55,13 +56,13 @@ export function StreamGraph({ initialNodes, initialEdges, onNodeClick }: StreamG
           size={1}
           color="rgba(100, 116, 139, 0.3)"
         />
-        <Controls className="!bg-dark-card !border !border-dark-border/60 !text-dark-text" />
+        <Controls className="!bg-surface-secondary !border !border-border-default/60 !text-content-primary" />
         <MiniMap
           nodeColor={(node) => {
             return node.type === 'stream' ? '#3b82f6' : '#60a5fa'
           }}
           maskColor="rgba(0, 0, 0, 0.8)"
-          className="!bg-dark-card !border !border-dark-border/60"
+          className="!bg-surface-secondary !border !border-border-default/60"
         />
       </ReactFlow>
     </div>

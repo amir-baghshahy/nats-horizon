@@ -37,20 +37,20 @@ export default function ServiceDiscoveryPanel({
         </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl bg-dark-bg/50 p-4">
-            <p className="text-display-xs text-dark-muted">{t('messages.serverName')}</p>
+          <div className="rounded-xl bg-surface-primary/50 p-4">
+            <p className="text-display-xs text-content-tertiary">{t('messages.serverName')}</p>
             <p className="mt-1 truncate text-display-sm font-mono">
               {serviceInfo?.server_name || t('messages.natsServer')}
             </p>
           </div>
-          <div className="rounded-xl bg-dark-bg/50 p-4">
-            <p className="text-display-xs text-dark-muted">{t('messages.version')}</p>
+          <div className="rounded-xl bg-surface-primary/50 p-4">
+            <p className="text-display-xs text-content-tertiary">{t('messages.version')}</p>
             <p className="mt-1 text-display-sm">
               {serviceInfo?.version || t('messages.notAvailable')}
             </p>
           </div>
-          <div className="rounded-xl bg-dark-bg/50 p-4">
-            <p className="text-display-xs text-dark-muted">{t('messages.maxPayload')}</p>
+          <div className="rounded-xl bg-surface-primary/50 p-4">
+            <p className="text-display-xs text-content-tertiary">{t('messages.maxPayload')}</p>
             <p className="mt-1 text-display-sm">
               {serviceInfo?.max_payload
                 ? `${(serviceInfo.max_payload / 1024).toFixed(0)} KB`
@@ -70,14 +70,14 @@ export default function ServiceDiscoveryPanel({
             {subscriptionList.map((subject) => (
               <span
                 key={subject}
-                className="rounded-xl border border-dark-border/70 bg-dark-bg/50 px-3 py-2 font-mono text-display-sm text-primary-300"
+                className="rounded-xl border border-border-default/70 bg-surface-primary/50 px-3 py-2 font-mono text-display-sm text-primary-300"
               >
                 {subject}
               </span>
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-8 text-center text-dark-muted">
+          <div className="rounded-xl border border-dashed border-border-default bg-surface-primary/30 p-8 text-center text-content-tertiary">
             <Network className="mx-auto mb-3 h-12 w-12 opacity-50" />
             <p>{t('messages.subscribeToMonitor')}</p>
           </div>

@@ -74,14 +74,14 @@ export default function AlertFormModal({
           aria-labelledby="alert-modal-title"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-dark-border flex-shrink-0">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border-default flex-shrink-0">
             <h2 id="alert-modal-title" className="text-display-sm font-bold">
               {alert ? t("alerts.editAlert") : t("alerts.createAlert")}
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 hover:bg-dark-bg rounded-lg transition-colors"
+              className="p-1.5 hover:bg-surface-primary rounded-lg transition-colors"
             >
               <X className="icon-base" />
             </button>
@@ -120,13 +120,13 @@ export default function AlertFormModal({
               </div>
 
               {/* Condition */}
-              <div className="border border-dark-border rounded-xl p-4 space-y-4">
-                <h3 className="text-display-sm font-semibold text-dark-muted uppercase tracking-wide">
+              <div className="border border-border-default rounded-xl p-4 space-y-4">
+                <h3 className="text-display-sm font-semibold text-content-tertiary uppercase tracking-wide">
                   {t("alerts.conditionType")}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-display-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-content-tertiary mb-1">
                       Type
                     </label>
                     <Select
@@ -142,7 +142,7 @@ export default function AlertFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-display-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-content-tertiary mb-1">
                       Operator
                     </label>
                     <Select
@@ -159,7 +159,7 @@ export default function AlertFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-display-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-content-tertiary mb-1">
                       Threshold
                     </label>
                     <input
@@ -171,7 +171,7 @@ export default function AlertFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-display-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-content-tertiary mb-1">
                       Severity
                     </label>
                     <Select
@@ -189,7 +189,7 @@ export default function AlertFormModal({
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-display-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-content-tertiary mb-1">
                       {t("alerts.streamNameOptional")}
                     </label>
                     <input
@@ -201,7 +201,7 @@ export default function AlertFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-display-xs text-dark-muted mb-1">
+                    <label className="block text-display-xs text-content-tertiary mb-1">
                       {t("alerts.consumerNameOptional")}
                     </label>
                     <input
@@ -216,14 +216,14 @@ export default function AlertFormModal({
               </div>
 
               {/* Notification Channels */}
-              <div className="border border-dark-border rounded-xl p-4 space-y-4">
-                <h3 className="text-display-sm font-semibold text-dark-muted uppercase tracking-wide">
+              <div className="border border-border-default rounded-xl p-4 space-y-4">
+                <h3 className="text-display-sm font-semibold text-content-tertiary uppercase tracking-wide">
                   {t("alerts.notificationChannels")}
                 </h3>
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-dark-bg/50 transition-colors cursor-pointer">
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-primary/50 transition-colors cursor-pointer">
                     <input
                       type="checkbox"
                       name="channel_email"
@@ -248,7 +248,7 @@ export default function AlertFormModal({
 
                 {/* Webhook */}
                 <div className="space-y-2">
-                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-dark-bg/50 transition-colors cursor-pointer">
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-primary/50 transition-colors cursor-pointer">
                     <input
                       type="checkbox"
                       name="channel_webhook"
@@ -273,7 +273,7 @@ export default function AlertFormModal({
 
                 {/* Slack */}
                 <div className="space-y-2">
-                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-dark-bg/50 transition-colors cursor-pointer">
+                  <label className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-primary/50 transition-colors cursor-pointer">
                     <input
                       type="checkbox"
                       name="channel_slack"
@@ -314,7 +314,7 @@ export default function AlertFormModal({
           </form>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 p-5 border-t border-dark-border flex-shrink-0">
+          <div className="flex items-center justify-end gap-3 p-5 border-t border-border-default flex-shrink-0">
             <Button type="button" onClick={onClose} variant="secondary">
               {t("common.cancel")}
             </Button>

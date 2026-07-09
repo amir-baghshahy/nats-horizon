@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react'
+import { STATUS_TONES } from '../utils/constants'
 
 type ToastType = 'success' | 'error' | 'warning' | 'info'
 
@@ -25,10 +26,10 @@ const ICONS: Record<ToastType, typeof CheckCircle> = {
 }
 
 const COLORS: Record<ToastType, string> = {
-  success: 'border-green-500/50 bg-green-500/10 text-green-400',
-  error: 'border-red-500/50 bg-red-500/10 text-red-400',
-  warning: 'border-yellow-500/50 bg-yellow-500/10 text-yellow-400',
-  info: 'border-blue-500/50 bg-blue-500/10 text-blue-400',
+  success: `border-green-500/50 bg-green-500/10 ${STATUS_TONES.success.text}`,
+  error: `border-red-500/50 bg-red-500/10 ${STATUS_TONES.error.text}`,
+  warning: `border-yellow-500/50 bg-yellow-500/10 ${STATUS_TONES.warning.text}`,
+  info: `border-blue-500/50 bg-blue-500/10 ${STATUS_TONES.info.text}`,
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -62,7 +63,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <span className="text-display-sm flex-1">{t.message}</span>
               <button
                 onClick={() => removeToast(t.id)}
-                className="opacity-60 hover:opacity-100 active-scale transition-opacity"
+                className="icon-btn opacity-60 hover:opacity-100 active:scale-95"
               >
                 <X className="icon-base" />
               </button>

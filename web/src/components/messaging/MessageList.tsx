@@ -52,8 +52,8 @@ export default function MessageList({
 
   return (
     <div className="card overflow-hidden p-0">
-      <div className="flex items-center justify-between p-4 border-b border-dark-border">
-        <div className="flex items-center gap-2 px-4 py-2 bg-dark-bg rounded-lg border border-dark-border">
+      <div className="flex items-center justify-between p-4 border-b border-border-default">
+        <div className="flex items-center gap-2 px-4 py-2 bg-surface-primary rounded-lg border border-border-default">
           {sseConnected ? (
             <>
               <CheckCircle className="icon-base text-green-400" />
@@ -71,7 +71,7 @@ export default function MessageList({
           <button
             onClick={onToggleAutoScroll}
             className={`px-4 py-2 rounded-lg transition-colors ${
-              autoScroll ? "bg-green-500/20 text-green-400" : "hover:bg-dark-bg"
+              autoScroll ? "bg-green-500/20 text-green-400" : "hover:bg-surface-primary"
             }`}
           >
             {t('messages.autoScroll')}: {autoScroll ? t('common.on') : t('common.off')}
@@ -83,7 +83,7 @@ export default function MessageList({
         </div>
       </div>
 
-      <div className="divide-y divide-dark-border max-h-[60vh] overflow-y-auto">
+      <div className="divide-y divide-border-default max-h-[60vh] overflow-y-auto">
         {displayedMessages.map((message) => {
           const timestamp = message.timestamp;
           const isExpanded = expandedMessages.has(timestamp);
@@ -113,7 +113,7 @@ export default function MessageList({
       </div>
 
       {messages.length > maxDisplayed && (
-        <div className="p-3 bg-dark-bg border-t border-dark-border text-center text-display-sm text-dark-muted">
+        <div className="p-3 bg-surface-primary border-t border-border-default text-center text-display-sm text-content-tertiary">
           {t('messages.showingCount', { shown: maxDisplayed, total: messages.length, hidden: messages.length - maxDisplayed })}
         </div>
       )}

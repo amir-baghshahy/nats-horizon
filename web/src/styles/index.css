@@ -20,11 +20,14 @@
 
   html[lang="fa"],
   html[lang="ar"] {
-    font-family: "Vazirmatn", "Tahoma", "Arial", sans-serif;
+    font-family: "Inter", "Vazirmatn", "Tahoma", "Arial", sans-serif;
   }
 
   body {
     @apply min-h-screen bg-surface-primary text-content-primary antialiased text-base;
+    font-family: "Inter", "Vazirmatn", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-feature-settings: "cv11", "ss01";
+    font-synthesis-weight: none;
     background:
       radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 32rem),
       radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.12), transparent 28rem),
@@ -48,6 +51,15 @@
 
   .card > * {
     @apply relative;
+  }
+
+  /* Avatar / icon containers (semantic sizing tokens) */
+  .avatar {
+    @apply flex h-8 w-8 items-center justify-center;
+  }
+
+  .avatar-lg {
+    @apply flex h-12 w-12 items-center justify-center;
   }
 
   /* Card variants */
@@ -110,15 +122,19 @@
 
   /* Icon button */
   .icon-btn {
-    @apply p-1.5 rounded-lg hover:scale-110 active:scale-95 transition-transform duration-200;
+    @apply inline-flex items-center justify-center p-1.5 rounded-lg text-content-primary
+      transition-colors duration-200
+      hover:bg-surface-tertiary
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary
+      active:scale-95;
   }
 
   .icon-btn-default {
-    @apply icon-btn hover:bg-dark-bg text-dark-text;
+    @apply icon-btn hover:bg-surface-primary text-content-primary;
   }
 
   .icon-btn-danger {
-    @apply icon-btn hover:bg-red-500/20 text-red-400;
+    @apply icon-btn hover:bg-red-500/20 text-red-400 hover:text-red-300;
   }
 
   @keyframes pulse-glow {
@@ -246,14 +262,14 @@
 .icon-md { width: 1.25rem; height: 1.25rem; } /* 20px */
 .icon-lg { width: 1.5rem; height: 1.5rem; }    /* 24px */
 
-/* Standardized text sizes */
-.text-display-xs { font-size: 0.75rem; }   /* 12px */
-.text-display-sm { font-size: 0.875rem; }  /* 14px */
-.text-display-base { font-size: 1rem; }     /* 16px */
-.text-display-lg { font-size: 1.125rem; }   /* 18px */
-.text-display-xl { font-size: 1.25rem; }    /* 20px */
-.text-display-2xl { font-size: 1.5rem; }   /* 24px */
-.text-display-3xl { font-size: 1.875rem; } /* 30px */
+/* Standardized text sizes (compact dashboard scale, aligned with Tailwind `fontSize`) */
+.text-display-xs { font-size: 0.75rem; line-height: 1rem; }      /* 12px */
+.text-display-sm { font-size: 0.8125rem; line-height: 1.125rem; } /* 13px */
+.text-display-base { font-size: 0.875rem; line-height: 1.25rem; } /* 14px */
+.text-display-lg { font-size: 1rem; line-height: 1.5rem; }        /* 16px */
+.text-display-xl { font-size: 1.125rem; line-height: 1.625rem; }  /* 18px */
+.text-display-2xl { font-size: 1.375rem; line-height: 1.75rem; }  /* 22px */
+.text-display-3xl { font-size: 1.625rem; line-height: 2rem; }     /* 26px */
 
 /* Standardized border radius */
 .rounded-card { border-radius: 0.75rem; }  /* 12px */

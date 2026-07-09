@@ -32,7 +32,7 @@ export default function PanelCard({
     >
       {/* Header */}
       {(header || title) && (
-        <div className="px-3 py-2.5 border-b border-dark-border bg-dark-bg/50 flex-shrink-0">
+        <div className="px-3 py-2.5 border-b border-border-default bg-surface-primary/50 flex-shrink-0">
           {header || (
             <div className="flex items-center gap-2">
               {icon && (
@@ -42,7 +42,7 @@ export default function PanelCard({
               )}
               <div>
                 <h3 className="text-display-xs font-semibold">{title}</h3>
-                {subtitle && <p className="text-display-xs text-dark-muted">{subtitle}</p>}
+                {subtitle && <p className="text-display-xs text-content-tertiary">{subtitle}</p>}
               </div>
             </div>
           )}
@@ -64,7 +64,7 @@ export default function PanelCard({
 
       {/* Footer */}
       {footer && (
-        <div className="px-3 py-2 border-t border-dark-border bg-dark-bg/50 text-center text-display-xs text-dark-muted flex-shrink-0">
+        <div className="px-3 py-2 border-t border-border-default bg-surface-primary/50 text-center text-display-xs text-content-tertiary flex-shrink-0">
           {footer}
         </div>
       )}

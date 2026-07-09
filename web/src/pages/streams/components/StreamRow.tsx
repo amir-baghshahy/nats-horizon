@@ -43,7 +43,7 @@ export default function StreamRow({
 }: StreamRowProps) {
   return (
     <div className={isItemSelected ? "bg-primary-500/5" : ""}>
-      <div className="p-4 hover:bg-dark-bg/50 transition-all hover-lift">
+      <div className="p-4 hover:bg-surface-primary/50 transition-all hover-lift">
         <div className="flex items-center gap-4">
           <input
             type="checkbox"
@@ -54,12 +54,12 @@ export default function StreamRow({
 
           <button
             onClick={() => toggleExpansion(streamName)}
-            className="p-1 hover:bg-dark-bg rounded transition-colors"
+            className="p-1 hover:bg-surface-primary rounded transition-colors"
           >
             {isItemExpanded ? (
-              <ChevronDown className="icon-base text-dark-muted" />
+              <ChevronDown className="icon-base text-content-tertiary" />
             ) : (
-              <ChevronRight className="icon-base text-dark-muted" />
+              <ChevronRight className="icon-base text-content-tertiary" />
             )}
           </button>
 
@@ -83,12 +83,12 @@ export default function StreamRow({
                 size="small"
               />
 
-              <span className="text-display-xs text-dark-muted">
+              <span className="text-display-xs text-content-tertiary">
                 {stream.config?.storage === "file" ? "File" : "Memory"}
               </span>
             </div>
 
-            <div className="flex items-center gap-4 text-display-sm text-dark-muted">
+            <div className="flex items-center gap-4 text-display-sm text-content-tertiary">
               <span>{stream.state?.messages?.toLocaleString() || 0} messages</span>
               <span>{formatBytes(stream.state?.bytes || 0)}</span>
               <span>{stream.state?.consumers || 0} consumers</span>
@@ -104,34 +104,34 @@ export default function StreamRow({
           <div className="flex items-center gap-2">
             <button
               onClick={() => onViewDetails(streamName)}
-              className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale transition-colors"
+              className="p-2 hover:bg-surface-primary rounded-lg hover-lift active-scale transition-colors"
               title="View details"
             >
-              <Eye className="icon-base text-dark-muted" />
+              <Eye className="icon-base text-content-tertiary" />
             </button>
 
             <button
               onClick={() => onExportStream(streamName, "json")}
-              className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale transition-colors"
+              className="p-2 hover:bg-surface-primary rounded-lg hover-lift active-scale transition-colors"
               title="Export stream"
             >
-              <Download className="icon-base text-dark-muted" />
+              <Download className="icon-base text-content-tertiary" />
             </button>
 
             <button
               onClick={() => onExportMessages(streamName)}
-              className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale transition-colors"
+              className="p-2 hover:bg-surface-primary rounded-lg hover-lift active-scale transition-colors"
               title="Export messages"
             >
-              <MessageSquare className="icon-base text-dark-muted" />
+              <MessageSquare className="icon-base text-content-tertiary" />
             </button>
 
             <button
               onClick={() => onPurge(streamName)}
-              className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale transition-colors"
+              className="p-2 hover:bg-surface-primary rounded-lg hover-lift active-scale transition-colors"
               title="Purge messages"
             >
-              <RefreshCw className="icon-base text-dark-muted" />
+              <RefreshCw className="icon-base text-content-tertiary" />
             </button>
 
             <button
@@ -139,15 +139,15 @@ export default function StreamRow({
               className="p-2 hover:bg-red-500/20 rounded-lg hover-lift active-scale transition-colors"
               title="Delete stream"
             >
-              <Trash2 className="icon-base text-dark-muted hover:text-red-400" />
+              <Trash2 className="icon-base text-content-tertiary hover:text-red-400" />
             </button>
           </div>
         </div>
 
         {isItemExpanded && (
           <div className="mt-4 pl-10 grid grid-cols-1 md:grid-cols-3 gap-4 text-display-sm animate-fade-in-down">
-            <div className="bg-dark-bg/50 rounded-lg p-3 hover-scale">
-              <p className="text-display-xs text-dark-muted mb-1">Subjects</p>
+            <div className="bg-surface-primary/50 rounded-lg p-3 hover-scale">
+              <p className="text-display-xs text-content-tertiary mb-1">Subjects</p>
               <div className="space-y-1">
                 {stream.config?.subjects?.map((subject: string) => (
                   <code key={subject} className="text-display-xs text-primary-400">
@@ -157,8 +157,8 @@ export default function StreamRow({
               </div>
             </div>
 
-            <div className="bg-dark-bg/50 rounded-lg p-3 hover-scale">
-              <p className="text-display-xs text-dark-muted mb-1">Configuration</p>
+            <div className="bg-surface-primary/50 rounded-lg p-3 hover-scale">
+              <p className="text-display-xs text-content-tertiary mb-1">Configuration</p>
               <div className="space-y-1">
                 <p>Replicas: {stream.config?.replicas}</p>
                 <p>Retention: {stream.config?.retention}</p>
@@ -166,8 +166,8 @@ export default function StreamRow({
               </div>
             </div>
 
-            <div className="bg-dark-bg/50 rounded-lg p-3 hover-scale">
-              <p className="text-display-xs text-dark-muted mb-1">State</p>
+            <div className="bg-surface-primary/50 rounded-lg p-3 hover-scale">
+              <p className="text-display-xs text-content-tertiary mb-1">State</p>
               <div className="space-y-1">
                 <p>First Seq: {stream.state?.first_seq?.toLocaleString() || 0}</p>
                 <p>Last Seq: {stream.state?.last_seq?.toLocaleString() || 0}</p>

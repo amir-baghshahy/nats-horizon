@@ -30,13 +30,13 @@ export default function EditConsumerModal({
         <div className="card w-full max-w-lg">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-display-xl font-bold">{t("consumers.editConsumer", { name })}</h2>
-          <button type="button" onClick={onClose} className="p-1.5 hover:bg-dark-bg rounded-lg">
-            <span className="text-dark-muted">✕</span>
+          <button type="button" onClick={onClose} className="p-1.5 hover:bg-surface-primary rounded-lg">
+            <span className="text-content-tertiary">✕</span>
           </button>
         </div>
         <div className="space-y-4">
           <div>
-            <label className="block text-display-sm text-dark-muted mb-1">{t("consumers.ackPolicy")}</label>
+            <label className="block text-display-sm text-content-tertiary mb-1">{t("consumers.ackPolicy")}</label>
             <Select
               value={editForm.ack_policy}
               onChange={(value) => setEditForm({ ...editForm, ack_policy: value })}
@@ -50,7 +50,7 @@ export default function EditConsumerModal({
             />
           </div>
           <div>
-            <label className="block text-display-sm text-dark-muted mb-1">{t("consumers.deliveryPolicy")}</label>
+            <label className="block text-display-sm text-content-tertiary mb-1">{t("consumers.deliveryPolicy")}</label>
             <Select
               value={editForm.deliver_policy}
               onChange={(value) => setEditForm({ ...editForm, deliver_policy: value })}
@@ -64,7 +64,7 @@ export default function EditConsumerModal({
             />
           </div>
           <div>
-            <label className="block text-display-sm text-dark-muted mb-1">{t("consumers.replayPolicy")}</label>
+            <label className="block text-display-sm text-content-tertiary mb-1">{t("consumers.replayPolicy")}</label>
             <Select
               value={editForm.replay_policy}
               onChange={(value) => setEditForm({ ...editForm, replay_policy: value })}
@@ -77,7 +77,7 @@ export default function EditConsumerModal({
             />
           </div>
           <div>
-            <label className="block text-display-sm text-dark-muted mb-1">{t("consumers.maxDeliverLabel")}</label>
+            <label className="block text-display-sm text-content-tertiary mb-1">{t("consumers.maxDeliverLabel")}</label>
             <input type="number" className="input w-full" min={-1} value={editForm.max_deliver} onChange={(e) => setEditForm({ ...editForm, max_deliver: parseInt(e.target.value) || -1 })} />
           </div>
         </div>

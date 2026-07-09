@@ -14,15 +14,16 @@ import {
   XCircle,
 } from "lucide-react";
 import { useNotifications } from "../store/notifications";
+import { STATUS_TONES } from "../utils/constants";
 import { Button } from "./ui/Button";
 import Card from "./ui/Card";
 import Badge from "./ui/Badge";
 
 const icons = {
-  success: <CheckCircle className="icon-base text-green-400" />,
-  error: <XCircle className="icon-base text-red-400" />,
-  warning: <AlertTriangle className="icon-base text-yellow-400" />,
-  info: <Info className="icon-base text-blue-400" />,
+  success: <CheckCircle className={`icon-base ${STATUS_TONES.success.text}`} />,
+  error: <XCircle className={`icon-base ${STATUS_TONES.error.text}`} />,
+  warning: <AlertTriangle className={`icon-base ${STATUS_TONES.warning.text}`} />,
+  info: <Info className={`icon-base ${STATUS_TONES.info.text}`} />,
 };
 
 export function NotificationCenter() {
@@ -55,10 +56,10 @@ export function NotificationCenter() {
       {/* Notification Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-lg hover:bg-dark-bg/60 transition-colors"
+        className="icon-btn-default relative hover:bg-surface-primary/60"
         aria-label={t("common.notifications")}
       >
-        <Bell className="icon-md text-dark-text" />
+        <Bell className="icon-md text-content-primary" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 flex h-5 w-5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -82,7 +83,7 @@ export function NotificationCenter() {
           <div className="absolute right-0 mt-2 w-96 max-h-[500px] z-50">
             <Card className="overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-dark-border">
+              <div className="flex items-center justify-between p-4 border-b border-border-default">
                 <h3 className="font-semibold">{t("common.notifications")}</h3>
                 <div className="flex items-center gap-2">
                   {notifications.length > 0 && (
@@ -110,18 +111,18 @@ export function NotificationCenter() {
               <div className="max-h-96 overflow-y-auto">
                 {notifications.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <Bell className="icon-lg text-dark-muted/30 mb-3" />
-                    <p className="text-display-sm text-dark-muted">
+                    <Bell className="icon-lg text-content-tertiary/30 mb-3" />
+                    <p className="text-display-sm text-content-tertiary">
                       {t("common.noNotifications")}
                     </p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-dark-border/50">
+                  <div className="divide-y divide-border-default/50">
                     {notifications.map((notification) => (
                       <div
                         key={notification.id}
                         onClick={() => handleNotificationClick(notification.id)}
-                        className={`p-4 hover:bg-dark-bg/30 transition-colors cursor-pointer ${
+                        className={`p-4 hover:bg-surface-primary/30 transition-colors cursor-pointer ${
                           !notification.read ? "bg-primary-500/5" : ""
                         }`}
                       >
@@ -134,7 +135,7 @@ export function NotificationCenter() {
                               {notification.title}
                             </p>
                             {notification.message && (
-                              <p className="text-display-xs text-dark-muted mt-1 line-clamp-2">
+                              <p className="text-display-xs text-content-tertiary mt-1 line-clamp-2">
                                 {notification.message}
                               </p>
                             )}
@@ -157,9 +158,9 @@ export function NotificationCenter() {
                               e.stopPropagation();
                               removeNotification(notification.id);
                             }}
-                            className="p-1 hover:bg-dark-bg rounded transition-colors"
+                            className="icon-btn-danger"
                           >
-                            <X className="icon-sm text-dark-muted" />
+                            <X className="icon-sm text-content-tertiary" />
                           </button>
                         </div>
                       </div>
@@ -170,10 +171,10 @@ export function NotificationCenter() {
 
               {/* Footer */}
               {notifications.length > 0 && (
-                <div className="p-3 border-t border-dark-border text-center">
+                <div className="p-3 border-t border-border-default text-center">
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="text-display-xs text-dark-muted hover:text-dark-text transition-colors"
+                    className="text-display-xs text-content-tertiary hover:text-content-primary transition-colors"
                   >
                     {t("common.close")}
                   </button>

@@ -20,9 +20,9 @@ export default function LoadingSpinner({
       className={`flex flex-col items-center justify-center ${className || ""}`}
     >
       <div
-        className={`${sizeClasses[size]} rounded-full border-dark-border border-t-primary-500 animate-spin`}
+        className={`${sizeClasses[size]} rounded-full border-border-default border-t-primary-500 animate-spin`}
       />
-      {text && <p className="mt-3 text-display-sm text-dark-muted">{text}</p>}
+      {text && <p className="mt-3 text-display-sm text-content-tertiary">{text}</p>}
     </div>
   );
 }

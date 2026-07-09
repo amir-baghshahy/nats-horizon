@@ -28,7 +28,7 @@ export const PAGE_STRUCTURE = {
   statsSection: 'mb-6 animate-slide-up',
 
   // Divider between sections
-  divider: 'h-px bg-gradient-to-r from-transparent via-dark-border/50 to-transparent mb-6',
+  divider: 'h-px bg-gradient-to-r from-transparent via-border-default/50 to-transparent mb-6',
 } as const;
 
 // ============================================
@@ -164,8 +164,8 @@ export const SELECT_STANDARDS = {
   // Dropdown
   dropdown: cn(
     'max-h-60 overflow-auto rounded-xl',
-    'border border-dark-border/70',
-    'bg-dark-card/95',
+    'border border-border-default/70',
+    'bg-surface-secondary/95',
     'shadow-xl',
     'backdrop-blur-sm',
     'scrollbar-thin',
@@ -200,7 +200,7 @@ export const BADGE_STANDARDS = {
 
   // Variants
   variants: {
-    default: 'bg-dark-border/50 text-dark-text',
+    default: 'bg-border-default/50 text-content-primary',
     success: 'bg-green-500/20 text-green-400',
     warning: 'bg-yellow-500/20 text-yellow-400',
     danger: 'bg-red-500/20 text-red-400',
@@ -214,7 +214,7 @@ export const BADGE_STANDARDS = {
 
 // Base row styles (defined separately to avoid circular reference)
 const tableRowBase = cn(
-  'border-b border-dark-border/40',
+  'border-b border-border-default/40',
   'transition-colors duration-200',
 );
 
@@ -225,7 +225,7 @@ export const TABLE_STANDARDS = {
   // Interactive row
   rowInteractive: cn(
     tableRowBase,
-    'hover:bg-dark-bg/50',
+    'hover:bg-surface-primary/50',
     'cursor-pointer',
   ),
 
@@ -234,7 +234,7 @@ export const TABLE_STANDARDS = {
     'px-4 py-3',
     FONT_SIZE['display-sm'],
     FONT_WEIGHT.semibold,
-    'text-dark-muted',
+    'text-content-tertiary',
     'uppercase tracking-wide',
   ),
 
@@ -272,7 +272,7 @@ export const MODAL_STANDARDS = {
   header: cn(
     'flex items-center justify-between',
     PADDING.card,
-    'border-b border-dark-border',
+    'border-b border-border-default',
   ),
 
   // Body
@@ -287,7 +287,7 @@ export const MODAL_STANDARDS = {
     'flex items-center justify-end',
     GAP.md,
     PADDING.card,
-    'border-t border-dark-border',
+    'border-t border-border-default',
   ),
 } as const;
 
@@ -301,7 +301,7 @@ export const TOOLTIP_STANDARDS = {
     'rounded-lg',
     FONT_SIZE['display-xs'],
     'font-medium',
-    'bg-dark-text',
+    'bg-content-primary',
     'text-white',
     'shadow-lg',
     'pointer-events-none',
@@ -324,7 +324,7 @@ export const ICON_BUTTON_STANDARDS = {
 
   // Variants
   variants: {
-    default: 'hover:bg-dark-bg text-dark-text',
+    default: 'hover:bg-surface-primary text-content-primary',
     danger: 'hover:bg-red-500/20 text-red-400',
     primary: 'hover:bg-primary-500/20 text-primary-400',
     success: 'hover:bg-green-500/20 text-green-400',
@@ -360,7 +360,7 @@ export const FORM_STANDARDS = {
   // Help text
   help: cn(
     FONT_SIZE['display-xs'],
-    'text-dark-muted',
+    'text-content-tertiary',
     'mt-1',
   ),
 } as const;
@@ -383,21 +383,21 @@ export const FILTER_BAR_STANDARDS = {
   searchIcon: cn(
     'absolute left-3 top-1/2 -translate-y-1/2',
     ICON.base,
-    'text-dark-muted',
+    'text-content-tertiary',
   ),
 
   // Clear button
   clearButton: cn(
     'absolute right-3 top-1/2 -translate-y-1/2',
     ICON.sm,
-    'text-dark-muted hover:text-dark-text',
+    'text-content-tertiary hover:text-content-primary',
   ),
 
   // Badges row
   badgesRow: cn(
     'flex flex-wrap items-center',
     GAP.md,
-    'pt-3 border-t border-dark-border/60',
+    'pt-3 border-t border-border-default/60',
   ),
 
   // Badge
@@ -426,7 +426,7 @@ export const LOADING_STANDARDS = {
   // Spinner base
   spinnerBase: cn(
     'rounded-full',
-    'border-dark-border',
+    'border-border-default',
     'border-t-primary-500',
     'animate-spin',
   ),
@@ -434,7 +434,7 @@ export const LOADING_STANDARDS = {
   // Skeleton
   skeleton: cn(
     'animate-pulse',
-    'bg-dark-border/50',
+    'bg-border-default/50',
     'rounded',
   ),
 
@@ -494,7 +494,7 @@ export const STATUS_STANDARDS = {
   // Status colors
   colors: {
     online: 'bg-green-400',
-    offline: 'bg-dark-muted',
+    offline: 'bg-content-tertiary',
     busy: 'bg-red-400',
     away: 'bg-yellow-400',
   },

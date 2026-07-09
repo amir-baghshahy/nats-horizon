@@ -24,10 +24,10 @@ export function ConsumerNode({ data, selected }: NodeProps) {
       <Handle
         type="target"
         position={Position.Top}
-        className="!bg-dark-border !border-2 !border-dark-muted"
+        className="!bg-border-default !border-2 !border-content-tertiary"
       />
       <div
-        className={`rounded-xl border-2 ${selected ? "border-primary-500" : "border-dark-border/60"} bg-dark-card p-3 shadow-lg min-w-[180px] transition-all hover:shadow-xl`}
+        className={`rounded-xl border-2 ${selected ? "border-primary-500" : "border-border-default/60"} bg-surface-secondary p-3 shadow-lg min-w-[180px] transition-all hover:shadow-xl`}
       >
         <div className="flex items-center gap-2 mb-2">
           <div
@@ -36,7 +36,7 @@ export function ConsumerNode({ data, selected }: NodeProps) {
             <Users className="h-3.5 w-3.5 text-blue-400" />
           </div>
           <h4
-            className="font-medium text-dark-text text-display-sm truncate max-w-[120px]"
+            className="font-medium text-content-primary text-display-sm truncate max-w-[120px]"
             title={data.name}
           >
             {data.name}
@@ -45,15 +45,15 @@ export function ConsumerNode({ data, selected }: NodeProps) {
 
         <div className="space-y-1.5 text-display-xs">
           <div className="flex items-center justify-between">
-            <span className="text-dark-muted">Lag:</span>
+            <span className="text-content-tertiary">Lag:</span>
             <span className={`font-medium tabular-nums ${healthColor}`}>
               {formatNumber(data.lag || 0)}
             </span>
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-dark-muted">Ack Rate:</span>
-            <span className="font-medium text-dark-text tabular-nums">
+            <span className="text-content-tertiary">Ack Rate:</span>
+            <span className="font-medium text-content-primary tabular-nums">
               {data.ackRate || "0"}/s
             </span>
           </div>

@@ -69,7 +69,7 @@ export default function AlertsList({
           return (
             <div
               key={alert.id}
-              className={`card hover:border-dark-border/50 transition-colors animate-fade-in hover-lift ${delayClass}`}
+              className={`card hover:border-border-default/50 transition-colors animate-fade-in hover-lift ${delayClass}`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
@@ -81,7 +81,7 @@ export default function AlertsList({
                     {alert.enabled ? (
                       <ToggleRight className="icon-md text-green-400 animate-bounce-in" />
                     ) : (
-                      <ToggleLeft className="icon-md text-dark-muted" />
+                      <ToggleLeft className="icon-md text-content-tertiary" />
                     )}
                   </button>
                   <div className="flex-1">
@@ -95,17 +95,17 @@ export default function AlertsList({
                         {alert.severity}
                       </span>
                       {!alert.enabled && (
-                        <span className="text-display-xs text-dark-muted">
+                        <span className="text-display-xs text-content-tertiary">
                           {t("alerts.disabled")}
                         </span>
                       )}
                     </div>
-                    <p className="text-display-sm text-dark-muted mb-3">
+                    <p className="text-display-sm text-content-tertiary mb-3">
                       {alert.description}
                     </p>
-                    <div className="flex items-center gap-4 text-display-xs text-dark-muted">
+                    <div className="flex items-center gap-4 text-display-xs text-content-tertiary">
                       {alert.condition && (
-                        <span className="font-mono bg-dark-bg px-2 py-1 rounded">
+                        <span className="font-mono bg-surface-primary px-2 py-1 rounded">
                           {alert.condition.type}: {alert.condition.operator}{" "}
                           {alert.condition.threshold}
                         </span>
@@ -137,7 +137,7 @@ export default function AlertsList({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onEdit(alert)}
-                    className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale"
+                    className="p-2 hover:bg-surface-primary rounded-lg hover-lift active-scale"
                     title={t("alerts.edit")}
                   >
                     <Edit className="icon-base" />

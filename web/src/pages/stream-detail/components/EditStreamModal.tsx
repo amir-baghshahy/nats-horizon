@@ -33,14 +33,14 @@ export default function EditStreamModal({
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-dark-bg rounded-lg"
+              className="p-2 hover:bg-surface-primary rounded-lg"
             >
-              <span className="text-dark-muted">✕</span>
+              <span className="text-content-tertiary">✕</span>
             </button>
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-display-sm text-dark-muted mb-1">
+              <label className="block text-display-sm text-content-tertiary mb-1">
                 {t("streams.editSubjects")}
               </label>
               <input
@@ -54,7 +54,7 @@ export default function EditStreamModal({
               />
             </div>
             <div>
-              <label className="block text-display-sm text-dark-muted mb-1">
+              <label className="block text-display-sm text-content-tertiary mb-1">
                 {t("streams.replicas")}
               </label>
               <input
@@ -72,7 +72,7 @@ export default function EditStreamModal({
               />
             </div>
             <div>
-              <label className="block text-display-sm text-dark-muted mb-1">
+              <label className="block text-display-sm text-content-tertiary mb-1">
                 {t("streams.maxAgeLabel")}
               </label>
               <input
@@ -86,7 +86,7 @@ export default function EditStreamModal({
               />
             </div>
             <div>
-              <label className="block text-display-sm text-dark-muted mb-1">
+              <label className="block text-display-sm text-content-tertiary mb-1">
                 {t("streams.maxBytesLabel")}
               </label>
               <input

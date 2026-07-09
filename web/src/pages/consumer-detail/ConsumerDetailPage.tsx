@@ -80,7 +80,7 @@ export default function ConsumerDetailPage() {
   return (
     <div className="p-4 md:p-6">
       <div className="flex items-center gap-4 mb-4">
-        <Link to="/consumers" className="p-2 hover:bg-dark-bg rounded-lg transition-colors">
+        <Link to="/consumers" className="p-2 hover:bg-surface-primary rounded-lg transition-colors">
           <ArrowLeft className="icon-md" />
         </Link>
         <div className="flex-1">
@@ -100,7 +100,7 @@ export default function ConsumerDetailPage() {
               <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-display-sm">Durable</span>
             )}
           </div>
-          <p className="text-dark-muted mt-1">
+          <p className="text-content-tertiary mt-1">
             {t("consumers.stream")}:{" "}
             <Link to={`/streams/${encodeURIComponent(consumerData.stream ?? "")}`} className="text-primary-400 hover:underline">
               {consumerData.stream}
@@ -229,9 +229,9 @@ export default function ConsumerDetailPage() {
 
           {!pendingMessages || !pendingMessages.messages || pendingMessages.messages.length === 0 ? (
             <div className="text-center py-12">
-              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-dark-muted opacity-50" />
+              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-content-tertiary opacity-50" />
               <h3 className="text-display-lg font-semibold mb-2">{t("consumers.noPendingMessages")}</h3>
-              <p className="text-dark-muted">
+              <p className="text-content-tertiary">
                 {consumerData.num_pending && consumerData.num_pending > 0
                   ? t("consumers.noPendingMessagesDescription", { count: consumerData.num_pending })
                   : t("consumers.noPendingMessagesDescriptionEmpty")}
@@ -240,19 +240,19 @@ export default function ConsumerDetailPage() {
           ) : (
             <div className="space-y-3">
               {pendingMessages.messages.map((msg: any) => (
-                <div key={msg.sequence} className="p-4 bg-dark-bg rounded-lg">
+                <div key={msg.sequence} className="p-4 bg-surface-primary rounded-lg">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">
                         <span className="font-mono text-display-sm text-primary-400">#{msg.sequence}</span>
-                        <span className="text-display-sm font-mono text-dark-muted">{msg.subject}</span>
-                        <span className="text-display-xs text-dark-muted flex items-center gap-1">
+                        <span className="text-display-sm font-mono text-content-tertiary">{msg.subject}</span>
+                        <span className="text-display-xs text-content-tertiary flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {new Date(msg.timestamp).toLocaleString()}
                         </span>
-                        <span className="text-display-xs text-dark-muted">{t("consumers.deliveredCount", { count: msg.num_delivered })}</span>
+                        <span className="text-display-xs text-content-tertiary">{t("consumers.deliveredCount", { count: msg.num_delivered })}</span>
                       </div>
-                      <pre className="text-display-sm p-3 bg-dark-bg rounded overflow-x-auto max-h-32">
+                      <pre className="text-display-sm p-3 bg-surface-primary rounded overflow-x-auto max-h-32">
                         <code className="text-green-400">{msg.data}</code>
                       </pre>
                     </div>
@@ -295,42 +295,42 @@ export default function ConsumerDetailPage() {
           <PanelCard title={t("consumers.consumerConfiguration")}>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">Durable</span>
-                  <span className={`px-2 py-1 rounded text-display-xs ${consumerData.config?.durable ? "bg-green-500/20 text-green-400" : "bg-dark-border"}`}>
+                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                  <span className="text-content-tertiary">Durable</span>
+                  <span className={`px-2 py-1 rounded text-display-xs ${consumerData.config?.durable ? "bg-green-500/20 text-green-400" : "bg-border-default"}`}>
                     {consumerData.config?.durable ? t("consumers.yes") : t("consumers.no")}
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">{t("consumers.deliveryPolicy")}</span>
+                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                  <span className="text-content-tertiary">{t("consumers.deliveryPolicy")}</span>
                   <span className="font-medium capitalize">{consumerData.config?.deliver_policy || "all"}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">{t("consumers.ackPolicy")}</span>
+                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                  <span className="text-content-tertiary">{t("consumers.ackPolicy")}</span>
                   <span className="font-medium capitalize">{consumerData.config?.ack_policy || "explicit"}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">{t("consumers.replayPolicy")}</span>
+                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                  <span className="text-content-tertiary">{t("consumers.replayPolicy")}</span>
                   <span className="font-medium capitalize">{consumerData.config?.replay_policy || "instant"}</span>
                 </div>
               </div>
               <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">{t("consumers.maxDeliveries")}</span>
+                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                  <span className="text-content-tertiary">{t("consumers.maxDeliveries")}</span>
                   <span className="font-medium">
                     {consumerData.config?.max_deliver === -1 ? t("common.unlimited") : consumerData.config?.max_deliver || 3}
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">{t("consumers.ackWait")}</span>
+                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                  <span className="text-content-tertiary">{t("consumers.ackWait")}</span>
                   <span className="font-medium">{(consumerData.config as any)?.ack_wait ?? t("common.na")}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">{t("consumers.maxWaiting")}</span>
+                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                  <span className="text-content-tertiary">{t("consumers.maxWaiting")}</span>
                   <span className="font-medium">{(consumerData.config as any)?.max_waiting ?? t("common.na")}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                  <span className="text-dark-muted">{t("consumers.maxBatch")}</span>
+                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                  <span className="text-content-tertiary">{t("consumers.maxBatch")}</span>
                   <span className="font-medium">{(consumerData.config as any)?.max_batch ?? t("common.na")}</span>
                 </div>
               </div>
@@ -339,9 +339,9 @@ export default function ConsumerDetailPage() {
 
           {(consumerData.config as any)?.filter_subject && (
             <PanelCard title={t("consumers.filterSubject")}>
-              <div className="p-3 bg-dark-bg/50 rounded-lg">
+              <div className="p-3 bg-surface-primary/50 rounded-lg">
                 <p className="font-mono text-display-sm">{(consumerData.config as any).filter_subject}</p>
-                <p className="text-display-xs text-dark-muted mt-1">{t("consumers.filterSubjectHelp")}</p>
+                <p className="text-display-xs text-content-tertiary mt-1">{t("consumers.filterSubjectHelp")}</p>
               </div>
             </PanelCard>
           )}

@@ -60,7 +60,7 @@ export default function StreamsPage() {
       </section>
 
       {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-dark-border/50 to-transparent mb-6" />
+      <div className="h-px bg-gradient-to-r from-transparent via-border-default/50 to-transparent mb-6" />
 
       {/* Filters & List Section */}
       <section className="space-y-4 animate-slide-up animate-delay-100">

@@ -24,7 +24,7 @@ export default function Pagination({
 
   return (
     <div className="flex items-center justify-between">
-      <div className="text-display-sm text-dark-muted">
+      <div className="text-display-sm text-content-tertiary">
         {t('common.showing', { start: startItem, end: endItem, total })}
       </div>
 
@@ -32,7 +32,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={!hasPrevPage}
-          className="p-2 rounded-lg border border-dark-border hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-2 rounded-lg border border-border-default hover:bg-surface-primary disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label={t('common.previousPage')}
         >
           <ChevronLeft className="icon-base" />
@@ -45,7 +45,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={!hasNextPage}
-          className="p-2 rounded-lg border border-dark-border hover:bg-dark-bg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-2 rounded-lg border border-border-default hover:bg-surface-primary disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label={t('common.nextPage')}
         >
           <ChevronRight className="icon-base" />

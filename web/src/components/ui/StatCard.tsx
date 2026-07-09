@@ -93,7 +93,11 @@ export default function StatCard({
 
   if (onClick) {
     return (
-      <button onClick={onClick} className="w-full">
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full rounded-xl text-start transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary"
+      >
         {card}
       </button>
     );

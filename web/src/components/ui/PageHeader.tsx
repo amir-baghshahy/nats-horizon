@@ -29,13 +29,13 @@ export default function PageHeader({
         )}
         <div className="min-w-0">
           <h1 className="text-display-lg font-bold leading-tight truncate">{title}</h1>
-          {subtitle && <p className="text-display-xs text-dark-muted truncate">{subtitle}</p>}
+          {subtitle && <p className="text-display-xs text-content-tertiary truncate">{subtitle}</p>}
         </div>
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
         {sseConnected !== undefined && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-dark-bg rounded-lg border border-dark-border">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-surface-primary rounded-lg border border-border-default">
             {sseConnected ? (
               <>
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />

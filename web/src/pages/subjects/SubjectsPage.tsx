@@ -35,14 +35,14 @@ export default function SubjectsPage({
     return (
       <div key={node.name} style={{ marginLeft: depth > 0 ? 16 : 0 }}>
         <div
-          className="flex items-center gap-2 p-2 rounded-lg hover:bg-dark-bg/50 transition-colors cursor-pointer"
+          className="flex items-center gap-2 p-2 rounded-lg hover:bg-surface-primary/50 transition-colors cursor-pointer"
           onClick={() => hasChildren && toggleNode(node.name)}
         >
           {hasChildren ? (
             isExpanded ? (
-              <ChevronDown className="icon-base text-dark-muted" />
+              <ChevronDown className="icon-base text-content-tertiary" />
             ) : (
-              <ChevronRight className="icon-base text-dark-muted" />
+              <ChevronRight className="icon-base text-content-tertiary" />
             )
           ) : (
             <div className="w-4" />
@@ -51,13 +51,13 @@ export default function SubjectsPage({
           {node.name.includes(">") ? (
             <Globe className="icon-base text-primary-400" />
           ) : (
-            <Activity className="icon-base text-dark-muted" />
+            <Activity className="icon-base text-content-tertiary" />
           )}
 
           <span className={depth === 0 ? "font-semibold" : ""}>
             {node.name}
           </span>
-          <span className="ml-auto text-display-xs text-dark-muted">
+          <span className="ml-auto text-display-xs text-content-tertiary">
             {t("subjects.messageCount", { count: node.count })}
           </span>
         </div>
@@ -67,7 +67,7 @@ export default function SubjectsPage({
             {node.children.map((child: SubjectInfo) => (
               <div
                 key={child.name}
-                className="flex items-center gap-2 p-2 pl-8 text-display-sm text-dark-muted"
+                className="flex items-center gap-2 p-2 pl-8 text-display-sm text-content-tertiary"
               >
                 <Activity className="icon-base" />
                 <span className="font-mono">{child.name}</span>
@@ -97,13 +97,13 @@ export default function SubjectsPage({
         onSearchChange={setSearchQuery}
         searchPlaceholder={t("subjects.searchPlaceholder")}
         filters={
-          <div className="flex items-center bg-dark-bg rounded-lg p-1">
+          <div className="flex items-center bg-surface-primary rounded-lg p-1">
             <button
               onClick={() => setViewMode("tree")}
               className={`px-4 py-2 rounded transition-colors ${
                 viewMode === "tree"
                   ? "bg-primary-600 text-white"
-                  : "text-dark-muted"
+                  : "text-content-tertiary"
               }`}
             >
               <FolderOpen className="icon-base inline mr-2" />
@@ -114,7 +114,7 @@ export default function SubjectsPage({
               className={`px-4 py-2 rounded transition-colors ${
                 viewMode === "list"
                   ? "bg-primary-600 text-white"
-                  : "text-dark-muted"
+                  : "text-content-tertiary"
               }`}
             >
               <MessageSquare className="icon-base inline mr-2" />
@@ -146,7 +146,7 @@ export default function SubjectsPage({
             <PanelCard maxHeight={600} footer={<span>{t("subjects.subjectCount", { count: filteredSubjects.length })}</span>}>
               <div className="overflow-x-auto overflow-y-auto scrollbar-thin flex-1">
                 <table className="table">
-                  <thead className="sticky top-0 bg-dark-bg z-10">
+                  <thead className="sticky top-0 bg-surface-primary z-10">
                     <tr>
                       <th>{t("subjects.subject")}</th>
                       <th>{t("subjects.messages")}</th>
@@ -160,7 +160,7 @@ export default function SubjectsPage({
                             {(s.name || "").includes(">") ? (
                               <Globe className="icon-base text-primary-400" />
                             ) : (
-                              <Activity className="icon-base text-dark-muted" />
+                              <Activity className="icon-base text-content-tertiary" />
                             )}
                             <span className="font-mono">{s.name}</span>
                           </div>

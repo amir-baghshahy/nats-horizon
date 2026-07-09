@@ -122,16 +122,16 @@ function ErrorFallback({
           {t("common.somethingWentWrong")}
         </h2>
 
-        <p className="text-dark-muted mb-4">
+        <p className="text-content-tertiary mb-4">
           {error?.message || t("common.unexpectedError")}
         </p>
 
         {error?.stack && typeof window !== 'undefined' && (window as any).process?.env?.NODE_ENV === "development" && (
           <details className="mb-4 text-left">
-            <summary className="cursor-pointer text-display-xs text-dark-muted hover:text-dark-text mb-2">
+            <summary className="cursor-pointer text-display-xs text-content-tertiary hover:text-content-primary mb-2">
               {t("common.errorDetails")}
             </summary>
-            <pre className="bg-dark-bg p-3 rounded-lg text-display-xs overflow-auto max-h-40 text-red-400">
+            <pre className="bg-surface-primary p-3 rounded-lg text-display-xs overflow-auto max-h-40 text-red-400">
               {error.stack}
             </pre>
           </details>
@@ -158,7 +158,7 @@ function ErrorFallback({
         </div>
 
         {!showRetry && (
-          <p className="text-display-xs text-dark-muted mt-3">
+          <p className="text-display-xs text-content-tertiary mt-3">
             {t("common.tooManyRetries")}
           </p>
         )}

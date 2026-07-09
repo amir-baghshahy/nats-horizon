@@ -27,16 +27,16 @@ export default function BulkActions({
   const variantClasses = {
     danger: "bg-red-500/20 text-red-400 hover:bg-red-500/30",
     primary: "bg-primary-500/20 text-primary-400 hover:bg-primary-500/30",
-    secondary: "bg-dark-bg text-dark-text hover:bg-dark-bg/80",
+    secondary: "bg-surface-primary text-content-primary hover:bg-surface-primary/80",
   };
 
   return (
     <div className="flex items-center justify-between p-4 bg-primary-500/10 border border-primary-500/30 rounded-lg mb-4">
       <div className="text-display-sm">
         <span className="font-medium">{selectedCount}</span>
-        <span className="text-dark-muted mx-2">of</span>
-        <span className="text-dark-muted">{totalCount}</span>
-        <span className="text-dark-muted mx-2">selected</span>
+        <span className="text-content-tertiary mx-2">of</span>
+        <span className="text-content-tertiary">{totalCount}</span>
+        <span className="text-content-tertiary mx-2">selected</span>
       </div>
 
       <div className="flex items-center gap-3">
@@ -55,7 +55,7 @@ export default function BulkActions({
 
         <button
           onClick={onClearSelection}
-          className="text-display-sm text-dark-muted hover:text-dark-text transition-colors"
+          className="text-display-sm text-content-tertiary hover:text-content-primary transition-colors"
         >
           Clear selection
         </button>

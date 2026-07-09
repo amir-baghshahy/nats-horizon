@@ -17,25 +17,25 @@ export default function SubjectExplorer({ subjects }: SubjectExplorerProps) {
           </div>
           <div>
             <h2 className="text-display-xl font-bold">{t('messages.subjects')}</h2>
-            <p className="mt-2 text-display-sm leading-6 text-dark-muted">
+            <p className="mt-2 text-display-sm leading-6 text-content-tertiary">
               {t('messages.subjectsDescription')}
             </p>
             <div className="mt-4 grid gap-3 md:grid-cols-3">
-              <div className="rounded-xl bg-dark-bg/50 p-4">
+              <div className="rounded-xl bg-surface-primary/50 p-4">
                 <p className="text-display-sm font-medium">{t('messages.subscribe')}</p>
-                <p className="mt-1 text-display-xs text-dark-muted">
+                <p className="mt-1 text-display-xs text-content-tertiary">
                   {t('messages.subscribeDescription')}
                 </p>
               </div>
-              <div className="rounded-xl bg-dark-bg/50 p-4">
+              <div className="rounded-xl bg-surface-primary/50 p-4">
                 <p className="text-display-sm font-medium">{t('messages.publish')}</p>
-                <p className="mt-1 text-display-xs text-dark-muted">
+                <p className="mt-1 text-display-xs text-content-tertiary">
                   {t('messages.publishDescription')}
                 </p>
               </div>
-              <div className="rounded-xl bg-dark-bg/50 p-4">
+              <div className="rounded-xl bg-surface-primary/50 p-4">
                 <p className="text-display-sm font-medium">{t('messages.requestReply')}</p>
-                <p className="mt-1 text-display-xs text-dark-muted">
+                <p className="mt-1 text-display-xs text-content-tertiary">
                   {t('messages.requestReplyDescription')}
                 </p>
               </div>
@@ -51,14 +51,14 @@ export default function SubjectExplorer({ subjects }: SubjectExplorerProps) {
             {subjects.map((subject) => (
               <span
                 key={subject}
-                className="rounded-xl border border-dark-border/70 bg-dark-bg/50 px-3 py-2 font-mono text-display-sm text-primary-300"
+                className="rounded-xl border border-border-default/70 bg-surface-primary/50 px-3 py-2 font-mono text-display-sm text-primary-300"
               >
                 {subject}
               </span>
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-8 text-center text-dark-muted">
+          <div className="rounded-xl border border-dashed border-border-default bg-surface-primary/30 p-8 text-center text-content-tertiary">
             <Globe className="mx-auto mb-3 h-10 w-10 opacity-50" />
             <p>{t('messages.noSubjectsDiscovered')}</p>
             <p className="mt-1 text-display-sm">

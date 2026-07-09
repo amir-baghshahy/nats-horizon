@@ -57,7 +57,7 @@ export default function HistoryPage({
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         {/* Duration toggle buttons */}
-        <div className="flex items-center rounded-lg border border-dark-border/60 bg-dark-bg/50 p-0.5 gap-0.5">
+        <div className="flex items-center rounded-lg border border-border-default/60 bg-surface-primary/50 p-0.5 gap-0.5">
           {DURATIONS.map((d) => (
             <button
               key={d}
@@ -65,7 +65,7 @@ export default function HistoryPage({
               className={`rounded-md px-3 py-1 text-display-xs font-medium transition-colors ${
                 duration === d
                   ? "bg-primary-600 text-white shadow-sm"
-                  : "text-dark-muted hover:text-dark-text"
+                  : "text-content-tertiary hover:text-content-primary"
               }`}
             >
               {d}
@@ -92,7 +92,7 @@ export default function HistoryPage({
           <div className="flex items-center gap-2 mb-3">
             <HistoryIcon className="h-4 w-4 text-primary-400" />
             <h3 className="text-display-sm font-semibold">{t("history.streamSummary")}</h3>
-            <span className="ml-auto text-display-xs text-dark-muted">
+            <span className="ml-auto text-display-xs text-content-tertiary">
               {historyStreams.length} {t("common.streams") || "streams"}
             </span>
           </div>
@@ -115,12 +115,12 @@ export default function HistoryPage({
                 const trendColor =
                   trend === "up" ? "text-green-400"
                   : trend === "down" ? "text-red-400"
-                  : "text-dark-muted";
+                  : "text-content-tertiary";
 
                 return (
                   <div
                     key={stream.name || idx}
-                    className="group rounded-lg bg-dark-bg/40 px-3 py-2.5 hover:bg-dark-bg/70 transition-colors cursor-pointer"
+                    className="group rounded-lg bg-surface-primary/40 px-3 py-2.5 hover:bg-surface-primary/70 transition-colors cursor-pointer"
                     onClick={() => setSelectedStream(stream.name || "all")}
                   >
                     <div className="flex items-center justify-between mb-1.5">
@@ -129,21 +129,21 @@ export default function HistoryPage({
                       </span>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <TrendIcon className={`h-3 w-3 ${trendColor}`} />
-                        <span className="text-display-xs tabular-nums text-dark-muted">
+                        <span className="text-display-xs tabular-nums text-content-tertiary">
                           {(stream.messages || 0).toLocaleString()}
                         </span>
                       </div>
                     </div>
                     {/* mini bar */}
-                    <div className="h-1 w-full rounded-full bg-dark-border/50 overflow-hidden">
+                    <div className="h-1 w-full rounded-full bg-border-default/50 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-primary-500/70 transition-all duration-500"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-display-xs text-dark-muted/70">{formatBytes(stream.bytes || 0)}</span>
-                      <span className="text-display-xs text-dark-muted/70">{pct}%</span>
+                      <span className="text-display-xs text-content-tertiary/70">{formatBytes(stream.bytes || 0)}</span>
+                      <span className="text-display-xs text-content-tertiary/70">{pct}%</span>
                     </div>
                   </div>
                 );
@@ -162,7 +162,7 @@ export default function HistoryPage({
                 {selectedStream}
               </span>
             )}
-            <span className="ml-auto text-display-xs text-dark-muted">
+            <span className="ml-auto text-display-xs text-content-tertiary">
               {chartData.length} {t("history.dataPoints") || "points"}
             </span>
           </div>
@@ -208,8 +208,8 @@ export default function HistoryPage({
                     content={({ active, payload, label }) => {
                       if (!active || !payload?.length) return null;
                       return (
-                        <div className="rounded-lg border border-dark-border bg-dark-card/95 px-3 py-2 text-display-xs shadow-lg backdrop-blur">
-                          <p className="text-dark-muted mb-1">{label}</p>
+                        <div className="rounded-lg border border-border-default bg-surface-secondary/95 px-3 py-2 text-display-xs shadow-lg backdrop-blur">
+                          <p className="text-content-tertiary mb-1">{label}</p>
                           <p className="font-semibold text-primary-400 tabular-nums">
                             {(payload[0].value as number).toLocaleString()} {t("common.messages") || "messages"}
                           </p>
@@ -240,7 +240,7 @@ export default function HistoryPage({
             const avg = Math.round(values.reduce((s: number, v: number) => s + v, 0) / values.length);
             const last = values[values.length - 1];
             return (
-              <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-dark-border/40">
+              <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-border-default/40">
                 {[
                   { label: "Min", value: min.toLocaleString() },
                   { label: "Max", value: max.toLocaleString() },
@@ -248,7 +248,7 @@ export default function HistoryPage({
                   { label: "Latest", value: last.toLocaleString() },
                 ].map(({ label, value }) => (
                   <div key={label} className="text-center">
-                    <p className="text-display-xs text-dark-muted">{label}</p>
+                    <p className="text-display-xs text-content-tertiary">{label}</p>
                     <p className="text-display-xs font-semibold tabular-nums mt-0.5">{value}</p>
                   </div>
                 ))}

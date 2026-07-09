@@ -36,7 +36,7 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
           </div>
           <div className="min-w-0">
             <h3 className="text-display-sm font-semibold leading-tight">{t('dashboard.connectionStatus')}</h3>
-            <p className="text-display-xs text-dark-muted truncate">
+            <p className="text-display-xs text-content-tertiary truncate">
               {list.length === 0
                 ? (t('dashboard.noActiveConnections') || 'No active connections')
                 : t('dashboard.activeConnections', { count: list.length })}
@@ -63,8 +63,8 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
           { label: t('dashboard.pending'), value: formatNumber(totalPending) },
           { label: t('dashboard.servers'), value: serverCount },
         ].map(({ label, value }) => (
-          <div key={label} className="rounded-lg bg-dark-bg/50 px-2 py-2 text-center">
-            <p className="text-display-xs text-dark-muted leading-tight">{label}</p>
+          <div key={label} className="rounded-lg bg-surface-primary/50 px-2 py-2 text-center">
+            <p className="text-display-xs text-content-tertiary leading-tight">{label}</p>
             <p className="text-display-sm font-semibold tabular-nums mt-0.5">{value}</p>
           </div>
         ))}
@@ -72,10 +72,10 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
 
       {/* Empty state */}
       {list.length === 0 && (
-        <div className="rounded-lg border border-dashed border-dark-border/50 bg-dark-bg/30 py-8 text-center">
+        <div className="rounded-lg border border-dashed border-border-default/50 bg-surface-primary/30 py-8 text-center">
           <Radio className="mx-auto mb-2 h-7 w-7 opacity-25" />
-          <p className="text-display-xs text-dark-muted">{t('dashboard.noActiveConnections') || 'No active connections'}</p>
-          <p className="text-display-xs text-dark-muted/60 mt-0.5">
+          <p className="text-display-xs text-content-tertiary">{t('dashboard.noActiveConnections') || 'No active connections'}</p>
+          <p className="text-display-xs text-content-tertiary/60 mt-0.5">
             {t('dashboard.connectionsWillAppear') || 'Client connections will appear here'}
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
           {hasMore && (
             <button
               onClick={() => setExpanded(p => !p)}
-              className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dark-border/40 py-1.5 text-display-xs text-dark-muted hover:text-dark-text hover:bg-dark-bg/40 transition-colors mt-1"
+              className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border-default/40 py-1.5 text-display-xs text-content-tertiary hover:text-content-primary hover:bg-surface-primary/40 transition-colors mt-1"
             >
               {expanded ? (
                 <><ChevronUp className="h-3 w-3" />{t('dashboard.showLess') || 'Show less'}</>
@@ -113,19 +113,19 @@ function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: any }) {
   const addr = conn.ip ? `${conn.ip}${conn.port ? `:${conn.port}` : ''}` : null;
 
   return (
-    <div className="rounded-lg border border-dark-border/40 bg-dark-bg/20 overflow-hidden">
+    <div className="rounded-lg border border-border-default/40 bg-surface-primary/20 overflow-hidden">
       <button
         onClick={() => setOpen(p => !p)}
-        className="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-dark-bg/50 transition-colors"
+        className="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-surface-primary/50 transition-colors"
       >
         <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse shrink-0" />
 
-        <Server className="h-3.5 w-3.5 text-dark-muted shrink-0" />
+        <Server className="h-3.5 w-3.5 text-content-tertiary shrink-0" />
 
         <div className="flex-1 min-w-0 flex items-center gap-2">
           <span className="text-display-xs font-medium truncate">{label}</span>
           {addr && (
-            <span className="text-display-xs font-mono text-dark-muted/70 truncate hidden sm:block" title={addr}>
+            <span className="text-display-xs font-mono text-content-tertiary/70 truncate hidden sm:block" title={addr}>
               {addr}
             </span>
           )}
@@ -137,15 +137,15 @@ function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: any }) {
           </span>
         )}
 
-        <div className="hidden sm:flex items-center gap-1 shrink-0 text-display-xs text-dark-muted">
+        <div className="hidden sm:flex items-center gap-1 shrink-0 text-display-xs text-content-tertiary">
           <span>{conn.subs_count || 0} subs</span>
         </div>
 
-        <ChevronDown className={`h-3 w-3 text-dark-muted shrink-0 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`h-3 w-3 text-content-tertiary shrink-0 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div className="border-t border-dark-border/40 px-3 py-2 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1.5 text-display-xs">
+        <div className="border-t border-border-default/40 px-3 py-2 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1.5 text-display-xs">
           <DetailRow label={t('dashboard.rtt') || 'RTT'} value={conn.rtt || '—'} />
           <DetailRow label={t('dashboard.subscriptions') || 'Subs'} value={conn.subs_count ?? 0} />
           <DetailRow label={t('dashboard.pending') || 'Pending'} value={formatNumber(conn.pending_bytes)} />
@@ -179,9 +179,9 @@ function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: any }) {
             }
           />
           {conn.server && (
-            <div className="col-span-full border-t border-dark-border/30 pt-1.5 mt-0.5 flex items-center gap-2">
-              <span className="text-dark-muted shrink-0">{t('dashboard.natsServer') || 'NATS server'}</span>
-              <span className="font-mono text-display-xs text-dark-muted/70 truncate" title={conn.server}>
+            <div className="col-span-full border-t border-border-default/30 pt-1.5 mt-0.5 flex items-center gap-2">
+              <span className="text-content-tertiary shrink-0">{t('dashboard.natsServer') || 'NATS server'}</span>
+              <span className="font-mono text-display-xs text-content-tertiary/70 truncate" title={conn.server}>
                 {conn.server}
               </span>
             </div>
@@ -195,7 +195,7 @@ function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: any }) {
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className="text-dark-muted shrink-0">{label}</span>
+      <span className="text-content-tertiary shrink-0">{label}</span>
       <span className="font-medium text-right tabular-nums">{value}</span>
     </div>
   );

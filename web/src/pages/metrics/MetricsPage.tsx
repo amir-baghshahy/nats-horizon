@@ -1,22 +1,35 @@
 import { UseMetricsReturn } from "./hooks/useMetrics";
+import type { MetricSeries, MetricsResponse } from "../../types";
 import { useTranslation } from "react-i18next";
 import {
   Activity,
+  ArrowDownRight,
+  ArrowUpRight,
   BarChart3,
   Clock,
+  Database,
   HardDrive,
   MessageSquare,
+  Minus,
   RefreshCw,
   TrendingUp,
   Zap,
 } from "lucide-react";
 
 import { formatBytes, formatNumber } from "../../utils/formatters";
-import { AreaChart, Area, ResponsiveContainer } from "recharts";
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { PageError, PageLoading } from "../../components/ui/PageState";
 import Select from "../../components/ui/Select";
-import { PageHeader, StatCard, PanelCard, EmptyState } from "../../components/ui";
+import { PageHeader, PanelCard, EmptyState } from "../../components/ui";
 import { Button } from "../../components/ui";
+import Badge from "../../components/ui/Badge";
 
 const durations = [
   { label: "last15Minutes", value: "15m" },
@@ -25,44 +38,236 @@ const durations = [
   { label: "last24Hours", value: "24h" },
 ];
 
-function MiniChart({ data, color }: { data: { value?: number }[]; color: string }) {
+const TONES: Record<string, string> = {
+  blue: "bg-blue-500/15 text-blue-400",
+  purple: "bg-purple-500/15 text-purple-400",
+  emerald: "bg-emerald-500/15 text-emerald-400",
+  amber: "bg-amber-500/15 text-amber-400",
+  primary: "bg-primary-500/15 text-primary-400",
+};
+
+// Sum a metric type across all streams, index-aligned, for a hero trend.
+function aggregateSeries(metrics: MetricsResponse | undefined, type: string) {
+  const list = (metrics?.streams || []).filter((s) => s.labels?.type === type);
+  if (!list.length) return { data: [] } as MetricSeries;
+  const maxLen = Math.max(...list.map((s) => s.data?.length || 0));
+  const data: { value?: number; timestamp?: number }[] = [];
+  for (let i = 0; i < maxLen; i++) {
+    let sum = 0;
+    let ts: number | undefined;
+    for (const s of list) {
+      const d = s.data?.[i];
+      if (d) {
+        sum += d.value || 0;
+        ts = d.timestamp;
+      }
+    }
+    data.push({ value: sum, timestamp: ts });
+  }
+  return { data } as MetricSeries;
+}
+
+function KpiCard({
+  icon: Icon,
+  label,
+  value,
+  trend,
+  tone,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  trend?: number;
+  tone: keyof typeof TONES;
+}) {
+  const TrendIcon =
+    trend && trend > 0 ? ArrowUpRight : trend && trend < 0 ? ArrowDownRight : Minus;
+  const trendColor =
+    trend && trend > 0
+      ? "text-green-400"
+      : trend && trend < 0
+        ? "text-red-400"
+        : "text-content-tertiary";
+  return (
+    <div className="card p-4 sm:p-5">
+      <div className="flex items-center justify-between">
+        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${TONES[tone]}`}>
+          <Icon className="icon-base" />
+        </div>
+        {trend !== undefined && (
+          <div className={`flex items-center gap-1 text-display-xs font-medium ${trendColor}`}>
+            <TrendIcon className="h-3.5 w-3.5" />
+            <span>{Math.abs(trend).toFixed(1)}%</span>
+          </div>
+        )}
+      </div>
+      <p className="mt-4 text-display-2xl font-bold tabular-nums leading-none">{value}</p>
+      <p className="mt-2 text-display-xs text-content-tertiary">{label}</p>
+    </div>
+  );
+}
+
+function UsageBar({
+  label,
+  used,
+  max,
+  usage,
+}: {
+  label: string;
+  used: number;
+  max?: number;
+  usage?: number;
+}) {
   const { t } = useTranslation();
-  const chartData = data.map((p, i) => ({ i, v: p.value || 0 }));
+  const pct = usage ?? (max ? (used / max) * 100 : 0);
+  const barColor = pct > 90 ? "bg-red-400" : pct > 70 ? "bg-yellow-400" : "bg-green-400";
+  const textColor = pct > 90 ? "text-red-400" : pct > 70 ? "text-yellow-400" : "text-green-400";
+  const status = pct > 90 ? t("common.critical") : pct > 70 ? t("common.warning") : t("common.healthy");
+  return (
+    <div className="rounded-xl bg-surface-primary/50 p-4">
+      <div className="flex items-center justify-between">
+        <span className="text-display-sm text-content-tertiary">{label}</span>
+        <span className={`text-display-xs font-medium ${textColor}`}>{status}</span>
+      </div>
+      <p className="mt-2 text-display-lg font-semibold tabular-nums">{formatBytes(used || 0)}</p>
+      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-border-default">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+          style={{ width: `${Math.min(pct || 0, 100)}%` }}
+        />
+      </div>
+      <p className="mt-2 text-display-xs text-content-tertiary">
+        {max
+          ? `${pct.toFixed(0)}% ${t("common.of")} ${formatBytes(max)}`
+          : `${pct.toFixed(0)}% — ${t("common.unlimited")}`}
+      </p>
+    </div>
+  );
+}
+
+function StatBlock({
+  icon: Icon,
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: React.ReactNode;
+  sub: string;
+  tone: keyof typeof TONES;
+}) {
+  return (
+    <div className="rounded-xl bg-surface-primary/50 p-4">
+      <div className="flex items-center gap-2">
+        <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${TONES[tone]}`}>
+          <Icon className="icon-base" />
+        </div>
+        <span className="text-display-sm text-content-tertiary">{label}</span>
+      </div>
+      <p className="mt-2 text-display-lg font-semibold tabular-nums">{value}</p>
+      <p className="mt-1 text-display-xs text-content-tertiary">{sub}</p>
+    </div>
+  );
+}
+
+function HeroChart({ series, color }: { series: MetricSeries; color: string }) {
+  const { t } = useTranslation();
+  const hex = `rgb(${color})`;
+  const chartData = (series.data || []).map((p, i) => ({ i, v: p.value || 0, ts: p.timestamp }));
+
   if (chartData.length < 2) {
     return (
-      <div className="flex h-10 items-center justify-center text-display-xs text-dark-muted/60">
-        {t("common.collectingData")}
+      <div className="flex h-72 flex-col items-center justify-center text-center">
+        <div className="icon-lg mb-3 flex items-center justify-center rounded-full bg-border-default/30">
+          <TrendingUp className="icon-md text-content-tertiary/50" />
+        </div>
+        <p className="text-display-xs text-content-tertiary/60">{t("common.collectingData")}</p>
       </div>
     );
   }
+
+  const peak = Math.max(...chartData.map((d) => d.v));
+
   return (
-    <div className="h-10 w-full">
+    <div className="h-72 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={chartData} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
+        <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
           <defs>
-            <linearGradient id={`mg-${color.replace(/[^a-z0-9]/gi, '')}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={color} stopOpacity={0.25} />
-              <stop offset="95%" stopColor={color} stopOpacity={0} />
+            <linearGradient id={`hero-${color}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={hex} stopOpacity={0.35} />
+              <stop offset="100%" stopColor={hex} stopOpacity={0} />
             </linearGradient>
           </defs>
+          <XAxis dataKey="i" hide />
+          <YAxis hide domain={["dataMin", "dataMax"]} />
+          <Tooltip
+            content={({ active, payload }) => {
+              if (!active || !payload?.length) return null;
+              const p = payload[0].payload as { v: number; ts?: number };
+              return (
+                <div className="rounded-lg border border-border-default bg-surface-secondary/95 px-3 py-2 text-display-xs shadow-xl backdrop-blur">
+                  <p className="mb-0.5 text-content-tertiary">
+                    {p.ts
+                      ? new Date(p.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                      : ""}
+                  </p>
+                  <p className="font-mono font-semibold" style={{ color: hex }}>
+                    {formatNumber(p.v)}
+                  </p>
+                </div>
+              );
+            }}
+          />
           <Area
             type="monotone"
             dataKey="v"
-            stroke={color}
-            strokeWidth={1.5}
-            fill={`url(#mg-${color.replace(/[^a-z0-9]/gi, '')})`}
+            stroke={hex}
+            strokeWidth={2}
+            fill={`url(#hero-${color})`}
             dot={false}
+            activeDot={{ r: 4, strokeWidth: 0 }}
             isAnimationActive={false}
           />
         </AreaChart>
       </ResponsiveContainer>
+      <p className="mt-1 text-center text-display-xs text-content-tertiary">
+        {t("metrics.totalMessages")}: {formatNumber(peak)} {t("common.peak")}
+      </p>
+    </div>
+  );
+}
+
+function TopStreamRow({ stream, max, rank }: { stream: any; max: number; rank: number }) {
+  const pct = max > 0 ? ((stream.messages || 0) / max) * 100 : 0;
+  return (
+    <div className="group flex items-center gap-3 rounded-xl bg-surface-primary/50 p-3 transition-colors hover:bg-surface-primary">
+      <span className="w-5 shrink-0 text-center text-display-sm font-semibold text-content-tertiary">
+        {rank}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <p className="truncate font-mono text-display-sm group-hover:text-primary-400 transition-colors">
+            {stream.name}
+          </p>
+          <span className="shrink-0 text-display-xs tabular-nums text-content-tertiary">
+            {formatNumber(stream.messages || 0)} msgs
+          </span>
+        </div>
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border-default">
+          <div
+            className="h-full rounded-full bg-primary-500 transition-all duration-500"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <p className="mt-1 text-display-xs text-content-tertiary">{formatBytes(stream.bytes || 0)}</p>
+      </div>
     </div>
   );
 }
 
 export default function MetricsPage({
-  selectedStream,
-  setSelectedStream,
   duration,
   setDuration,
   autoRefresh,
@@ -74,8 +279,7 @@ export default function MetricsPage({
   error,
   refetch,
   getErrorMessage,
-  getLatestValue,
-  getSeries,
+  getTrend,
   streamNames,
   totalMessages,
   totalStorage,
@@ -84,6 +288,7 @@ export default function MetricsPage({
   rateTotalBytes,
 }: UseMetricsReturn) {
   const { t } = useTranslation();
+
   if (isLoading) {
     return <PageLoading text={t("metrics.loading")} />;
   }
@@ -92,8 +297,18 @@ export default function MetricsPage({
     return <PageError message={getErrorMessage(error)} onRetry={refetch} />;
   }
 
+  const totalMessagesSeries = aggregateSeries(metrics, "messages");
+  const totalStorageSeries = aggregateSeries(metrics, "bytes");
+  const messagesTrend = getTrend(totalMessagesSeries);
+  const storageTrend = getTrend(totalStorageSeries);
+  const durationLabel = t(`metrics.${durations.find((d) => d.value === duration)?.label ?? "last1Hour"}`);
+  const topStreams = [...rateStreams]
+    .sort((a: any, b: any) => (b.messages || 0) - (a.messages || 0))
+    .slice(0, 8);
+  const maxRateMessages = Math.max(...rateStreams.map((s: any) => s.messages || 0), 0);
+
   return (
-    <div className="p-4 md:p-6">
+    <div className="animate-fade-in space-y-6 p-4 md:p-6">
       <PageHeader
         title={t("metrics.title")}
         subtitle={t("metrics.subtitle")}
@@ -106,237 +321,128 @@ export default function MetricsPage({
                 value: item.value,
                 label: t(`metrics.${item.label}`),
               }))}
-              className="shrink-0"
+              className="w-[140px] shrink-0"
               aria-label={t("metrics.duration")}
             />
             <Button
               type="button"
-              variant="secondary"
+              variant={autoRefresh ? "primary" : "secondary"}
               size="sm"
               onClick={() => setAutoRefresh(!autoRefresh)}
               aria-pressed={autoRefresh}
-              className={autoRefresh ? "border-primary-500/40 bg-primary-500/15 text-primary-300" : ""}
-              icon={autoRefresh ? <Activity className="h-3 w-3 text-green-400" /> : <Clock className="h-3 w-3" />}
+              icon={autoRefresh ? <Activity className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+              className={autoRefresh ? "animate-pulse-glow" : ""}
             >
-              {t("metrics.autoRefresh")}
+              <span className="hidden sm:inline">{t("metrics.autoRefresh")}</span>
             </Button>
             <Button
               type="button"
               variant="secondary"
               size="sm"
               onClick={() => refetch()}
-              icon={<RefreshCw className="h-3 w-3" />}
+              icon={<RefreshCw className="h-3.5 w-3.5" />}
+              aria-label={t("common.refresh")}
             />
           </>
         }
       />
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard
+      {/* KPI overview */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <KpiCard
           icon={MessageSquare}
           value={formatNumber(totalMessages)}
           label={t("metrics.totalMessages")}
-          formatValue={false}
+          trend={messagesTrend}
+          tone="blue"
         />
-        <StatCard
+        <KpiCard
           icon={HardDrive}
           value={formatBytes(totalStorage)}
           label={t("metrics.totalStorage")}
-          iconBg="bg-blue-500/20"
-          iconColor="text-blue-400"
-          formatValue={false}
+          trend={storageTrend}
+          tone="purple"
         />
-        <StatCard
-          icon={BarChart3}
-          value={streamNames.length}
+        <KpiCard
+          icon={Database}
+          value={formatNumber(streamNames.length)}
           label={t("metrics.activeStreams")}
-          iconBg="bg-purple-500/20"
-          iconColor="text-purple-400"
+          tone="emerald"
         />
-        <StatCard
+        <KpiCard
           icon={Zap}
           value={formatNumber(rateTotalMessages)}
           label={t("metrics.messagesInRateWindow")}
-          iconBg="bg-green-500/20"
-          iconColor="text-green-400"
-          formatValue={false}
+          tone="amber"
         />
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-[1.2fr_0.8fr] mt-4">
-        <PanelCard title={t("metrics.systemMetrics")}>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-display-xs text-dark-muted">
-                {t("metrics.memoryUsed")}
-              </p>
-              <p className="mt-1 text-display-lg font-medium">
-                {formatBytes(systemMetrics?.memory?.used || 0)}
-              </p>
-              <p className="text-display-xs text-dark-muted">
-                {systemMetrics?.memory?.max
-                  ? `${systemMetrics.memory.usage || 0}% of ${formatBytes(systemMetrics.memory.max)}`
-                  : systemMetrics?.memory?.usage !== undefined
-                    ? `${systemMetrics.memory.usage}% — Unlimited`
-                    : "Unlimited"}
-              </p>
-            </div>
-            <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-display-xs text-dark-muted">
-                {t("metrics.storageUsed")}
-              </p>
-              <p className="mt-1 text-display-lg font-medium">
-                {formatBytes(systemMetrics?.storage?.used || 0)}
-              </p>
-              <p className="text-display-xs text-dark-muted">
-                {systemMetrics?.storage?.max
-                  ? `${systemMetrics.storage.usage || 0}% of ${formatBytes(systemMetrics.storage.max)}`
-                  : systemMetrics?.storage?.usage !== undefined
-                    ? `${systemMetrics.storage.usage}% — Unlimited`
-                    : "Unlimited"}
-              </p>
-            </div>
-            <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-display-xs text-dark-muted">
-                {t("metrics.connections")}
-              </p>
-              <p className="mt-1 text-display-lg font-medium">
-                {systemMetrics?.connections || 0}
-              </p>
-              <p className="text-display-xs text-dark-muted">
-                {systemMetrics?.streams || 0} streams ·{" "}
-                {systemMetrics?.consumers || 0} consumers
-              </p>
-            </div>
-            <div className="rounded-xl bg-dark-bg/50 p-4">
-              <p className="text-display-xs text-dark-muted">
-                {t("metrics.rateWindow")}
-              </p>
-              <p className="mt-1 text-display-lg font-medium">
-                {formatBytes(rateTotalBytes)} / {rates?.duration || 60}s
-              </p>
-              <p className="text-display-xs text-dark-muted">
-                {formatNumber(rateTotalMessages)} messages
-              </p>
-            </div>
-          </div>
-        </PanelCard>
+      {/* Hero throughput chart */}
+      <PanelCard
+        title={t("metrics.messages")}
+        subtitle={t("history.lastDuration", { duration: durationLabel })}
+        icon={<TrendingUp className="h-5 w-5 text-primary-400" />}
+      >
+        <HeroChart series={totalMessagesSeries} color="59, 130, 246" />
+      </PanelCard>
 
-        <PanelCard
-          title={t("metrics.rateByStream")}
-          icon={<TrendingUp className="h-5 w-5 text-primary-400" />}
-          maxHeight={400}
-          empty={rateStreams.length === 0}
-          emptyState={
-            <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-6 text-center text-dark-muted">
-              {t("metrics.noRateData")}
-            </div>
-          }
-          footer={
-            <span>
-              {rateStreams.length}{" "}
-              {t("metrics.streamCount", { count: rateStreams.length })}
-            </span>
-          }
-        >
-          {rateStreams.map((stream: any) => (
-            <div key={stream.name} className="rounded-xl bg-dark-bg/50 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="font-mono text-display-sm truncate">{stream.name}</p>
-                <p className="text-display-xs text-dark-muted whitespace-nowrap">
-                  {formatNumber(stream.messages || 0)} msgs ·{" "}
-                  {formatBytes(stream.bytes || 0)}
-                </p>
-              </div>
-            </div>
-          ))}
-        </PanelCard>
-      </div>
-
-      <div className="mb-4 mt-4">
-        <PanelCard
-          maxHeight={800}
-          header={
-            <Select
-              value={selectedStream || "all"}
-              onChange={(value) =>
-                setSelectedStream(value === "all" ? null : value)
-              }
-              options={[
-                { value: "all", label: t("metrics.allStreams") },
-                ...streamNames.map((name) => ({ value: name, label: name })),
-              ]}
-              aria-label={t("metrics.selectStream")}
-            />
-          }
-          footer={
-            <span>
-              {streamNames.length}{" "}
-              {t("metrics.streamCount", { count: streamNames.length })}
-            </span>
-          }
-        >
-          <div className="grid gap-3 lg:grid-cols-2">
-            {streamNames.map((streamName) => {
-              const messageSeries = getSeries(metrics, streamName, "messages");
-              const bytesSeries = getSeries(metrics, streamName, "bytes");
-              const messages = getLatestValue(messageSeries);
-              const bytes = getLatestValue(bytesSeries);
-              return (
-                <PanelCard
-                  key={streamName}
-                  title={streamName}
-                  icon={<MessageSquare className="h-4 w-4 text-primary-400" />}
-                >
-                  <div
-                    key={`${streamName}-messages`}
-                    className="rounded-xl bg-dark-bg/50 p-4"
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-display-sm text-dark-muted whitespace-nowrap">
-                        {t("metrics.messages")}
-                      </span>
-                      <span className="font-medium tabular-nums whitespace-nowrap">
-                        {formatNumber(messages)}
-                      </span>
-                    </div>
-                    <MiniChart
-                      data={messageSeries?.data || []}
-                      color="rgb(59, 130, 246)"
-                    />
-                  </div>
-
-                  <div
-                    key={`${streamName}-bytes`}
-                    className="rounded-xl bg-dark-bg/50 p-4"
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-display-sm text-dark-muted whitespace-nowrap">
-                        {t("metrics.storage")}
-                      </span>
-                      <span className="font-medium tabular-nums whitespace-nowrap">
-                        {formatBytes(bytes)}
-                      </span>
-                    </div>
-                    <MiniChart
-                      data={bytesSeries?.data || []}
-                      color="rgb(16, 185, 129)"
-                    />
-                  </div>
-                </PanelCard>
-              );
-            })}
-          </div>
-        </PanelCard>
-      </div>
-
-      {streamNames.length === 0 && (
-        <EmptyState
-          icon={BarChart3}
-          title={t("metrics.noMetricsAvailable")}
-          description={t("metrics.noMetricsAvailableDescription")}
+      {/* System resources */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <UsageBar
+          label={t("metrics.memoryUsed")}
+          used={systemMetrics?.memory?.used || 0}
+          max={systemMetrics?.memory?.max}
+          usage={systemMetrics?.memory?.usage}
         />
-      )}
+        <UsageBar
+          label={t("metrics.storageUsed")}
+          used={systemMetrics?.storage?.used || 0}
+          max={systemMetrics?.storage?.max}
+          usage={systemMetrics?.storage?.usage}
+        />
+        <StatBlock
+          icon={Activity}
+          label={t("metrics.connections")}
+          value={systemMetrics?.connections || 0}
+          sub={`${systemMetrics?.streams || 0} streams · ${systemMetrics?.consumers || 0} consumers`}
+          tone="emerald"
+        />
+        <StatBlock
+          icon={Zap}
+          label={t("metrics.rateWindow")}
+          value={
+            <>
+              {formatBytes(rateTotalBytes)}
+              <span className="ml-1 text-display-sm text-content-tertiary">/ {rates?.duration || 60}s</span>
+            </>
+          }
+          sub={`${formatNumber(rateTotalMessages)} messages`}
+          tone="amber"
+        />
+      </div>
+
+      {/* Top streams by rate */}
+      <PanelCard
+        title={t("metrics.rateByStream")}
+        icon={<TrendingUp className="h-5 w-5 text-primary-400" />}
+        footer={
+          <Badge variant="info">{t("metrics.streamCount", { count: rateStreams.length })}</Badge>
+        }
+      >
+        {topStreams.length === 0 ? (
+          <EmptyState
+            icon={BarChart3}
+            title={t("metrics.noRateData")}
+            description={t("metrics.noMetricsAvailableDescription")}
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            {topStreams.map((stream: any, i: number) => (
+              <TopStreamRow key={stream.name} stream={stream} max={maxRateMessages} rank={i + 1} />
+            ))}
+          </div>
+        )}
+      </PanelCard>
     </div>
   );
 }

@@ -57,7 +57,7 @@ export default function PublishForm({
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-display-sm font-medium mb-2">{t('messages.subject')}</label>
-          <p className="text-display-xs text-dark-muted mb-2">
+          <p className="text-display-xs text-content-tertiary mb-2">
             {t('messages.subjectHelp')}
           </p>
           <input

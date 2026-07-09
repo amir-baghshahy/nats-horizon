@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ChevronDown } from "lucide-react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 
 interface SelectOption {
@@ -33,82 +33,131 @@ export default function Select({
   const { i18n } = useTranslation();
   const isRTL = i18n.dir() === "rtl";
   const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  const selectRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
   const displayValue = selectedOption?.label || placeholder || "";
 
-  // Calculate dropdown position when opened
-  const updateDropdownPosition = () => {
-    if (buttonRef.current && typeof window !== 'undefined') {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + 4, // 4px gap
-        left: isRTL ? rect.right : rect.left,
-        width: rect.width,
-      });
+  const updateDropdownPosition = useCallback(() => {
+    if (!buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    setDropdownPosition({
+      top: rect.bottom + 4,
+      left: isRTL ? rect.right : rect.left,
+      width: rect.width,
+    });
+  }, [isRTL]);
+
+  const focusOption = useCallback((index: number) => {
+    const dropdown = dropdownRef.current;
+    if (!dropdown) return;
+    const optionEls = dropdown.querySelectorAll<HTMLButtonElement>('[role="option"]');
+    const el = optionEls[index];
+    if (el) {
+      el.focus();
+      el.scrollIntoView({ block: "nearest" });
     }
+  }, []);
+
+  const open = () => {
+    const initial = Math.max(0, options.findIndex((o) => o.value === value));
+    setActiveIndex(initial);
+    setIsOpen(true);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
+    if (!isOpen) return;
+    updateDropdownPosition();
+
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      const insideButton = buttonRef.current?.contains(target);
-      const insideDropdown = dropdownRef.current?.contains(target);
-      if (!insideButton && !insideDropdown) {
+      if (!buttonRef.current?.contains(target) && !dropdownRef.current?.contains(target)) {
         setIsOpen(false);
       }
     };
+    const handleScroll = () => updateDropdownPosition();
+    const handleResize = () => updateDropdownPosition();
 
-    const handleScroll = () => {
-      if (isOpen) {
-        updateDropdownPosition();
-      }
+    document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("scroll", handleScroll, true);
+    window.addEventListener("resize", handleResize);
+
+    const focusTimer = window.setTimeout(() => focusOption(activeIndex), 0);
+
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll, true);
+      window.removeEventListener("resize", handleResize);
     };
+  }, [isOpen, activeIndex, options, updateDropdownPosition, focusOption]);
 
-    const handleResize = () => {
-      if (isOpen) {
-        updateDropdownPosition();
-      }
-    };
-
-    if (isOpen) {
-      updateDropdownPosition();
-      document.addEventListener("mousedown", handleClickOutside);
-      window.addEventListener("scroll", handleScroll, true);
-      window.addEventListener("resize", handleResize);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-        window.removeEventListener("scroll", handleScroll, true);
-        window.removeEventListener("resize", handleResize);
-      };
-    }
-  }, [isOpen]);
-
-  const handleToggle = () => {
-    if (!disabled) {
-      setIsOpen(!isOpen);
+  const selectIndex = (index: number) => {
+    const option = options[index];
+    if (option && !option.disabled) {
+      onChange(option.value);
+      setIsOpen(false);
+      buttonRef.current?.focus();
     }
   };
 
-  const handleSelect = (optionValue: string) => {
-    onChange(optionValue);
-    setIsOpen(false);
+  const handleButtonKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return;
+    if (!isOpen) {
+      if (["ArrowDown", "ArrowUp", "Enter", " "].includes(e.key)) {
+        e.preventDefault();
+        open();
+      }
+      return;
+    }
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setActiveIndex((i) => {
+          const next = (i + 1) % options.length;
+          focusOption(next);
+          return next;
+        });
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setActiveIndex((i) => {
+          const next = (i - 1 + options.length) % options.length;
+          focusOption(next);
+          return next;
+        });
+        break;
+      case "Home":
+        e.preventDefault();
+        setActiveIndex(0);
+        focusOption(0);
+        break;
+      case "End":
+        e.preventDefault();
+        setActiveIndex(options.length - 1);
+        focusOption(options.length - 1);
+        break;
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        if (activeIndex >= 0) selectIndex(activeIndex);
+        break;
+      case "Escape":
+        e.preventDefault();
+        setIsOpen(false);
+        buttonRef.current?.focus();
+        break;
+      case "Tab":
+        setIsOpen(false);
+        break;
+    }
   };
-
-  const selectBaseClasses = "relative w-full";
-  const buttonClasses = `
-    input relative flex items-center justify-between gap-2
-    ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}
-    ${className}
-  `;
 
   return (
-    <div ref={selectRef} className={selectBaseClasses}>
+    <div className="relative w-full">
       <button
         ref={buttonRef}
         type="button"
@@ -117,8 +166,11 @@ export default function Select({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         disabled={disabled}
-        onClick={handleToggle}
-        className={buttonClasses}
+        onClick={() => (isOpen ? setIsOpen(false) : open())}
+        onKeyDown={handleButtonKeyDown}
+        className={`input flex items-center justify-between gap-2 ${
+          disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+        } ${className}`}
       >
         <span className="truncate">{displayValue}</span>
         <ChevronDown
@@ -130,11 +182,10 @@ export default function Select({
 
       {isOpen &&
         !disabled &&
-        typeof window !== 'undefined' &&
         createPortal(
           <div
             ref={dropdownRef}
-            className="fixed z-[99999] max-h-60 overflow-auto rounded-xl border border-dark-border/70 bg-dark-card/95 shadow-xl backdrop-blur-sm scrollbar-thin"
+            className="fixed z-[99999] max-h-60 overflow-auto rounded-xl border border-border-default/70 bg-surface-secondary/95 shadow-xl shadow-black/30 backdrop-blur-sm scrollbar-thin"
             style={{
               top: `${dropdownPosition.top}px`,
               left: isRTL ? "auto" : `${dropdownPosition.left}px`,
@@ -143,27 +194,25 @@ export default function Select({
             }}
             role="listbox"
           >
-            {options.map((option) => (
+            {options.map((option, index) => (
               <button
                 key={option.value}
                 type="button"
                 role="option"
                 aria-selected={value === option.value}
                 disabled={option.disabled}
-                onClick={() => !option.disabled && handleSelect(option.value)}
-                className={`
-                  w-full px-4 py-2.5 text-start text-display-sm transition-colors
-                  ${
-                    option.disabled
-                      ? "cursor-not-allowed opacity-50"
-                      : "cursor-pointer hover:bg-dark-border/60"
-                  }
-                  ${
-                    value === option.value
-                      ? "bg-primary-500/20 text-primary-300 font-medium"
-                      : "text-dark-text"
-                  }
-                `}
+                tabIndex={index === activeIndex ? 0 : -1}
+                onClick={() => !option.disabled && selectIndex(index)}
+                onMouseEnter={() => setActiveIndex(index)}
+                className={`w-full px-4 py-2.5 text-start text-display-sm transition-colors ${
+                  option.disabled
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer hover:bg-surface-primary/60"
+                } ${
+                  value === option.value
+                    ? "bg-primary-500/20 font-medium text-primary-300"
+                    : "text-content-primary"
+                }`}
               >
                 {option.label}
               </button>

@@ -1,4 +1,5 @@
 import { Search, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface FilterBadge {
   label: string;
@@ -19,32 +20,37 @@ interface FilterBarProps {
 export default function FilterBar({
   searchValue,
   onSearchChange,
-  searchPlaceholder = "Search...",
+  searchPlaceholder,
   filters,
   badges,
   onClearFilters,
   actions,
 }: FilterBarProps) {
+  const { t } = useTranslation();
+  const placeholder = searchPlaceholder ?? t("common.search");
   const hasActiveBadges = badges && badges.length > 0;
 
   return (
     <div className="card mb-4">
       <div className="flex flex-col gap-3">
         {/* Search and filters row */}
-        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 icon-base text-dark-muted" />
+            <Search className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 icon-base text-content-tertiary" />
             <input
               type="text"
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={searchPlaceholder}
-              className="input w-full pl-10"
+              placeholder={placeholder}
+              aria-label={placeholder}
+              className="input w-full ps-10"
             />
             {searchValue && (
               <button
+                type="button"
                 onClick={() => onSearchChange("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-muted hover:text-dark-text"
+                aria-label={t("common.clear")}
+                className="absolute end-3 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-content-tertiary transition-colors hover:text-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
                 <X className="icon-base" />
               </button>
@@ -55,19 +61,21 @@ export default function FilterBar({
 
         {/* Badges row */}
         {(hasActiveBadges || actions) && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-dark-border/60">
+          <div className="flex flex-col gap-3 border-t border-border-default/60 pt-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               {badges?.map((badge, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-500/15 text-display-xs text-primary-300"
+                  className="inline-flex items-center gap-1 rounded-full bg-primary-500/15 px-2.5 py-1 text-display-xs text-primary-300"
                 >
-                  <span className="text-dark-muted">{badge.label}:</span>
+                  <span className="text-content-tertiary">{badge.label}:</span>
                   {badge.value}
                   {badge.onRemove && (
                     <button
+                      type="button"
                       onClick={badge.onRemove}
-                      className="ml-1 hover:text-dark-text"
+                      aria-label={`${t("common.remove")} ${badge.label}`}
+                      className="ms-1 rounded transition-colors hover:text-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                     >
                       <X className="icon-sm" />
                     </button>
@@ -76,10 +84,11 @@ export default function FilterBar({
               ))}
               {hasActiveBadges && onClearFilters && (
                 <button
+                  type="button"
                   onClick={onClearFilters}
-                  className="text-display-xs text-dark-muted hover:text-dark-text"
+                  className="rounded text-display-xs text-content-tertiary transition-colors hover:text-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                 >
-                  Clear all
+                  {t("common.clear")}
                 </button>
               )}
             </div>

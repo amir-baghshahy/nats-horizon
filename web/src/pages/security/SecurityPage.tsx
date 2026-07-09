@@ -89,20 +89,20 @@ export default function SecurityPage({
         <div className="space-y-6">
           <PanelCard title={t('security.accountInformation')}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted">{t('security.accountName')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary">{t('security.accountName')}</p>
                 <p className="font-medium">{securityInfo?.account?.name || 'N/A'}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted">{t('security.imports')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary">{t('security.imports')}</p>
                 <p className="font-medium">{securityInfo?.account?.imports || 0}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted">{t('security.exports')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary">{t('security.exports')}</p>
                 <p className="font-medium">{securityInfo?.account?.exports || 0}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted">{t('security.lastUpdated')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary">{t('security.lastUpdated')}</p>
                 <p className="font-medium text-display-sm">
                   {securityInfo?.timestamp ? formatTimestamp(securityInfo.timestamp) : 'N/A'}
                 </p>
@@ -112,20 +112,20 @@ export default function SecurityPage({
 
           <PanelCard title={t('security.resourceLimits')}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted">{t('security.maxConnections')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary">{t('security.maxConnections')}</p>
                 <p className="font-medium">{securityInfo?.limits?.connections || 'Unlimited'}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted">{t('security.maxSubscriptions')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary">{t('security.maxSubscriptions')}</p>
                 <p className="font-medium">{securityInfo?.limits?.subscriptions || 'Unlimited'}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted">{t('security.maxData')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary">{t('security.maxData')}</p>
                 <p className="font-medium">{securityInfo?.limits?.data ? formatBytes(securityInfo.limits.data) : 'Unlimited'}</p>
               </div>
-              <div className="bg-dark-bg/50 rounded-lg p-4">
-                <p className="text-display-xs text-dark-muted">{t('security.maxPayload')}</p>
+              <div className="bg-surface-primary/50 rounded-lg p-4">
+                <p className="text-display-xs text-content-tertiary">{t('security.maxPayload')}</p>
                 <p className="font-medium">{securityInfo?.limits?.payload ? formatBytes(securityInfo.limits.payload) : 'Unlimited'}</p>
               </div>
             </div>
@@ -133,7 +133,7 @@ export default function SecurityPage({
 
           <PanelCard title={t('security.serverSecuritySettings')}>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-dark-bg/50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-surface-primary/50 rounded-lg">
                 <span>{t('security.authenticationRequired')}</span>
                 <span className={`px-3 py-1 rounded-full text-display-sm ${
                   securityInfo?.server_security?.auth_required
@@ -143,7 +143,7 @@ export default function SecurityPage({
                   {securityInfo?.server_security?.auth_required ? t('security.enabled') : t('security.disabled')}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-dark-bg/50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-surface-primary/50 rounded-lg">
                 <span>{t('security.tlsRequired')}</span>
                 <span className={`px-3 py-1 rounded-full text-display-sm ${
                   securityInfo?.server_security?.tls_required
@@ -153,7 +153,7 @@ export default function SecurityPage({
                   {securityInfo?.server_security?.tls_required ? t('security.enabled') : t('security.disabled')}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-dark-bg/50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-surface-primary/50 rounded-lg">
                 <span>{t('security.tlsVerify')}</span>
                 <span className={`px-3 py-1 rounded-full text-display-sm ${
                   securityInfo?.server_security?.tls_verify
@@ -176,7 +176,7 @@ export default function SecurityPage({
         >
           <div className="space-y-4">
             {users?.map((user) => (
-              <div key={user.name} className="p-4 bg-dark-bg/50 rounded-lg">
+              <div key={user.name} className="p-4 bg-surface-primary/50 rounded-lg">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -187,23 +187,23 @@ export default function SecurityPage({
                          {user.enabled ? t('security.active') : t('security.disabled')}
                       </span>
                     </div>
-                    <p className="text-display-sm text-dark-muted mb-2">{t('security.account', { name: user.account })}</p>
+                    <p className="text-display-sm text-content-tertiary mb-2">{t('security.account', { name: user.account })}</p>
                     <div className="grid grid-cols-2 gap-4 text-display-xs">
                       <div>
-                        <p className="text-dark-muted">{t('security.publishPermissions')}</p>
+                        <p className="text-content-tertiary">{t('security.publishPermissions')}</p>
                         <div className="mt-1 space-y-1">
                           {Object.entries(user.permissions.publish as Record<string, string>).map(([subject, perm]: [string, string]) => (
-                            <div key={subject} className="font-mono bg-dark-bg px-2 py-1 rounded">
+                            <div key={subject} className="font-mono bg-surface-primary px-2 py-1 rounded">
                               {subject}: {perm}
                             </div>
                           ))}
                         </div>
                       </div>
                       <div>
-                        <p className="text-dark-muted">{t('security.subscribePermissions')}</p>
+                        <p className="text-content-tertiary">{t('security.subscribePermissions')}</p>
                         <div className="mt-1 space-y-1">
                           {Object.entries(user.permissions.subscribe as Record<string, string>).map(([subject, perm]: [string, string]) => (
-                            <div key={subject} className="font-mono bg-dark-bg px-2 py-1 rounded">
+                            <div key={subject} className="font-mono bg-surface-primary px-2 py-1 rounded">
                               {subject}: {perm}
                             </div>
                           ))}
@@ -218,14 +218,14 @@ export default function SecurityPage({
                           const ok = await confirm({ title: user.enabled ? t('security.disableUser') : t('security.enableUser'), message: t('security.toggleUserConfirm', { name: user.name }), confirmLabel: user.enabled ? t('security.disable') : t('security.enable'), variant: "warning" })
                           if (ok) updateUserMutation.mutate({ name: user.name, data: { enabled: !user.enabled } })
                         }}
-                        className="p-1.5 hover:bg-dark-border rounded-lg"
+                        className="p-1.5 hover:bg-border-default rounded-lg"
                       >
-                        {user.enabled ? <ToggleRight className="icon-base text-green-400" /> : <ToggleLeft className="icon-base text-dark-muted" />}
+                        {user.enabled ? <ToggleRight className="icon-base text-green-400" /> : <ToggleLeft className="icon-base text-content-tertiary" />}
                       </button>
                       <button
                         type="button"
                         onClick={() => { setSelectedUser(user); setShowUserModal(true); }}
-                        className="p-1.5 hover:bg-dark-border rounded-lg"
+                        className="p-1.5 hover:bg-border-default rounded-lg"
                       >
                         <Edit className="icon-base" />
                       </button>
@@ -255,17 +255,17 @@ export default function SecurityPage({
         >
           <div className="space-y-3">
             {auditLogs?.map((log: any, index: number) => (
-              <div key={index} className="p-4 bg-dark-bg/50 rounded-lg">
+              <div key={index} className="p-4 bg-surface-primary/50 rounded-lg">
                 <div className="flex items-start gap-4">
-                  <Clock className="icon-base text-dark-muted mt-1" />
+                  <Clock className="icon-base text-content-tertiary mt-1" />
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
                       <span className="font-mono text-display-sm">{log.action}</span>
-                      <span className="text-display-sm text-dark-muted">{t('security.byUser', { name: log.user })}</span>
+                      <span className="text-display-sm text-content-tertiary">{t('security.byUser', { name: log.user })}</span>
                     </div>
-                    <p className="text-display-sm text-dark-muted">{t('security.resource', { name: log.resource })}</p>
+                    <p className="text-display-sm text-content-tertiary">{t('security.resource', { name: log.resource })}</p>
                     <p className="text-display-sm mt-1">{log.details}</p>
-                    <p className="text-display-xs text-dark-muted mt-1">
+                    <p className="text-display-xs text-content-tertiary mt-1">
                       {formatTimestamp(log.timestamp)}
                     </p>
                   </div>
@@ -279,19 +279,19 @@ export default function SecurityPage({
       {activeTab === 'connections' && (
         <PanelCard title={t('security.connectionSecurityStatus')}>
           <div className="space-y-4">
-            <div className="p-4 bg-dark-bg/50 rounded-lg">
-              <p className="text-display-sm text-dark-muted">Server</p>
+            <div className="p-4 bg-surface-primary/50 rounded-lg">
+              <p className="text-display-sm text-content-tertiary">Server</p>
               <p className="font-medium">{connectionStatus?.server?.name || 'N/A'}</p>
-              <p className="text-display-xs text-dark-muted">
+              <p className="text-display-xs text-content-tertiary">
                 {connectionStatus?.server?.host}:{connectionStatus?.server?.port}
               </p>
             </div>
-            <div className="p-4 bg-dark-bg/50 rounded-lg">
-              <p className="text-display-sm text-dark-muted">Version</p>
+            <div className="p-4 bg-surface-primary/50 rounded-lg">
+              <p className="text-display-sm text-content-tertiary">Version</p>
               <p className="font-medium">{connectionStatus?.server?.version || 'N/A'}</p>
             </div>
-            <div className="p-4 bg-dark-bg/50 rounded-lg">
-              <p className="text-display-sm text-dark-muted">Status</p>
+            <div className="p-4 bg-surface-primary/50 rounded-lg">
+              <p className="text-display-sm text-content-tertiary">Status</p>
               <p className="font-medium flex items-center gap-2">
                 <Activity className="icon-base text-green-400" />
                 {connectionStatus?.status || t('cluster.disconnected')}
@@ -313,7 +313,7 @@ export default function SecurityPage({
               <button
                 type="button"
                 onClick={() => { setShowUserModal(false); setSelectedUser(null); }}
-                className="p-1.5 hover:bg-dark-bg rounded-lg"
+                className="p-1.5 hover:bg-surface-primary rounded-lg"
               >
                 <X className="icon-base" />
               </button>
@@ -373,7 +373,7 @@ export default function SecurityPage({
                   className="input w-full"
                   defaultValue={selectedUser ? Object.keys(selectedUser.permissions.publish || {}).join(', ') : '>'}
                 />
-                <p className="text-display-xs text-dark-muted mt-1">Comma-separated subjects or JSON</p>
+                <p className="text-display-xs text-content-tertiary mt-1">Comma-separated subjects or JSON</p>
               </div>
               <div>
                 <label className="block text-display-sm font-medium mb-2">{t('security.subscribePermissions')}</label>
@@ -384,7 +384,7 @@ export default function SecurityPage({
                   className="input w-full"
                   defaultValue={selectedUser ? Object.keys(selectedUser.permissions.subscribe || {}).join(', ') : '>'}
                 />
-                <p className="text-display-xs text-dark-muted mt-1">{t('security.permissionsHelp')}</p>
+                <p className="text-display-xs text-content-tertiary mt-1">{t('security.permissionsHelp')}</p>
               </div>
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="user-enabled" name="enabled" defaultChecked={selectedUser?.enabled ?? true} />

@@ -21,11 +21,11 @@ export default function VisualStreamGraph() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <Database className="mx-auto mb-4 h-16 w-16 text-dark-muted opacity-50" />
-          <h3 className="mb-2 text-display-lg font-medium text-dark-text">
+          <Database className="mx-auto mb-4 h-16 w-16 text-content-tertiary opacity-50" />
+          <h3 className="mb-2 text-display-lg font-medium text-content-primary">
             {t('visualStreamGraph.noStreams')}
           </h3>
-          <p className="text-dark-muted">
+          <p className="text-content-tertiary">
             No streams found. Create your first stream to see the visual graph.
           </p>
         </div>
@@ -34,7 +34,7 @@ export default function VisualStreamGraph() {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden">
+    <div className="h-full flex overflow-hidden">
       <div className="flex-1">
         <StreamGraph
           initialNodes={graphData.nodes}

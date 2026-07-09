@@ -20,11 +20,11 @@ export default function MessagingHeader({
     <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
         <h1 className="text-display-2xl font-bold md:text-3xl">{t('messages.title')}</h1>
-        <p className="mt-1 text-dark-muted">{t('messages.subtitle')}</p>
+        <p className="mt-1 text-content-tertiary">{t('messages.subtitle')}</p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 rounded-xl border border-dark-border bg-dark-bg px-4 py-2">
+        <div className="flex items-center gap-2 rounded-xl border border-border-default bg-surface-primary px-4 py-2">
           {sseConnected ? (
             <>
               <CheckCircle className="h-4 w-4 text-green-400" />

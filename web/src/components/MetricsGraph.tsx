@@ -77,7 +77,7 @@ export function MetricsGraph({
   const trendColor =
     change > 0 ? (isPositiveGood ? 'text-green-400' : 'text-red-400')
     : change < 0 ? (isPositiveGood ? 'text-red-400' : 'text-green-400')
-    : 'text-dark-muted'
+    : 'text-content-tertiary'
 
   const chartData: ChartPoint[] = dataPoints.map(p => ({ t: p.timestamp, v: p.value }))
 
@@ -96,7 +96,7 @@ export function MetricsGraph({
             {icon}
           </div>
           <div className="min-w-0">
-            <p className="text-display-xs text-dark-muted truncate leading-tight">{title}</p>
+            <p className="text-display-xs text-content-tertiary truncate leading-tight">{title}</p>
             <p className="text-display-base font-bold leading-tight tabular-nums">{formatValue(currentValue)}</p>
           </div>
         </div>
@@ -121,7 +121,7 @@ export function MetricsGraph({
                 content={({ active, payload }) => {
                   if (!active || !payload?.length) return null
                   return (
-                    <div className="rounded-lg border border-dark-border bg-dark-card/95 px-2 py-1 text-display-xs shadow-lg">
+                    <div className="rounded-lg border border-border-default bg-surface-secondary/95 px-2 py-1 text-display-xs shadow-lg">
                       <span className="font-mono" style={{ color: hexColor }}>
                         {formatValue(payload[0].value as number)}
                       </span>
@@ -142,7 +142,7 @@ export function MetricsGraph({
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex h-full items-center justify-center text-display-xs text-dark-muted/60">
+          <div className="flex h-full items-center justify-center text-display-xs text-content-tertiary/60">
             {t('common.collectingData') || 'Collecting data…'}
           </div>
         )}
@@ -210,12 +210,12 @@ export function ResourceUsageBar({
   const percentage = max > 0 ? (used / max) * 100 : 0
 
   return (
-    <div className="bg-dark-bg rounded-lg p-3">
+    <div className="bg-surface-primary rounded-lg p-3">
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-display-xs font-medium">{label}</span>
-        <span className="text-display-xs text-dark-muted">{formatBytes(used)} / {formatBytes(max)}</span>
+        <span className="text-display-xs text-content-tertiary">{formatBytes(used)} / {formatBytes(max)}</span>
       </div>
-      <div className="w-full bg-dark-border rounded-full h-1.5 overflow-hidden">
+      <div className="w-full bg-border-default rounded-full h-1.5 overflow-hidden">
         <div
           className="h-full transition-all duration-500 rounded-full"
           style={{ width: `${Math.min(percentage, 100)}%`, backgroundColor: color }}
@@ -225,7 +225,7 @@ export function ResourceUsageBar({
         <span className={`text-display-xs ${percentage > 90 ? 'text-red-400' : percentage > 70 ? 'text-yellow-400' : 'text-green-400'}`}>
           {percentage.toFixed(1)}%
         </span>
-        <span className="text-display-xs text-dark-muted">
+        <span className="text-display-xs text-content-tertiary">
           {percentage > 90 ? t('common.critical') : percentage > 70 ? t('common.warning') : t('common.healthy')}
         </span>
       </div>

@@ -8,12 +8,54 @@ export const STATUS_TYPES = {
 
 export type StatusType = (typeof STATUS_TYPES)[keyof typeof STATUS_TYPES];
 
-// Status Colors Mapping
+// Semantic tone tokens — single source of truth for status color intent.
+// Every status-colored surface (badges, toasts, indicators) should derive from these.
+export const STATUS_TONES = {
+  success: {
+    text: "text-green-400",
+    bg: "bg-green-500/20",
+    solid: "bg-green-500",
+    ring: "ring-green-500/25",
+    dot: "bg-green-400",
+  },
+  warning: {
+    text: "text-yellow-400",
+    bg: "bg-yellow-500/20",
+    solid: "bg-yellow-500",
+    ring: "ring-yellow-500/25",
+    dot: "bg-yellow-400",
+  },
+  error: {
+    text: "text-red-400",
+    bg: "bg-red-500/20",
+    solid: "bg-red-500",
+    ring: "ring-red-500/25",
+    dot: "bg-red-400",
+  },
+  info: {
+    text: "text-blue-400",
+    bg: "bg-blue-500/20",
+    solid: "bg-blue-500",
+    ring: "ring-blue-500/25",
+    dot: "bg-blue-400",
+  },
+  unknown: {
+    text: "text-gray-400",
+    bg: "bg-gray-500/20",
+    solid: "bg-gray-500",
+    ring: "ring-gray-500/25",
+    dot: "bg-gray-400",
+  },
+} as const;
+
+export type StatusTone = keyof typeof STATUS_TONES;
+
+// Status Colors Mapping (derived from the tone tokens above)
 export const STATUS_COLORS: Record<StatusType, string> = {
-  success: "text-green-400 bg-green-500/20",
-  warning: "text-yellow-400 bg-yellow-500/20",
-  error: "text-red-400 bg-red-500/20",
-  unknown: "text-gray-400 bg-gray-500/20",
+  success: `${STATUS_TONES.success.text} ${STATUS_TONES.success.bg}`,
+  warning: `${STATUS_TONES.warning.text} ${STATUS_TONES.warning.bg}`,
+  error: `${STATUS_TONES.error.text} ${STATUS_TONES.error.bg}`,
+  unknown: `${STATUS_TONES.unknown.text} ${STATUS_TONES.unknown.bg}`,
 };
 
 // Message Format Colors

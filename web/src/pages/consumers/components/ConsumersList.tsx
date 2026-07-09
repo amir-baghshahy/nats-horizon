@@ -48,7 +48,7 @@ export default function ConsumersList({
       emptyTitle={t("consumers.noConsumersFound")}
       getKey={(consumer) => consumer.name || ""}
       header={
-        <div className="bg-dark-bg border-b border-dark-border p-4 flex-shrink-0">
+        <div className="bg-surface-primary border-b border-border-default p-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <input
@@ -59,7 +59,7 @@ export default function ConsumersList({
                 onChange={onToggleAll}
                 className="icon-base rounded"
               />
-              <span className="text-display-sm text-dark-muted">
+              <span className="text-display-sm text-content-tertiary">
                 {selectedConsumers.size > 0
                   ? t("consumers.selectedCount", { count: selectedConsumers.size })
                   : t("consumers.consumerCount", { count: consumers.length })}

@@ -83,7 +83,7 @@ export default function ClusterPage({
             <p className="font-medium">
               {clusterHealth?.connected ? t('cluster.connected') : t('cluster.disconnected')}
             </p>
-            <p className="text-display-sm text-dark-muted">
+            <p className="text-display-sm text-content-tertiary">
               {clusterHealth?.connected
                 ? t('cluster.server', { name: clusterHealth?.connected_server?.id || 'Current server' })
                 : t('cluster.unableToConnect')}
@@ -98,20 +98,20 @@ export default function ClusterPage({
           icon={<Server className="icon-md text-primary-400" />}
         >
           <div className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">{t('cluster.clusterName')}</span>
+            <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+              <span className="text-content-tertiary">{t('cluster.clusterName')}</span>
               <span className="font-medium font-mono">
                 {clusterInfo?.cluster_name || 'N/A'}
               </span>
             </div>
-            <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">{t('cluster.serverName')}</span>
+            <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+              <span className="text-content-tertiary">{t('cluster.serverName')}</span>
               <span className="font-medium font-mono">
                 {clusterInfo?.server_name || 'N/A'}
               </span>
             </div>
-            <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">{t('cluster.mode')}</span>
+            <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+              <span className="text-content-tertiary">{t('cluster.mode')}</span>
               <span className={`px-2 py-1 rounded text-display-xs ${
                 clusterInfo?.is_clustered
                   ? 'bg-purple-500/20 text-purple-400'
@@ -120,25 +120,25 @@ export default function ClusterPage({
                 {clusterInfo?.is_clustered ? t('cluster.clustered') : t('cluster.standalone')}
               </span>
             </div>
-            <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">{t('cluster.jetStream')}</span>
+            <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+              <span className="text-content-tertiary">{t('cluster.jetStream')}</span>
               <span className={`px-2 py-1 rounded text-display-xs ${
                 clusterInfo?.jetstream?.enabled
                   ? 'bg-green-500/20 text-green-400'
-                  : 'bg-dark-border'
+                  : 'bg-border-default'
               }`}>
                 {clusterInfo?.jetstream?.enabled ? t('common.enabled') : t('common.disabled')}
               </span>
             </div>
             {clusterInfo?.jetstream?.domain && (
-              <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                <span className="text-dark-muted">{t('cluster.jsDomain')}</span>
+              <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                <span className="text-content-tertiary">{t('cluster.jsDomain')}</span>
                 <span className="font-mono text-display-sm">{clusterInfo.jetstream.domain}</span>
               </div>
             )}
             {clusterInfo?.jetstream?.tier && (
-              <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                <span className="text-dark-muted">{t('cluster.jsTier')}</span>
+              <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                <span className="text-content-tertiary">{t('cluster.jsTier')}</span>
                 <span className="font-mono text-display-sm">{clusterInfo.jetstream.tier}</span>
               </div>
             )}
@@ -150,8 +150,8 @@ export default function ClusterPage({
           icon={<Activity className="icon-md text-primary-400" />}
         >
           <div className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">{t('cluster.connectionStatus')}</span>
+            <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+              <span className="text-content-tertiary">{t('cluster.connectionStatus')}</span>
               <span className={`px-2 py-1 rounded text-display-xs ${
                 clusterHealth?.connected
                   ? 'bg-status-success/20 text-status-success'
@@ -160,14 +160,14 @@ export default function ClusterPage({
                 {clusterHealth?.status || t('cluster.disconnected')}
               </span>
             </div>
-            <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">{t('cluster.serverStatus')}</span>
+            <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+              <span className="text-content-tertiary">{t('cluster.serverStatus')}</span>
               <span className="font-mono text-display-sm capitalize">
                 {clusterHealth?.server_status || 'N/A'}
               </span>
             </div>
-            <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-              <span className="text-dark-muted">{t('cluster.jetStreamStatus')}</span>
+            <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+              <span className="text-content-tertiary">{t('cluster.jetStreamStatus')}</span>
               <span className={`px-2 py-1 rounded text-display-xs ${
                 clusterHealth?.jetstream?.status === 'ok'
                   ? 'bg-status-success/20 text-status-success'
@@ -177,8 +177,8 @@ export default function ClusterPage({
               </span>
             </div>
             {clusterHealth?.connected_server?.url && (
-              <div className="flex justify-between items-center p-3 bg-dark-bg/50 rounded-lg">
-                <span className="text-dark-muted">{t('cluster.connectedUrl')}</span>
+              <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                <span className="text-content-tertiary">{t('cluster.connectedUrl')}</span>
                 <span className="font-mono text-display-sm truncate max-w-[200px]">
                   {clusterHealth.connected_server.url}
                 </span>
@@ -202,7 +202,7 @@ export default function ClusterPage({
                   node.current
                     ? 'border-primary-500/50 bg-primary-500/10'
                     : node.healthy
-                    ? 'border-dark-border bg-dark-bg/50'
+                    ? 'border-border-default bg-surface-primary/50'
                     : 'border-status-error/50 bg-status-error/10'
                 }`}
               >
@@ -227,7 +227,7 @@ export default function ClusterPage({
                 </div>
                 <div className="space-y-2 text-display-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-dark-muted">{t('common.status')}</span>
+                    <span className="text-content-tertiary">{t('common.status')}</span>
                     <span className={`px-2 py-0.5 rounded text-display-xs ${
                       node.healthy
                         ? 'bg-status-success/20 text-status-success'
@@ -238,17 +238,17 @@ export default function ClusterPage({
                   </div>
                   {node.active ? (
                     <div className="flex items-center justify-between">
-                      <span className="text-dark-muted">{t('cluster.active')}</span>
+                      <span className="text-content-tertiary">{t('cluster.active')}</span>
                       {node.active ? (
                         <Zap className="icon-base text-yellow-400" />
                       ) : (
-                        <span className="text-dark-muted">{t('common.no')}</span>
+                        <span className="text-content-tertiary">{t('common.no')}</span>
                       )}
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
-                      <span className="text-dark-muted">Active</span>
-                      <span className="text-dark-muted">No</span>
+                      <span className="text-content-tertiary">Active</span>
+                      <span className="text-content-tertiary">No</span>
                     </div>
                   )}
                 </div>
@@ -275,12 +275,12 @@ export default function ClusterPage({
                     className={`p-3 rounded-lg cursor-pointer transition-colors ${
                       selectedStream === stream.config?.name
                         ? 'bg-primary-500/20 border border-primary-500/50'
-                        : 'bg-dark-bg hover:bg-dark-bg/80'
+                        : 'bg-surface-primary hover:bg-surface-primary/80'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-display-sm">{stream.config?.name}</span>
-                      <span className="text-display-xs text-dark-muted">
+                      <span className="text-display-xs text-content-tertiary">
                         {stream.config?.replicas}x {t('cluster.replicas', { count: stream.config?.replicas })}
                       </span>
                     </div>
@@ -288,7 +288,7 @@ export default function ClusterPage({
                 ))}
 
                 {(!streams || streams.length === 0) && (
-                  <div className="text-center py-8 text-dark-muted">
+                  <div className="text-center py-8 text-content-tertiary">
                     <Database className="icon-lg mx-auto mb-2 opacity-50" />
                     <p>{t('cluster.noStreamsFound')}</p>
                   </div>
@@ -302,24 +302,24 @@ export default function ClusterPage({
                   {t('cluster.replicationDetails', { name: selectedStream })}
                 </h3>
                 <div className="space-y-4">
-                  <div className="p-4 bg-dark-bg/50 rounded-lg">
+                  <div className="p-4 bg-surface-primary/50 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-dark-muted">{t('common.replicas')}</span>
+                      <span className="text-content-tertiary">{t('common.replicas')}</span>
                       <span className="font-medium">{streamReplicas.replicas}x</span>
                     </div>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-dark-muted">{t('cluster.clustered')}</span>
+                      <span className="text-content-tertiary">{t('cluster.clustered')}</span>
                       <span className={`px-2 py-1 rounded text-display-xs ${
                         streamReplicas.is_clustered
                           ? 'bg-status-success/20 text-status-success'
-                          : 'bg-dark-border'
+                          : 'bg-border-default'
                       }`}>
                         {streamReplicas.is_clustered ? t('common.yes') : t('common.no')}
                       </span>
                     </div>
                     {streamReplicas.cluster && (
-                      <div className="mt-3 pt-3 border-t border-dark-border">
-                        <p className="text-display-sm text-dark-muted mb-2">{t('cluster.clusterInfo')}</p>
+                      <div className="mt-3 pt-3 border-t border-border-default">
+                        <p className="text-display-sm text-content-tertiary mb-2">{t('cluster.clusterInfo')}</p>
                         <p className="font-mono text-display-sm">{streamReplicas.cluster.name}</p>
                       </div>
                     )}
@@ -333,7 +333,7 @@ export default function ClusterPage({
                       </div>
                       <p className="font-mono text-display-sm">{streamReplicas.mirror.name}</p>
                       {streamReplicas.mirror.domain && (
-                        <p className="text-display-xs text-dark-muted mt-1">
+                        <p className="text-display-xs text-content-tertiary mt-1">
                           {t('cluster.domain', { domain: streamReplicas.mirror.domain })}
                         </p>
                       )}
@@ -350,7 +350,7 @@ export default function ClusterPage({
                         {streamReplicas.sources.map((source: any, idx: any) => (
                           <p key={idx} className="font-mono text-display-sm">
                             {source.name}
-                            {source.domain && <span className="text-dark-muted ml-2">@ {source.domain}</span>}
+                            {source.domain && <span className="text-content-tertiary ml-2">@ {source.domain}</span>}
                           </p>
                         ))}
                       </div>
@@ -358,19 +358,19 @@ export default function ClusterPage({
                   )}
 
                   {streamReplicas.placement && (
-                    <div className="p-4 bg-dark-bg/50 rounded-lg">
+                    <div className="p-4 bg-surface-primary/50 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Shield className="icon-base text-primary-400" />
                         <span className="font-medium">{t('cluster.placementRules')}</span>
                       </div>
-                      <p className="text-display-sm text-dark-muted">
+                      <p className="text-display-sm text-content-tertiary">
                         Cluster: <span className="font-mono">{streamReplicas.placement.cluster}</span>
                       </p>
                       {streamReplicas.placement.tags.length > 0 && (
                         <div className="mt-2">
-                          <span className="text-display-sm text-dark-muted">{t('cluster.tags')}</span>
+                          <span className="text-display-sm text-content-tertiary">{t('cluster.tags')}</span>
                           {streamReplicas.placement.tags.map((tag: any, idx: any) => (
-                            <span key={idx} className="inline-block px-2 py-0.5 bg-dark-bg rounded text-display-xs font-mono ml-1">
+                            <span key={idx} className="inline-block px-2 py-0.5 bg-surface-primary rounded text-display-xs font-mono ml-1">
                               {tag}
                             </span>
                           ))}
@@ -383,7 +383,7 @@ export default function ClusterPage({
             )}
 
             {!selectedStream && (
-              <div className="flex items-center justify-center h-64 text-dark-muted">
+              <div className="flex items-center justify-center h-64 text-content-tertiary">
                 <div className="text-center">
                   <Database className="icon-lg mx-auto mb-2 opacity-50" />
                   <p>{t('cluster.selectStreamPrompt')}</p>
@@ -400,7 +400,7 @@ export default function ClusterPage({
             <Info className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" />
             <div>
               <h3 className="font-semibold text-blue-400 mb-1">{t('cluster.standaloneModeTitle')}</h3>
-              <p className="text-dark-muted text-display-sm">
+              <p className="text-content-tertiary text-display-sm">
                 {t('cluster.standaloneModeDescription')}
               </p>
             </div>

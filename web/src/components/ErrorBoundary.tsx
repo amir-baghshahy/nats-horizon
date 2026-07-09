@@ -75,7 +75,7 @@ class ErrorBoundary extends Component<Props, State> {
           <div className="card text-center max-w-md">
             <div className="text-red-400 text-4xl mb-4">!</div>
             <h2 className="text-display-lg font-semibold mb-2">{t('somethingWentWrong')}</h2>
-            <p className="text-dark-muted text-display-sm mb-4">
+            <p className="text-content-tertiary text-display-sm mb-4">
               {this.state.error?.message || t('unexpectedError')}
             </p>
             <Button

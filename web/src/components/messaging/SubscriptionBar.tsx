@@ -35,7 +35,7 @@ export default function SubscriptionBar({
             className="input w-full font-mono"
             onKeyPress={handleKeyPress}
           />
-          <p className="text-display-xs text-dark-muted mt-2">
+          <p className="text-display-xs text-content-tertiary mt-2">
             {t('messages.subscriptionHelp')}
           </p>
         </div>
@@ -62,10 +62,10 @@ export default function SubscriptionBar({
       </div>
 
       {subscriptions.size === 0 && (
-        <p className="text-display-xs text-dark-muted mt-2">
+        <p className="text-display-xs text-content-tertiary mt-2">
           {t('messages.tip')}: {t('messages.tipSingle')}{" "}
-          <code className="bg-dark-bg px-1 rounded">*</code> {t('messages.tipAll')}{" "}
-          <code className="bg-dark-bg px-1 rounded">&gt;</code>
+          <code className="bg-surface-primary px-1 rounded">*</code> {t('messages.tipAll')}{" "}
+          <code className="bg-surface-primary px-1 rounded">&gt;</code>
         </p>
       )}
     </div>

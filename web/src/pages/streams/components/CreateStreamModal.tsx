@@ -46,7 +46,7 @@ export default function CreateStreamModal({
         <div className="card max-w-md w-full" role="dialog" aria-modal="true" aria-labelledby="create-stream-title">
           <div className="flex items-center justify-between mb-4">
             <h2 id="create-stream-title" className="text-display-base font-semibold">{t("streams.createStream")}</h2>
-            <button type="button" onClick={onClose} className="p-1.5 hover:bg-dark-bg rounded-lg transition-colors">
+            <button type="button" onClick={onClose} className="p-1.5 hover:bg-surface-primary rounded-lg transition-colors">
               <X className="icon-base" />
             </button>
           </div>
@@ -74,7 +74,7 @@ export default function CreateStreamModal({
                 className="input w-full"
                 required
               />
-               <p className="text-display-xs text-dark-muted mt-1">{t("streams.subjectsHelp")}</p>
+               <p className="text-display-xs text-content-tertiary mt-1">{t("streams.subjectsHelp")}</p>
             </div>
             <div>
                <label className="block text-display-sm font-medium mb-2">{t("streams.storage")}</label>

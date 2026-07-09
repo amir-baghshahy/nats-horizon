@@ -83,8 +83,13 @@
     "minutes": "{{count}}m",
     "memory": "Memory",
     "storage": "Storage",
+    "collectingData": "Collecting data…",
+    "peak": "peak",
     "vsLastPeriod": "vs last period",
-    "purge": "Purge"
+    "purge": "Purge",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "skipToContent": "Skip to content"
   },
   "nav": {
     "groups": {
@@ -93,6 +98,7 @@
       "system": "System",
       "administration": "Administration"
     },
+    "title": "Navigation",
     "dashboard": "Dashboard",
     "streams": "Streams",
     "consumers": "Consumers",
@@ -537,6 +543,7 @@
     "alertRules": "Alert Rules",
     "triggeredAlerts": "Triggered Alerts",
     "allSeverities": "All Severities",
+    "filterBySeverity": "Filter by severity",
     "warning": "Warning",
     "info": "Info",
     "noAlertsConfigured": "No Alerts Configured",
@@ -619,6 +626,8 @@
     "storageUsage": "{{usage}}% of {{max}}",
     "storageUnlimited": "{{usage}}% — Unlimited",
     "connections": "Connections",
+    "duration": "Duration",
+    "selectStream": "Select stream",
     "streamsConsumers": "{{streams}} streams · {{consumers}} consumers",
     "rateWindow": "Rate Window",
     "rateWindowDetail": "{{bytes}} / {{duration}}s",

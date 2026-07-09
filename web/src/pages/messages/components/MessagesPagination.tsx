@@ -28,7 +28,7 @@ export default function MessagesPagination({
     <PanelCard className="mb-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <span className="text-display-sm text-dark-muted">
+          <span className="text-display-sm text-content-tertiary">
             {t('common.showing', { start: (currentPage - 1) * messagesPerPage + 1, end: Math.min(currentPage * messagesPerPage, totalMessages), total: totalMessages.toLocaleString() })}
           </span>
           <Select
@@ -47,7 +47,7 @@ export default function MessagesPagination({
           <Button variant="secondary" size="sm" onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage <= 1}>
             {t('messages.previous')}
           </Button>
-          <span className="text-display-sm text-dark-muted">
+          <span className="text-display-sm text-content-tertiary">
             {t('common.page', { page: currentPage, total: totalPages })}
           </span>
           <Button variant="secondary" size="sm" onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))} disabled={currentPage >= totalPages}>

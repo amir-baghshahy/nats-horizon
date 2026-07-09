@@ -59,11 +59,11 @@ export default function DashboardPage({
       </section>
 
       {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-dark-border/50 to-transparent mb-6" />
+      <div className="h-px bg-gradient-to-r from-transparent via-border-default/50 to-transparent mb-6" />
 
       {/* Real-time Metrics Section */}
       <section className="mb-6 animate-slide-up animate-delay-100">
-        <h2 className="text-display-sm font-semibold mb-3 text-dark-text">{t('dashboard.realTimeMetrics')}</h2>
+        <h2 className="text-display-sm font-semibold mb-3 text-content-primary">{t('dashboard.realTimeMetrics')}</h2>
         <SystemMetrics />
       </section>
 
@@ -73,7 +73,7 @@ export default function DashboardPage({
       </section>
 
       {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-dark-border/50 to-transparent mb-6" />
+      <div className="h-px bg-gradient-to-r from-transparent via-border-default/50 to-transparent mb-6" />
 
       {/* Connection & Consumer Health Section */}
       <section className="space-y-4 animate-slide-up animate-delay-300">

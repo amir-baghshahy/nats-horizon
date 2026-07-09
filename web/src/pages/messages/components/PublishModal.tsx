@@ -47,7 +47,7 @@ export default function PublishModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 hover:bg-dark-bg rounded-lg"
+              className="p-1.5 hover:bg-surface-primary rounded-lg"
             >
               <X className="icon-base" />
             </button>

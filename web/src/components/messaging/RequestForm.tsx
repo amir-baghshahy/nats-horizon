@@ -58,7 +58,7 @@ export default function RequestForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-display-sm font-medium mb-2">{t('messages.subject')}</label>
-            <p className="text-display-xs text-dark-muted mb-2">
+            <p className="text-display-xs text-content-tertiary mb-2">
               {t('messages.subjectHelp')}
             </p>
             <input
@@ -125,16 +125,16 @@ export default function RequestForm({
               </div>
             ) : (
               <>
-                <div className="bg-dark-bg/50 rounded-lg p-4">
-                  <p className="text-display-xs text-dark-muted mb-1">{t('messages.subject')}</p>
+                <div className="bg-surface-primary/50 rounded-lg p-4">
+                  <p className="text-display-xs text-content-tertiary mb-1">{t('messages.subject')}</p>
                   <p className="font-mono text-display-sm">
                     {response.subject || t('common.na')}
                   </p>
                 </div>
 
-                <div className="bg-dark-bg/50 rounded-lg p-4">
-                  <p className="text-display-xs text-dark-muted mb-2">{t('common.data')}</p>
-                  <pre className="text-display-sm p-3 bg-dark-bg rounded overflow-x-auto">
+                <div className="bg-surface-primary/50 rounded-lg p-4">
+                  <p className="text-display-xs text-content-tertiary mb-2">{t('common.data')}</p>
+                  <pre className="text-display-sm p-3 bg-surface-primary rounded overflow-x-auto">
                     <code className="text-green-400">
                       {response.data || t('messages.noData')}
                     </code>
@@ -142,8 +142,8 @@ export default function RequestForm({
                 </div>
 
                 {response.data_base64 && (
-                  <div className="bg-dark-bg/50 rounded-lg p-4">
-                    <p className="text-display-xs text-dark-muted mb-1">{t('messages.base64')}</p>
+                  <div className="bg-surface-primary/50 rounded-lg p-4">
+                    <p className="text-display-xs text-content-tertiary mb-1">{t('messages.base64')}</p>
                     <p className="font-mono text-display-xs break-all">
                       {response.data_base64}
                     </p>
@@ -151,16 +151,16 @@ export default function RequestForm({
                 )}
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-dark-bg/50 rounded-lg p-3">
-                    <p className="text-display-xs text-dark-muted">{t('messages.timestamp')}</p>
+                  <div className="bg-surface-primary/50 rounded-lg p-3">
+                    <p className="text-display-xs text-content-tertiary">{t('messages.timestamp')}</p>
                     <p className="text-display-sm">
                       {formatTimestamp(response.timestamp || 0)}
                     </p>
                   </div>
 
                   {response.reply && (
-                    <div className="bg-dark-bg/50 rounded-lg p-3">
-                      <p className="text-display-xs text-dark-muted">{t('messages.reply')}</p>
+                    <div className="bg-surface-primary/50 rounded-lg p-3">
+                      <p className="text-display-xs text-content-tertiary">{t('messages.reply')}</p>
                       <p className="font-mono text-display-sm truncate">
                         {response.reply}
                       </p>
@@ -171,7 +171,7 @@ export default function RequestForm({
             )}
           </div>
         ) : (
-          <div className="p-8 text-center text-dark-muted">
+          <div className="p-8 text-center text-content-tertiary">
             <MessageSquare className="icon-lg mx-auto mb-4 opacity-50" />
             <p>{t('messages.sendRequestDescription')}</p>
           </div>

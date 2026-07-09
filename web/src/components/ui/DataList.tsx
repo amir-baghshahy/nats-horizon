@@ -38,17 +38,17 @@ export default function DataList<T>({
     >
       {/* Optional header */}
       {header && (
-        <div className="p-4 border-b border-dark-border flex-shrink-0">{header}</div>
+        <div className="p-4 border-b border-border-default flex-shrink-0">{header}</div>
       )}
 
       {/* Loading state */}
       {isLoading ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-dark-muted">
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-content-tertiary">
           <div className="animate-spin icon-lg border-2 border-primary-500 border-t-transparent rounded-full mb-3" />
           <span className="text-display-sm">Loading...</span>
         </div>
       ) : isEmpty ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-dark-muted">
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-content-tertiary">
           {EmptyIcon && <EmptyIcon className="icon-lg mb-4 opacity-50" />}
           <h3 className="text-display-lg font-semibold mb-1">{emptyTitle}</h3>
           {emptyDescription && (
@@ -57,7 +57,7 @@ export default function DataList<T>({
           {emptyAction}
         </div>
       ) : (
-        <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-dark-border">
+        <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-border-default">
           {items.map((item, index) => (
             <div
               key={getKey(item)}
@@ -71,7 +71,7 @@ export default function DataList<T>({
 
       {/* Footer */}
       {footer && (
-        <div className="p-3 border-t border-dark-border bg-dark-bg/50 text-center text-display-sm text-dark-muted flex-shrink-0">
+        <div className="p-3 border-t border-border-default bg-surface-primary/50 text-center text-display-sm text-content-tertiary flex-shrink-0">
           {footer}
         </div>
       )}

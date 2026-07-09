@@ -1,3 +1,5 @@
+import { STATUS_TONES } from "../../utils/constants";
+
 interface BadgeProps {
   children: React.ReactNode;
   variant?: "default" | "success" | "warning" | "danger" | "info";
@@ -5,12 +7,19 @@ interface BadgeProps {
   className?: string;
 }
 
+const toneVariant: Record<Exclude<BadgeProps["variant"], "default" | undefined>, string> = {
+  success: `${STATUS_TONES.success.text} ${STATUS_TONES.success.bg}`,
+  warning: `${STATUS_TONES.warning.text} ${STATUS_TONES.warning.bg}`,
+  danger: `${STATUS_TONES.error.text} ${STATUS_TONES.error.bg}`,
+  info: `${STATUS_TONES.info.text} ${STATUS_TONES.info.bg}`,
+};
+
 const variantStyles = {
-  default: "bg-dark-border/50 text-dark-text",
-  success: "bg-green-500/20 text-green-400",
-  warning: "bg-yellow-500/20 text-yellow-400",
-  danger: "bg-red-500/20 text-red-400",
-  info: "bg-blue-500/20 text-blue-400",
+  default: "bg-border-default/50 text-content-primary",
+  success: toneVariant.success,
+  warning: toneVariant.warning,
+  danger: toneVariant.danger,
+  info: toneVariant.info,
 };
 
 const sizeStyles = {

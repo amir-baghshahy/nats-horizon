@@ -86,7 +86,7 @@ export default function MessagesList({
   if (isLoading) {
     return (
       <PanelCard>
-        <div className="p-6 text-center text-dark-muted">
+        <div className="p-6 text-center text-content-tertiary">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
           {t('common.loading')}
         </div>
@@ -110,7 +110,7 @@ export default function MessagesList({
     <PanelCard
       maxHeight={600}
       header={
-        <div className="bg-dark-bg border-b border-dark-border p-4 flex-shrink-0">
+        <div className="bg-surface-primary border-b border-border-default p-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <input
@@ -119,7 +119,7 @@ export default function MessagesList({
                 onChange={onSelectAll}
                 className="icon-base rounded"
               />
-              <span className="text-display-sm text-dark-muted">
+              <span className="text-display-sm text-content-tertiary">
                 {selected.size > 0
                   ? `${selected.size} ${t('common.selected')}`
                   : `${messages.length} ${t('messages.messageCount', { count: messages.length })}`}
@@ -131,7 +131,7 @@ export default function MessagesList({
                 className={`p-2 rounded-lg transition-colors ${
                   viewMode === "list"
                     ? "bg-primary-500/20 text-primary-400"
-                    : "hover:bg-dark-bg"
+                    : "hover:bg-surface-primary"
                 }`}
               >
                 <FileText className="icon-base" />
@@ -141,7 +141,7 @@ export default function MessagesList({
                 className={`p-2 rounded-lg transition-colors ${
                   viewMode === "grid"
                     ? "bg-primary-500/20 text-primary-400"
-                    : "hover:bg-dark-bg"
+                    : "hover:bg-surface-primary"
                 }`}
               >
                 <Code className="icon-base" />
@@ -156,7 +156,7 @@ export default function MessagesList({
     >
 
       {/* Messages */}
-      <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-dark-border">
+      <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-border-default">
         {messages.map((message, index) => {
           const sequence = message.sequence;
           const isExpanded = expanded.has(sequence);
@@ -170,7 +170,7 @@ export default function MessagesList({
               key={sequence}
               className={`border-l-2 border-l-transparent hover:border-l-primary-500 transition-colors animate-slide-in animate-duration-200 ${delayClass}`}
             >
-              <div className="p-4 hover:bg-dark-bg/50 transition-colors">
+              <div className="p-4 hover:bg-surface-primary/50 transition-colors">
                 <div className="flex items-start gap-4">
                   {/* Checkbox */}
                   <input
@@ -183,12 +183,12 @@ export default function MessagesList({
                   {/* Expand Button */}
                   <button
                     onClick={() => onToggleExpand(sequence)}
-                    className="p-1 hover:bg-dark-bg rounded transition-colors mt-0.5"
+                    className="p-1 hover:bg-surface-primary rounded transition-colors mt-0.5"
                   >
                     {isExpanded ? (
-                      <ChevronDown className="icon-base text-dark-muted" />
+                      <ChevronDown className="icon-base text-content-tertiary" />
                     ) : (
-                      <ChevronRight className="icon-base text-dark-muted" />
+                      <ChevronRight className="icon-base text-content-tertiary" />
                     )}
                   </button>
 
@@ -199,15 +199,15 @@ export default function MessagesList({
                         #{sequence}
                       </span>
                       <span className="text-display-sm font-medium">{message.subject}</span>
-                      <span className="text-display-xs text-dark-muted">
+                      <span className="text-display-xs text-content-tertiary">
                         {formatBytes(message.size || 0)}
                       </span>
-                      <span className="text-display-xs text-dark-muted flex items-center gap-1">
+                      <span className="text-display-xs text-content-tertiary flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {formatTimestamp(message.timestamp)}
                       </span>
                     </div>
-                    <div className="text-display-sm text-dark-muted truncate">
+                    <div className="text-display-sm text-content-tertiary truncate">
                       {messageData.substring(0, 100)}...
                     </div>
                   </div>
@@ -216,20 +216,20 @@ export default function MessagesList({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onToggleExpand(sequence)}
-                      className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale"
+                      className="p-2 hover:bg-surface-primary rounded-lg hover-lift active-scale"
                       title={t('messages.viewFullMessage')}
                     >
-                      <Eye className="icon-base text-dark-muted" />
+                      <Eye className="icon-base text-content-tertiary" />
                     </button>
                     <button
                       onClick={() => onCopy(messageData, sequence)}
-                      className="p-2 hover:bg-dark-bg rounded-lg hover-lift active-scale"
+                      className="p-2 hover:bg-surface-primary rounded-lg hover-lift active-scale"
                       title={t('messages.copyMessage')}
                     >
                       {copiedMessage === sequence ? (
                         <Check className="icon-base text-green- animate-bounce-in" />
                       ) : (
-                        <CopyIcon className="icon-base text-dark-muted" />
+                        <CopyIcon className="icon-base text-content-tertiary" />
                       )}
                     </button>
                     <button
@@ -247,7 +247,7 @@ export default function MessagesList({
                 {isExpanded && (
                   <div className="mt-4 pl-8 space-y-4 animate-fade-in-down">
                     {/* Headers */}
-                    <div className="bg-dark-bg/50 rounded-lg p-4 hover-scale">
+                    <div className="bg-surface-primary/50 rounded-lg p-4 hover-scale">
                       <h4 className="text-display-sm font-medium mb-3 flex items-center gap-2">
                         <FileText className="icon-base" />
                         {t('messages.headers')}
@@ -255,7 +255,7 @@ export default function MessagesList({
                       <div className="grid grid-cols-2 gap-2 text-display-sm">
                         {Object.entries(headers).map(([key, value]) => (
                           <div key={key} className="flex">
-                            <span className="text-dark-muted mr-2">{key}:</span>
+                            <span className="text-content-tertiary mr-2">{key}:</span>
                             <span className="font-mono text-display-xs">
                               {String(value)}
                             </span>
@@ -265,7 +265,7 @@ export default function MessagesList({
                     </div>
 
                     {/* Payload */}
-                    <div className="bg-dark-bg/50 rounded-lg p-4">
+                    <div className="bg-surface-primary/50 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <h4 className="text-display-sm font-medium flex items-center gap-2">
                           <Code className="icon-base" />
@@ -279,7 +279,7 @@ export default function MessagesList({
                           {t('messages.collapse')}
                         </button>
                       </div>
-                      <pre className="text-display-sm bg-dark-bg p-3 rounded overflow-x-auto">
+                      <pre className="text-display-sm bg-surface-primary p-3 rounded overflow-x-auto">
                         <code className="text-green-400">
                           {messageData.length > MAX_DISPLAY_PAYLOAD_SIZE
                             ? messageData.slice(0, MAX_DISPLAY_PAYLOAD_SIZE) +
@@ -291,22 +291,22 @@ export default function MessagesList({
 
                     {/* Metadata */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-display-xs text-dark-muted">{t('messages.sequence')}</p>
+                      <div className="bg-surface-primary/50 rounded-lg p-3">
+                        <p className="text-display-xs text-content-tertiary">{t('messages.sequence')}</p>
                         <p className="font-mono text-display-sm">{sequence.toLocaleString()}</p>
                       </div>
-                      <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-display-xs text-dark-muted">{t('messages.timestamp')}</p>
+                      <div className="bg-surface-primary/50 rounded-lg p-3">
+                        <p className="text-display-xs text-content-tertiary">{t('messages.timestamp')}</p>
                         <p className="text-display-sm">
                           {new Date(message.timestamp || Date.now()).toLocaleString()}
                         </p>
                       </div>
-                      <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-display-xs text-dark-muted">{t('common.size')}</p>
+                      <div className="bg-surface-primary/50 rounded-lg p-3">
+                        <p className="text-display-xs text-content-tertiary">{t('common.size')}</p>
                         <p className="text-display-sm">{formatBytes(message.size || 0)}</p>
                       </div>
-                      <div className="bg-dark-bg/50 rounded-lg p-3">
-                        <p className="text-display-xs text-dark-muted">{t('messages.subject')}</p>
+                      <div className="bg-surface-primary/50 rounded-lg p-3">
+                        <p className="text-display-xs text-content-tertiary">{t('messages.subject')}</p>
                         <p className="text-display-sm font-mono truncate">{message.subject}</p>
                       </div>
                     </div>

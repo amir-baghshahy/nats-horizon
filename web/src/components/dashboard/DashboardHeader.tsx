@@ -19,11 +19,11 @@ export default function DashboardHeader({
         <h1 className="text-display-lg font-bold leading-tight">
           {t("dashboard.title")}
         </h1>
-        <p className="text-display-xs text-dark-muted">{t("dashboard.subtitle")}</p>
+        <p className="text-display-xs text-content-tertiary">{t("dashboard.subtitle")}</p>
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-dark-bg rounded-lg border border-dark-border">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-surface-primary rounded-lg border border-border-default">
           {sseConnected ? (
             <>
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />

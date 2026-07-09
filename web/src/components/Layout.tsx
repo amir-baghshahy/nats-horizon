@@ -116,15 +116,27 @@ export default function Layout({ children }: { children: ReactNode }) {
   };
 
   const isGroupActive = (group: NavGroup) =>
-    group.items.some((item) => location.pathname === item.href || location.pathname.startsWith(item.href + "/"));
+    group.items.some(
+      (item) =>
+        location.pathname === item.href ||
+        location.pathname.startsWith(item.href + "/")
+    );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-dark-bg">
+    <div className="flex h-screen overflow-hidden bg-surface-primary">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-3 focus:top-3 focus:z-[60] focus:rounded-lg focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-display-sm focus:font-semibold focus:text-white focus:shadow-lg"
+      >
+        {t("common.skipToContent")}
+      </a>
+
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 md:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
           onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
 
@@ -133,34 +145,37 @@ export default function Layout({ children }: { children: ReactNode }) {
         onClick={() => setSidebarOpen(!sidebarOpen)}
         aria-label={sidebarOpen ? t("common.closeMenu") : t("common.openMenu")}
         aria-expanded={sidebarOpen}
-        className="md:hidden fixed top-3 left-3 z-50 p-1.5 rounded-lg bg-dark-card border border-dark-border text-dark-text hover:bg-dark-bg transition-colors"
+        className="fixed start-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-lg border border-border-default bg-surface-secondary text-content-primary shadow-lg transition-colors hover:bg-surface-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary md:hidden"
       >
         {sidebarOpen ? <X className="icon-md" /> : <Menu className="icon-md" />}
       </button>
 
       {/* Sidebar */}
       <aside
-        className={`fixed md:relative z-30 flex h-full w-64 flex-shrink-0 flex-col border-r border-dark-border/70 bg-dark-card/75 shadow-2xl shadow-black/20 backdrop-blur-xl overflow-hidden transition-transform duration-300 ${
+        className={`fixed z-30 flex h-full w-64 flex-shrink-0 flex-col border-e border-border-default/70 bg-surface-secondary/80 shadow-2xl shadow-black/20 backdrop-blur-xl transition-transform duration-300 ease-out md:relative ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
+        aria-label={t("nav.title")}
       >
         {/* Logo */}
-        <div className="border-b border-dark-border/70 px-4 py-4">
+        <div className="border-b border-border-default/70 px-4 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300 ring-1 ring-primary-400/30 shrink-0">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary-500/20 text-primary-300 ring-1 ring-primary-400/30">
               <Activity className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-display-sm font-bold tracking-tight text-dark-text truncate">
+              <h1 className="truncate text-display-sm font-bold tracking-tight text-content-primary">
                 {t("app.title")}
               </h1>
-              <p className="text-display-xs text-dark-muted truncate">{t("app.subtitle")}</p>
+              <p className="truncate text-display-xs text-content-tertiary">
+                {t("app.subtitle")}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto px-2 py-3 scrollbar-thin space-y-1">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-3 scrollbar-thin">
           {NAV_GROUPS.map((group) => {
             const isCollapsed = collapsedGroups.has(group.titleKey);
             const groupActive = isGroupActive(group);
@@ -170,52 +185,67 @@ export default function Layout({ children }: { children: ReactNode }) {
                 {/* Group Header */}
                 <button
                   onClick={() => toggleGroup(group.titleKey)}
-                  className={`w-full flex items-center gap-2 rounded-lg px-3 py-2 text-display-xs font-semibold uppercase tracking-wider transition-colors duration-150 ${
+                  aria-expanded={!isCollapsed}
+                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-display-xs font-semibold uppercase tracking-wider transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                     groupActive
-                      ? "text-primary-400 bg-primary-500/10"
-                      : "text-dark-muted hover:bg-dark-bg/60 hover:text-dark-text"
+                      ? "bg-primary-500/10 text-primary-400"
+                      : "text-content-tertiary hover:bg-surface-primary/60 hover:text-content-primary"
                   }`}
                 >
-                  <group.icon className={`h-3.5 w-3.5 shrink-0 ${groupActive ? "text-primary-400" : "text-dark-muted"}`} />
-                  <span className="flex-1 text-left truncate">{t(group.titleKey)}</span>
+                  <group.icon
+                    className={`h-3.5 w-3.5 shrink-0 ${
+                      groupActive ? "text-primary-400" : "text-content-tertiary"
+                    }`}
+                  />
+                  <span className="flex-1 truncate text-start">
+                    {t(group.titleKey)}
+                  </span>
                   {isCollapsed ? (
-                    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-dark-muted" />
+                    <ChevronRight className="h-3.5 w-3.5 shrink-0 rtl:rotate-180" />
                   ) : (
-                    <ChevronDown className="h-3.5 w-3.5 shrink-0 text-dark-muted" />
+                    <ChevronDown className="h-3.5 w-3.5 shrink-0" />
                   )}
                 </button>
 
                 {/* Group Items */}
                 <div
-                  className={`overflow-hidden transition-all duration-200 ease-in-out ${
-                    isCollapsed ? "max-h-0" : "max-h-96"
+                  className={`grid transition-all duration-200 ease-in-out ${
+                    isCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
                   }`}
                 >
-                  <div className="pl-5 pr-1 space-y-0.5">
-                    {group.items.map((item) => {
-                      const isActive =
-                        location.pathname === item.href ||
-                        location.pathname.startsWith(item.href + "/");
-                      return (
-                        <Link
-                          key={item.key}
-                          to={item.href}
-                          onClick={() => setSidebarOpen(false)}
-                          className={`group flex items-center gap-2.5 rounded-lg px-3 py-2 text-display-sm font-medium transition-colors duration-150 ${
-                            isActive
-                              ? "bg-primary-600 text-white shadow-sm shadow-primary-500/20"
-                              : "text-dark-muted hover:bg-dark-bg/60 hover:text-dark-text"
-                          }`}
-                        >
-                          <item.icon
-                            className={`h-4 w-4 shrink-0 ${
-                              isActive ? "text-white" : "text-dark-muted group-hover:text-dark-text"
+                  <div className="overflow-hidden">
+                    <div className="space-y-0.5 py-0.5 pe-1 ps-5">
+                      {group.items.map((item) => {
+                        const isActive =
+                          location.pathname === item.href ||
+                          location.pathname.startsWith(item.href + "/");
+                        return (
+                          <Link
+                            key={item.key}
+                            to={item.href}
+                            onClick={() => setSidebarOpen(false)}
+                            aria-current={isActive ? "page" : undefined}
+                            className={`group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-display-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+                              isActive
+                                ? "bg-primary-600/15 text-content-primary"
+                                : "text-content-tertiary hover:bg-surface-primary/60 hover:text-content-primary"
                             }`}
-                          />
-                          <span className="truncate">{t(`nav.${item.key}`)}</span>
-                        </Link>
-                      );
-                    })}
+                          >
+                            {isActive && (
+                              <span className="absolute inset-y-1.5 start-0 w-0.5 rounded-full bg-primary-500" />
+                            )}
+                            <item.icon
+                              className={`h-4 w-4 shrink-0 ${
+                                isActive
+                                  ? "text-primary-400"
+                                  : "text-content-tertiary group-hover:text-content-primary"
+                              }`}
+                            />
+                            <span className="truncate">{t(`nav.${item.key}`)}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -224,15 +254,17 @@ export default function Layout({ children }: { children: ReactNode }) {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-dark-border/70 p-3 space-y-2">
+        <div className="space-y-2 border-t border-border-default/70 p-3">
           <LanguageSwitcher />
           <Card variant="stat" className="flex items-center gap-2">
-            <div
-              className={`h-2 w-2 rounded-full shrink-0 ${
-                connected ? "bg-status-success animate-pulse" : "bg-status-error"
+            <span
+              className={`h-2 w-2 shrink-0 rounded-full ${
+                connected
+                  ? "animate-pulse-glow bg-status-success text-status-success"
+                  : "bg-status-error"
               }`}
             />
-            <span className="text-display-xs text-dark-muted truncate">
+            <span className="truncate text-display-xs text-content-tertiary">
               {connected ? t("common.connected") : t("common.disconnected")}
             </span>
             {!connected && (
@@ -243,7 +275,10 @@ export default function Layout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main className="h-full flex-1 pt-12 md:pt-0 overflow-hidden min-w-0">
+      <main
+        id="main-content"
+        className="min-w-0 flex-1 overflow-hidden pt-12 md:pt-0"
+      >
         <div className="h-full overflow-y-auto overflow-x-hidden scrollbar-thin">
           {children}
         </div>

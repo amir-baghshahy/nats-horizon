@@ -30,14 +30,14 @@ export default function CloneConsumerModal({
         <div className="card w-full max-w-md">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-display-xl font-bold">{t("consumers.cloneConsumerTitle")}</h2>
-            <button type="button" onClick={onClose} className="p-1.5 hover:bg-dark-bg rounded-lg">
-              <span className="text-dark-muted">✕</span>
+            <button type="button" onClick={onClose} className="p-1.5 hover:bg-surface-primary rounded-lg">
+              <span className="text-content-tertiary">✕</span>
             </button>
           </div>
           <div>
-            <label className="block text-display-sm text-dark-muted mb-1">{t("consumers.newConsumerName")}</label>
+            <label className="block text-display-sm text-content-tertiary mb-1">{t("consumers.newConsumerName")}</label>
             <input type="text" className="input w-full" value={cloneName} onChange={(e) => setCloneName(e.target.value)} placeholder={t("consumers.newConsumerNamePlaceholder")} />
-            <p className="text-display-xs text-dark-muted mt-2">
+            <p className="text-display-xs text-content-tertiary mt-2">
               {t("consumers.cloneConsumerHelp", { stream })}
             </p>
           </div>

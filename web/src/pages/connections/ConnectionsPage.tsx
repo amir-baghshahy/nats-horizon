@@ -93,11 +93,11 @@ export default function ConnectionsPage({
                   <div key={server.server} className="space-y-2">
                     <div className="flex items-center justify-between gap-4 text-display-sm">
                       <span className="truncate font-medium">{server.server}</span>
-                      <span className="text-dark-muted">
+                      <span className="text-content-tertiary">
                         {server.connections} · {percentage}%
                       </span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-dark-bg">
+                    <div className="h-2 overflow-hidden rounded-full bg-surface-primary">
                       <div
                         className="h-full rounded-full bg-gradient-to-r from-primary-500 to-violet-500"
                         style={{ width: `${percentage}%` }}
@@ -108,7 +108,7 @@ export default function ConnectionsPage({
               })}
             </div>
           ) : (
-            <div className="rounded-xl border border-dashed border-dark-border bg-dark-bg/30 p-6 text-center text-dark-muted">
+            <div className="rounded-xl border border-dashed border-border-default bg-surface-primary/30 p-6 text-center text-content-tertiary">
               <Network className="mx-auto mb-3 h-10 w-10 opacity-50" />
               <p>{t('connections.noServerData')}</p>
             </div>
@@ -146,18 +146,18 @@ export default function ConnectionsPage({
               key={cid}
               className="border-l-2 border-l-transparent hover:border-l-primary-500 transition-colors"
             >
-              <div className="p-4 hover:bg-dark-bg/50 transition-colors">
+              <div className="p-4 hover:bg-surface-primary/50 transition-colors">
                 <div className="flex items-center gap-4">
                   <div className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
 
                   <button
                     onClick={() => toggleExpand(cid)}
-                    className="p-1 hover:bg-dark-bg rounded transition-colors"
+                    className="p-1 hover:bg-surface-primary rounded transition-colors"
                   >
                     {isExpanded ? (
-                      <ChevronDown className="icon-base text-dark-muted" />
+                      <ChevronDown className="icon-base text-content-tertiary" />
                     ) : (
-                      <ChevronRight className="icon-base text-dark-muted" />
+                      <ChevronRight className="icon-base text-content-tertiary" />
                     )}
                   </button>
 
@@ -166,12 +166,12 @@ export default function ConnectionsPage({
                       <span className="font-medium">
                         {conn.user || t('connections.anonymous')}
                       </span>
-                      <span className="text-display-xs text-dark-muted">•</span>
-                      <span className="text-display-sm text-dark-muted">
+                      <span className="text-display-xs text-content-tertiary">•</span>
+                      <span className="text-display-sm text-content-tertiary">
                         {conn.ip}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 mt-1 text-display-xs text-dark-muted">
+                    <div className="flex items-center gap-4 mt-1 text-display-xs text-content-tertiary">
                       <span className="flex items-center gap-1 min-w-0">
                         <Server className="w-3 h-3 shrink-0" />
                         <span className="truncate max-w-[200px]" title={conn.server}>{conn.server}</span>
@@ -182,13 +182,13 @@ export default function ConnectionsPage({
                   <div className="hidden md:flex items-center gap-4 text-display-sm">
                     <div className="text-center">
                       <p className="font-medium">{conn.subs_count || 0}</p>
-                      <p className="text-display-xs text-dark-muted">{t('connections.subs')}</p>
+                      <p className="text-display-xs text-content-tertiary">{t('connections.subs')}</p>
                     </div>
                     <div className="text-center">
                       <p className="font-medium">
                         {getConnectionDuration(conn.connected_at || '')}
                       </p>
-                      <p className="text-display-xs text-dark-muted">{t('connections.duration')}</p>
+                      <p className="text-display-xs text-content-tertiary">{t('connections.duration')}</p>
                     </div>
                   </div>
 
@@ -214,7 +214,7 @@ export default function ConnectionsPage({
                             )
                         }
                       }}
-                      className="p-2 hover:bg-dark-bg rounded-lg transition-colors text-status-error"
+                      className="p-2 hover:bg-surface-primary rounded-lg transition-colors text-status-error"
                       title={t('connections.terminateConnection')}
                     >
                       <XCircle className="icon-base" />
@@ -224,8 +224,8 @@ export default function ConnectionsPage({
 
                 {isExpanded && (
                   <div className="mt-4 pl-8 space-y-4">
-                    <div className="bg-dark-bg/50 rounded-lg p-4">
-                      <p className="text-display-xs text-dark-muted">
+                    <div className="bg-surface-primary/50 rounded-lg p-4">
+                      <p className="text-display-xs text-content-tertiary">
                         {t('connections.connectedSince')}
                       </p>
                       <p className="font-medium text-display-sm">

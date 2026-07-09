@@ -83,6 +83,8 @@
     "minutes": "{{count}} دقیقه",
     "memory": "حافظه",
     "storage": "ذخیره‌سازی",
+    "collectingData": "در حال جمع‌آوری داده...",
+    "peak": "بیشینه",
     "vsLastPeriod": "نسبت به دوره قبل",
     "purge": "پاکسازی"
   },
@@ -100,7 +102,13 @@
     "visualStreamGraph": "گراف بصری استریم‌ها",
     "history": "تاریخچه",
     "security": "امنیت",
-    "tenancy": "اجاره‌دهی"
+    "tenancy": "اجاره‌دهی",
+    "groups": {
+      "monitoring": "پایش",
+      "natsEntities": "موجودیت‌های NATS",
+      "system": "سیستم",
+      "administration": "مدیریت"
+    }
   },
   "app": {
     "title": "nats-ui",
@@ -529,6 +537,7 @@
     "alertRules": "قوانین هشدار",
     "triggeredAlerts": "هشدارهای فعال شده",
     "allSeverities": "همه شدت‌ها",
+    "filterBySeverity": "فیلتر بر اساس شدت",
     "warning": "هشدار",
     "info": "اطلاعات",
     "noAlertsConfigured": "هشداری پیکربندی نشده",
@@ -611,6 +620,8 @@
     "storageUsage": "{{usage}}٪ از {{max}}",
     "storageUnlimited": "{{usage}}٪ — نامحدود",
     "connections": "اتصالات",
+    "duration": "مدت زمان",
+    "selectStream": "انتخاب استریم",
     "streamsConsumers": "{{streams}} استریم · {{consumers}} مصرف‌کننده",
     "rateWindow": "پنجره نرخ",
     "rateWindowDetail": "{{bytes}} / {{duration}} ثانیه",

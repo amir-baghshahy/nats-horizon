@@ -46,7 +46,7 @@ export default function LanguageSwitcher() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-2 rounded-lg border border-dark-border/60 bg-dark-bg/45 px-3 py-2 text-display-xs text-dark-muted hover:text-dark-text hover:border-dark-border transition-colors"
+        className="flex w-full items-center gap-2 rounded-lg border border-border-default/60 bg-surface-primary/45 px-3 py-2 text-display-xs text-content-tertiary hover:text-content-primary hover:border-border-default transition-colors"
         aria-label={t("language.select")}
       >
         <Globe className="h-3.5 w-3.5 shrink-0" />
@@ -57,7 +57,7 @@ export default function LanguageSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute bottom-full left-0 right-0 mb-1 rounded-lg border border-dark-border/70 bg-dark-card shadow-xl shadow-black/30 backdrop-blur-xl z-50 overflow-hidden">
+        <div className="absolute bottom-full left-0 right-0 mb-1 rounded-lg border border-border-default/70 bg-surface-secondary shadow-xl shadow-black/30 backdrop-blur-xl z-50 overflow-hidden">
           {supportedLanguages.map((lang) => (
             <button
               key={lang}
@@ -65,10 +65,10 @@ export default function LanguageSwitcher() {
               className={`flex w-full items-center gap-2.5 px-3 py-2 text-display-xs transition-colors ${
                 currentLang === lang
                   ? "bg-primary-600/20 text-primary-300"
-                  : "text-dark-muted hover:bg-dark-bg/60 hover:text-dark-text"
+                  : "text-content-tertiary hover:bg-surface-primary/60 hover:text-content-primary"
               }`}
             >
-              <span className="w-6 text-display-xs font-mono font-semibold text-dark-muted/60 shrink-0">
+              <span className="w-6 text-display-xs font-mono font-semibold text-content-tertiary/60 shrink-0">
                 {lang.toUpperCase()}
               </span>
               <span className="flex-1 text-left">{LANGUAGE_LABELS[lang]}</span>

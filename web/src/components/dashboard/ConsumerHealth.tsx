@@ -21,7 +21,7 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
 
   return (
     <div className="card overflow-hidden flex flex-col h-full min-h-0">
-      <div className="p-3 border-b border-border-default bg-surface-primary/50 flex-shrink-0">
+      <div className="p-3 border-b border-border-default bg-surface-primary/50 shrink-0">
         <h3 className="text-display-base font-semibold">{t('dashboard.consumerHealth')}</h3>
       </div>
 
@@ -66,7 +66,7 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
           );
         })}
       </div>
-      <div className="p-2 border-t border-border-default bg-surface-primary/50 text-center text-display-xs text-content-tertiary flex-shrink-0">
+      <div className="p-2 border-t border-border-default bg-surface-primary/50 text-center text-display-xs text-content-tertiary shrink-0">
         {t('dashboard.consumerHealthFooter', {
           shown: topLagging.length,
           total: consumers.length,

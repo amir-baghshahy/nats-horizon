@@ -727,7 +727,12 @@
     "subjectCount_other": "{{count}} موضوع",
     "subject": "موضوع",
     "messages": "پیام‌ها",
-    "messageCount": "{{count}} پیام"
+    "messageCount": "{{count}} پیام",
+    "loading": "Loading subjects…",
+    "errorMessage": "Failed to load subjects. Please try refreshing.",
+    "totalSubjects": "Total Subjects",
+    "totalMessages": "Total Messages",
+    "lastActivity": "Last Activity"
   },
   "security": {
     "title": "امنیت",

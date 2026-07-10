@@ -727,7 +727,12 @@
     "subjectCount_other": "{{count}} مواضيع",
     "subject": "الموضوع",
     "messages": "الرسائل",
-    "messageCount": "{{count}} رسائل"
+    "messageCount": "{{count}} رسائل",
+    "loading": "Loading subjects…",
+    "errorMessage": "Failed to load subjects. Please try refreshing.",
+    "totalSubjects": "Total Subjects",
+    "totalMessages": "Total Messages",
+    "lastActivity": "Last Activity"
   },
   "security": {
     "title": "الأمان",

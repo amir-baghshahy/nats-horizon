@@ -83,7 +83,7 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
 
       {/* Connection list — centered when short, scrolls from the top once it outgrows the available space */}
       {list.length > 0 && (
-        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin flex flex-col justify-center pe-0.5">
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin flex flex-col justify-start pe-0.5">
           <div className="space-y-1">
           {visible.map((conn) => (
             <ConnectionRow key={conn.cid ?? conn.ip ?? conn.name ?? Math.random()} conn={conn} t={t} />

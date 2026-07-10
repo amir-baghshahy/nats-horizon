@@ -61,12 +61,12 @@ export default function DashboardPage({
       </section>
 
       {/* Secondary Stats Section */}
-      <section className="shrink-0 animate-slide-up animate-delay-200">
+      <section className="shrink-0 animate-slide-up animate-delay-100">
         <SecondaryStatsGrid account={accountInfo} />
       </section>
 
       {/* Real-time Metrics Section */}
-      <section className="shrink-0 animate-slide-up animate-delay-100">
+      <section className="shrink-0 animate-slide-up animate-delay-200">
         <h2 className="text-display-sm font-semibold mb-2 text-content-primary">{t('dashboard.realTimeMetrics')}</h2>
         <SystemMetrics />
       </section>

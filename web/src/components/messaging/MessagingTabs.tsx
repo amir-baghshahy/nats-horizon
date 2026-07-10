@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { Tabs } from '../ui';
+import { Activity, Hash, MessageSquare, Server } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-export type MessagingTab = "messages" | "publish" | "request" | "monitor" | "services" | "subjects";
+export type MessagingTab = "messages" | "request" | "monitor" | "services" | "subjects";
 
 interface MessagingTabsProps {
   activeTab: MessagingTab;
@@ -16,21 +17,40 @@ export default function MessagingTabs({
 }: MessagingTabsProps) {
   const { t } = useTranslation();
 
+  const tabs: { id: MessagingTab; label: string; icon: LucideIcon }[] = [
+    { id: "messages", label: t('messages.messagesCount', { count: messagesCount }), icon: MessageSquare },
+    { id: "request", label: t('messages.requestReply'), icon: MessageSquare },
+    { id: "monitor", label: t('messages.trafficMonitor'), icon: Activity },
+    { id: "subjects", label: t('messages.subjects'), icon: Hash },
+    { id: "services", label: t('messages.services'), icon: Server },
+  ];
+
   return (
-    <div className="mb-2">
-      <Tabs
-        tabs={[
-          { id: "messages", label: t('messages.messagesCount', { count: messagesCount }) },
-          { id: "publish", label: t('messages.publish') },
-          { id: "request", label: t('messages.requestReply') },
-          { id: "monitor", label: t('messages.trafficMonitor') },
-          { id: "subjects", label: t('messages.subjects') },
-          { id: "services", label: t('messages.services') },
-        ]}
-        activeTab={activeTab}
-        onTabChange={onTabChange}
-        variant="underline"
-      />
+    <div
+      role="tablist"
+      aria-orientation="horizontal"
+      className="flex flex-wrap items-center gap-1 rounded-lg bg-surface-primary/60 p-1"
+    >
+      {tabs.map(({ id, label, icon: Icon }) => {
+        const isActive = activeTab === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onTabChange(id)}
+            className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-display-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+              isActive
+                ? "bg-primary-600 text-white shadow-sm"
+                : "text-content-tertiary hover:bg-surface-primary hover:text-content-primary"
+            }`}
+          >
+            <Icon className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

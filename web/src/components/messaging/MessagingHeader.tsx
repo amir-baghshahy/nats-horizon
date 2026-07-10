@@ -7,12 +7,13 @@ interface MessagingHeaderProps {
   sseConnected: boolean;
   activeTab: MessagingTab;
   onTabChange: (tab: MessagingTab) => void;
+  onPublishClick: () => void;
 }
 
 export default function MessagingHeader({
   sseConnected,
-  activeTab,
   onTabChange,
+  onPublishClick,
 }: MessagingHeaderProps) {
   const { t } = useTranslation();
 
@@ -38,13 +39,13 @@ export default function MessagingHeader({
           )}
         </div>
 
-        <Button variant="primary" onClick={() => onTabChange("publish")} icon={<Send className="h-4 w-4" />}>
+        <Button variant="primary" onClick={onPublishClick} icon={<Send className="h-4 w-4" />}>
           {t('messages.publish')}
         </Button>
 
         <Button
           variant="secondary"
-          onClick={() => onTabChange(activeTab === "request" ? "publish" : "request")}
+          onClick={() => onTabChange("request")}
           icon={<MessageSquare className="h-4 w-4" />}
         >
           {t('messages.request')}

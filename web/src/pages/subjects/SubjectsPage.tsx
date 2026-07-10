@@ -2,18 +2,23 @@ import type { SubjectInfo } from "../../types";
 import { UseSubjectsReturn } from "./hooks/useSubjects";
 import { useTranslation } from "react-i18next";
 import {
-  RefreshCw,
+  Hash,
+  MessageSquare,
+  Clock,
   ChevronRight,
   ChevronDown,
-  MessageSquare,
   Globe,
   Activity,
   FolderOpen,
+  List,
 } from "lucide-react";
-import { PageHeader, FilterBar, EmptyState, PanelCard } from "../../components/ui";
-import { Button } from "../../components/ui";
+import { DashboardHeader } from "../../components/dashboard";
+import StatCard from "../../components/ui/StatCard";
+import { PageLoading, PageError } from "../../components/ui/PageState";
+import { FilterBar, EmptyState, PanelCard } from "../../components/ui";
 
 export default function SubjectsPage({
+  sseConnected,
   searchQuery,
   setSearchQuery,
   viewMode,
@@ -24,8 +29,14 @@ export default function SubjectsPage({
   toggleNode,
   buildSubjectTree,
   filteredSubjects,
+  totalSubjects,
+  totalMessages,
+  lastActivity,
+  isLoading,
+  isError,
 }: UseSubjectsReturn) {
   const { t } = useTranslation();
+  const hasData = subjects && subjects.length > 0;
   const subjectTree = buildSubjectTree();
 
   const renderNode = (node: any, depth: number = 0) => {
@@ -82,68 +93,123 @@ export default function SubjectsPage({
     );
   };
 
-  return (
-    <div className="p-4 md:p-6">
-      <PageHeader
-        title={t("subjects.title")}
-        subtitle={t("subjects.subtitle")}
-        actions={
-           <Button variant="secondary" icon={<RefreshCw className="icon-base" />} onClick={() => refetch()} />
-        }
-      />
-
-      <FilterBar
-        searchValue={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder={t("subjects.searchPlaceholder")}
-        filters={
-          <div className="flex items-center bg-surface-primary rounded-lg p-1">
-            <button
-              onClick={() => setViewMode("tree")}
-              className={`px-4 py-2 rounded transition-colors ${
-                viewMode === "tree"
-                  ? "bg-primary-600 text-white"
-                  : "text-content-tertiary"
-              }`}
-            >
-              <FolderOpen className="icon-base inline mr-2" />
-              {t("subjects.tree")}
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`px-4 py-2 rounded transition-colors ${
-                viewMode === "list"
-                  ? "bg-primary-600 text-white"
-                  : "text-content-tertiary"
-              }`}
-            >
-              <MessageSquare className="icon-base inline mr-2" />
-              {t("subjects.list")}
-            </button>
-          </div>
-        }
-      />
-
-      {subjects.length === 0 && (
-        <EmptyState
-          icon={Globe}
-          title={t("subjects.noSubjectsFound")}
-          description={t("subjects.noSubjectsFoundDescription")}
+  if (isLoading) {
+    return (
+      <div className="h-full flex flex-col p-4 md:p-6">
+        <DashboardHeader
+          sseConnected={sseConnected}
+          onRefresh={() => refetch()}
         />
-      )}
+        <PageLoading text={t("subjects.loading")} />
+      </div>
+    );
+  }
 
-      {subjects.length > 0 && (
-        <>
-          {viewMode === "tree" ? (
-            <PanelCard maxHeight={600} footer={<span>{t("subjects.subjectCount", { count: filteredSubjects.length })}</span>}>
+  if (isError) {
+    return (
+      <div className="h-full flex flex-col p-4 md:p-6">
+        <DashboardHeader
+          sseConnected={sseConnected}
+          onRefresh={() => refetch()}
+        />
+        <PageError message={t("subjects.errorMessage")} onRetry={refetch} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col gap-4 p-4 md:p-6 animate-fade-in overflow-hidden">
+      <div className="shrink-0">
+        <DashboardHeader
+          sseConnected={sseConnected}
+          onRefresh={() => refetch()}
+        />
+      </div>
+
+      {/* Summary Stats Section */}
+      <section className="shrink-0 animate-slide-up">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <StatCard
+            icon={Hash}
+            value={totalSubjects || 0}
+            label={t("subjects.totalSubjects")}
+            iconBg="bg-primary-500/20"
+            iconColor="text-primary-400"
+          />
+          <StatCard
+            icon={MessageSquare}
+            value={totalMessages || 0}
+            label={t("subjects.totalMessages")}
+            iconBg="bg-green-500/20"
+            iconColor="text-green-400"
+          />
+          <StatCard
+            icon={Clock}
+            value={lastActivity || "—"}
+            label={t("subjects.lastActivity")}
+            iconBg="bg-cyan-500/20"
+            iconColor="text-cyan-400"
+            formatValue={false}
+          />
+        </div>
+      </section>
+
+      {/* Subject Browser Section */}
+      <section className="flex-1 min-h-0 flex flex-col gap-3 animate-slide-up animate-delay-100">
+        <FilterBar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={t("subjects.searchPlaceholder")}
+          filters={
+            <div className="flex items-center bg-surface-primary rounded-lg p-1">
+              <button
+                onClick={() => setViewMode("tree")}
+                className={`px-4 py-2 rounded transition-colors ${
+                  viewMode === "tree"
+                    ? "bg-primary-600 text-white"
+                    : "text-content-tertiary"
+                }`}
+              >
+                <FolderOpen className="icon-base inline mr-2" />
+                {t("subjects.tree")}
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`px-4 py-2 rounded transition-colors ${
+                  viewMode === "list"
+                    ? "bg-primary-600 text-white"
+                    : "text-content-tertiary"
+                }`}
+              >
+                <List className="icon-base inline mr-2" />
+                {t("subjects.list")}
+              </button>
+            </div>
+          }
+        />
+
+        {!hasData ? (
+          <EmptyState
+            icon={Globe}
+            title={t("subjects.noSubjectsFound")}
+            description={t("subjects.noSubjectsFoundDescription")}
+          />
+        ) : (
+          <PanelCard
+            maxHeight={600}
+            footer={
+              <span>
+                {t("subjects.subjectCount", { count: filteredSubjects.length })}
+              </span>
+            }
+          >
+            {viewMode === "tree" ? (
               <div className="overflow-y-auto scrollbar-thin flex-1 p-4">
                 <div className="space-y-1">
                   {subjectTree.map((node) => renderNode(node))}
                 </div>
               </div>
-            </PanelCard>
-          ) : (
-            <PanelCard maxHeight={600} footer={<span>{t("subjects.subjectCount", { count: filteredSubjects.length })}</span>}>
+            ) : (
               <div className="overflow-x-auto overflow-y-auto scrollbar-thin flex-1">
                 <table className="table">
                   <thead className="sticky top-0 bg-surface-primary z-10">
@@ -171,10 +237,10 @@ export default function SubjectsPage({
                   </tbody>
                 </table>
               </div>
-            </PanelCard>
-          )}
-        </>
-      )}
+            )}
+          </PanelCard>
+        )}
+      </section>
     </div>
   );
 }

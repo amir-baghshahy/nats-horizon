@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
+import { X, Send } from "lucide-react";
 import {
   CoreNatsService,
   PublishMessageRequest,
@@ -17,6 +18,8 @@ import {
 } from "../components/messaging";
 import { useToast } from "../components/Toast";
 import { PageError, PageLoading } from "../components/ui/PageState";
+import { ModalWrapper } from "../components/ui/Modal";
+import { Button } from "../components/ui";
 import {
   useNATSSubscription,
   useMessageList,
@@ -36,11 +39,15 @@ import {
 interface CoreMessagingContentProps {
   activeTab?: MessagingTab;
   onTabChange?: (tab: MessagingTab) => void;
+  showPublishModal?: boolean;
+  onPublishModalChange?: (show: boolean) => void;
 }
 
 export function CoreMessagingContent({
   activeTab: controlledTab,
   onTabChange: setControlledTab,
+  showPublishModal: controlledShowPublishModal,
+  onPublishModalChange: setControlledShowPublishModal,
 }: CoreMessagingContentProps = {}) {
   const { t } = useTranslation();
   const [uncontrolledTab, setUncontrolledTab] = usePersistedState<MessagingTab>(
@@ -49,6 +56,9 @@ export function CoreMessagingContent({
   );
   const activeTab = controlledTab ?? uncontrolledTab;
   const setActiveTab = setControlledTab ?? setUncontrolledTab;
+  const [uncontrolledShowPublishModal, setUncontrolledShowPublishModal] = useState(false);
+  const showPublishModal = controlledShowPublishModal ?? uncontrolledShowPublishModal;
+  const setShowPublishModal = setControlledShowPublishModal ?? setUncontrolledShowPublishModal;
   const [subscriptions, setSubscriptions] = useState<Set<string>>(new Set());
   const [autoScroll, setAutoScroll] = usePersistedState<boolean>(
     "core:autoScroll",
@@ -154,6 +164,7 @@ export function CoreMessagingContent({
       };
       await CoreNatsService.postCorePublish(request);
       setPublishForm({ subject: "", payload: "", replyTo: "", headers: "{}" });
+      setShowPublishModal(false);
       toast("success", t("messages.messagePublished"));
     } catch (err: any) {
       toast(
@@ -280,12 +291,21 @@ export function CoreMessagingContent({
 
   return (
     <div className="h-full flex flex-col gap-3">
-      <div className="shrink-0">
+      <div className="shrink-0 flex items-center justify-between gap-2">
         <MessagingTabs
           activeTab={activeTab}
           messagesCount={messages.length}
           onTabChange={setActiveTab}
         />
+        <Button
+          type="button"
+          variant="primary"
+          size="sm"
+          onClick={() => setShowPublishModal(true)}
+          icon={<Send className="h-3.5 w-3.5" />}
+        >
+          {t("messages.publish")}
+        </Button>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
@@ -312,14 +332,6 @@ export function CoreMessagingContent({
               onToggleAutoScroll={() => setAutoScroll(!autoScroll)}
             />
           </div>
-        )}
-
-        {activeTab === "publish" && (
-          <PublishForm
-            form={publishForm}
-            onChange={setPublishForm}
-            onSubmit={handlePublish}
-          />
         )}
 
         {activeTab === "request" && (
@@ -352,6 +364,37 @@ export function CoreMessagingContent({
           />
         )}
       </div>
+
+      {showPublishModal && (
+        <ModalWrapper isOpen={true} onClose={() => setShowPublishModal(false)}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in"
+            onClick={(e) => { if (e.target === e.currentTarget) setShowPublishModal(false); }}
+          >
+            <div
+              className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto scrollbar-thin"
+              role="dialog"
+              aria-modal="true"
+              aria-label={t("messages.publishMessage")}
+            >
+              <button
+                type="button"
+                onClick={() => setShowPublishModal(false)}
+                className="absolute end-4 top-4 z-10 rounded-lg p-1.5 hover:bg-surface-primary"
+                aria-label={t("common.close")}
+              >
+                <X className="icon-base" />
+              </button>
+
+              <PublishForm
+                form={publishForm}
+                onChange={setPublishForm}
+                onSubmit={handlePublish}
+              />
+            </div>
+          </div>
+        </ModalWrapper>
+      )}
     </div>
   );
 }
@@ -362,6 +405,7 @@ export default function CoreMessaging() {
     "core:tab",
     "messages",
   );
+  const [showPublishModal, setShowPublishModal] = useState(false);
 
   return (
     <div className="h-full flex flex-col gap-4 p-4 md:p-6 overflow-hidden">
@@ -370,10 +414,16 @@ export default function CoreMessaging() {
           sseConnected={sseConnected}
           activeTab={activeTab}
           onTabChange={setActiveTab}
+          onPublishClick={() => setShowPublishModal(true)}
         />
       </div>
       <div className="flex-1 min-h-0">
-        <CoreMessagingContent activeTab={activeTab} onTabChange={setActiveTab} />
+        <CoreMessagingContent
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          showPublishModal={showPublishModal}
+          onPublishModalChange={setShowPublishModal}
+        />
       </div>
     </div>
   );

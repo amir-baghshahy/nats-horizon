@@ -727,7 +727,12 @@
     "subjectCount_other": "{{count}} sujets",
     "subject": "Sujet",
     "messages": "Messages",
-    "messageCount": "{{count}} msgs"
+    "messageCount": "{{count}} msgs",
+    "loading": "Loading subjects…",
+    "errorMessage": "Failed to load subjects. Please try refreshing.",
+    "totalSubjects": "Total Subjects",
+    "totalMessages": "Total Messages",
+    "lastActivity": "Last Activity"
   },
   "security": {
     "title": "Sécurité",

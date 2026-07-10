@@ -89,7 +89,10 @@
     "purge": "Purge",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "healthy": "Healthy",
+    "warning": "Warning",
+    "critical": "Critical"
   },
   "nav": {
     "groups": {
@@ -160,7 +163,8 @@
     "messages": "Messages",
     "memory": "Memory",
     "storage": "Storage",
-    "messageRate": "Message Rate"
+    "messageRate": "Message Rate",
+    "na": "N/A"
   },
   "streams": {
     "title": "Streams",
@@ -192,6 +196,7 @@
     "subjectsPlaceholder": "orders.*, events.*",
     "subjectsHelp": "Comma-separated list",
     "storage": "Storage",
+    "status": "Status",
     "file": "File",
     "memory": "Memory",
     "replicas": "Replicas",
@@ -243,7 +248,8 @@
     "maxAgePlaceholder": "24h",
     "maxAgeLabel": "Max Age (e.g. 24h, 7d — empty = unlimited)",
     "maxBytesLabel": "Max Bytes (0 = unlimited)",
-    "saveChanges": "Save Changes"
+    "saveChanges": "Save Changes",
+    "healthy": "healthy"
   },
   "consumers": {
     "title": "Consumers",
@@ -387,11 +393,12 @@
     "deleteCount": "Delete ({{count}})",
     "publishMessage": "Publish Message",
     "subject": "Subject",
+    "subjects": "Subjects",
     "subjectPlaceholder": "orders.created",
     "subjectHelp": "The NATS address this message is sent to, e.g. orders.created.",
-    "replyTo": "Reply To (Optional)",
+    "replyTo": "Reply To",
     "replyToPlaceholder": "_INBOX.reply",
-    "headers": "Headers (JSON, Optional)",
+    "headers": "Headers",
     "headersPlaceholder": "{\"Content-Type\": \"application/json\"}",
     "payload": "Payload",
     "payloadPlaceholder": "{\"order_id\": \"123\", \"amount\": 99.99}",
@@ -417,8 +424,6 @@
     "copyMessage": "Copy message",
     "payloadFormat": "Payload ({{format}})",
     "switchTo": "Switch to",
-    "headers": "Headers",
-    "replyTo": "Reply To",
     "viewFullMessage": "View full message",
     "deleteMessage": "Delete message",
     "deleteMessages": "Delete Messages",
@@ -519,7 +524,6 @@
     "replicas": "{{count}}x replica",
     "noStreamsFound": "No streams found",
     "replicationDetails": "Replication Details: {{name}}",
-    "clustered": "Clustered",
     "clusterInfo": "Cluster Info",
     "mirrorSource": "Mirror Source",
     "domain": "Domain: {{domain}}",
@@ -648,6 +652,7 @@
     "subtitle": "Interactive topology of NATS streams and consumers",
     "loading": "Loading stream graph...",
     "noStreams": "No streams found",
+    "noStreamsDescription": "Create your first stream to see the visual graph.",
     "noConsumers": "No consumers found",
     "nodeDetails": "Node Details",
     "streamDetails": "Stream Details",
@@ -834,7 +839,6 @@
     "urlPlaceholder": "nats://localhost:4222",
     "description": "Description",
     "descriptionPlaceholder": "Main production NATS server",
-    "enabled": "Enabled",
     "cancel": "Cancel",
     "update": "Update",
     "create": " Create",

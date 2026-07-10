@@ -84,7 +84,15 @@
     "memory": "الذاكرة",
     "storage": "التخزين",
     "vsLastPeriod": "مقارنة بالفترة السابقة",
-    "purge": "تنظيف"
+    "purge": "تنظيف",
+    "healthy": "صحي",
+    "warning": "تحذير",
+    "critical": "حرج",
+    "closeMenu": "إغلاق القائمة",
+    "collectingData": "جارٍ جمع البيانات…",
+    "openMenu": "فتح القائمة",
+    "peak": "الذروة",
+    "skipToContent": "تخطَّ إلى المحتوى"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -100,7 +108,14 @@
     "visualStreamGraph": "رسم التدفقات البصري",
     "history": "السجل",
     "security": "الأمان",
-    "tenancy": "الإيجار"
+    "tenancy": "الإيجار",
+    "groups": {
+      "administration": "الإدارة",
+      "monitoring": "المراقبة",
+      "natsEntities": "كيانات NATS",
+      "system": "النظام"
+    },
+    "title": "التنقل"
   },
   "app": {
     "title": "nats-ui",
@@ -181,6 +196,7 @@
     "subjectsPlaceholder": "orders.*, events.*",
     "subjectsHelp": "قائمة مفصولة بفواصل",
     "storage": "التخزين",
+    "status": "الحالة",
     "file": "ملف",
     "memory": "ذاكرة",
     "replicas": "النسخ المتماثلة",
@@ -232,7 +248,8 @@
     "maxAgePlaceholder": "24h",
     "maxAgeLabel": "الحد الأقصى للعمر (مثال: 24h, 7d — فارغ = غير محدود)",
     "maxBytesLabel": "الحد الأقصى للبايتات (0 = غير محدود)",
-    "saveChanges": "حفظ التغييرات"
+    "saveChanges": "حفظ التغييرات",
+    "healthy": "سليم"
   },
   "consumers": {
     "title": "المستهلكون",
@@ -376,9 +393,10 @@
     "deleteCount": "حذف ({{count}})",
     "publishMessage": "نشر رسالة",
     "subject": "الموضوع",
+    "subjects": "المواضيع",
     "subjectPlaceholder": "orders.created",
     "subjectHelp": "عنوان NATS الذي تُرسل إليه الرسالة، مثال: orders.created.",
-    "replyTo": "الرد إلى (اختياري)",
+    "replyTo": "الرد إلى",
     "replyToPlaceholder": "_INBOX.reply",
     "headers": "الرؤوس (JSON، اختياري)",
     "headersPlaceholder": "{\"Content-Type\": \"application/json\"}",
@@ -406,7 +424,6 @@
     "copyMessage": "نسخ الرسالة",
     "payloadFormat": "الحمولة ({{format}})",
     "switchTo": "التبديل إلى",
-    "replyTo": "الرد إلى",
     "viewFullMessage": "عرض الرسالة كاملة",
     "deleteMessage": "حذف الرسالة",
     "deleteMessages": "حذف الرسائل",
@@ -587,7 +604,8 @@
     "create": "إنشاء",
     "loading": "جاري تحميل محفزات التنبيه...",
     "alertsLoading": "جاري تحميل التنبيهات...",
-    "unableToLoad": "تعذر تحميل التنبيهات"
+    "unableToLoad": "تعذر تحميل التنبيهات",
+    "filterBySeverity": "تصفية حسب الخطورة"
   },
   "metrics": {
     "title": "المقاييس الفورية",
@@ -625,13 +643,16 @@
     "messages": "الرسائل",
     "storage": "التخزين",
     "noMetricsAvailable": "لا توجد مقاييس متاحة",
-    "noMetricsAvailableDescription": "ستظهر المقاييس هنا بمجرد إنشاء التدفقات وأخذ العينات."
+    "noMetricsAvailableDescription": "ستظهر المقاييس هنا بمجرد إنشاء التدفقات وأخذ العينات.",
+    "duration": "المدة",
+    "selectStream": "اختر التدفق"
   },
   "visualStreamGraph": {
     "title": "رسم التدفقات البصري",
     "subtitle": "الهيكل التفاعلي للتي تدفقات ومستهلكي NATS",
     "loading": "جاري تحميل الرسم البياني...",
     "noStreams": "لم يتم العثور على تدفقات",
+    "noStreamsDescription": "أنشئ أول تدفق لك لرؤية الرسم البياني المرئي.",
     "noConsumers": "لم يتم العثور على مستهلكين",
     "nodeDetails": "تفاصيل العقدة",
     "streamDetails": "تفاصيل التدفق",
@@ -783,7 +804,9 @@
     "pointCount": "{{count}} نقطة",
     "pointCount_other": "{{count}} نقاط",
     "noStreamTrend": "لا يوجد اتجاه للتدفق",
-    "noStreamTrendDescription": "اختر تدفقاً لعرض نقاط الرسائل التاريخية."
+    "noStreamTrendDescription": "اختر تدفقاً لعرض نقاط الرسائل التاريخية.",
+    "dataPoints": "نقاط",
+    "selectStreamForTrend": "اختر تدفقًا لعرض اتجاهه"
   },
   "tenancy": {
     "title": "تعدد الإيجار",

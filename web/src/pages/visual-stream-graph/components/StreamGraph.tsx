@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import ReactFlow, {
   Background,
   Controls,
@@ -25,8 +25,16 @@ interface StreamGraphProps {
 }
 
 export function StreamGraph({ initialNodes, initialEdges, onNodeClick }: StreamGraphProps) {
-  const [nodes, , onNodesChange] = useNodesState(initialNodes)
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges)
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+
+  useEffect(() => {
+    setNodes(initialNodes)
+  }, [initialNodes, setNodes])
+
+  useEffect(() => {
+    setEdges(initialEdges)
+  }, [initialEdges, setEdges])
 
   const handleNodeClick = useCallback((_: any, node: any) => {
     onNodeClick?.(node)

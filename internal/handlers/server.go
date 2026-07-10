@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/base64"
+	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -371,7 +372,7 @@ func (h *ServerHandler) GetRateMetrics(c *gin.Context) {
 		}
 	}
 
-	metrics, err := h.useCase.GetRateMetrics(c.Request.Context(), duration)
+	metrics, windowSeconds, err := h.useCase.GetRateMetrics(c.Request.Context(), duration)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 			Error:   "Failed to get rate metrics",
@@ -383,17 +384,23 @@ func (h *ServerHandler) GetRateMetrics(c *gin.Context) {
 	streamMetrics := make([]gin.H, len(metrics))
 	for i, m := range metrics {
 		streamMetrics[i] = gin.H{
-			"name":     m.Name,
-			"messages": m.Messages,
-			"bytes":    m.Bytes,
-			"first_ts": m.FirstTs,
-			"last_ts":  m.LastTs,
+			"name":             m.Name,
+			"messages":         m.Messages,
+			"bytes":            m.Bytes,
+			"first_ts":         m.FirstTs,
+			"last_ts":          m.LastTs,
+			"messages_per_sec": m.MessagesPerSec,
+			"bytes_per_sec":    m.BytesPerSec,
+			"messages_delta":   m.MessagesDelta,
+			"bytes_delta":      m.BytesDelta,
 		}
 	}
 
+	// duration reflects the actual measured window (seconds since the previous poll),
+	// not the requested query param — deltas above are only meaningful against it.
 	c.JSON(http.StatusOK, gin.H{
 		"streams":   streamMetrics,
-		"duration":  duration,
+		"duration":  math.Round(windowSeconds*10) / 10,
 		"timestamp": time.Now().Unix(),
 	})
 }

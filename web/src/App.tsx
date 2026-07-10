@@ -75,7 +75,7 @@ function App() {
   return (
     <Layout>
       <div
-        className={`transition-all duration-300 ease-out ${
+        className={`h-full transition-all duration-300 ease-out ${
           isTransitioning
             ? "translate-y-4 opacity-0"
             : "translate-y-0 opacity-100"

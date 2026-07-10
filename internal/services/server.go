@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
@@ -15,17 +16,28 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
+// rateSample captures a stream's counters at a point in time, used to derive throughput.
+type rateSample struct {
+	messages uint64
+	bytes    uint64
+}
+
 // ServerUseCase handles server-related business logic
 type ServerUseCase struct {
 	nc *nats.Conn
 	js nats.JetStreamContext
+
+	rateMu      sync.Mutex
+	rateAt      time.Time
+	rateSamples map[string]rateSample
 }
 
 // NewServerUseCase creates a new server use case
 func NewServerUseCase(nc *nats.Conn, js nats.JetStreamContext) *ServerUseCase {
 	return &ServerUseCase{
-		nc: nc,
-		js: js,
+		nc:          nc,
+		js:          js,
+		rateSamples: make(map[string]rateSample),
 	}
 }
 
@@ -47,7 +59,7 @@ func (uc *ServerUseCase) GetDashboardStats(ctx context.Context) (*DashboardStats
 		}, nil
 	}
 
-	msg, err := uc.nc.Request(constants.APIStreamList, []byte(`{"subjects_filter":">"}`), constants.LongRequestTimeout)
+	msg, err := uc.nc.Request(constants.APIStreamList, []byte(`{}`), constants.LongRequestTimeout)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get stream list: %w", err)
 	}
@@ -69,10 +81,15 @@ func (uc *ServerUseCase) GetDashboardStats(ctx context.Context) (*DashboardStats
 		return nil, fmt.Errorf("failed to parse stream list: %w", err)
 	}
 
+	connections := 0
+	if connz, err := uc.getConnz(); err == nil {
+		connections = connz.TotalConnections()
+	}
+
 	stats := &DashboardStats{
 		Streams:     len(response.Streams),
 		Status:      "connected",
-		Connections: 0,
+		Connections: connections,
 	}
 
 	for _, stream := range response.Streams {
@@ -117,6 +134,15 @@ func (uc *ServerUseCase) GetAccountInfo(ctx context.Context) (*AccountInfo, erro
 		storageMax = 0
 	}
 
+	maxStreams := info.Limits.MaxStreams
+	if maxStreams < 0 {
+		maxStreams = 0
+	}
+	maxConsumers := info.Limits.MaxConsumers
+	if maxConsumers < 0 {
+		maxConsumers = 0
+	}
+
 	return &AccountInfo{
 		Memory:       info.Tier.Memory,
 		Storage:      info.Tier.Store,
@@ -125,8 +151,8 @@ func (uc *ServerUseCase) GetAccountInfo(ctx context.Context) (*AccountInfo, erro
 		Domain:       info.Domain,
 		MaxMemory:    memoryMax,
 		MaxStorage:   storageMax,
-		MaxStreams:   info.Limits.MaxStreams,
-		MaxConsumers: info.Limits.MaxConsumers,
+		MaxStreams:   maxStreams,
+		MaxConsumers: maxConsumers,
 	}, nil
 }
 
@@ -388,7 +414,7 @@ type SubjectInfo struct {
 func (uc *ServerUseCase) GetSubjects(ctx context.Context) ([]*SubjectInfo, error) {
 	subjectsByName := make(map[string]*SubjectInfo)
 
-	streamMsg, err := uc.nc.Request(constants.APIStreamList, []byte(`{"subjects_filter":">"}`), constants.LongRequestTimeout)
+	streamMsg, err := uc.nc.Request(constants.APIStreamList, []byte(`{}`), constants.LongRequestTimeout)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get stream list: %w", err)
 	}
@@ -501,8 +527,8 @@ func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, 
 	}
 
 	connections := 0
-	if uc.nc != nil && uc.nc.IsConnected() {
-		connections = 1
+	if connz, err := uc.getConnz(); err == nil {
+		connections = connz.TotalConnections()
 	}
 
 	memoryMax := uint64(accountInfo.Limits.MaxMemory)
@@ -539,18 +565,27 @@ func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, 
 
 // StreamMetrics represents metrics for a specific stream
 type StreamMetrics struct {
-	Name     string
-	Messages uint64
-	Bytes    uint64
-	FirstTs  string
-	LastTs   string
+	Name           string
+	Messages       uint64
+	Bytes          uint64
+	FirstTs        string
+	LastTs         string
+	MessagesPerSec float64
+	BytesPerSec    float64
+	MessagesDelta  uint64
+	BytesDelta     uint64
 }
 
-// GetRateMetrics returns message rate metrics for streams
-func (uc *ServerUseCase) GetRateMetrics(ctx context.Context, duration int) ([]*StreamMetrics, error) {
-	msg, err := uc.nc.Request(constants.APIStreamList, []byte(`{"subjects_filter":">"}`), constants.LongRequestTimeout)
+// GetRateMetrics returns message rate metrics for streams, plus the actual elapsed
+// window (in seconds) the deltas were measured over. Rates are derived by diffing
+// each stream's counters against the previous call's sample, so the first call
+// after startup always reports a zero rate and a zero window — there's nothing to
+// diff against yet. The requested `duration` is accepted for API compatibility but
+// does not affect the measurement window, which is always "since the last poll".
+func (uc *ServerUseCase) GetRateMetrics(ctx context.Context, duration int) ([]*StreamMetrics, float64, error) {
+	msg, err := uc.nc.Request(constants.APIStreamList, []byte(`{}`), constants.LongRequestTimeout)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get stream list: %w", err)
+		return nil, 0, fmt.Errorf("failed to get stream list: %w", err)
 	}
 
 	var response struct {
@@ -568,19 +603,56 @@ func (uc *ServerUseCase) GetRateMetrics(ctx context.Context, duration int) ([]*S
 	}
 
 	if err := json.Unmarshal(msg.Data, &response); err != nil {
-		return nil, fmt.Errorf("failed to parse stream list: %w", err)
+		return nil, 0, fmt.Errorf("failed to parse stream list: %w", err)
 	}
 
+	now := time.Now()
+
+	uc.rateMu.Lock()
+	elapsed := now.Sub(uc.rateAt).Seconds()
+	prevSamples := uc.rateSamples
+	hasPrev := !uc.rateAt.IsZero() && elapsed > 0
+
+	nextSamples := make(map[string]rateSample, len(response.Streams))
 	metrics := make([]*StreamMetrics, len(response.Streams))
 	for i, stream := range response.Streams {
-		metrics[i] = &StreamMetrics{
-			Name:     stream.Config.Name,
+		name := stream.Config.Name
+		nextSamples[name] = rateSample{messages: stream.State.Messages, bytes: stream.State.Bytes}
+
+		m := &StreamMetrics{
+			Name:     name,
 			Messages: stream.State.Messages,
 			Bytes:    stream.State.Bytes,
 			FirstTs:  stream.State.FirstTs,
 			LastTs:   stream.State.LastTs,
 		}
+
+		if hasPrev {
+			if prev, ok := prevSamples[name]; ok {
+				// Counters only grow (or reset on stream purge/recreate); treat any
+				// decrease as a reset rather than negative throughput.
+				if stream.State.Messages >= prev.messages {
+					m.MessagesDelta = stream.State.Messages - prev.messages
+					m.MessagesPerSec = float64(m.MessagesDelta) / elapsed
+				}
+				if stream.State.Bytes >= prev.bytes {
+					m.BytesDelta = stream.State.Bytes - prev.bytes
+					m.BytesPerSec = float64(m.BytesDelta) / elapsed
+				}
+			}
+		}
+
+		metrics[i] = m
 	}
 
-	return metrics, nil
+	uc.rateAt = now
+	uc.rateSamples = nextSamples
+	uc.rateMu.Unlock()
+
+	windowSeconds := 0.0
+	if hasPrev {
+		windowSeconds = elapsed
+	}
+
+	return metrics, windowSeconds, nil
 }

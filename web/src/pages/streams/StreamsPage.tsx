@@ -44,9 +44,9 @@ export default function StreamsPage() {
   } = useStreamsPage();
 
   return (
-    <div className="p-4 md:p-6 animate-fade-in">
+    <div className="h-full flex flex-col gap-4 p-4 md:p-6 animate-fade-in overflow-hidden">
       {/* Header Section */}
-      <section className="mb-6">
+      <section className="shrink-0">
         <StreamsHeader
           sseConnected={sseConnected}
           onShowCreateModal={() => setShowCreateModal(true)}
@@ -55,21 +55,20 @@ export default function StreamsPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="mb-6 animate-slide-up">
+      <section className="shrink-0 animate-slide-up">
         <StreamsStats stats={stats} />
       </section>
 
-      {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-border-default/50 to-transparent mb-6" />
-
       {/* Filters & List Section */}
-      <section className="space-y-4 animate-slide-up animate-delay-100">
+      <section className="flex-1 min-h-0 flex flex-col gap-4 animate-slide-up animate-delay-100">
+        <div className="shrink-0">
         <StreamsFilters
           filters={filters}
           hasActiveFilters={hasActiveFilters}
           updateFilter={updateFilter}
           resetFilters={resetFilters}
         />
+        </div>
 
         <StreamsList
           streams={paginatedStreams}

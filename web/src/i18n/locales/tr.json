@@ -84,7 +84,15 @@
     "memory": "Bellek",
     "storage": "Depolama",
     "vsLastPeriod": "önceki döneme göre",
-    "purge": "Temizle"
+    "purge": "Temizle",
+    "healthy": "Sağlıklı",
+    "warning": "Uyarı",
+    "critical": "Kritik",
+    "closeMenu": "Menüyü kapat",
+    "collectingData": "Veriler toplanıyor…",
+    "openMenu": "Menüyü aç",
+    "peak": "tepe",
+    "skipToContent": "İçeriğe geç"
   },
   "nav": {
     "dashboard": "Panel",
@@ -100,7 +108,14 @@
     "visualStreamGraph": "Görsel Akış Grafiği",
     "history": "Geçmiş",
     "security": "Güvenlik",
-    "tenancy": "Kiralama"
+    "tenancy": "Kiralama",
+    "groups": {
+      "administration": "Yönetim",
+      "monitoring": "İzleme",
+      "natsEntities": "NATS Varlıkları",
+      "system": "Sistem"
+    },
+    "title": "Gezinme"
   },
   "app": {
     "title": "nats-ui",
@@ -148,7 +163,8 @@
     "messages": "Mesajlar",
     "memory": "Bellek",
     "storage": "Depolama",
-    "messageRate": "Mesaj Hızı"
+    "messageRate": "Mesaj Hızı",
+    "na": "Yok"
   },
   "streams": {
     "title": "Akışlar",
@@ -180,6 +196,7 @@
     "subjectsPlaceholder": "siparişler.*, olaylar.*",
     "subjectsHelp": "Virgülle ayrılmış liste",
     "storage": "Depolama",
+    "status": "Durum",
     "file": "Dosya",
     "memory": "Bellek",
     "replicas": "Kopyalar",
@@ -231,7 +248,8 @@
     "maxAgePlaceholder": "24s",
     "maxAgeLabel": "Maks. Yaş (örn. 24s, 7g — boş = sınırsız)",
     "maxBytesLabel": "Maks. Bayt (0 = sınırsız)",
-    "saveChanges": "Değişiklikleri Kaydet"
+    "saveChanges": "Değişiklikleri Kaydet",
+    "healthy": "sağlıklı"
   },
   "consumers": {
     "title": "Tüketiciler",
@@ -375,11 +393,12 @@
     "deleteCount": "Sil ({{count}})",
     "publishMessage": "Mesaj Yayınla",
     "subject": "Konu",
+    "subjects": "Konular",
     "subjectPlaceholder": "siparişler.oluşturuldu",
     "subjectHelp": "Bu mesajın gönderildiği NATS adresi, örn. siparişler.oluşturuldu.",
-    "replyTo": "Yanıt Adresi (İsteğe bağlı)",
+    "replyTo": "Yanıt Adresi",
     "replyToPlaceholder": "_INBOX.yanıt",
-    "headers": "Başlıklar (JSON, İsteğe bağlı)",
+    "headers": "Başlıklar",
     "headersPlaceholder": "{\"Content-Type\": \"application/json\"}",
     "payload": "Yük",
     "payloadPlaceholder": "{\"siparis_id\": \"123\", \"tutar\": 99.99}",
@@ -405,8 +424,6 @@
     "copyMessage": "Mesajı Kopyala",
     "payloadFormat": "Yük ({{format}})",
     "switchTo": "Geçiş yap",
-    "headers": "Başlıklar",
-    "replyTo": "Yanıt Adresi",
     "viewFullMessage": "Tam mesajı gör",
     "deleteMessage": "Mesajı Sil",
     "deleteMessages": "Mesajları Sil",
@@ -466,7 +483,13 @@
     "knownSubjects": "Bilinen Konular",
     "noSubjectsDiscovered": "Henüz konu keşfedilmedi.",
     "noSubjectsDiscoveredDescription": "Konuları görmek için abone olun, yayınlayın veya bir istek gönderin.",
-    "request": "İstek"
+    "request": "İstek",
+    "event": "olay",
+    "noTrafficCaptured": "Henüz trafik yakalanmadı.",
+    "noTrafficCapturedDescription": "İzleyiciyi başlatın ve seçili konulara mesaj yayımlayın.",
+    "recentEvents": "Son Olaylar",
+    "replyLabel": "Yanıt: ",
+    "sizeLabel": "Boyut: "
   },
   "cluster": {
     "title": "Küme İzleme",
@@ -501,7 +524,6 @@
     "replicas": "{{count}}x kopya",
     "noStreamsFound": "Akış bulunamadı",
     "replicationDetails": "Çoğaltma Detayları: {{name}}",
-    "clustered": "Kümeli",
     "clusterInfo": "Küme Bilgisi",
     "mirrorSource": "Yansı Kaynağı",
     "domain": "Alan: {{domain}}",
@@ -582,7 +604,8 @@
     "create": "Oluştur",
     "loading": "Uyarı tetikleyicileri yükleniyor...",
     "alertsLoading": "Uyarılar yükleniyor...",
-    "unableToLoad": "Uyarılar yüklenemiyor"
+    "unableToLoad": "Uyarılar yüklenemiyor",
+    "filterBySeverity": "Önem derecesine göre filtrele"
   },
   "metrics": {
     "title": "Gerçek Zamanlı Metrikler",
@@ -620,13 +643,16 @@
     "messages": "Mesajlar",
     "storage": "Depolama",
     "noMetricsAvailable": "Metrik Yok",
-    "noMetricsAvailableDescription": "Metrikler, akışlar oluşturulduktan ve örneklendikten sonra burada görünecek."
+    "noMetricsAvailableDescription": "Metrikler, akışlar oluşturulduktan ve örneklendikten sonra burada görünecek.",
+    "duration": "Süre",
+    "selectStream": "Akış seç"
   },
   "visualStreamGraph": {
     "title": "Görsel Akış Grafiği",
     "subtitle": "NATS akışları ve tüketicilerinin interaktif topolojisi",
     "loading": "Akış grafiği yükleniyor...",
     "noStreams": "Akış bulunamadı",
+    "noStreamsDescription": "Görsel grafiği görmek için ilk akışınızı oluşturun.",
     "noConsumers": "Tüketici bulunamadı",
     "nodeDetails": "Düğüm Detayları",
     "streamDetails": "Akış Detayları",
@@ -778,7 +804,9 @@
     "pointCount": "{{count}} nokta",
     "pointCount_other": "{{count}} nokta",
     "noStreamTrend": "Akış Trendi Yok",
-    "noStreamTrendDescription": "Geçmiş mesaj noktalarını görüntülemek için bir akış seçin."
+    "noStreamTrendDescription": "Geçmiş mesaj noktalarını görüntülemek için bir akış seçin.",
+    "dataPoints": "nokta",
+    "selectStreamForTrend": "Eğilimini görmek için bir akış seçin"
   },
   "tenancy": {
     "title": "Çok Kiracılı",
@@ -811,7 +839,6 @@
     "urlPlaceholder": "nats://localhost:4222",
     "description": "Açıklama",
     "descriptionPlaceholder": "Ana üretim NATS sunucusu",
-    "enabled": "Etkin",
     "cancel": "İptal",
     "update": "Güncelle",
     "create": "Oluştur",

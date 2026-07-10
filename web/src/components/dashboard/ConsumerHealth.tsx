@@ -20,12 +20,12 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
     .slice(0, 5);
 
   return (
-    <div className="card overflow-hidden flex flex-col max-h-[350px]">
+    <div className="card overflow-hidden flex flex-col h-full min-h-0">
       <div className="p-3 border-b border-border-default bg-surface-primary/50 flex-shrink-0">
         <h3 className="text-display-base font-semibold">{t('dashboard.consumerHealth')}</h3>
       </div>
 
-      <div className="overflow-y-auto scrollbar-thin flex-1 p-3 space-y-2">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin p-3 space-y-2">
         {topLagging.map((consumer) => {
           const lag = consumer.lag || consumer.num_pending || 0;
           const status = getConsumerStatus(lag);
@@ -67,7 +67,11 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
         })}
       </div>
       <div className="p-2 border-t border-border-default bg-surface-primary/50 text-center text-display-xs text-content-tertiary flex-shrink-0">
-        {t('dashboard.consumerCount', { count: topLagging.length })}
+        {t('dashboard.consumerHealthFooter', {
+          shown: topLagging.length,
+          total: consumers.length,
+          defaultValue: `Showing top ${topLagging.length} of ${consumers.length} consumers`,
+        })}
       </div>
     </div>
   );

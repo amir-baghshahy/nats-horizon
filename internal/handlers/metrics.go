@@ -158,7 +158,7 @@ func (h *MetricsHandler) collectMetrics() {
 				Name string `json:"name"`
 			} `json:"config"`
 			State struct {
-				Msgs  uint64 `json:"msgs"`
+				Msgs  uint64 `json:"messages"`
 				Bytes uint64 `json:"bytes"`
 			} `json:"state"`
 		} `json:"streams"`

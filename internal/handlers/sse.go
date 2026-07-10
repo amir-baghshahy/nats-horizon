@@ -50,8 +50,8 @@ type sseStreamListResponse struct {
 			Name string `json:"name"`
 		} `json:"config"`
 		State struct {
-			Messages  uint64 `json:"msgs"`
-			Consumers uint64 `json:"consumers"`
+			Messages  uint64 `json:"messages"`
+			Consumers uint64 `json:"consumer_count"`
 		} `json:"state"`
 	} `json:"streams"`
 }

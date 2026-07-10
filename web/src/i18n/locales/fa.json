@@ -83,10 +83,16 @@
     "minutes": "{{count}} دقیقه",
     "memory": "حافظه",
     "storage": "ذخیره‌سازی",
-    "collectingData": "در حال جمع‌آوری داده...",
+    "collectingData": "در حال جمع‌آوری داده‌ها…",
     "peak": "بیشینه",
     "vsLastPeriod": "نسبت به دوره قبل",
-    "purge": "پاکسازی"
+    "purge": "پاکسازی",
+    "healthy": "سالم",
+    "warning": "هشدار",
+    "critical": "بحرانی",
+    "closeMenu": "بستن منو",
+    "openMenu": "باز کردن منو",
+    "skipToContent": "پرش به محتوا"
   },
   "nav": {
     "dashboard": "داشبورد",
@@ -108,7 +114,8 @@
       "natsEntities": "موجودیت‌های NATS",
       "system": "سیستم",
       "administration": "مدیریت"
-    }
+    },
+    "title": "ناوبری"
   },
   "app": {
     "title": "nats-ui",
@@ -156,7 +163,8 @@
     "messages": "پیام‌ها",
     "memory": "حافظه",
     "storage": "ذخیره‌سازی",
-    "messageRate": "نرخ پیام"
+    "messageRate": "نرخ پیام",
+    "na": "نامشخص"
   },
   "streams": {
     "title": "استریم‌ها",
@@ -188,6 +196,7 @@
     "subjectsPlaceholder": "orders.*, events.*",
     "subjectsHelp": "لیست جدا شده با کاما",
     "storage": "ذخیره‌سازی",
+    "status": "وضعیت",
     "file": "فایل",
     "memory": "حافظه",
     "replicas": "تکرارها",
@@ -384,6 +393,7 @@
     "deleteCount": "حذف ({{count}})",
     "publishMessage": "انتشار پیام",
     "subject": "موضوع",
+    "subjects": "موضوع‌ها",
     "subjectPlaceholder": "orders.created",
     "subjectHelp": "آدرس NATS که این پیام به آن ارسال می‌شود، مثلاً orders.created.",
     "replyTo": "پاسخ به (اختیاری)",
@@ -642,6 +652,7 @@
     "subtitle": "توپولوژی تعاملی استریم‌ها و مصرف‌کننده‌های NATS",
     "loading": "در حال بارگذاری گراف استریم...",
     "noStreams": "هیچ استریمی یافت نشد",
+    "noStreamsDescription": "برای مشاهده گراف تصویری، اولین استریم خود را بسازید.",
     "noConsumers": "هیچ مصرف‌کننده‌ای یافت نشد",
     "nodeDetails": "جزئیات گره",
     "streamDetails": "جزئیات استریم",
@@ -793,7 +804,9 @@
     "pointCount": "{{count}} نقطه",
     "pointCount_other": "{{count}} نقطه",
     "noStreamTrend": "روند استریمی وجود ندارد",
-    "noStreamTrendDescription": "یک استریم برای مشاهده نقاط تاریخی پیام انتخاب کنید."
+    "noStreamTrendDescription": "یک استریم برای مشاهده نقاط تاریخی پیام انتخاب کنید.",
+    "dataPoints": "نقطه",
+    "selectStreamForTrend": "یک جریان را برای مشاهده روند انتخاب کنید"
   },
   "tenancy": {
     "title": "چند‌اجاره‌ای",
@@ -826,7 +839,6 @@
     "urlPlaceholder": "nats://localhost:4222",
     "description": "توضیحات",
     "descriptionPlaceholder": "سرور تولیدی اصلی NATS",
-    "enabled": "فعال",
     "cancel": "لغو",
     "update": "به‌روزرسانی",
     "create": " ایجاد",

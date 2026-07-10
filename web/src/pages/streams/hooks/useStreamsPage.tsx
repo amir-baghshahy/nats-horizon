@@ -155,49 +155,52 @@ export function useStreamsPage(): UseStreamsPageReturn {
     queryFn: () => StreamsService.getStreams(),
   });
 
-  const streamFilterFn = useCallback((stream: Stream, filters: StreamFilters) => {
-    const streamName = stream.config?.name || "";
-    const matchesSearch =
-      streamName.toLowerCase().includes(filters.search.toLowerCase()) ||
-      (stream.config?.subjects || []).some((subject) =>
-        subject.toLowerCase().includes(filters.search.toLowerCase()),
+  const streamFilterFn = useCallback(
+    (stream: Stream, filters: StreamFilters) => {
+      const streamName = stream.config?.name || "";
+      const matchesSearch =
+        streamName.toLowerCase().includes(filters.search.toLowerCase()) ||
+        (stream.config?.subjects || []).some((subject) =>
+          subject.toLowerCase().includes(filters.search.toLowerCase()),
+        );
+
+      const matchesStorage =
+        filters.storage === "all" || stream.config?.storage === filters.storage;
+
+      const lag = stream.state?.num_pending || 0;
+      let matchesStatus = true;
+      if (filters.status === "healthy") {
+        matchesStatus = lag < 1000;
+      } else if (filters.status === "warning") {
+        matchesStatus = lag >= 1000 && lag < 10000;
+      } else if (filters.status === "critical") {
+        matchesStatus = lag >= 10000;
+      }
+
+      const messages = stream.state?.messages || 0;
+      const matchesMinMessages = messages >= filters.minMessages;
+      const matchesMaxMessages =
+        filters.maxMessages === 0 || messages <= filters.maxMessages;
+      const matchesMinConsumers =
+        (stream.state?.consumers || 0) >= filters.minConsumers;
+      const matchesSubjectPattern =
+        filters.subjectPattern === "" ||
+        (stream.config?.subjects || []).some((subject) =>
+          subject.includes(filters.subjectPattern),
+        );
+
+      return (
+        matchesSearch &&
+        matchesStorage &&
+        matchesStatus &&
+        matchesMinMessages &&
+        matchesMaxMessages &&
+        matchesMinConsumers &&
+        matchesSubjectPattern
       );
-
-    const matchesStorage =
-      filters.storage === "all" || stream.config?.storage === filters.storage;
-
-    const lag = stream.state?.num_pending || 0;
-    let matchesStatus = true;
-    if (filters.status === "healthy") {
-      matchesStatus = lag < 1000;
-    } else if (filters.status === "warning") {
-      matchesStatus = lag >= 1000 && lag < 10000;
-    } else if (filters.status === "critical") {
-      matchesStatus = lag >= 10000;
-    }
-
-    const messages = stream.state?.messages || 0;
-    const matchesMinMessages = messages >= filters.minMessages;
-    const matchesMaxMessages =
-      filters.maxMessages === 0 || messages <= filters.maxMessages;
-    const matchesMinConsumers =
-      (stream.state?.consumers || 0) >= filters.minConsumers;
-    const matchesSubjectPattern =
-      filters.subjectPattern === "" ||
-      (stream.config?.subjects || []).some((subject) =>
-        subject.includes(filters.subjectPattern),
-      );
-
-    return (
-      matchesSearch &&
-      matchesStorage &&
-      matchesStatus &&
-      matchesMinMessages &&
-      matchesMaxMessages &&
-      matchesMinConsumers &&
-      matchesSubjectPattern
-    );
-  }, []);
+    },
+    [],
+  );
 
   const {
     filters,
@@ -219,8 +222,14 @@ export function useStreamsPage(): UseStreamsPageReturn {
     perPage: 20,
   });
 
-  const filteredStreams = useMemo(() => applyFilters(streams), [streams, filters, applyFilters]);
-  const paginatedStreams = useMemo(() => getPaginatedItems(filteredStreams), [filteredStreams, page, getPaginatedItems]);
+  const filteredStreams = useMemo(
+    () => applyFilters(streams),
+    [streams, filters, applyFilters],
+  );
+  const paginatedStreams = useMemo(
+    () => getPaginatedItems(filteredStreams),
+    [filteredStreams, page, getPaginatedItems],
+  );
 
   const deleteMutation = useMutation({
     mutationFn: (name: string) => StreamsService.deleteStreams(name),
@@ -331,36 +340,27 @@ export function useStreamsPage(): UseStreamsPageReturn {
         0,
       ),
     }),
-    // Use streams length instead of filteredStreams reference to avoid infinite loop
-    [
-      streams.length,
-      filters.search,
-      filters.storage,
-      filters.status,
-      filters.minMessages,
-      filters.maxMessages,
-      filters.minConsumers,
-      filters.subjectPattern,
-    ],
+
+    [filteredStreams],
   );
 
   const handleDelete = async (streamName: string) => {
-     const ok = await confirm({
-       title: t("streams.deleteStream"),
-       message: t("streams.deleteStreamConfirm", { streamName }),
-       confirmLabel: t("streams.delete"),
-       variant: "danger",
-     });
+    const ok = await confirm({
+      title: t("streams.deleteStream"),
+      message: t("streams.deleteStreamConfirm", { streamName }),
+      confirmLabel: t("streams.delete"),
+      variant: "danger",
+    });
     if (ok) deleteMutation.mutate(streamName);
   };
 
   const handlePurge = async (streamName: string) => {
-     const ok = await confirm({
-       title: t("streams.purgeStream"),
-       message: t("streams.purgeStreamConfirm", { streamName }),
-       confirmLabel: t("streams.purge"),
-       variant: "warning",
-     });
+    const ok = await confirm({
+      title: t("streams.purgeStream"),
+      message: t("streams.purgeStreamConfirm", { streamName }),
+      confirmLabel: t("streams.purge"),
+      variant: "warning",
+    });
     if (ok) purgeMutation.mutate(streamName);
   };
 
@@ -380,12 +380,12 @@ export function useStreamsPage(): UseStreamsPageReturn {
   };
 
   const handleBulkDelete = async () => {
-     const ok = await confirm({
-       title: t("streams.deleteStreams"),
-       message: t("streams.deleteStreamsConfirm", { count: selected.size }),
-       confirmLabel: t("streams.deleteAll"),
-       variant: "danger",
-     });
+    const ok = await confirm({
+      title: t("streams.deleteStreams"),
+      message: t("streams.deleteStreamsConfirm", { count: selected.size }),
+      confirmLabel: t("streams.deleteAll"),
+      variant: "danger",
+    });
     if (ok) {
       selected.forEach((name) => deleteMutation.mutate(name));
       clearSelection();

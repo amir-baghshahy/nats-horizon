@@ -68,9 +68,9 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="p-4 md:p-6 animate-fade-in">
+    <div className="h-full flex flex-col gap-4 p-4 md:p-6 animate-fade-in overflow-hidden">
       {/* Header Section */}
-      <section className="mb-6">
+      <section className="shrink-0">
         <MessagesHeader
           title={t('messages.messageBrowser')}
           description={t('messages.messageBrowserDescription')}
@@ -83,7 +83,7 @@ export default function MessagesPage() {
       </section>
 
       {/* Tabs Section */}
-      <section className="mb-6">
+      <section className="shrink-0">
         <MessagesTabs
           activeTab={activeMessageTab}
           onTabChange={setActiveMessageTab}
@@ -91,26 +91,30 @@ export default function MessagesPage() {
       </section>
 
       {activeMessageTab === "stream" && (
-        <section className="space-y-4 animate-slide-up">
-          <StreamSelector
-            streams={streams}
-            selectedStream={selectedStream}
-            searchQuery={searchQuery}
-            showFilters={showFilters}
-            onStreamChange={setSelectedStream}
-            onSearchChange={setSearchQuery}
-            onToggleFilters={() => setShowFilters(!showFilters)}
-            onRefresh={refetch}
-          />
+        <section className="flex-1 min-h-0 flex flex-col gap-4 animate-slide-up">
+          <div className="shrink-0">
+            <StreamSelector
+              streams={streams}
+              selectedStream={selectedStream}
+              searchQuery={searchQuery}
+              showFilters={showFilters}
+              onStreamChange={setSelectedStream}
+              onSearchChange={setSearchQuery}
+              onToggleFilters={() => setShowFilters(!showFilters)}
+              onRefresh={refetch}
+            />
+          </div>
 
-          <MessagesPagination
-            currentPage={currentPage}
-            messagesPerPage={messagesPerPage}
-            totalMessages={totalMessages}
-            onPageChange={setCurrentPage}
-            onPerPageChange={setMessagesPerPage}
-            onRefresh={refetch}
-          />
+          <div className="shrink-0">
+            <MessagesPagination
+              currentPage={currentPage}
+              messagesPerPage={messagesPerPage}
+              totalMessages={totalMessages}
+              onPageChange={setCurrentPage}
+              onPerPageChange={setMessagesPerPage}
+              onRefresh={refetch}
+            />
+          </div>
 
           <MessagesList
             messages={messages}
@@ -141,7 +145,7 @@ export default function MessagesPage() {
       )}
 
       {activeMessageTab === "core" && (
-        <section className="animate-slide-up">
+        <section className="flex-1 min-h-0 animate-slide-up">
           <CoreMessagingContent />
         </section>
       )}

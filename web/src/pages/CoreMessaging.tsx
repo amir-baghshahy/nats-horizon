@@ -33,12 +33,22 @@ import {
   RequestForm,
 } from "../components/messaging";
 
-export function CoreMessagingContent() {
+interface CoreMessagingContentProps {
+  activeTab?: MessagingTab;
+  onTabChange?: (tab: MessagingTab) => void;
+}
+
+export function CoreMessagingContent({
+  activeTab: controlledTab,
+  onTabChange: setControlledTab,
+}: CoreMessagingContentProps = {}) {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = usePersistedState<MessagingTab>(
+  const [uncontrolledTab, setUncontrolledTab] = usePersistedState<MessagingTab>(
     "core:tab",
     "messages",
   );
+  const activeTab = controlledTab ?? uncontrolledTab;
+  const setActiveTab = setControlledTab ?? setUncontrolledTab;
   const [subscriptions, setSubscriptions] = useState<Set<string>>(new Set());
   const [autoScroll, setAutoScroll] = usePersistedState<boolean>(
     "core:autoScroll",
@@ -269,89 +279,102 @@ export function CoreMessagingContent() {
   }
 
   return (
-    <div>
-      <MessagingHeader
-        sseConnected={sseConnected}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
+    <div className="h-full flex flex-col gap-3">
+      <div className="shrink-0">
+        <MessagingTabs
+          activeTab={activeTab}
+          messagesCount={messages.length}
+          onTabChange={setActiveTab}
+        />
+      </div>
 
-      <MessagingTabs
-        activeTab={activeTab}
-        messagesCount={messages.length}
-        onTabChange={setActiveTab}
-      />
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
+        {activeTab === "messages" && (
+          <div className="flex flex-col gap-3">
+            <SubscriptionBar
+              subscriptions={subscriptions}
+              onSubscribe={handleSubscribe}
+              onUnsubscribe={unsubscribeFromSubject}
+            />
 
-      {activeTab === "messages" && (
-        <>
-          <SubscriptionBar
+            <MessageList
+              messages={messages}
+              expandedMessages={expandedMessages}
+              viewModes={viewModes}
+              messageFormats={messageFormats}
+              sseConnected={sseConnected}
+              autoScroll={autoScroll}
+              messagesEndRef={messagesEndRef}
+              onToggleExpand={toggleExpand}
+              onCycleViewMode={cycleViewMode}
+              onCopyMessage={handleCopyMessage}
+              onClearMessages={clearMessages}
+              onToggleAutoScroll={() => setAutoScroll(!autoScroll)}
+            />
+          </div>
+        )}
+
+        {activeTab === "publish" && (
+          <PublishForm
+            form={publishForm}
+            onChange={setPublishForm}
+            onSubmit={handlePublish}
+          />
+        )}
+
+        {activeTab === "request" && (
+          <RequestForm
+            form={requestForm}
+            onChange={setRequestForm}
+            onSubmit={handleRequest}
+            response={requestResponse}
+          />
+        )}
+
+        {activeTab === "subjects" && <SubjectExplorer subjects={knownSubjects} />}
+
+        {activeTab === "services" && (
+          <ServiceDiscoveryPanel
+            serviceInfo={serviceInfo as ServiceInfo}
             subscriptions={subscriptions}
-            onSubscribe={handleSubscribe}
-            onUnsubscribe={unsubscribeFromSubject}
+            onRefresh={refetchServiceInfo}
           />
+        )}
 
-          <MessageList
-            messages={messages}
-            expandedMessages={expandedMessages}
-            viewModes={viewModes}
-            messageFormats={messageFormats}
-            sseConnected={sseConnected}
-            autoScroll={autoScroll}
-            messagesEndRef={messagesEndRef}
-            onToggleExpand={toggleExpand}
-            onCycleViewMode={cycleViewMode}
-            onCopyMessage={handleCopyMessage}
-            onClearMessages={clearMessages}
-            onToggleAutoScroll={() => setAutoScroll(!autoScroll)}
+        {activeTab === "monitor" && (
+          <TrafficMonitorPanel
+            subjects={monitorSubjects}
+            onSubjectsChange={setMonitorSubjects}
+            isMonitoring={Boolean(monitorSourceRef.current)}
+            events={monitorEvents}
+            onStart={startMonitor}
+            onStop={stopMonitor}
           />
-        </>
-      )}
-
-      {activeTab === "publish" && (
-        <PublishForm
-          form={publishForm}
-          onChange={setPublishForm}
-          onSubmit={handlePublish}
-        />
-      )}
-
-      {activeTab === "request" && (
-        <RequestForm
-          form={requestForm}
-          onChange={setRequestForm}
-          onSubmit={handleRequest}
-          response={requestResponse}
-        />
-      )}
-
-      {activeTab === "subjects" && <SubjectExplorer subjects={knownSubjects} />}
-
-      {activeTab === "services" && (
-        <ServiceDiscoveryPanel
-          serviceInfo={serviceInfo as ServiceInfo}
-          subscriptions={subscriptions}
-          onRefresh={refetchServiceInfo}
-        />
-      )}
-
-      {activeTab === "monitor" && (
-        <TrafficMonitorPanel
-          subjects={monitorSubjects}
-          onSubjectsChange={setMonitorSubjects}
-          isMonitoring={Boolean(monitorSourceRef.current)}
-          events={monitorEvents}
-          onStart={startMonitor}
-          onStop={stopMonitor}
-        />
-      )}
+        )}
+      </div>
     </div>
   );
 }
 
 export default function CoreMessaging() {
+  const { connected: sseConnected } = useSSE("core-messaging");
+  const [activeTab, setActiveTab] = usePersistedState<MessagingTab>(
+    "core:tab",
+    "messages",
+  );
+
   return (
-    <div className="p-4 md:p-6">
-      <CoreMessagingContent />
+    <div className="h-full flex flex-col gap-4 p-4 md:p-6 overflow-hidden">
+      <div className="shrink-0">
+        <MessagingHeader
+          sseConnected={sseConnected}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+      </div>
+      <div className="flex-1 min-h-0">
+        <CoreMessagingContent activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
     </div>
   );
 }

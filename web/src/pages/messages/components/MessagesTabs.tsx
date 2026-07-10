@@ -17,7 +17,7 @@ export default function MessagesTabs({ activeTab, onTabChange }: MessagesTabsPro
       ]}
       activeTab={activeTab}
       onTabChange={onTabChange}
-      variant="underline"
+      variant="pill"
     />
   );
 }

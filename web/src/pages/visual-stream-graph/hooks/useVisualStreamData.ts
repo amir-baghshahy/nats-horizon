@@ -70,10 +70,14 @@ export function useVisualStreamData() {
   const graphData = useMemo((): GraphData => {
     const nodes: GraphNode[] = []
     const edges: GraphEdge[] = []
+    const streamX = new Map<string, number>()
+    const consumerIndexByStream = new Map<string, number>()
 
     // Process streams
     streams.forEach((stream, index) => {
       const streamName = stream.config?.name || `stream-${index}`
+      const x = index * 350
+      streamX.set(streamName, x)
       nodes.push({
         id: `stream-${streamName}`,
         type: 'stream',
@@ -85,15 +89,20 @@ export function useVisualStreamData() {
           storage: stream.state?.bytes || 0,
           health: getStreamHealth(stream),
         },
-        position: { x: index * 350, y: 100 },
+        position: { x, y: 100 },
       })
     })
 
-    // Process consumers and link to streams
+    // Process consumers and link to streams — stack each stream's consumers in a
+    // column below it so they don't all pile up at the same coordinates.
     consumers.forEach((consumer) => {
       const streamName = consumer.stream
       if (streamName) {
         const consumerName = consumer.name || `consumer-${nodes.length}`
+        const x = streamX.get(streamName) ?? 0
+        const row = consumerIndexByStream.get(streamName) ?? 0
+        consumerIndexByStream.set(streamName, row + 1)
+
         nodes.push({
           id: `consumer-${consumerName}`,
           type: 'consumer',
@@ -104,7 +113,7 @@ export function useVisualStreamData() {
             status: consumer.status || 'unknown',
             health: getConsumerHealth(consumer),
           },
-          position: { x: 0, y: 0 }, // Will be positioned by layout
+          position: { x, y: 320 + row * 140 },
         })
 
         edges.push({

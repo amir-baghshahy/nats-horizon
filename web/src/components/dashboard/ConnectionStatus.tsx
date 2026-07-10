@@ -27,9 +27,9 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
   const serverCount = new Set(list.map(c => c.server || c.server_id || "unknown")).size;
 
   return (
-    <div className="card mb-3">
+    <div className="card h-full flex flex-col min-h-0">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 shrink-0">
         <div className="flex items-center gap-2 min-w-0">
           <div className="w-7 h-7 rounded-lg bg-primary-500/20 flex items-center justify-center shrink-0">
             <Radio className="h-3.5 w-3.5 text-primary-400" />
@@ -56,7 +56,7 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
       </div>
 
       {/* Summary stats — always show */}
-      <div className="grid grid-cols-4 gap-1.5 mb-3">
+      <div className="grid grid-cols-4 gap-1.5 mb-3 shrink-0">
         {[
           { label: t('dashboard.active'), value: list.length },
           { label: t('dashboard.subscriptions'), value: formatNumber(totalSubs) },
@@ -72,18 +72,19 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
 
       {/* Empty state */}
       {list.length === 0 && (
-        <div className="rounded-lg border border-dashed border-border-default/50 bg-surface-primary/30 py-8 text-center">
-          <Radio className="mx-auto mb-2 h-7 w-7 opacity-25" />
+        <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border-default/50 bg-surface-primary/30 text-center">
+          <Radio className="mx-auto mb-1 h-7 w-7 opacity-25" />
           <p className="text-display-xs text-content-tertiary">{t('dashboard.noActiveConnections') || 'No active connections'}</p>
-          <p className="text-display-xs text-content-tertiary/60 mt-0.5">
+          <p className="text-display-xs text-content-tertiary/60">
             {t('dashboard.connectionsWillAppear') || 'Client connections will appear here'}
           </p>
         </div>
       )}
 
-      {/* Connection list */}
+      {/* Connection list — centered when short, scrolls from the top once it outgrows the available space */}
       {list.length > 0 && (
-        <div className="space-y-1">
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin flex flex-col justify-center pe-0.5">
+          <div className="space-y-1">
           {visible.map((conn) => (
             <ConnectionRow key={conn.cid ?? conn.ip ?? conn.name ?? Math.random()} conn={conn} t={t} />
           ))}
@@ -100,6 +101,7 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
               )}
             </button>
           )}
+          </div>
         </div>
       )}
     </div>

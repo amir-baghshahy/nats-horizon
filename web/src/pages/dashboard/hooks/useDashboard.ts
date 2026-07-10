@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useSSE } from '../../../hooks/useSSE'
-import { ConsumersService, HealthService } from '../../../types'
-import type { DashboardStatsResponse } from '../../../types'
+import { ConsumersService, HealthService, ClusterService } from '../../../types'
+import type { DashboardStatsResponse, ClusterHealthResponse } from '../../../types'
 
 export interface UseDashboardReturn {
   sseConnected: boolean
@@ -10,6 +10,7 @@ export interface UseDashboardReturn {
   accountInfo: any
   connections: any
   consumers: any
+  clusterHealth?: ClusterHealthResponse
   isLoading: boolean
   isError: boolean
   refetch: () => void
@@ -69,6 +70,13 @@ export function useDashboard(): UseDashboardReturn {
     refetchInterval: sseConnected ? false : 5000,
   })
 
+  const { data: clusterHealth } = useQuery({
+    queryKey: ['clusterHealth'],
+    queryFn: () => ClusterService.getClusterHealth(),
+    refetchInterval: sseConnected ? false : 10000,
+    retry: 1,
+  })
+
   const isLoading =
     statsLoading || accountLoading || connectionsLoading || consumersLoading
   const isError =
@@ -97,6 +105,7 @@ export function useDashboard(): UseDashboardReturn {
     accountInfo: account,
     connections,
     consumers,
+    clusterHealth,
     isLoading,
     isError,
     refetch,

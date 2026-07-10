@@ -84,7 +84,15 @@
     "memory": "Arbeitsspeicher",
     "storage": "Speicher",
     "vsLastPeriod": "vs. letzter Zeitraum",
-    "purge": "Bereinigen"
+    "purge": "Bereinigen",
+    "healthy": "Gesund",
+    "warning": "Warnung",
+    "critical": "Kritisch",
+    "closeMenu": "Menü schließen",
+    "collectingData": "Daten werden gesammelt…",
+    "openMenu": "Menü öffnen",
+    "peak": "Spitze",
+    "skipToContent": "Zum Inhalt springen"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -100,7 +108,14 @@
     "visualStreamGraph": "Visueller Stromgraph",
     "history": "Verlauf",
     "security": "Sicherheit",
-    "tenancy": "Multi-Tenancy"
+    "tenancy": "Multi-Tenancy",
+    "groups": {
+      "administration": "Verwaltung",
+      "monitoring": "Überwachung",
+      "natsEntities": "NATS-Entitäten",
+      "system": "System"
+    },
+    "title": "Navigation"
   },
   "app": {
     "title": "nats-ui",
@@ -181,6 +196,7 @@
     "subjectsPlaceholder": "orders.*, events.*",
     "subjectsHelp": "Kommagetrennte Liste",
     "storage": "Speicher",
+    "status": "Status",
     "file": "Datei",
     "memory": "Arbeitsspeicher",
     "replicas": "Replikas",
@@ -232,7 +248,8 @@
     "maxAgePlaceholder": "24h",
     "maxAgeLabel": "Max. Alter (z.B. 24h, 7d — leer = unbegrenzt)",
     "maxBytesLabel": "Max. Bytes (0 = unbegrenzt)",
-    "saveChanges": "Änderungen speichern"
+    "saveChanges": "Änderungen speichern",
+    "healthy": "fehlerfrei"
   },
   "consumers": {
     "title": "Consumer",
@@ -376,11 +393,12 @@
     "deleteCount": "Löschen ({{count}})",
     "publishMessage": "Nachricht veröffentlichen",
     "subject": "Subject",
+    "subjects": "Subjects",
     "subjectPlaceholder": "orders.created",
     "subjectHelp": "Die NATS-Adresse, an die diese Nachricht gesendet wird, z.B. orders.created.",
-    "replyTo": "Antwort an (Optional)",
+    "replyTo": "Antwort an",
     "replyToPlaceholder": "_INBOX.antwort",
-    "headers": "Header (JSON, Optional)",
+    "headers": "Header",
     "headersPlaceholder": "{\"Content-Type\": \"application/json\"}",
     "payload": "Nutzlast",
     "payloadPlaceholder": "{\"order_id\": \"123\", \"amount\": 99.99}",
@@ -406,8 +424,6 @@
     "copyMessage": "Nachricht kopieren",
     "payloadFormat": "Nutzlast ({{format}})",
     "switchTo": "Wechseln zu",
-    "headers": "Header",
-    "replyTo": "Antwort an",
     "viewFullMessage": "Vollständige Nachricht anzeigen",
     "deleteMessage": "Nachricht löschen",
     "deleteMessages": "Nachrichten löschen",
@@ -508,7 +524,6 @@
     "replicas": "{{count}}x Replika",
     "noStreamsFound": "Keine Streams gefunden",
     "replicationDetails": "Replikationsdetails: {{name}}",
-    "clustered": "Geclustert",
     "clusterInfo": "Cluster-Info",
     "mirrorSource": "Mirror-Quelle",
     "domain": "Domäne: {{domain}}",
@@ -589,7 +604,8 @@
     "create": "Erstellen",
     "loading": "Warnungsauslösungen werden geladen...",
     "alertsLoading": "Warnungen werden geladen...",
-    "unableToLoad": "Warnungen konnten nicht geladen werden"
+    "unableToLoad": "Warnungen konnten nicht geladen werden",
+    "filterBySeverity": "Nach Schweregrad filtern"
   },
   "metrics": {
     "title": "Echtzeit-Metriken",
@@ -627,13 +643,16 @@
     "messages": "Nachrichten",
     "storage": "Speicher",
     "noMetricsAvailable": "Keine Metriken verfügbar",
-    "noMetricsAvailableDescription": "Metriken werden hier angezeigt, sobald Streams erstellt und gesammelt wurden."
+    "noMetricsAvailableDescription": "Metriken werden hier angezeigt, sobald Streams erstellt und gesammelt wurden.",
+    "duration": "Dauer",
+    "selectStream": "Stream auswählen"
   },
   "visualStreamGraph": {
     "title": "Visueller Stromgraph",
     "subtitle": "Interaktive Topologie von NATS-Streams und Consumern",
     "loading": "Stromgraph wird geladen...",
     "noStreams": "Keine Streams gefunden",
+    "noStreamsDescription": "Erstellen Sie Ihren ersten Stream, um den visuellen Graphen zu sehen.",
     "noConsumers": "Keine Consumer gefunden",
     "nodeDetails": "Knotendetails",
     "streamDetails": "Stream-Details",
@@ -785,7 +804,9 @@
     "pointCount": "{{count}} Datenpunkt",
     "pointCount_other": "{{count}} Datenpunkte",
     "noStreamTrend": "Kein Stream-Trend",
-    "noStreamTrendDescription": "Wählen Sie einen Stream aus, um historische Nachrichtenpunkte anzuzeigen."
+    "noStreamTrendDescription": "Wählen Sie einen Stream aus, um historische Nachrichtenpunkte anzuzeigen.",
+    "dataPoints": "Punkte",
+    "selectStreamForTrend": "Stream auswählen, um den Trend anzuzeigen"
   },
   "tenancy": {
     "title": "Multi-Tenancy",
@@ -818,7 +839,6 @@
     "urlPlaceholder": "nats://localhost:4222",
     "description": "Beschreibung",
     "descriptionPlaceholder": "Haupt-Produktions-NATS-Server",
-    "enabled": "Aktiviert",
     "cancel": "Abbrechen",
     "update": "Aktualisieren",
     "create": "Erstellen",

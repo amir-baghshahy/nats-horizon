@@ -25,7 +25,7 @@ export default function MessagesPagination({
   const totalPages = Math.max(1, Math.ceil(totalMessages / messagesPerPage));
 
   return (
-    <PanelCard className="mb-4">
+    <PanelCard>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <span className="text-display-sm text-content-tertiary">
@@ -39,7 +39,7 @@ export default function MessagesPagination({
               { value: "50", label: t('messages.perPage', { count: 50 }) },
               { value: "100", label: t('messages.perPage', { count: 100 }) },
             ]}
-            className="py-1 text-display-sm w-24"
+            className="py-1 text-display-sm w-36"
             aria-label={t('messages.perPage', { count: messagesPerPage })}
           />
         </div>

@@ -89,20 +89,51 @@ function KpiCard({
         ? "text-red-400"
         : "text-content-tertiary";
   return (
-    <div className="card p-4 sm:p-5">
+    <div className="card p-3">
       <div className="flex items-center justify-between">
-        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${TONES[tone]}`}>
-          <Icon className="icon-base" />
+        <div className="flex items-center gap-2 min-w-0">
+          <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${TONES[tone]}`}>
+            <Icon className="h-3.5 w-3.5" />
+          </div>
+          <span className="truncate text-display-xs text-content-tertiary">{label}</span>
         </div>
         {trend !== undefined && (
-          <div className={`flex items-center gap-1 text-display-xs font-medium ${trendColor}`}>
-            <TrendIcon className="h-3.5 w-3.5" />
+          <div className={`flex shrink-0 items-center gap-0.5 text-display-xs font-medium ${trendColor}`}>
+            <TrendIcon className="h-3 w-3" />
             <span>{Math.abs(trend).toFixed(1)}%</span>
           </div>
         )}
       </div>
-      <p className="mt-4 text-display-2xl font-bold tabular-nums leading-none">{value}</p>
-      <p className="mt-2 text-display-xs text-content-tertiary">{label}</p>
+      <p className="mt-2 text-display-lg font-bold tabular-nums leading-none">{value}</p>
+    </div>
+  );
+}
+
+function StatCardShell({
+  icon: Icon,
+  label,
+  tone,
+  corner,
+  children,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  tone: keyof typeof TONES;
+  corner?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl bg-surface-primary/50 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${TONES[tone]}`}>
+            <Icon className="h-3.5 w-3.5" />
+          </div>
+          <span className="truncate text-display-xs text-content-tertiary">{label}</span>
+        </div>
+        {corner && <div className="shrink-0">{corner}</div>}
+      </div>
+      {children}
     </div>
   );
 }
@@ -124,24 +155,25 @@ function UsageBar({
   const textColor = pct > 90 ? "text-red-400" : pct > 70 ? "text-yellow-400" : "text-green-400";
   const status = pct > 90 ? t("common.critical") : pct > 70 ? t("common.warning") : t("common.healthy");
   return (
-    <div className="rounded-xl bg-surface-primary/50 p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-display-sm text-content-tertiary">{label}</span>
-        <span className={`text-display-xs font-medium ${textColor}`}>{status}</span>
-      </div>
-      <p className="mt-2 text-display-lg font-semibold tabular-nums">{formatBytes(used || 0)}</p>
-      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-border-default">
+    <StatCardShell
+      icon={HardDrive}
+      label={label}
+      tone="purple"
+      corner={<span className={`text-display-xs font-medium ${textColor}`}>{status}</span>}
+    >
+      <p className="mt-2 text-display-base font-semibold tabular-nums leading-none">{formatBytes(used || 0)}</p>
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border-default">
         <div
           className={`h-full rounded-full transition-all duration-500 ${barColor}`}
           style={{ width: `${Math.min(pct || 0, 100)}%` }}
         />
       </div>
-      <p className="mt-2 text-display-xs text-content-tertiary">
+      <p className="mt-1.5 text-display-xs text-content-tertiary">
         {max
           ? `${pct.toFixed(0)}% ${t("common.of")} ${formatBytes(max)}`
           : `${pct.toFixed(0)}% — ${t("common.unlimited")}`}
       </p>
-    </div>
+    </StatCardShell>
   );
 }
 
@@ -159,16 +191,10 @@ function StatBlock({
   tone: keyof typeof TONES;
 }) {
   return (
-    <div className="rounded-xl bg-surface-primary/50 p-4">
-      <div className="flex items-center gap-2">
-        <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${TONES[tone]}`}>
-          <Icon className="icon-base" />
-        </div>
-        <span className="text-display-sm text-content-tertiary">{label}</span>
-      </div>
-      <p className="mt-2 text-display-lg font-semibold tabular-nums">{value}</p>
-      <p className="mt-1 text-display-xs text-content-tertiary">{sub}</p>
-    </div>
+    <StatCardShell icon={Icon} label={label} tone={tone}>
+      <p className="mt-2 text-display-base font-semibold tabular-nums leading-none">{value}</p>
+      <p className="mt-1.5 text-display-xs text-content-tertiary">{sub}</p>
+    </StatCardShell>
   );
 }
 
@@ -179,7 +205,7 @@ function HeroChart({ series, color }: { series: MetricSeries; color: string }) {
 
   if (chartData.length < 2) {
     return (
-      <div className="flex h-72 flex-col items-center justify-center text-center">
+      <div className="flex h-32 flex-col items-center justify-center text-center">
         <div className="icon-lg mb-3 flex items-center justify-center rounded-full bg-border-default/30">
           <TrendingUp className="icon-md text-content-tertiary/50" />
         </div>
@@ -191,7 +217,7 @@ function HeroChart({ series, color }: { series: MetricSeries; color: string }) {
   const peak = Math.max(...chartData.map((d) => d.v));
 
   return (
-    <div className="h-72 w-full">
+    <div className="h-32 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
           <defs>
@@ -240,7 +266,8 @@ function HeroChart({ series, color }: { series: MetricSeries; color: string }) {
 }
 
 function TopStreamRow({ stream, max, rank }: { stream: any; max: number; rank: number }) {
-  const pct = max > 0 ? ((stream.messages || 0) / max) * 100 : 0;
+  const rate = stream.messages_per_sec || 0;
+  const pct = max > 0 ? (rate / max) * 100 : 0;
   return (
     <div className="group flex items-center gap-3 rounded-xl bg-surface-primary/50 p-3 transition-colors hover:bg-surface-primary">
       <span className="w-5 shrink-0 text-center text-display-sm font-semibold text-content-tertiary">
@@ -252,7 +279,7 @@ function TopStreamRow({ stream, max, rank }: { stream: any; max: number; rank: n
             {stream.name}
           </p>
           <span className="shrink-0 text-display-xs tabular-nums text-content-tertiary">
-            {formatNumber(stream.messages || 0)} msgs
+            {rate.toFixed(1)} msg/s
           </span>
         </div>
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border-default">
@@ -261,7 +288,9 @@ function TopStreamRow({ stream, max, rank }: { stream: any; max: number; rank: n
             style={{ width: `${pct}%` }}
           />
         </div>
-        <p className="mt-1 text-display-xs text-content-tertiary">{formatBytes(stream.bytes || 0)}</p>
+        <p className="mt-1 text-display-xs text-content-tertiary">
+          {formatBytes(stream.bytes_per_sec || 0)}/s · {formatNumber(stream.messages || 0)} total msgs
+        </p>
       </div>
     </div>
   );
@@ -303,12 +332,13 @@ export default function MetricsPage({
   const storageTrend = getTrend(totalStorageSeries);
   const durationLabel = t(`metrics.${durations.find((d) => d.value === duration)?.label ?? "last1Hour"}`);
   const topStreams = [...rateStreams]
-    .sort((a: any, b: any) => (b.messages || 0) - (a.messages || 0))
+    .sort((a: any, b: any) => (b.messages_per_sec || 0) - (a.messages_per_sec || 0))
     .slice(0, 8);
-  const maxRateMessages = Math.max(...rateStreams.map((s: any) => s.messages || 0), 0);
+  const maxRateMessages = Math.max(...rateStreams.map((s: any) => s.messages_per_sec || 0), 0);
 
   return (
-    <div className="animate-fade-in space-y-6 p-4 md:p-6">
+    <div className="h-full flex flex-col gap-4 p-4 md:p-6 animate-fade-in overflow-hidden">
+      <div className="shrink-0">
       <PageHeader
         title={t("metrics.title")}
         subtitle={t("metrics.subtitle")}
@@ -346,9 +376,10 @@ export default function MetricsPage({
           </>
         }
       />
+      </div>
 
       {/* KPI overview */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="shrink-0 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard
           icon={MessageSquare}
           value={formatNumber(totalMessages)}
@@ -378,16 +409,18 @@ export default function MetricsPage({
       </div>
 
       {/* Hero throughput chart */}
+      <div className="shrink-0">
       <PanelCard
         title={t("metrics.messages")}
-        subtitle={t("history.lastDuration", { duration: durationLabel })}
+        subtitle={durationLabel}
         icon={<TrendingUp className="h-5 w-5 text-primary-400" />}
       >
         <HeroChart series={totalMessagesSeries} color="59, 130, 246" />
       </PanelCard>
+      </div>
 
       {/* System resources */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="shrink-0 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <UsageBar
           label={t("metrics.memoryUsed")}
           used={systemMetrics?.memory?.used || 0}
@@ -423,25 +456,26 @@ export default function MetricsPage({
 
       {/* Top streams by rate */}
       <PanelCard
+        className="flex-1 min-h-0"
         title={t("metrics.rateByStream")}
         icon={<TrendingUp className="h-5 w-5 text-primary-400" />}
-        footer={
-          <Badge variant="info">{t("metrics.streamCount", { count: rateStreams.length })}</Badge>
-        }
-      >
-        {topStreams.length === 0 ? (
+        empty={topStreams.length === 0}
+        emptyState={
           <EmptyState
             icon={BarChart3}
             title={t("metrics.noRateData")}
             description={t("metrics.noMetricsAvailableDescription")}
           />
-        ) : (
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-            {topStreams.map((stream: any, i: number) => (
-              <TopStreamRow key={stream.name} stream={stream} max={maxRateMessages} rank={i + 1} />
-            ))}
-          </div>
-        )}
+        }
+        footer={
+          <Badge variant="info">{t("metrics.streamCount", { count: rateStreams.length })}</Badge>
+        }
+      >
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          {topStreams.map((stream: any, i: number) => (
+            <TopStreamRow key={stream.name} stream={stream} max={maxRateMessages} rank={i + 1} />
+          ))}
+        </div>
       </PanelCard>
     </div>
   );

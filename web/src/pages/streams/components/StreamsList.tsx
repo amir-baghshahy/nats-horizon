@@ -105,8 +105,8 @@ export default function StreamsList({
         actions={actions}
       />
 
-      <div className="card overflow-hidden flex flex-col max-h-[600px]">
-        <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-border-default animate-fade-in">
+      <div className="card overflow-hidden flex flex-col flex-1 min-h-0">
+        <div className="overflow-y-auto scrollbar-thin flex-1 min-h-0 divide-y divide-border-default animate-fade-in">
           {streams.map((stream, index) => {
             const streamName = getStreamName(stream);
             const healthStatus = getStreamHealthStatus(stream);
@@ -143,7 +143,7 @@ export default function StreamsList({
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="shrink-0">
         <Pagination
           page={page}
           perPage={20}

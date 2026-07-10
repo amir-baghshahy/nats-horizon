@@ -196,8 +196,9 @@ export function SystemMetrics() {
         queryKey={['rateMetrics']}
         queryFn={() => MetricsService.getMetricsRates()}
         getValue={(data) =>
-          data?.streams?.reduce((sum: number, s: any) => sum + (s?.messages || 0), 0) || 0
+          data?.streams?.reduce((sum: number, s: any) => sum + (s?.messages_per_sec || 0), 0) || 0
         }
+        formatValue={(v) => `${v.toFixed(1)} msg/s`}
       />
     </div>
   )

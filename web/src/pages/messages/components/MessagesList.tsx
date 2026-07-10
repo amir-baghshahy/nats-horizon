@@ -53,7 +53,7 @@ const parseMessageData = (data: any): string => {
   return JSON.stringify(data, null, 2);
 };
 
-const formatTimestamp = (timestamp: string) => {
+const formatTimestamp = (timestamp: string, t: (key: string, opts?: any) => string) => {
   const date = new Date(timestamp);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
@@ -61,10 +61,10 @@ const formatTimestamp = (timestamp: string) => {
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (days > 0) return `${days}d ago`;
-  if (hours > 0) return `${hours}h ago`;
-  if (minutes > 0) return `${minutes}m ago`;
-  return "Just now";
+  if (days > 0) return t("common.ago", { time: t("common.days", { count: days }) });
+  if (hours > 0) return t("common.ago", { time: t("common.hours", { count: hours }) });
+  if (minutes > 0) return t("common.ago", { time: t("common.minutes", { count: minutes }) });
+  return t("common.justNow");
 };
 
 export default function MessagesList({
@@ -108,7 +108,7 @@ export default function MessagesList({
 
   return (
     <PanelCard
-      maxHeight={600}
+      className="flex-1 min-h-0"
       header={
         <div className="bg-surface-primary border-b border-border-default p-4 flex-shrink-0">
           <div className="flex items-center justify-between">
@@ -122,7 +122,7 @@ export default function MessagesList({
               <span className="text-display-sm text-content-tertiary">
                 {selected.size > 0
                   ? `${selected.size} ${t('common.selected')}`
-                  : `${messages.length} ${t('messages.messageCount', { count: messages.length })}`}
+                  : t('messages.messageCount', { count: messages.length })}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -156,7 +156,7 @@ export default function MessagesList({
     >
 
       {/* Messages */}
-      <div className="overflow-y-auto scrollbar-thin flex-1 divide-y divide-border-default">
+      <div className="overflow-y-auto scrollbar-thin flex-1 min-h-0 divide-y divide-border-default">
         {messages.map((message, index) => {
           const sequence = message.sequence;
           const isExpanded = expanded.has(sequence);
@@ -204,7 +204,7 @@ export default function MessagesList({
                       </span>
                       <span className="text-display-xs text-content-tertiary flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {formatTimestamp(message.timestamp)}
+                        {formatTimestamp(message.timestamp, t)}
                       </span>
                     </div>
                     <div className="text-display-sm text-content-tertiary truncate">
@@ -227,7 +227,7 @@ export default function MessagesList({
                       title={t('messages.copyMessage')}
                     >
                       {copiedMessage === sequence ? (
-                        <Check className="icon-base text-green- animate-bounce-in" />
+                        <Check className="icon-base text-green-400 animate-bounce-in" />
                       ) : (
                         <CopyIcon className="icon-base text-content-tertiary" />
                       )}

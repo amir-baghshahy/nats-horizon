@@ -30,6 +30,7 @@ export interface UseMetricsReturn {
   rateStreams: any[];
   rateTotalMessages: number;
   rateTotalBytes: number;
+  rateTotalMessagesPerSec: number;
 }
 
 export function useMetrics(): UseMetricsReturn {
@@ -110,12 +111,20 @@ export function useMetrics(): UseMetricsReturn {
     0,
   );
   const rateStreams = (rates?.streams as any[] | undefined) || [];
+  // messages_delta/bytes_delta are the real change since the previous poll — the
+  // window they were measured over is `rates.duration` (seconds), returned by the
+  // backend. Do not use the raw `messages`/`bytes` fields here: those are lifetime
+  // totals, not activity within the window.
   const rateTotalMessages = rateStreams.reduce<number>(
-    (sum, stream) => sum + (stream.messages || 0),
+    (sum, stream) => sum + (stream.messages_delta || 0),
     0,
   );
   const rateTotalBytes = rateStreams.reduce<number>(
-    (sum, stream) => sum + (stream.bytes || 0),
+    (sum, stream) => sum + (stream.bytes_delta || 0),
+    0,
+  );
+  const rateTotalMessagesPerSec = rateStreams.reduce<number>(
+    (sum, stream) => sum + (stream.messages_per_sec || 0),
     0,
   );
 
@@ -142,5 +151,6 @@ export function useMetrics(): UseMetricsReturn {
     rateStreams,
     rateTotalMessages,
     rateTotalBytes,
+    rateTotalMessagesPerSec,
   };
 }

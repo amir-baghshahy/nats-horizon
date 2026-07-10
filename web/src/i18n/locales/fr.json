@@ -84,7 +84,15 @@
     "memory": "Mémoire",
     "storage": "Stockage",
     "vsLastPeriod": "vs période précédente",
-    "purge": "Purger"
+    "purge": "Purger",
+    "healthy": "En bonne santé",
+    "warning": "Avertissement",
+    "critical": "Critique",
+    "closeMenu": "Fermer le menu",
+    "collectingData": "Collecte des données…",
+    "openMenu": "Ouvrir le menu",
+    "peak": "pic",
+    "skipToContent": "Aller au contenu"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -100,7 +108,14 @@
     "visualStreamGraph": "Graphe Visuel des Flux",
     "history": "Historique",
     "security": "Sécurité",
-    "tenancy": "Location"
+    "tenancy": "Location",
+    "groups": {
+      "administration": "Administration",
+      "monitoring": "Surveillance",
+      "natsEntities": "Entités NATS",
+      "system": "Système"
+    },
+    "title": "Navigation"
   },
   "app": {
     "title": "nats-ui",
@@ -148,7 +163,8 @@
     "messages": "Messages",
     "memory": "Mémoire",
     "storage": "Stockage",
-    "messageRate": "Débit de messages"
+    "messageRate": "Débit de messages",
+    "na": "N/D"
   },
   "streams": {
     "title": "Flux",
@@ -180,6 +196,7 @@
     "subjectsPlaceholder": "commandes.*, evenements.*",
     "subjectsHelp": "Liste séparée par des virgules",
     "storage": "Stockage",
+    "status": "Statut",
     "file": "Fichier",
     "memory": "Mémoire",
     "replicas": "Réplicas",
@@ -231,7 +248,8 @@
     "maxAgePlaceholder": "24h",
     "maxAgeLabel": "Âge max (ex. 24h, 7j — vide = illimité)",
     "maxBytesLabel": "Octets max (0 = illimité)",
-    "saveChanges": "Enregistrer les modifications"
+    "saveChanges": "Enregistrer les modifications",
+    "healthy": "sain"
   },
   "consumers": {
     "title": "Consommateurs",
@@ -375,11 +393,12 @@
     "deleteCount": "Supprimer ({{count}})",
     "publishMessage": "Publier un message",
     "subject": "Sujet",
+    "subjects": "Sujets",
     "subjectPlaceholder": "commandes.creees",
     "subjectHelp": "L'adresse NATS à laquelle ce message est envoyé, ex. commandes.creees.",
-    "replyTo": "Répondre à (Optionnel)",
+    "replyTo": "Répondre à",
     "replyToPlaceholder": "_INBOX.reponse",
-    "headers": "En-têtes (JSON, Optionnel)",
+    "headers": "En-têtes",
     "headersPlaceholder": "{\"Content-Type\": \"application/json\"}",
     "payload": "Charge utile",
     "payloadPlaceholder": "{\"order_id\": \"123\", \"amount\": 99.99}",
@@ -405,8 +424,6 @@
     "copyMessage": "Copier le message",
     "payloadFormat": "Charge utile ({{format}})",
     "switchTo": "Passer en",
-    "headers": "En-têtes",
-    "replyTo": "Répondre à",
     "viewFullMessage": "Voir le message complet",
     "deleteMessage": "Supprimer le message",
     "deleteMessages": "Supprimer les messages",
@@ -507,7 +524,6 @@
     "replicas": "{{count}}x réplica",
     "noStreamsFound": "Aucun flux trouvé",
     "replicationDetails": "Détails de réplication : {{name}}",
-    "clustered": "Clusterisé",
     "clusterInfo": "Infos du cluster",
     "mirrorSource": "Source miroir",
     "domain": "Domaine : {{domain}}",
@@ -588,7 +604,8 @@
     "create": " Créer",
     "loading": "Chargement des déclencheurs d'alerte...",
     "alertsLoading": "Chargement des alertes...",
-    "unableToLoad": "Impossible de charger les alertes"
+    "unableToLoad": "Impossible de charger les alertes",
+    "filterBySeverity": "Filtrer par sévérité"
   },
   "metrics": {
     "title": "Métriques en temps réel",
@@ -626,13 +643,16 @@
     "messages": "Messages",
     "storage": "Stockage",
     "noMetricsAvailable": "Aucune métrique disponible",
-    "noMetricsAvailableDescription": "Les métriques apparaîtront ici une fois les flux créés et échantillonnés."
+    "noMetricsAvailableDescription": "Les métriques apparaîtront ici une fois les flux créés et échantillonnés.",
+    "duration": "Durée",
+    "selectStream": "Sélectionner un stream"
   },
   "visualStreamGraph": {
     "title": "Graphe Visuel des Flux",
     "subtitle": "Topologie interactive des flux et consommateurs NATS",
     "loading": "Chargement du graphe...",
     "noStreams": "Aucun flux trouvé",
+    "noStreamsDescription": "Créez votre premier flux pour voir le graphe visuel.",
     "noConsumers": "Aucun consommateur trouvé",
     "nodeDetails": "Détails du nœud",
     "streamDetails": "Détails du flux",
@@ -784,7 +804,9 @@
     "pointCount": "{{count}} point",
     "pointCount_other": "{{count}} points",
     "noStreamTrend": "Aucune tendance de flux",
-    "noStreamTrendDescription": "Sélectionnez un flux pour voir les points de messages historiques."
+    "noStreamTrendDescription": "Sélectionnez un flux pour voir les points de messages historiques.",
+    "dataPoints": "points",
+    "selectStreamForTrend": "Sélectionnez un stream pour voir sa tendance"
   },
   "tenancy": {
     "title": "Multi-location",
@@ -817,7 +839,6 @@
     "urlPlaceholder": "nats://localhost:4222",
     "description": "Description",
     "descriptionPlaceholder": "Serveur NATS de production principal",
-    "enabled": "Activé",
     "cancel": "Annuler",
     "update": "Mettre à jour",
     "create": " Créer",

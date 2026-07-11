@@ -24,7 +24,7 @@ export default function VisualStreamGraph() {
   const isEmpty = graphData.nodes.length === 0 && graphData.edges.length === 0
 
   return (
-    <div className="h-full flex flex-col gap-4 p-4 md:p-6 overflow-hidden">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
       <div className="shrink-0">
         <PageHeader
           title={t('visualStreamGraph.title')}

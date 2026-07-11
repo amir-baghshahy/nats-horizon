@@ -47,9 +47,9 @@ export default function ConsumersPage() {
   } = useConsumersPage();
 
   return (
-    <div className="p-4 md:p-6 animate-fade-in">
+    <div className="flex flex-col gap-4 p-4 md:p-6 animate-fade-in md:h-full md:overflow-hidden">
       {/* Header Section */}
-      <section className="mb-6">
+      <section className="shrink-0">
         <ConsumersHeader
           sseConnected={sseConnected}
           selectedCount={selectedConsumers.size}
@@ -64,15 +64,13 @@ export default function ConsumersPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="mb-6 animate-slide-up">
+      <section className="shrink-0 animate-slide-up">
         <ConsumersStats stats={stats} />
       </section>
 
-      {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-border-default/50 to-transparent mb-6" />
-
       {/* Filters & List Section */}
-      <section className="space-y-4 animate-slide-up animate-delay-100">
+      <section className="flex-1 min-h-0 flex flex-col gap-4 animate-slide-up animate-delay-100">
+        <div className="shrink-0">
         <ConsumersFilters
           searchQuery={searchQuery}
           selectedStream={selectedStream}
@@ -87,6 +85,7 @@ export default function ConsumersPage() {
           onClear={clearFilters}
           getStatusLabel={getStatusLabel}
         />
+        </div>
 
         <ConsumersList
           consumers={filteredConsumers}
@@ -106,7 +105,7 @@ export default function ConsumersPage() {
           getLagColor={getLagColor}
         />
 
-        <div className="flex items-center justify-between text-display-sm text-content-tertiary">
+        <div className="shrink-0 flex items-center justify-between text-display-sm text-content-tertiary">
           <span>
             {t('consumers.showingConsumers', { filtered: filteredConsumers.length, total: totalConsumers })}
           </span>

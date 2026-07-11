@@ -85,7 +85,8 @@ export default function AlertsPage() {
   };
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
+      <div className="shrink-0">
       <AlertsHeader
         onNewAlert={() => {
           setSelectedAlert(null);
@@ -94,22 +95,30 @@ export default function AlertsPage() {
         onCheckAlerts={() => checkAlertsMutation.mutate()}
         isChecking={checkAlertsMutation.isPending}
       />
+      </div>
 
+      <div className="shrink-0">
       <AlertsStats alerts={alerts || []} triggers={triggers || []} />
+      </div>
 
+      <div className="shrink-0">
       <AlertsTabs
         activeTab={activeTab}
         onTabChange={setActiveTab}
         unackedCount={unackedTriggers.length}
       />
+      </div>
 
+      <div className="shrink-0">
       <AlertsFilters
         filterSeverity={
           filterSeverity as "all" | "critical" | "warning" | "info"
         }
         onFilterChange={(value) => setFilterSeverity(value)}
       />
+      </div>
 
+      <div className="flex-1 min-h-0 flex flex-col">
       {activeTab === "alerts" && (
         <AlertsList
           alerts={filteredAlerts}
@@ -133,6 +142,7 @@ export default function AlertsPage() {
           }
         />
       )}
+      </div>
 
       <AlertFormModal
         isOpen={showCreateModal}

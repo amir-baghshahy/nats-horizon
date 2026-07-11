@@ -347,6 +347,10 @@ func (h *SecurityHandler) GetConnectionStatus(c *gin.Context) {
 		}
 	}
 
+	if serverVersion == "Unknown" || serverVersion == "" {
+		serverVersion = h.nc.ConnectedServerVersion()
+	}
+
 	connections := h.nc.Status()
 
 	c.JSON(http.StatusOK, gin.H{

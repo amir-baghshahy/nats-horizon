@@ -56,8 +56,8 @@ export default function StreamDetailPage() {
   if (!name) return <div>{t("streams.notFound")}</div>;
 
   return (
-    <div className="p-4 md:p-6">
-      <div className="flex items-center gap-4 mb-4">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
+      <div className="shrink-0 flex items-center gap-4">
         <Link
           to="/streams"
           className="p-2 hover:bg-surface-primary rounded-lg transition-colors"
@@ -129,7 +129,7 @@ export default function StreamDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+      <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <StatCard
           icon={MessageSquare}
           value={(streamData.state?.messages || 0).toLocaleString()}
@@ -154,7 +154,7 @@ export default function StreamDetailPage() {
         <StatCard
           icon={TrendingUp}
           value={(streamData.state?.num_pending || 0).toLocaleString()}
-          label="Lag"
+          label={t("streams.lag")}
           iconBg="bg-orange-500/20"
           iconColor="text-orange-400"
           formatValue={false}
@@ -180,6 +180,7 @@ export default function StreamDetailPage() {
         />
       </div>
 
+      <div className="shrink-0">
       <Tabs
         tabs={[
           { id: "overview", label: t("streams.overview"), icon: Activity },
@@ -190,7 +191,9 @@ export default function StreamDetailPage() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
+      </div>
 
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin flex flex-col">
       {activeTab === "overview" && (
         <div className="space-y-6">
           <PanelCard title={t("streams.streamInformation")}>
@@ -254,7 +257,7 @@ export default function StreamDetailPage() {
                   icon={<Filter className="icon-base" />}
                   onClick={() => navigate(`/messages`)}
                 >
-                  Filters
+                  {t("streams.filters", { defaultValue: "Filters" })}
                 </Button>
               </div>
             </div>
@@ -390,7 +393,7 @@ export default function StreamDetailPage() {
                   <span className="font-medium">
                     {streamData.config?.max_age
                       ? streamData.config.max_age
-                      : "None"}
+                      : t("common.none")}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -470,6 +473,7 @@ export default function StreamDetailPage() {
           </PanelCard>
         </div>
       )}
+      </div>
 
       {showEditModal && (
         <EditStreamModal

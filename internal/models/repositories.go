@@ -26,6 +26,7 @@ type ConsumerRepository interface {
 	Replay(ctx context.Context, req *ReplayRequest) (string, error)
 	Pause(ctx context.Context, req *PauseRequest) error
 	Resume(ctx context.Context, req *ResumeRequest) error
+	IsPaused(streamName, consumerName string) bool
 
 	// Message acknowledgment operations
 	AckMessage(ctx context.Context, streamName, consumerName string, sequence uint64) error

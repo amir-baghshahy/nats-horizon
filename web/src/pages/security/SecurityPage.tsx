@@ -2,7 +2,7 @@ import { UseSecurityReturn } from './hooks/useSecurity'
 import { useTranslation } from "react-i18next";
 import {
   Shield, Users, Plus, Edit, Trash2, X,
-  Clock, FileText, Server, Activity, ToggleLeft, ToggleRight
+  Clock, FileText, ToggleLeft, ToggleRight
 } from 'lucide-react'
 import { PageError, PageLoading } from '../../components/ui/PageState'
 import { PageHeader, PanelCard, ModalWrapper, Tabs } from '../../components/ui'
@@ -18,7 +18,6 @@ export default function SecurityPage({
   securityInfo,
   users,
   auditLogs,
-  connectionStatus,
   infoLoading,
   usersLoading,
   auditLoading,
@@ -58,7 +57,8 @@ export default function SecurityPage({
   }
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
+      <div className="shrink-0">
       <PageHeader
         title={t('security.title')}
         subtitle={t('security.subtitle')}
@@ -79,12 +79,13 @@ export default function SecurityPage({
           { id: 'overview', label: t('security.overview'), icon: Shield },
           { id: 'users', label: t('security.users'), icon: Users },
           { id: 'audit', label: t('security.auditLog'), icon: FileText },
-          { id: 'connections', label: t('security.connections'), icon: Server },
         ]}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
+      </div>
 
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <PanelCard title={t('security.accountInformation')}>
@@ -171,7 +172,6 @@ export default function SecurityPage({
       {activeTab === 'users' && (
         <PanelCard
           title={t('security.usersCount', { count: users?.length || 0 })}
-          maxHeight={600}
           footer={<span>{t('security.userCount', { count: users?.length || 0 })}</span>}
         >
           <div className="space-y-4">
@@ -250,7 +250,6 @@ export default function SecurityPage({
       {activeTab === 'audit' && (
         <PanelCard
           title={t('security.auditLogTitle')}
-          maxHeight={600}
           footer={<span>{t('security.entriesCount', { count: auditLogs?.length || 0 })}</span>}
         >
           <div className="space-y-3">
@@ -275,31 +274,7 @@ export default function SecurityPage({
             </div>
         </PanelCard>
       )}
-
-      {activeTab === 'connections' && (
-        <PanelCard title={t('security.connectionSecurityStatus')}>
-          <div className="space-y-4">
-            <div className="p-4 bg-surface-primary/50 rounded-lg">
-              <p className="text-display-sm text-content-tertiary">Server</p>
-              <p className="font-medium">{connectionStatus?.server?.name || 'N/A'}</p>
-              <p className="text-display-xs text-content-tertiary">
-                {connectionStatus?.server?.host}:{connectionStatus?.server?.port}
-              </p>
-            </div>
-            <div className="p-4 bg-surface-primary/50 rounded-lg">
-              <p className="text-display-sm text-content-tertiary">Version</p>
-              <p className="font-medium">{connectionStatus?.server?.version || 'N/A'}</p>
-            </div>
-            <div className="p-4 bg-surface-primary/50 rounded-lg">
-              <p className="text-display-sm text-content-tertiary">Status</p>
-              <p className="font-medium flex items-center gap-2">
-                <Activity className="icon-base text-green-400" />
-                {connectionStatus?.status || t('cluster.disconnected')}
-              </p>
-            </div>
-          </div>
-        </PanelCard>
-      )}
+      </div>
 
       {showUserModal && (
         <ModalWrapper isOpen={true} onClose={() => { setShowUserModal(false); setSelectedUser(null); }}>
@@ -373,7 +348,7 @@ export default function SecurityPage({
                   className="input w-full"
                   defaultValue={selectedUser ? Object.keys(selectedUser.permissions.publish || {}).join(', ') : '>'}
                 />
-                <p className="text-display-xs text-content-tertiary mt-1">Comma-separated subjects or JSON</p>
+                <p className="text-display-xs text-content-tertiary mt-1">{t('security.permissionsHelp')}</p>
               </div>
               <div>
                 <label className="block text-display-sm font-medium mb-2">{t('security.subscribePermissions')}</label>

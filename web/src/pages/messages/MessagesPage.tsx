@@ -68,7 +68,7 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="h-full flex flex-col gap-4 p-4 md:p-6 animate-fade-in overflow-hidden">
+    <div className="flex flex-col gap-4 p-4 md:p-6 animate-fade-in md:h-full md:overflow-hidden">
       {/* Header Section */}
       <section className="shrink-0">
         <MessagesHeader

@@ -42,6 +42,7 @@ export default function ConsumersList({
 
   return (
     <DataList
+      fill
       items={consumers}
       isLoading={isLoading}
       isEmpty={consumers.length === 0}

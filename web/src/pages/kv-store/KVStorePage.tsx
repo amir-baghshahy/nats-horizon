@@ -31,7 +31,8 @@ export default function KVStorePage() {
   }
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
+      <div className="shrink-0">
       <PageHeader
         title={t('kvStore.title')}
         subtitle={t('kvStore.subtitle')}
@@ -41,11 +42,13 @@ export default function KVStorePage() {
           </Button>
         }
       />
+      </div>
 
-      <div className="grid lg:grid-cols-3 gap-4">
+      <div className="flex-1 min-h-0 grid lg:grid-cols-3 gap-4">
         {/* Bucket list */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 min-h-0">
           <PanelCard
+            className="h-full min-h-0"
             header={
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold flex items-center gap-2">
@@ -114,8 +117,9 @@ export default function KVStorePage() {
 
         {/* Keys panel */}
         {store.selectedBucket && (
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 min-h-0">
             <PanelCard
+              className="h-full min-h-0"
               header={
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
@@ -151,8 +155,8 @@ export default function KVStorePage() {
                 />
               </div>
 
-              {/* Key list */}
-              <div className="space-y-1.5 max-h-[560px] overflow-y-auto scrollbar-thin">
+              {/* Key list — scrolls together with the search box inside PanelCard's own scroll area */}
+              <div className="space-y-1.5">
                 {store.filteredKeys.map((kv: KVKeyEntry) => (
                   <div key={kv.key ?? kv.revision} className="rounded-lg bg-surface-primary/50 px-3 py-2.5 hover:bg-surface-primary/70 transition-colors">
                     <div className="flex items-start justify-between gap-2">

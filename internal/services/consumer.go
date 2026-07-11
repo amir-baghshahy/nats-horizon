@@ -109,6 +109,15 @@ func (uc *ConsumerUseCase) ResumeConsumer(ctx context.Context, req *models.Resum
 	return uc.consumerRepo.Resume(ctx, req)
 }
 
+// IsPaused checks whether a consumer is paused, supporting both native NATS
+// pause (newer versions) and the repository's fallback tracking (older versions).
+func (uc *ConsumerUseCase) IsPaused(streamName, consumerName string) bool {
+	if streamName == "" || consumerName == "" {
+		return false
+	}
+	return uc.consumerRepo.IsPaused(streamName, consumerName)
+}
+
 // AckMessage acknowledges a message
 func (uc *ConsumerUseCase) AckMessage(ctx context.Context, streamName, consumerName string, sequence uint64) error {
 	if streamName == "" {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
@@ -16,11 +17,18 @@ import (
 type NATSConsumerRepository struct {
 	nc *nats.Conn
 	js nats.JetStreamContext
+
+	pausedConsumers map[string]struct{}
+	mu              sync.RWMutex
 }
 
 // NewNATSConsumerRepository creates a new NATS consumer repository
 func NewNATSConsumerRepository(nc *nats.Conn, js nats.JetStreamContext) *NATSConsumerRepository {
-	return &NATSConsumerRepository{nc: nc, js: js}
+	return &NATSConsumerRepository{
+		nc:              nc,
+		js:              js,
+		pausedConsumers: make(map[string]struct{}),
+	}
 }
 
 type consumerListResponse struct {
@@ -53,6 +61,8 @@ func (r *NATSConsumerRepository) List(ctx context.Context, streamName string) ([
 
 	consumers := make([]*models.Consumer, len(response.Consumers))
 	for i, c := range response.Consumers {
+		key := fmt.Sprintf("%s.%s", streamName, c.Name)
+		paused := c.Config.MaxDeliver == constants.PauseSentinel || r.isPaused(key)
 		consumers[i] = &models.Consumer{
 			Name:          c.Name,
 			Stream:        streamName,
@@ -63,7 +73,7 @@ func (r *NATSConsumerRepository) List(ctx context.Context, streamName string) ([
 			DeliverPolicy: utils.DeliverPolicyToString(c.Config.DeliverPolicy),
 			ReplayPolicy:  utils.ReplayPolicyToString(c.Config.ReplayPolicy),
 			MaxDeliver:    c.Config.MaxDeliver,
-			Paused:        c.Config.MaxDeliver == constants.PauseSentinel,
+			Paused:        paused,
 		}
 	}
 
@@ -105,6 +115,9 @@ func (r *NATSConsumerRepository) Delete(ctx context.Context, streamName, name st
 	if err := r.js.DeleteConsumer(streamName, name); err != nil {
 		return fmt.Errorf("failed to delete consumer: %w", err)
 	}
+	r.mu.Lock()
+	delete(r.pausedConsumers, fmt.Sprintf("%s.%s", streamName, name))
+	r.mu.Unlock()
 	return nil
 }
 
@@ -122,7 +135,6 @@ func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *models.LagRe
 	if req.Sequence > 0 {
 		info.Config.OptStartSeq = req.Sequence
 	} else {
-		// default: start from the latest sequence (skip all pending)
 		streamInfo, err := r.js.StreamInfo(req.StreamName)
 		if err == nil {
 			info.Config.OptStartSeq = streamInfo.State.LastSeq + 1
@@ -169,19 +181,54 @@ func (r *NATSConsumerRepository) Pause(ctx context.Context, req *models.PauseReq
 		return fmt.Errorf("failed to get consumer info: %w", err)
 	}
 
-	originalMaxDeliver := info.Config.MaxDeliver
+	if err := r.js.DeleteConsumer(req.StreamName, req.ConsumerName); err != nil {
+		return fmt.Errorf("failed to delete consumer: %w", err)
+	}
+
 	info.Config.MaxDeliver = constants.PauseSentinel
 
-	_, err = r.js.UpdateConsumer(req.StreamName, &info.Config)
+	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {
-		info.Config.MaxDeliver = originalMaxDeliver
-		return fmt.Errorf("failed to pause consumer: %w", err)
+		return fmt.Errorf("failed to recreate paused consumer: %w", err)
+	}
+
+	// Verify NATS actually stored the pause sentinel.
+	// Older NATS versions silently convert unsupported MaxDeliver values,
+	// so we fall back to in-memory tracking when native pause is unavailable.
+	verified, err := r.js.ConsumerInfo(req.StreamName, req.ConsumerName)
+	if err != nil {
+		return fmt.Errorf("failed to verify paused consumer: %w", err)
+	}
+
+	key := fmt.Sprintf("%s.%s", req.StreamName, req.ConsumerName)
+	if verified.Config.MaxDeliver == constants.PauseSentinel {
+		r.mu.Lock()
+		delete(r.pausedConsumers, key)
+		r.mu.Unlock()
+	} else {
+		r.mu.Lock()
+		r.pausedConsumers[key] = struct{}{}
+		r.mu.Unlock()
 	}
 
 	return nil
 }
 
 func (r *NATSConsumerRepository) Resume(ctx context.Context, req *models.ResumeRequest) error {
+	key := fmt.Sprintf("%s.%s", req.StreamName, req.ConsumerName)
+
+	// If we tracked this consumer as paused on an older NATS, resume from tracker.
+	r.mu.RLock()
+	_, tracked := r.pausedConsumers[key]
+	r.mu.RUnlock()
+
+	if tracked {
+		r.mu.Lock()
+		delete(r.pausedConsumers, key)
+		r.mu.Unlock()
+		return nil
+	}
+
 	info, err := r.js.ConsumerInfo(req.StreamName, req.ConsumerName)
 	if err != nil {
 		return fmt.Errorf("failed to get consumer info: %w", err)
@@ -191,17 +238,36 @@ func (r *NATSConsumerRepository) Resume(ctx context.Context, req *models.ResumeR
 		return nil
 	}
 
+	if err := r.js.DeleteConsumer(req.StreamName, req.ConsumerName); err != nil {
+		return fmt.Errorf("failed to delete consumer: %w", err)
+	}
+
 	info.Config.MaxDeliver = constants.DefaultMaxDeliver
 
-	_, err = r.js.UpdateConsumer(req.StreamName, &info.Config)
+	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {
-		return fmt.Errorf("failed to resume consumer: %w", err)
+		return fmt.Errorf("failed to recreate resumed consumer: %w", err)
 	}
 
 	return nil
 }
 
+func (r *NATSConsumerRepository) isPaused(key string) bool {
+	r.mu.RLock()
+	_, ok := r.pausedConsumers[key]
+	r.mu.RUnlock()
+	return ok
+}
+
+func (r *NATSConsumerRepository) IsPaused(streamName, consumerName string) bool {
+	key := fmt.Sprintf("%s.%s", streamName, consumerName)
+	return r.isPaused(key)
+}
+
 func (r *NATSConsumerRepository) toDomainConsumer(info *nats.ConsumerInfo, streamName string) *models.Consumer {
+	key := fmt.Sprintf("%s.%s", streamName, info.Name)
+	paused := info.Config.MaxDeliver == constants.PauseSentinel || r.isPaused(key)
+
 	return &models.Consumer{
 		Name:          info.Name,
 		Stream:        streamName,
@@ -212,15 +278,13 @@ func (r *NATSConsumerRepository) toDomainConsumer(info *nats.ConsumerInfo, strea
 		DeliverPolicy: utils.DeliverPolicyToString(int(info.Config.DeliverPolicy)),
 		ReplayPolicy:  utils.ReplayPolicyToString(int(info.Config.ReplayPolicy)),
 		MaxDeliver:    int(info.Config.MaxDeliver),
-		Paused:        info.Config.MaxDeliver == constants.PauseSentinel,
+		Paused:        paused,
 	}
 }
 
 func (r *NATSConsumerRepository) toNATSConsumerConfig(consumer *models.Consumer) *nats.ConsumerConfig {
 	var ackPolicy nats.AckPolicy
 	switch consumer.AckPolicy {
-	case "explicit":
-		ackPolicy = nats.AckExplicitPolicy
 	case "none":
 		ackPolicy = nats.AckNonePolicy
 	default:
@@ -229,8 +293,6 @@ func (r *NATSConsumerRepository) toNATSConsumerConfig(consumer *models.Consumer)
 
 	var deliverPolicy nats.DeliverPolicy
 	switch consumer.DeliverPolicy {
-	case "all":
-		deliverPolicy = nats.DeliverAllPolicy
 	case "last":
 		deliverPolicy = nats.DeliverLastPolicy
 	case "new":
@@ -268,8 +330,6 @@ func (r *NATSConsumerRepository) TerminateMessage(ctx context.Context, streamNam
 // sendAck fetches the message at sequence from the stream, then publishes payload
 // to msg.Reply (the real JetStream ack subject embedded in the delivered message).
 func (r *NATSConsumerRepository) sendAck(ctx context.Context, streamName, consumerName string, sequence uint64, payload []byte) error {
-	// Create a temporary ephemeral consumer starting at the target sequence
-	// so we can retrieve the delivered message and its real reply-to address.
 	ephemeralCfg := &nats.ConsumerConfig{
 		DeliverPolicy: nats.DeliverByStartSequencePolicy,
 		OptStartSeq:   sequence,

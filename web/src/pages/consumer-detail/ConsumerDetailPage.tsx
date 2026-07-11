@@ -78,8 +78,8 @@ export default function ConsumerDetailPage() {
   })();
 
   return (
-    <div className="p-4 md:p-6">
-      <div className="flex items-center gap-4 mb-4">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
+      <div className="shrink-0 flex items-center gap-4">
         <Link to="/consumers" className="p-2 hover:bg-surface-primary rounded-lg transition-colors">
           <ArrowLeft className="icon-md" />
         </Link>
@@ -97,7 +97,7 @@ export default function ConsumerDetailPage() {
               <span className="text-display-sm font-medium capitalize">{consumerData.status}</span>
             </div>
             {consumerData.config?.durable && (
-              <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-display-sm">Durable</span>
+              <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-display-sm">{t("consumers.durable", { defaultValue: "Durable" })}</span>
             )}
           </div>
           <p className="text-content-tertiary mt-1">
@@ -124,7 +124,7 @@ export default function ConsumerDetailPage() {
          </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+      <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         <StatCard
           icon={TrendingUp}
           value={(consumerData.lag || 0).toLocaleString()}
@@ -165,16 +165,19 @@ export default function ConsumerDetailPage() {
         />
       </div>
 
+      <div className="shrink-0">
       <Tabs
         tabs={[
-          { id: "overview", label: "Overview", icon: BarChart3 },
-          { id: "messages", label: "Messages", icon: MessageSquare },
-          { id: "config", label: "Configuration", icon: Settings },
+          { id: "overview", label: t("consumers.overview", { defaultValue: "Overview" }), icon: BarChart3 },
+          { id: "messages", label: t("consumers.messages", { defaultValue: "Messages" }), icon: MessageSquare },
+          { id: "config", label: t("consumers.configuration", { defaultValue: "Configuration" }), icon: Settings },
         ]}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
+      </div>
 
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin flex flex-col">
       {activeTab === "overview" && (
         <div className="space-y-6">
           <PanelCard title={t("consumers.quickActions")}>
@@ -214,6 +217,7 @@ export default function ConsumerDetailPage() {
 
       {activeTab === "messages" && (
         <PanelCard
+          className="flex-1 min-h-0"
           header={
             <div className="flex items-center justify-between w-full">
               <h3 className="text-display-lg font-semibold flex items-center gap-2">
@@ -296,7 +300,7 @@ export default function ConsumerDetailPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
-                  <span className="text-content-tertiary">Durable</span>
+                  <span className="text-content-tertiary">{t("consumers.durable", { defaultValue: "Durable" })}</span>
                   <span className={`px-2 py-1 rounded text-display-xs ${consumerData.config?.durable ? "bg-green-500/20 text-green-400" : "bg-border-default"}`}>
                     {consumerData.config?.durable ? t("consumers.yes") : t("consumers.no")}
                   </span>
@@ -375,6 +379,7 @@ export default function ConsumerDetailPage() {
            </PanelCard>
         </div>
       )}
+      </div>
 
       {showEditModal && (
         <EditConsumerModal

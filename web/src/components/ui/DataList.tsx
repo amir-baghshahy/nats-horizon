@@ -11,6 +11,9 @@ interface DataListProps<T> {
   header?: React.ReactNode;
   footer?: React.ReactNode;
   maxHeight?: number;
+  /** Fill the parent flex container instead of capping to maxHeight — use inside a `flex-1 min-h-0` layout. */
+  fill?: boolean;
+  className?: string;
   renderItem: (item: T, index: number) => React.ReactNode;
   getKey: (item: T) => string;
   animate?: boolean;
@@ -27,14 +30,16 @@ export default function DataList<T>({
   header,
   footer,
   maxHeight = 600,
+  fill = false,
+  className = "",
   renderItem,
   getKey,
   animate = true,
 }: DataListProps<T>) {
   return (
     <div
-      className="card overflow-hidden flex flex-col"
-      style={{ maxHeight }}
+      className={`card overflow-hidden flex flex-col ${fill ? "flex-1 min-h-0" : ""} ${className}`}
+      style={fill ? undefined : { maxHeight }}
     >
       {/* Optional header */}
       {header && (

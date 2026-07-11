@@ -118,7 +118,7 @@ export default function SubjectsPage({
   }
 
   return (
-    <div className="h-full flex flex-col gap-4 p-4 md:p-6 animate-fade-in overflow-hidden">
+    <div className="flex flex-col gap-4 p-4 md:p-6 animate-fade-in md:h-full md:overflow-hidden">
       <div className="shrink-0">
         <DashboardHeader
           sseConnected={sseConnected}
@@ -196,7 +196,7 @@ export default function SubjectsPage({
           />
         ) : (
           <PanelCard
-            maxHeight={600}
+            className="flex-1 min-h-0"
             footer={
               <span>
                 {t("subjects.subjectCount", { count: filteredSubjects.length })}
@@ -204,13 +204,13 @@ export default function SubjectsPage({
             }
           >
             {viewMode === "tree" ? (
-              <div className="overflow-y-auto scrollbar-thin flex-1 p-4">
+              <div className="overflow-y-auto scrollbar-thin flex-1 min-h-0 p-4">
                 <div className="space-y-1">
                   {subjectTree.map((node) => renderNode(node))}
                 </div>
               </div>
             ) : (
-              <div className="overflow-x-auto overflow-y-auto scrollbar-thin flex-1">
+              <div className="overflow-x-auto overflow-y-auto scrollbar-thin flex-1 min-h-0">
                 <table className="table">
                   <thead className="sticky top-0 bg-surface-primary z-10">
                     <tr>

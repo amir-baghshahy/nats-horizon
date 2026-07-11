@@ -168,8 +168,10 @@ func (uc *ServerUseCase) GetServerInfo(ctx context.Context) (map[string]interfac
 	connected := uc.nc != nil && uc.nc.IsConnected()
 	serverURL := "N/A"
 	serverName := "N/A"
+	serverVersion := "N/A"
 	if connected {
 		serverURL = uc.nc.ConnectedUrl()
+		serverVersion = uc.nc.ConnectedServerVersion()
 		if msg, err := uc.nc.Request("$SYS.REQ.SERVER.PING", []byte("{}"), constants.DefaultRequestTimeout); err == nil && msg != nil {
 			var resp struct {
 				Data struct {
@@ -186,7 +188,7 @@ func (uc *ServerUseCase) GetServerInfo(ctx context.Context) (map[string]interfac
 	}
 	return map[string]interface{}{
 		"server_id":  serverName,
-		"version":    "0.0.0",
+		"version":    serverVersion,
 		"connected":  connected,
 		"server_url": serverURL,
 	}, nil

@@ -31,7 +31,8 @@ export default function ConnectionsPage({
   const { t } = useTranslation();
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
+      <div className="shrink-0">
       <PageHeader
         title={t('connections.title')}
         subtitle={t('connections.subtitle')}
@@ -41,8 +42,9 @@ export default function ConnectionsPage({
           </Button>
         }
       />
+      </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+      <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           icon={Network}
           value={stats.total}
@@ -71,7 +73,7 @@ export default function ConnectionsPage({
         />
       </div>
 
-      <div className="mb-4">
+      <div className="shrink-0">
         <PanelCard
           title={t('connections.serverDistribution')}
           footer={
@@ -116,6 +118,7 @@ export default function ConnectionsPage({
         </PanelCard>
       </div>
 
+      <div className="shrink-0">
       <ConnectionFilters
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -123,8 +126,10 @@ export default function ConnectionsPage({
         setFilterServer={setFilterServer}
         servers={servers}
       />
+      </div>
 
       <DataList
+        fill
         items={filteredConnections}
         isLoading={isLoading}
         isEmpty={filteredConnections.length === 0}

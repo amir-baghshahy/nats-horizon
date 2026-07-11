@@ -44,11 +44,11 @@ func (h *KVHandler) ListBuckets(c *gin.Context) {
 	// List all keystores in the current account
 	storeNames := []string{}
 	offset := 0
-	limit := 256
+
 
 	for {
 		// Get stream list with pagination
-		req := fmt.Sprintf(`{"offset":%d,"limit":%d}`, offset, limit)
+		req := fmt.Sprintf(`{"offset":%d}`, offset)
 		msg, err := h.nc.Request("$JS.API.STREAM.LIST", []byte(req), 5*time.Second)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: fmt.Sprintf("Failed to list streams: %v", err)})

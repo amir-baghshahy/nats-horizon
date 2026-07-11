@@ -37,7 +37,8 @@ export default function HistoryPage({
   }));
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
+      <div className="shrink-0">
       <PageHeader
         title={t("history.title")}
         subtitle={t("history.subtitle")}
@@ -53,9 +54,10 @@ export default function HistoryPage({
           </Button>
         }
       />
+      </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
+      <div className="shrink-0 flex flex-wrap items-center gap-3">
         {/* Duration toggle buttons */}
         <div className="flex items-center rounded-lg border border-border-default/60 bg-surface-primary/50 p-0.5 gap-0.5">
           {DURATIONS.map((d) => (
@@ -86,10 +88,10 @@ export default function HistoryPage({
       </div>
 
       {/* Main content */}
-      <div className="grid gap-4 lg:grid-cols-5">
+      <div className="flex-1 min-h-0 grid gap-4 lg:grid-cols-5">
         {/* Stream summary table — 2/5 */}
-        <div className="lg:col-span-2 card">
-          <div className="flex items-center gap-2 mb-3">
+        <div className="lg:col-span-2 card flex flex-col min-h-0">
+          <div className="flex items-center gap-2 mb-3 shrink-0">
             <HistoryIcon className="h-4 w-4 text-primary-400" />
             <h3 className="text-display-sm font-semibold">{t("history.streamSummary")}</h3>
             <span className="ml-auto text-display-xs text-content-tertiary">
@@ -104,7 +106,7 @@ export default function HistoryPage({
               description={t("history.noHistoryDataDescription")}
             />
           ) : (
-            <div className="space-y-2">
+            <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin space-y-2 pe-0.5">
               {historyStreams.map((stream: any, idx: number) => {
                 const pct = Math.round(((stream.messages || 0) / maxMessages) * 100);
                 const trend = stream.trend;
@@ -153,7 +155,7 @@ export default function HistoryPage({
         </div>
 
         {/* Timeline chart — 3/5 */}
-        <div className="lg:col-span-3 card">
+        <div className="lg:col-span-3 card flex flex-col min-h-0 overflow-y-auto scrollbar-thin">
           <div className="flex items-center gap-2 mb-3">
             <BarChart3 className="h-4 w-4 text-primary-400" />
             <h3 className="text-display-sm font-semibold">{t("history.messagesTrend")}</h3>
@@ -242,10 +244,10 @@ export default function HistoryPage({
             return (
               <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-border-default/40">
                 {[
-                  { label: "Min", value: min.toLocaleString() },
-                  { label: "Max", value: max.toLocaleString() },
-                  { label: "Avg", value: avg.toLocaleString() },
-                  { label: "Latest", value: last.toLocaleString() },
+                  { label: t("history.min", { defaultValue: "Min" }), value: min.toLocaleString() },
+                  { label: t("history.max", { defaultValue: "Max" }), value: max.toLocaleString() },
+                  { label: t("history.avg", { defaultValue: "Avg" }), value: avg.toLocaleString() },
+                  { label: t("history.latest", { defaultValue: "Latest" }), value: last.toLocaleString() },
                 ].map(({ label, value }) => (
                   <div key={label} className="text-center">
                     <p className="text-display-xs text-content-tertiary">{label}</p>

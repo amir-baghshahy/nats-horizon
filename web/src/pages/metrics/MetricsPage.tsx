@@ -337,7 +337,7 @@ export default function MetricsPage({
   const maxRateMessages = Math.max(...rateStreams.map((s: any) => s.messages_per_sec || 0), 0);
 
   return (
-    <div className="h-full flex flex-col gap-4 p-4 md:p-6 animate-fade-in overflow-hidden">
+    <div className="flex flex-col gap-4 p-4 md:p-6 animate-fade-in md:h-full md:overflow-hidden">
       <div className="shrink-0">
       <PageHeader
         title={t("metrics.title")}

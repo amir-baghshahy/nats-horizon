@@ -37,7 +37,7 @@ export default function AlertsTriggersList({
 
   return (
     <PanelCard
-      maxHeight={600}
+      className="flex-1 min-h-0"
       footer={
         <span>{t("alerts.triggerCount", { count: triggers.length })}</span>
       }

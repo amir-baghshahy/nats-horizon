@@ -62,7 +62,8 @@ export default function TenancyPage({
   }
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="flex flex-col gap-3 p-4 md:p-6 md:h-full md:overflow-hidden">
+      <div className="shrink-0">
       <PageHeader
         title={t('tenancy.title')}
         subtitle={t('tenancy.subtitle')}
@@ -80,8 +81,9 @@ export default function TenancyPage({
         </Button>
       }
       />
+      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-3">
+      <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         <StatCard
           icon={Server}
           value={stats.total}
@@ -111,6 +113,7 @@ export default function TenancyPage({
       </div>
 
       <PanelCard
+        className="flex-1 min-h-0"
         header={<h3 className="text-display-lg font-semibold flex items-center gap-2"><Server className="icon-md" /> {t('tenancy.serverConnections')}</h3>}
       >
         <div className="space-y-4">
@@ -322,7 +325,7 @@ export default function TenancyPage({
                   {t('common.cancel')}
                 </Button>
                 <Button variant="primary" type="submit">
-                  {editingConnection ? t('tenancy.update') : t('tenancy.create')} Connection
+                  {editingConnection ? t('tenancy.editConnection') : t('tenancy.addConnection')}
                 </Button>
               </div>
             </form>

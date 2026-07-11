@@ -145,14 +145,14 @@ export default function Layout({ children }: { children: ReactNode }) {
         onClick={() => setSidebarOpen(!sidebarOpen)}
         aria-label={sidebarOpen ? t("common.closeMenu") : t("common.openMenu")}
         aria-expanded={sidebarOpen}
-        className="fixed start-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-lg border border-border-default bg-surface-secondary text-content-primary shadow-lg transition-colors hover:bg-surface-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary md:hidden"
+        className="fixed start-3 top-3 z-[60] flex h-10 w-10 items-center justify-center rounded-lg border border-border-default bg-surface-secondary text-content-primary shadow-lg transition-colors hover:bg-surface-tertiary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary md:hidden"
       >
         {sidebarOpen ? <X className="icon-md" /> : <Menu className="icon-md" />}
       </button>
 
       {/* Sidebar */}
       <aside
-        className={`fixed z-30 flex h-full w-64 flex-shrink-0 flex-col border-e border-border-default/70 bg-surface-secondary/80 shadow-2xl shadow-black/20 backdrop-blur-xl transition-transform duration-300 ease-out md:relative ${
+        className={`fixed z-50 flex h-full w-64 flex-shrink-0 flex-col border-e border-border-default/70 bg-surface-secondary/80 shadow-2xl shadow-black/20 backdrop-blur-xl transition-transform duration-300 ease-out md:relative md:z-auto ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
         aria-label={t("nav.title")}

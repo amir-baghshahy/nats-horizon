@@ -55,7 +55,8 @@ export default function ClusterPage({
   }
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
+      <div className="shrink-0">
       <PageHeader
         title={t('cluster.title')}
         subtitle={clusterInfo?.is_clustered
@@ -67,8 +68,10 @@ export default function ClusterPage({
           </Button>
         }
       />
+      </div>
 
-      <div className={`card mb-4 border-l-4 ${
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin flex flex-col gap-4">
+      <div className={`card border-l-4 ${
         clusterHealth?.connected
           ? 'border-l-status-success bg-status-success/10'
           : 'border-l-status-error bg-status-error/10'
@@ -192,7 +195,6 @@ export default function ClusterPage({
         <PanelCard
           title={t('cluster.clusterNodes', { count: clusterNodes.nodes.length })}
           icon={<HardDrive className="icon-md text-primary-400" />}
-          className="mt-6"
         >
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {clusterNodes.nodes.map((node: any) => (
@@ -236,21 +238,14 @@ export default function ClusterPage({
                       {node.healthy ? t('cluster.healthy') : t('cluster.unhealthy')}
                     </span>
                   </div>
-                  {node.active ? (
-                    <div className="flex items-center justify-between">
-                      <span className="text-content-tertiary">{t('cluster.active')}</span>
-                      {node.active ? (
-                        <Zap className="icon-base text-yellow-400" />
-                      ) : (
-                        <span className="text-content-tertiary">{t('common.no')}</span>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between">
-                      <span className="text-content-tertiary">Active</span>
-                      <span className="text-content-tertiary">No</span>
-                    </div>
-                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-content-tertiary">{t('cluster.active')}</span>
+                    {node.active ? (
+                      <Zap className="icon-base text-yellow-400" />
+                    ) : (
+                      <span className="text-content-tertiary">{t('common.no')}</span>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -262,7 +257,6 @@ export default function ClusterPage({
         <PanelCard
           title={t('cluster.streamReplication')}
           icon={<Database className="icon-md text-primary-400" />}
-          className="mt-6"
         >
           <div className="grid lg:grid-cols-2 gap-4">
             <div>
@@ -364,7 +358,7 @@ export default function ClusterPage({
                         <span className="font-medium">{t('cluster.placementRules')}</span>
                       </div>
                       <p className="text-display-sm text-content-tertiary">
-                        Cluster: <span className="font-mono">{streamReplicas.placement.cluster}</span>
+                        {t('cluster.title')}: <span className="font-mono">{streamReplicas.placement.cluster}</span>
                       </p>
                       {streamReplicas.placement.tags.length > 0 && (
                         <div className="mt-2">
@@ -395,7 +389,7 @@ export default function ClusterPage({
       )}
 
       {(!clusterInfo?.is_clustered) && (
-        <PanelCard className="mt-6">
+        <PanelCard>
           <div className="flex items-start gap-4 p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
             <Info className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" />
             <div>
@@ -407,6 +401,7 @@ export default function ClusterPage({
           </div>
         </PanelCard>
       )}
+      </div>
     </div>
   )
 }

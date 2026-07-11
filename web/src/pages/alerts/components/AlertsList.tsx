@@ -59,7 +59,7 @@ export default function AlertsList({
 
   return (
     <PanelCard
-      maxHeight={600}
+      className="flex-1 min-h-0"
       footer={<span>{t("alerts.alertCount", { count: alerts.length })}</span>}
     >
       <div className="space-y-4">

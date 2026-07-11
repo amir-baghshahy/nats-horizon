@@ -465,7 +465,7 @@ func (h *ConsumerHandler) ListAll(c *gin.Context) {
 					Lag:        consumer.State.NumPending,
 					AckRate:    "",
 					NumPending: consumer.State.NumPending,
-					Paused:     consumer.Config.MaxDeliver == constants.PauseSentinel,
+					Paused:     consumer.Config.MaxDeliver == constants.PauseSentinel || h.useCase.IsPaused(name, consumer.Name),
 					Config: &dto.ConsumerConfigResponse{
 						Durable:       durable,
 						AckPolicy:     consumer.Config.AckPolicy,
@@ -521,22 +521,22 @@ func (h *ConsumerHandler) GetConsumerByName(c *gin.Context) {
 				durable = consumerInfo.Name
 			}
 
-			c.JSON(http.StatusOK, dto.ConsumerResponse{
-				Name:       consumerInfo.Name,
-				Stream:     streamName,
-				Status:     "active",
-				Lag:        consumerInfo.NumPending,
-				AckRate:    "",
-				NumPending: consumerInfo.NumPending,
-				Paused:     consumerInfo.Config.MaxDeliver == constants.PauseSentinel,
-				Config: &dto.ConsumerConfigResponse{
-					Durable:       durable,
-					AckPolicy:     utils.AckPolicyToString(int(consumerInfo.Config.AckPolicy)),
-					DeliverPolicy: utils.DeliverPolicyToString(int(consumerInfo.Config.DeliverPolicy)),
-					ReplayPolicy:  utils.ReplayPolicyToString(int(consumerInfo.Config.ReplayPolicy)),
-					MaxDeliver:    int64(consumerInfo.Config.MaxDeliver),
-				},
-			})
+		c.JSON(http.StatusOK, dto.ConsumerResponse{
+			Name:       consumerInfo.Name,
+			Stream:     streamName,
+			Status:     "active",
+			Lag:        consumerInfo.NumPending,
+			AckRate:    "",
+			NumPending: consumerInfo.NumPending,
+			Paused:     consumerInfo.Config.MaxDeliver == constants.PauseSentinel || h.useCase.IsPaused(streamName, consumerInfo.Name),
+			Config: &dto.ConsumerConfigResponse{
+				Durable:       durable,
+				AckPolicy:     utils.AckPolicyToString(int(consumerInfo.Config.AckPolicy)),
+				DeliverPolicy: utils.DeliverPolicyToString(int(consumerInfo.Config.DeliverPolicy)),
+				ReplayPolicy:  utils.ReplayPolicyToString(int(consumerInfo.Config.ReplayPolicy)),
+				MaxDeliver:    int64(consumerInfo.Config.MaxDeliver),
+			},
+		})
 			return
 		}
 	}

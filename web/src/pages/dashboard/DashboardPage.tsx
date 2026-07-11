@@ -47,7 +47,7 @@ export default function DashboardPage({
   }
 
   return (
-    <div className="h-full flex flex-col gap-4 p-4 md:p-6 animate-fade-in overflow-hidden">
+    <div className="flex flex-col gap-4 p-4 md:p-6 animate-fade-in md:h-full md:overflow-hidden">
       <div className="shrink-0">
         <DashboardHeader
           sseConnected={sseConnected}

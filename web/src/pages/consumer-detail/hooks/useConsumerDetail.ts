@@ -183,7 +183,8 @@ export function useConsumerDetail(): UseConsumerDetailReturn {
     if (!name || !consumerData.stream) return;
     setLoadingAction("pause-resume");
     const newState = !isPaused;
-    await setConsumerState(consumerData.stream, name, newState);
+    const result = await setConsumerState(consumerData.stream, name, newState);
+    if (result.success) refetch();
     setLoadingAction(null);
   };
 

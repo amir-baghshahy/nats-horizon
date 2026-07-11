@@ -56,10 +56,11 @@ type streamListResponse struct {
 			Subjects  []string `json:"subjects"`
 			Retention string   `json:"retention"`
 			Storage   string   `json:"storage"`
-			Replicas  int      `json:"replicas"`
+			Replicas  int      `json:"num_replicas"`
 			MaxAge    int64    `json:"max_age"`
 			MaxBytes  int64    `json:"max_bytes"`
 		} `json:"config"`
+		Created string `json:"created"`
 		State struct {
 			Msgs      uint64 `json:"messages"`
 			Bytes     uint64 `json:"bytes"`
@@ -98,6 +99,7 @@ func (r *NATSStreamRepository) List(ctx context.Context) ([]*models.Stream, erro
 	for _, s := range response.Streams {
 		firstTs, _ := time.Parse(time.RFC3339Nano, s.State.FirstTs)
 		lastTs, _ := time.Parse(time.RFC3339Nano, s.State.LastTs)
+		createdAt, _ := time.Parse(time.RFC3339Nano, s.Created)
 		stream := &models.Stream{
 			Name:      s.Config.Name,
 			Subjects:  s.Config.Subjects,
@@ -113,7 +115,7 @@ func (r *NATSStreamRepository) List(ctx context.Context) ([]*models.Stream, erro
 			LastSeq:   s.State.LastSeq,
 			FirstTs:   firstTs,
 			LastTs:    lastTs,
-			CreatedAt: time.Now(),
+			CreatedAt: createdAt,
 		}
 		streams = append(streams, stream)
 	}
@@ -204,7 +206,7 @@ func (r *NATSStreamRepository) toDomainStream(info *nats.StreamInfo) *models.Str
 		LastSeq:   info.State.LastSeq,
 		FirstTs:   info.State.FirstTime,
 		LastTs:    info.State.LastTime,
-		CreatedAt: time.Now(),
+		CreatedAt: info.Created,
 	}
 }
 

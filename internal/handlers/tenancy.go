@@ -22,8 +22,8 @@ func validateNATSURL(raw string) error {
 		return fmt.Errorf("invalid URL: %w", err)
 	}
 	scheme := strings.ToLower(u.Scheme)
-	if scheme != "nats" && scheme != "tls" {
-		return fmt.Errorf("URL scheme %q is not allowed; only nats:// and tls:// are permitted", u.Scheme)
+	if scheme != "nats" && scheme != "tls" && scheme != "ws" && scheme != "wss" {
+		return fmt.Errorf("URL scheme %q is not allowed; only nats://, tls://, ws://, and wss:// are permitted", u.Scheme)
 	}
 	if u.Host == "" {
 		return fmt.Errorf("URL must include a host")
@@ -205,7 +205,13 @@ func (h *TenancyHandler) CreateConnection(c *gin.Context) {
 func (h *TenancyHandler) UpdateConnection(c *gin.Context) {
 	id := c.Param("id")
 
-	var req ConnectionConfig
+	var req struct {
+		Name        string `json:"name"`
+		URL         string `json:"url"`
+		Description string `json:"description"`
+		Enabled     *bool  `json:"enabled"`
+	}
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
 		return
@@ -220,7 +226,6 @@ func (h *TenancyHandler) UpdateConnection(c *gin.Context) {
 		return
 	}
 
-	// Update fields
 	if req.Name != "" {
 		existing.Name = req.Name
 	}
@@ -230,7 +235,9 @@ func (h *TenancyHandler) UpdateConnection(c *gin.Context) {
 	if req.Description != "" {
 		existing.Description = req.Description
 	}
-	existing.Enabled = req.Enabled
+	if req.Enabled != nil {
+		existing.Enabled = *req.Enabled
+	}
 	existing.UpdatedAt = time.Now()
 
 	c.JSON(http.StatusOK, existing)

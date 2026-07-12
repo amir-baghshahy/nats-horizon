@@ -126,10 +126,12 @@ func (h *ConsumerHandler) CreateConsumer(c *gin.Context) {
 
 	consumer := &models.Consumer{
 		Name:          req.Name,
+		DurableName:   req.Durable,
 		AckPolicy:     req.AckPolicy,
 		DeliverPolicy: req.DeliverPolicy,
 		ReplayPolicy:  req.ReplayPolicy,
 		MaxDeliver:    req.MaxDeliver,
+		FilterSubject: req.FilterSubject,
 		Stream:        streamName,
 	}
 
@@ -521,22 +523,22 @@ func (h *ConsumerHandler) GetConsumerByName(c *gin.Context) {
 				durable = consumerInfo.Name
 			}
 
-		c.JSON(http.StatusOK, dto.ConsumerResponse{
-			Name:       consumerInfo.Name,
-			Stream:     streamName,
-			Status:     "active",
-			Lag:        consumerInfo.NumPending,
-			AckRate:    "",
-			NumPending: consumerInfo.NumPending,
-			Paused:     consumerInfo.Config.MaxDeliver == constants.PauseSentinel || h.useCase.IsPaused(streamName, consumerInfo.Name),
-			Config: &dto.ConsumerConfigResponse{
-				Durable:       durable,
-				AckPolicy:     utils.AckPolicyToString(int(consumerInfo.Config.AckPolicy)),
-				DeliverPolicy: utils.DeliverPolicyToString(int(consumerInfo.Config.DeliverPolicy)),
-				ReplayPolicy:  utils.ReplayPolicyToString(int(consumerInfo.Config.ReplayPolicy)),
-				MaxDeliver:    int64(consumerInfo.Config.MaxDeliver),
-			},
-		})
+			c.JSON(http.StatusOK, dto.ConsumerResponse{
+				Name:       consumerInfo.Name,
+				Stream:     streamName,
+				Status:     "active",
+				Lag:        consumerInfo.NumPending,
+				AckRate:    "",
+				NumPending: consumerInfo.NumPending,
+				Paused:     consumerInfo.Config.MaxDeliver == constants.PauseSentinel || h.useCase.IsPaused(streamName, consumerInfo.Name),
+				Config: &dto.ConsumerConfigResponse{
+					Durable:       durable,
+					AckPolicy:     utils.AckPolicyToString(int(consumerInfo.Config.AckPolicy)),
+					DeliverPolicy: utils.DeliverPolicyToString(int(consumerInfo.Config.DeliverPolicy)),
+					ReplayPolicy:  utils.ReplayPolicyToString(int(consumerInfo.Config.ReplayPolicy)),
+					MaxDeliver:    int64(consumerInfo.Config.MaxDeliver),
+				},
+			})
 			return
 		}
 	}
@@ -594,6 +596,8 @@ func (h *ConsumerHandler) DeleteStreamMessage(c *gin.Context) {
 //	@Failure	500		{object}	dto.ErrorResponse
 //	@Router		/streams/{name}/messages/publish [post]
 func (h *ConsumerHandler) PublishMessage(c *gin.Context) {
+	streamName := c.Param("name")
+
 	var req dto.PublishMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
@@ -606,6 +610,14 @@ func (h *ConsumerHandler) PublishMessage(c *gin.Context) {
 	if len(req.Payload) > constants.MaxMessageSize {
 		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
 			Error: fmt.Sprintf("Message data exceeds maximum size of %d MB", constants.MaxMessageSize>>20),
+		})
+		return
+	}
+
+	if _, err := h.js.StreamInfo(streamName); err != nil {
+		c.JSON(http.StatusNotFound, dto.ErrorResponse{
+			Error:   "Stream not found",
+			Details: err.Error(),
 		})
 		return
 	}

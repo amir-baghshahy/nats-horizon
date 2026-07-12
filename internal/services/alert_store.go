@@ -20,21 +20,21 @@ type AlertStore struct {
 
 // PersistedAlert represents an alert stored on disk
 type PersistedAlert struct {
-	ID              string          `json:"id"`
-	Name            string          `json:"name"`
-	Description     string          `json:"description"`
-	Condition       AlertCondition  `json:"condition"`
-	Severity        string          `json:"severity"`
-	Enabled         bool            `json:"enabled"`
-	Channels        []string        `json:"channels"`
-	EmailAddress    string          `json:"email_address"`
-	WebhookURL      string          `json:"webhook_url"`
-	SlackWebhookURL string          `json:"slack_webhook_url"`
-	Cooldown        time.Duration   `json:"cooldown"`
-	LastTrigger     time.Time       `json:"last_trigger"`
-	TriggerCount    int             `json:"trigger_count"`
-	CreatedAt       time.Time       `json:"created_at"`
-	UpdatedAt       time.Time       `json:"updated_at"`
+	ID              string         `json:"id"`
+	Name            string         `json:"name"`
+	Description     string         `json:"description"`
+	Condition       AlertCondition `json:"condition"`
+	Severity        string         `json:"severity"`
+	Enabled         bool           `json:"enabled"`
+	Channels        []string       `json:"channels"`
+	EmailAddress    string         `json:"email_address"`
+	WebhookURL      string         `json:"webhook_url"`
+	SlackWebhookURL string         `json:"slack_webhook_url"`
+	Cooldown        int64  `json:"cooldown"`
+	LastTrigger     time.Time      `json:"last_trigger"`
+	TriggerCount    int            `json:"trigger_count"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       time.Time      `json:"updated_at"`
 }
 
 // AlertCondition represents the condition to trigger an alert
@@ -64,13 +64,12 @@ func GetAlertStore() *AlertStore {
 }
 
 func getAlertStorePath() string {
-	execPath, err := os.Executable()
-	if err == nil {
-		execDir := filepath.Dir(execPath)
-		return filepath.Join(execDir, "nats-horizon-alerts.json")
-	}
 	if cwd, err := os.Getwd(); err == nil {
 		return filepath.Join(cwd, "nats-horizon-alerts.json")
+	}
+	if execPath, err := os.Executable(); err == nil {
+		execDir := filepath.Dir(execPath)
+		return filepath.Join(execDir, "nats-horizon-alerts.json")
 	}
 	return "nats-horizon-alerts.json"
 }

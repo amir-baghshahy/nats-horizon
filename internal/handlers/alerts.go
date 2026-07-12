@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net/http"
@@ -40,7 +42,7 @@ type Alert struct {
 	EmailAddress    string         `json:"email_address"`     // Email address for email notifications
 	WebhookURL      string         `json:"webhook_url"`       // Webhook URL for webhook notifications
 	SlackWebhookURL string         `json:"slack_webhook_url"` // Slack webhook URL for Slack notifications
-	Cooldown        time.Duration  `json:"cooldown"`
+	Cooldown        int64  `json:"cooldown"`  // nanoseconds
 	LastTrigger     time.Time      `json:"last_trigger"`
 	TriggerCount    int            `json:"trigger_count"`
 	CreatedAt       time.Time      `json:"created_at"`
@@ -181,7 +183,7 @@ func (h *AlertsHandler) checkAlerts() (int, int) {
 		Name            string
 		Condition       AlertCondition
 		LastTrigger     time.Time
-		Cooldown        time.Duration
+		Cooldown        int64
 		Severity        AlertSeverity
 		Channels        []string
 		EmailAddress    string
@@ -212,7 +214,7 @@ func (h *AlertsHandler) checkAlerts() (int, int) {
 	triggeredCount := 0
 	for _, data := range evalData {
 		// Check cooldown
-		if !data.LastTrigger.IsZero() && now.Sub(data.LastTrigger) < data.Cooldown {
+		if !data.LastTrigger.IsZero() && now.Sub(data.LastTrigger) < time.Duration(data.Cooldown) {
 			continue
 		}
 
@@ -262,6 +264,14 @@ func (h *AlertsHandler) evaluateCondition(condition AlertCondition) (bool, map[s
 		data["messages"] = count
 		return compareValues(count, condition.Threshold, condition.Operator), data, nil
 
+	case "consumer_lag":
+		lag, err := h.getConsumerLag(condition.Stream, condition.Consumer)
+		if err != nil {
+			return false, nil, err
+		}
+		data["lag"] = lag
+		return compareValues(lag, condition.Threshold, condition.Operator), data, nil
+
 	case "latency":
 		data["latency_ms"] = 0
 		return false, data, nil
@@ -292,7 +302,7 @@ func compareValues(actual, threshold int64, operator string) bool {
 // formatConditionData formats condition data for message
 func formatConditionData(condition AlertCondition, data map[string]interface{}) string {
 	switch condition.Type {
-	case "lag":
+	case "lag", "consumer_lag":
 		return fmt.Sprintf("Consumer lag is %v (threshold: %s %d)", data["lag"], condition.Operator, condition.Threshold)
 	case "storage":
 		return fmt.Sprintf("Storage usage is %v bytes (threshold: %s %d)", data["bytes"], condition.Operator, condition.Threshold)
@@ -301,38 +311,6 @@ func formatConditionData(condition AlertCondition, data map[string]interface{}) 
 	default:
 		return fmt.Sprintf("Condition met: %v", data)
 	}
-}
-
-// triggerAlert triggers an alert
-func (h *AlertsHandler) triggerAlert(alert *Alert, message string, data map[string]interface{}) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
-	now := time.Now()
-	trigger := &AlertTrigger{
-		AlertID:     alert.ID,
-		AlertName:   alert.Name,
-		Severity:    alert.Severity,
-		Message:     message,
-		Data:        data,
-		TriggeredAt: now,
-		Acked:       false,
-	}
-
-	h.triggers = append(h.triggers, trigger)
-
-	// Write back state to the authoritative map entry (not the snapshot)
-	if original, ok := h.alerts[alert.ID]; ok {
-		original.LastTrigger = now
-		original.TriggerCount++
-		original.UpdatedAt = now
-	}
-
-	if len(h.triggers) > 1000 {
-		h.triggers = h.triggers[len(h.triggers)-1000:]
-	}
-
-	h.sendNotifications(trigger, alert)
 }
 
 // triggerAlertByID triggers an alert using its ID (thread-safe for concurrent checks)
@@ -519,12 +497,12 @@ func (h *AlertsHandler) CreateAlert(c *gin.Context) {
 		return
 	}
 
-	alert.ID = fmt.Sprintf("alert-%d", time.Now().UnixNano())
+	alert.ID = fmt.Sprintf("alert-%d-%s", time.Now().UnixNano(), randomHex(8))
 	alert.CreatedAt = time.Now()
 	alert.UpdatedAt = time.Now()
 
 	if alert.Cooldown == 0 {
-		alert.Cooldown = 5 * time.Minute
+		alert.Cooldown = int64(5 * time.Minute)
 	}
 
 	h.mu.Lock()
@@ -744,4 +722,10 @@ func (h *AlertsHandler) AckTrigger(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "trigger acknowledged"})
+}
+
+func randomHex(n int) string {
+	b := make([]byte, n)
+	rand.Read(b)
+	return hex.EncodeToString(b)[:n]
 }

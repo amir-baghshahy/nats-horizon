@@ -193,7 +193,6 @@ func (h *CoreNATShandler) Request(c *gin.Context) {
 
 	c.JSON(http.StatusOK, dto.MessageResponse{
 		Subject:   msgResp.Subject,
-		Sequence:  0, // Not available in this context
 		Data:      string(msgResp.Data),
 		Headers:   headers,
 		Timestamp: time.Now().Format(time.RFC3339),

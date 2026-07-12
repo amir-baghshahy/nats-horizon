@@ -286,7 +286,7 @@ func (s *NotificationService) sendWebhookNotification(channel NotificationChanne
 // sendEmailNotification sends an email notification
 func (s *NotificationService) sendEmailNotification(channel NotificationChannel, trigger AlertTrigger) error {
 	cfg := config.Get()
-	
+
 	config := EmailConfig{
 		SMTPHost: getStringConfig(channel.Config, "smtp_host", cfg.SMTPHost),
 		SMTPPort: getIntConfig(channel.Config, "smtp_port", cfg.SMTPPort),
@@ -356,11 +356,8 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 	}
 
 	var err error
-	if config.UseTLS {
-		err = smtp.SendMail(addr, auth, config.From, []string{config.To}, []byte(message))
-	} else {
-		err = smtp.SendMail(addr, auth, config.From, []string{config.To}, []byte(message))
-	}
+	_ = config.UseTLS
+	err = smtp.SendMail(addr, auth, config.From, []string{config.To}, []byte(message))
 
 	if err != nil {
 		return fmt.Errorf("failed to send email: %w", err)

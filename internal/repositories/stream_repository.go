@@ -61,7 +61,7 @@ type streamListResponse struct {
 			MaxBytes  int64    `json:"max_bytes"`
 		} `json:"config"`
 		Created string `json:"created"`
-		State struct {
+		State   struct {
 			Msgs      uint64 `json:"messages"`
 			Bytes     uint64 `json:"bytes"`
 			Consumers int    `json:"consumer_count"`
@@ -198,7 +198,7 @@ func (r *NATSStreamRepository) toDomainStream(info *nats.StreamInfo) *models.Str
 		Retention: retention,
 		Replicas:  int(info.Config.Replicas),
 		MaxAge:    maxAge,
-		MaxBytes:  info.Config.MaxBytes,
+		MaxBytes:  normalizeMaxBytes(info.Config.MaxBytes),
 		Messages:  info.State.Msgs,
 		Bytes:     info.State.Bytes,
 		Consumers: int(info.State.Consumers),

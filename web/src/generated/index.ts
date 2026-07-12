@@ -36,7 +36,6 @@ export type { ConsumerResponse } from './models/ConsumerResponse';
 export { CreateConsumerRequest } from './models/CreateConsumerRequest';
 export { CreateStreamRequest } from './models/CreateStreamRequest';
 export type { DashboardStatsResponse } from './models/DashboardStatsResponse';
-export { Duration } from './models/Duration';
 export type { ErrorResponse } from './models/ErrorResponse';
 export type { HealthResponse } from './models/HealthResponse';
 export type { KVBucketCreateResponse } from './models/KVBucketCreateResponse';

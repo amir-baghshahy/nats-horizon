@@ -114,10 +114,15 @@ type AccountInfo struct {
 	MaxConsumers int
 }
 
-// GetAccountInfo returns JetStream account information
+// GetAccountInfo returns JetStream account information with actual server memory.
 func (uc *ServerUseCase) GetAccountInfo(ctx context.Context) (*AccountInfo, error) {
 	if uc.js == nil {
 		return nil, fmt.Errorf("JetStream not available")
+	}
+
+	var memoryUsed uint64
+	if varz, err := uc.getVarz(); err == nil {
+		memoryUsed = varz.Data.Memory
 	}
 
 	info, err := uc.js.AccountInfo()
@@ -144,7 +149,7 @@ func (uc *ServerUseCase) GetAccountInfo(ctx context.Context) (*AccountInfo, erro
 	}
 
 	return &AccountInfo{
-		Memory:       info.Tier.Memory,
+		Memory:       memoryUsed,
 		Storage:      info.Tier.Store,
 		Streams:      info.Tier.Streams,
 		Consumers:    info.Tier.Consumers,
@@ -395,6 +400,29 @@ func (uc *ServerUseCase) getConnz() (*connzResponse, error) {
 	return &response, nil
 }
 
+type varzResponse struct {
+	Data struct {
+		Memory uint64  `json:"memory"`
+		CPU    float64 `json:"cpu"`
+	} `json:"data"`
+	Server struct {
+		Name string `json:"name"`
+		ID   string `json:"id"`
+	} `json:"server"`
+}
+
+func (uc *ServerUseCase) getVarz() (*varzResponse, error) {
+	msg, err := uc.nc.Request("$SYS.REQ.SERVER.PING.VARZ", []byte(`{}`), constants.DefaultRequestTimeout)
+	if err != nil {
+		return nil, err
+	}
+	var response varzResponse
+	if err := json.Unmarshal(msg.Data, &response); err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
 func parseServerTime(value string) time.Time {
 	if value == "" {
 		return time.Time{}
@@ -521,8 +549,14 @@ func isUnlimited(val uint64) bool {
 	return val == math.MaxUint64
 }
 
-// GetSystemMetrics returns system metrics
+// GetSystemMetrics returns system metrics using server VARZ for actual
+// memory/CPU and JetStream AccountInfo for storage/streams/consumers.
 func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, error) {
+	var memoryUsed uint64
+	if varz, err := uc.getVarz(); err == nil {
+		memoryUsed = varz.Data.Memory
+	}
+
 	accountInfo, err := uc.js.AccountInfo()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get account info: %w", err)
@@ -533,14 +567,7 @@ func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, 
 		connections = connz.TotalConnections()
 	}
 
-	memoryMax := uint64(accountInfo.Limits.MaxMemory)
-	if isUnlimited(memoryMax) {
-		memoryMax = 0
-	}
 	memoryUsage := 0.0
-	if memoryMax > 0 {
-		memoryUsage = float64(accountInfo.Tier.Memory) / float64(memoryMax) * 100
-	}
 
 	storageMax := uint64(accountInfo.Limits.MaxStore)
 	if isUnlimited(storageMax) {
@@ -552,8 +579,7 @@ func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, 
 	}
 
 	return &SystemMetrics{
-		MemoryUsed:   accountInfo.Tier.Memory,
-		MemoryMax:    memoryMax,
+		MemoryUsed:   memoryUsed,
 		MemoryUsage:  memoryUsage,
 		StorageUsed:  accountInfo.Tier.Store,
 		StorageMax:   storageMax,

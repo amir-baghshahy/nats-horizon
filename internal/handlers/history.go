@@ -100,7 +100,7 @@ func (h *HistoryHandler) collectData() {
 		activeStreams[s.Config.Name] = true
 	}
 	for key := range h.history {
-		parts := splitString(key, ":")
+		parts := strings.SplitN(key, ":", 2)
 		if len(parts) == 2 && !activeStreams[parts[0]] {
 			delete(h.history, key)
 		}
@@ -305,7 +305,7 @@ func (h *HistoryHandler) GetReport(c *gin.Context) {
 	// Get unique stream names
 	streamNames := make(map[string]bool)
 	for key := range h.history {
-		parts := splitString(key, ":")
+		parts := strings.SplitN(key, ":", 2)
 		if len(parts) == 2 {
 			streamNames[parts[0]] = true
 		}
@@ -341,9 +341,4 @@ func (h *HistoryHandler) GetReport(c *gin.Context) {
 		"generated_at": time.Now().Format(time.RFC3339),
 		"streams":      report,
 	})
-}
-
-// Helper function to split string - delegates to strings.SplitN
-func splitString(s string, sep string) []string {
-	return strings.SplitN(s, sep, 2)
 }

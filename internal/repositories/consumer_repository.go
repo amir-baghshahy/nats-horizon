@@ -127,6 +127,8 @@ func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *models.LagRe
 		return fmt.Errorf("failed to get consumer info: %w", err)
 	}
 
+	originalConfig := info.Config
+
 	if err := r.js.DeleteConsumer(req.StreamName, req.ConsumerName); err != nil {
 		return fmt.Errorf("failed to delete consumer: %w", err)
 	}
@@ -143,6 +145,7 @@ func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *models.LagRe
 
 	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {
+		r.js.AddConsumer(req.StreamName, &originalConfig)
 		return fmt.Errorf("failed to recreate consumer: %w", err)
 	}
 
@@ -150,6 +153,10 @@ func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *models.LagRe
 }
 
 func (r *NATSConsumerRepository) Replay(ctx context.Context, req *models.ReplayRequest) (string, error) {
+	if _, err := r.js.ConsumerInfo(req.StreamName, req.ConsumerName); err != nil {
+		return "", fmt.Errorf("consumer not found: %w", err)
+	}
+
 	replayID := fmt.Sprintf("replay-%s-%d", req.ConsumerName, time.Now().UnixNano())
 
 	replayCfg := &nats.ConsumerConfig{
@@ -181,6 +188,8 @@ func (r *NATSConsumerRepository) Pause(ctx context.Context, req *models.PauseReq
 		return fmt.Errorf("failed to get consumer info: %w", err)
 	}
 
+	originalConfig := info.Config
+
 	if err := r.js.DeleteConsumer(req.StreamName, req.ConsumerName); err != nil {
 		return fmt.Errorf("failed to delete consumer: %w", err)
 	}
@@ -189,6 +198,7 @@ func (r *NATSConsumerRepository) Pause(ctx context.Context, req *models.PauseReq
 
 	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {
+		r.js.AddConsumer(req.StreamName, &originalConfig)
 		return fmt.Errorf("failed to recreate paused consumer: %w", err)
 	}
 
@@ -242,10 +252,12 @@ func (r *NATSConsumerRepository) Resume(ctx context.Context, req *models.ResumeR
 		return fmt.Errorf("failed to delete consumer: %w", err)
 	}
 
+	originalConfigForRecovery := info.Config
 	info.Config.MaxDeliver = constants.DefaultMaxDeliver
 
 	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {
+		r.js.AddConsumer(req.StreamName, &originalConfigForRecovery)
 		return fmt.Errorf("failed to recreate resumed consumer: %w", err)
 	}
 
@@ -301,11 +313,26 @@ func (r *NATSConsumerRepository) toNATSConsumerConfig(consumer *models.Consumer)
 		deliverPolicy = nats.DeliverAllPolicy
 	}
 
+	var replayPolicy nats.ReplayPolicy
+	switch consumer.ReplayPolicy {
+	case "original":
+		replayPolicy = nats.ReplayOriginalPolicy
+	default:
+		replayPolicy = nats.ReplayInstantPolicy
+	}
+
+	durableName := consumer.DurableName
+	if durableName == "" {
+		durableName = consumer.Name
+	}
+
 	return &nats.ConsumerConfig{
-		Durable:       consumer.Name,
+		Durable:       durableName,
 		AckPolicy:     ackPolicy,
 		DeliverPolicy: deliverPolicy,
+		ReplayPolicy:  replayPolicy,
 		MaxDeliver:    consumer.MaxDeliver,
+		FilterSubject: consumer.FilterSubject,
 	}
 }
 

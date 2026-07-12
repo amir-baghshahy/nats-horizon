@@ -482,11 +482,11 @@ func (h *MetricsHandler) GetConsumerMetrics(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"stream":          streamName,
-		"consumer":        consumerName,
-		"lag":             info.NumPending,
-		"delivered":       info.Delivered,
-		"acked":           info.AckFloor,
-		"processing_time": info.Config.AckWait.String(),
+		"stream":    streamName,
+		"consumer":  consumerName,
+		"lag":       info.NumPending,
+		"delivered": info.Delivered,
+		"acked":     info.AckFloor,
+		"ack_wait":  info.Config.AckWait.String(),
 	})
 }

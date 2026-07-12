@@ -45,7 +45,6 @@ func (h *KVHandler) ListBuckets(c *gin.Context) {
 	storeNames := []string{}
 	offset := 0
 
-
 	for {
 		// Get stream list with pagination
 		req := fmt.Sprintf(`{"offset":%d}`, offset)
@@ -344,7 +343,7 @@ func (h *KVHandler) ListKeys(c *gin.Context) {
 			if key.Key() != "" && key.Operation().String() != "D" {
 				keysList = append(keysList, key.Key())
 			}
-		case <-time.After(100 * time.Millisecond):
+		case <-time.After(500 * time.Millisecond):
 			// Timeout - we've collected initial keys
 			goto Done
 		}

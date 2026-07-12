@@ -3,14 +3,16 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AlertCondition } from './AlertCondition';
-import type { Duration } from './Duration';
 export type Alert = {
     /**
      * Notification channels: "email", "webhook", "slack"
      */
     channels?: Array<string>;
     condition?: AlertCondition;
-    cooldown?: Duration;
+    /**
+     * nanoseconds
+     */
+    cooldown?: number;
     created_at?: string;
     description?: string;
     /**

@@ -61,12 +61,12 @@ func configPath() string {
 		execDir := filepath.Dir(execPath)
 		return filepath.Join(execDir, "nats-horizon.json")
 	}
-	
+
 	// Fallback to current directory
 	if cwd, err := os.Getwd(); err == nil {
 		return filepath.Join(cwd, "nats-horizon.json")
 	}
-	
+
 	return "nats-horizon.json"
 }
 
@@ -118,16 +118,70 @@ func (c *AppConfig) Update(updates map[string]interface{}) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	data, err := json.Marshal(updates)
-	if err != nil {
-		return err
+	if v, ok := updates["server_port"]; ok {
+		if n, ok := toInt(v); ok {
+			c.ServerPort = n
+		}
 	}
-
-	if err := json.Unmarshal(data, c); err != nil {
-		return err
+	if v, ok := updates["gin_mode"]; ok {
+		if s, ok := v.(string); ok {
+			c.GinMode = s
+		}
+	}
+	if v, ok := updates["nats_url"]; ok {
+		if s, ok := v.(string); ok {
+			c.NATSURL = s
+		}
+	}
+	if v, ok := updates["smtp_host"]; ok {
+		if s, ok := v.(string); ok {
+			c.SMTPHost = s
+		}
+	}
+	if v, ok := updates["smtp_port"]; ok {
+		if n, ok := toInt(v); ok {
+			c.SMTPPort = n
+		}
+	}
+	if v, ok := updates["smtp_username"]; ok {
+		if s, ok := v.(string); ok {
+			c.SMTPUsername = s
+		}
+	}
+	if v, ok := updates["smtp_password"]; ok {
+		if s, ok := v.(string); ok {
+			c.SMTPPassword = s
+		}
+	}
+	if v, ok := updates["smtp_from"]; ok {
+		if s, ok := v.(string); ok {
+			c.SMTPFrom = s
+		}
+	}
+	if v, ok := updates["cors_allowed_origins"]; ok {
+		if s, ok := v.(string); ok {
+			c.CORSAllowedOrigins = s
+		}
 	}
 
 	return c.save()
+}
+
+func toInt(v interface{}) (int, bool) {
+	switch n := v.(type) {
+	case float64:
+		return int(n), true
+	case int:
+		return n, true
+	case json.Number:
+		i, err := n.Int64()
+		if err != nil {
+			return 0, false
+		}
+		return int(i), true
+	default:
+		return 0, false
+	}
 }
 
 // save writes config to file (without lock)

@@ -302,8 +302,12 @@ func (h *SecurityHandler) GetAuditLogs(c *gin.Context) {
 		}
 	}
 
-		// Return array directly to match API spec
-		c.JSON(http.StatusOK, events)
+	c.JSON(http.StatusOK, gin.H{
+		"logs":   events,
+		"offset": offset,
+		"limit":  limit,
+		"total":  len(events),
+	})
 }
 
 // GetConnectionStatus returns connection security status

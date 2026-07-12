@@ -88,9 +88,11 @@ type Consumer struct {
 	NumPending    uint64    `json:"num_pending"`
 	Paused        bool      `json:"paused"`
 	Durable       bool      `json:"durable"`
+	DurableName   string    `json:"durable_name"`
 	AckPolicy     string    `json:"ack_policy"`
 	DeliverPolicy string    `json:"deliver_policy"`
 	ReplayPolicy  string    `json:"replay_policy"`
+	FilterSubject string    `json:"filter_subject"`
 	MaxDeliver    int       `json:"max_deliver"`
 	CreatedAt     time.Time `json:"created_at"`
 }

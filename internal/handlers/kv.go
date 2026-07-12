@@ -263,11 +263,7 @@ func (h *KVHandler) CreateBucket(c *gin.Context) {
 
 	status, err := kv.Status()
 	if err != nil {
-		c.JSON(http.StatusCreated, dto.KVBucketCreateResponse{
-			Name:    req.Name,
-			Values:  0,
-			History: history,
-		})
+		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: fmt.Sprintf("Failed to get bucket status: %v", err)})
 		return
 	}
 

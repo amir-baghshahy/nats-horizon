@@ -1,14 +1,16 @@
 package dto
 
 type ConsumerResponse struct {
-	Name       string                  `json:"name"`
-	Stream     string                  `json:"stream"`
-	Status     string                  `json:"status"`
-	Lag        uint64                  `json:"lag"`
-	AckRate    string                  `json:"ack_rate"`
-	NumPending uint64                  `json:"num_pending"`
-	Paused     bool                    `json:"paused"`
-	Config     *ConsumerConfigResponse `json:"config"`
+	Name          string                  `json:"name"`
+	Stream        string                  `json:"stream"`
+	Status        string                  `json:"status"`
+	Lag           uint64                  `json:"lag"`
+	AckRate       string                  `json:"ack_rate"`
+	NumPending    uint64                  `json:"num_pending"`
+	Paused        bool                    `json:"paused"`
+	DurableName   string                  `json:"durable_name"`
+	FilterSubject string                  `json:"filter_subject,omitempty"`
+	Config        *ConsumerConfigResponse `json:"config"`
 }
 
 type ConsumerConfigResponse struct {

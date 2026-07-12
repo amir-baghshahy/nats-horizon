@@ -357,11 +357,15 @@ func (h *TenancyHandler) TestConnection(c *gin.Context) {
 //	@Router			/tenancy/status [get]
 func (h *TenancyHandler) GetConnectionStatus(c *gin.Context) {
 	h.mu.RLock()
-	defer h.mu.RUnlock()
+	connectionsCopy := make(map[string]*ConnectionConfig, len(h.connections))
+	for k, v := range h.connections {
+		connectionsCopy[k] = v
+	}
+	h.mu.RUnlock()
 
 	statuses := make([]ConnectionStatus, 0)
 
-	for _, conn := range h.connections {
+	for _, conn := range connectionsCopy {
 		if !conn.Enabled {
 			statuses = append(statuses, ConnectionStatus{
 				ID:          conn.ID,

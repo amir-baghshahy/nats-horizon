@@ -41,25 +41,19 @@ func NewConsumerHandler(
 	}
 }
 
-// ListConsumers handles GET /consumers
+// ListConsumers handles GET /streams/:name/consumers
 //
 //	@Summary	List consumers for a stream
 //	@Tags		consumers
 //	@Accept		json
 //	@Produce	json
-//	@Param		stream	query		string	true	"Stream name"
+//	@Param		name	path		string	true	"Stream name"
 //	@Success	200		{array}		dto.ConsumerResponse
 //	@Failure	400		{object}	dto.ErrorResponse
 //	@Failure	500		{object}	dto.ErrorResponse
-//	@Router		/consumers [get]
+//	@Router		/streams/{name}/consumers [get]
 func (h *ConsumerHandler) ListConsumers(c *gin.Context) {
-	streamName := c.Query("stream")
-	if streamName == "" {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "stream query parameter is required",
-		})
-		return
-	}
+	streamName := c.Param("name")
 
 	consumers, err := h.useCase.ListConsumers(c.Request.Context(), streamName)
 	if err != nil {
@@ -237,7 +231,11 @@ func (h *ConsumerHandler) ResetLag(c *gin.Context) {
 
 	var req dto.ResetLagRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		req.Sequence = 0 // Default to 0 if body is empty
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Invalid request",
+			Details: err.Error(),
+		})
+		return
 	}
 
 	resetReq := &models.LagResetRequest{
@@ -277,7 +275,13 @@ func (h *ConsumerHandler) Replay(c *gin.Context) {
 	consumerName := c.Param("consumer")
 
 	var req dto.ReplayRequest
-	c.ShouldBindJSON(&req) // Don't fail if body is empty
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
+			Error:   "Invalid request",
+			Details: err.Error(),
+		})
+		return
+	}
 
 	replayReq := &models.ReplayRequest{
 		StreamName:    streamName,
@@ -323,10 +327,7 @@ func (h *ConsumerHandler) Pause(c *gin.Context) {
 	}
 
 	if err := h.useCase.PauseConsumer(c.Request.Context(), req); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to pause consumer",
-			Details: err.Error(),
-		})
+		respondWithError(c, http.StatusInternalServerError, "Failed to pause consumer", err.Error())
 		return
 	}
 
@@ -343,7 +344,7 @@ func (h *ConsumerHandler) Pause(c *gin.Context) {
 //	@Param		consumer	path		string	true	"Consumer name"
 //	@Success	200			{object}	dto.SuccessResponse
 //	@Failure	500			{object}	dto.ErrorResponse
-//	@Router		/streams/{name}/consumers/{consumer}/resume [post]
+//	@Router		/streams/{name}/consumers/:consumer/resume [post]
 func (h *ConsumerHandler) Resume(c *gin.Context) {
 	streamName := c.Param("name")
 	consumerName := c.Param("consumer")
@@ -354,10 +355,7 @@ func (h *ConsumerHandler) Resume(c *gin.Context) {
 	}
 
 	if err := h.useCase.ResumeConsumer(c.Request.Context(), req); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to resume consumer",
-			Details: err.Error(),
-		})
+		respondWithError(c, http.StatusInternalServerError, "Failed to resume consumer", err.Error())
 		return
 	}
 
@@ -797,4 +795,8 @@ func (h *ConsumerHandler) AckTermMessage(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "Message acknowledged and terminated"})
+}
+
+func respondWithError(c *gin.Context, status int, errMsg, details string) {
+	c.JSON(status, dto.ErrorResponse{Error: errMsg, Details: details})
 }

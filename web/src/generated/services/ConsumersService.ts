@@ -55,6 +55,27 @@ export class ConsumersService {
         });
     }
     /**
+     * List consumers for a stream
+     * @param name Stream name
+     * @returns ConsumerResponse OK
+     * @throws ApiError
+     */
+    public static getStreamsConsumers(
+        name: string,
+    ): CancelablePromise<Array<ConsumerResponse>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/streams/{name}/consumers',
+            path: {
+                'name': name,
+            },
+            errors: {
+                400: `Bad Request`,
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * Create a consumer
      * @param name Stream name
      * @param requestBody Consumer creation request
@@ -109,7 +130,7 @@ export class ConsumersService {
      * @returns ConsumerResponse OK
      * @throws ApiError
      */
-    public static getStreamsConsumers(
+    public static getStreamsConsumers1(
         name: string,
         consumer: string,
     ): CancelablePromise<ConsumerResponse> {

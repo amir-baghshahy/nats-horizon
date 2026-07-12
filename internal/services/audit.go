@@ -119,9 +119,9 @@ func (s *AuditService) GetLogs(offset int64, limit int64) ([]AuditEvent, error) 
 	}
 
 	startSeq := streamInfo.State.LastSeq
-	if uint64(offset) < startSeq {
+	if uint64(offset) > 0 && uint64(offset) < startSeq {
 		startSeq = streamInfo.State.LastSeq - uint64(offset)
-	} else {
+	} else if uint64(offset) >= startSeq {
 		startSeq = streamInfo.State.FirstSeq
 	}
 	if startSeq < streamInfo.State.FirstSeq {
@@ -220,8 +220,10 @@ func (s *AuditService) Cleanup() error {
 	if streamInfo.State.Msgs > AuditMaxMessages {
 		excess := streamInfo.State.Msgs - AuditMaxMessages
 		if excess > 0 {
-			excessSeq := streamInfo.State.FirstSeq + excess
-			if err := s.js.PurgeStream(AuditStreamName, &nats.StreamPurgeRequest{Sequence: excessSeq}); err != nil {
+			// Purge messages up to and including the excess count from the start
+			// Sequence value is inclusive, so we purge FirstSeq to FirstSeq+excess-1
+			purgeSeq := streamInfo.State.FirstSeq + excess - 1
+			if err := s.js.PurgeStream(AuditStreamName, &nats.StreamPurgeRequest{Sequence: purgeSeq}); err != nil {
 				return fmt.Errorf("failed to purge audit stream: %w", err)
 			}
 		}

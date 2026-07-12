@@ -6,6 +6,8 @@ import type { ConsumerConfigResponse } from './ConsumerConfigResponse';
 export type ConsumerResponse = {
     ack_rate?: string;
     config?: ConsumerConfigResponse;
+    durable_name?: string;
+    filter_subject?: string;
     lag?: number;
     name?: string;
     num_pending?: number;

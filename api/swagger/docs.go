@@ -2404,6 +2404,50 @@ const docTemplate = `{
             }
         },
         "/streams/{name}/consumers": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "consumers"
+                ],
+                "summary": "List consumers for a stream",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stream name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ConsumerResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -4035,6 +4079,12 @@ const docTemplate = `{
                 },
                 "config": {
                     "$ref": "#/definitions/ConsumerConfigResponse"
+                },
+                "durable_name": {
+                    "type": "string"
+                },
+                "filter_subject": {
+                    "type": "string"
                 },
                 "lag": {
                     "type": "integer"

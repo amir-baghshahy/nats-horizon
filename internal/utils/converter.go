@@ -60,13 +60,15 @@ func ConsumerToResponse(consumer *models.Consumer) *dto.ConsumerResponse {
 	}
 
 	return &dto.ConsumerResponse{
-		Name:       consumer.Name,
-		Stream:     consumer.Stream,
-		Status:     consumer.Status,
-		Lag:        consumer.Lag,
-		AckRate:    consumer.AckRate,
-		NumPending: consumer.NumPending,
-		Paused:     consumer.Paused,
+		Name:          consumer.Name,
+		Stream:        consumer.Stream,
+		Status:        consumer.Status,
+		Lag:           consumer.Lag,
+		AckRate:       consumer.AckRate,
+		NumPending:    consumer.NumPending,
+		Paused:        consumer.Paused,
+		DurableName:   consumer.DurableName,
+		FilterSubject: consumer.FilterSubject,
 		Config: &dto.ConsumerConfigResponse{
 			Durable:       durable,
 			AckPolicy:     consumer.AckPolicy,

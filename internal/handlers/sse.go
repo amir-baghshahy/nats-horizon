@@ -95,8 +95,12 @@ func (h *SSEHub) RemoveClient(id string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	if client, exists := h.clients[id]; exists {
-		client.closed = true
-		close(client.closeChan)
+		client.mu.Lock()
+		if !client.closed {
+			client.closed = true
+			close(client.closeChan)
+		}
+		client.mu.Unlock()
 		delete(h.clients, id)
 	}
 }
@@ -178,7 +182,6 @@ func (h *SSEHub) Broadcast(channel string, event SSEEvent) {
 			_, err := fmt.Fprintf(client.Writer, "data: %s\n\n", data)
 			if err != nil {
 				log.Printf("Failed to write to SSE client %s: %v, removing client", client.ID, err)
-				client.closed = true
 				client.mu.Unlock()
 				h.RemoveClient(client.ID)
 				continue

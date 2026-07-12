@@ -345,7 +345,10 @@ func (h *ExportHandler) ExportMessages(c *gin.Context) {
 		Subject string `json:"subject"`
 		Limit   int    `json:"limit"`
 	}
-	c.ShouldBindJSON(&req)
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: fmt.Sprintf("invalid request body: %v", err)})
+		return
+	}
 
 	if req.Subject != "" {
 		subject = req.Subject

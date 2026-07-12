@@ -557,6 +557,12 @@
           "config": {
             "$ref": "#/components/schemas/ConsumerConfigResponse"
           },
+          "durable_name": {
+            "type": "string"
+          },
+          "filter_subject": {
+            "type": "string"
+          },
           "lag": {
             "type": "integer"
           },
@@ -4308,6 +4314,58 @@
       }
     },
     "/streams/{name}/consumers": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Stream name",
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConsumerResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "List consumers for a stream",
+        "tags": [
+          "consumers"
+        ]
+      },
       "post": {
         "parameters": [
           {

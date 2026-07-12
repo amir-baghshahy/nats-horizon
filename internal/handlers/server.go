@@ -421,7 +421,6 @@ func (h *ServerHandler) TerminateConnection(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 			Error:   "Failed to terminate connection",
 			Details: err.Error(),
-			Code:    id,
 		})
 		return
 	}

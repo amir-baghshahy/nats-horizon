@@ -42,7 +42,7 @@ type Alert struct {
 	EmailAddress    string         `json:"email_address"`     // Email address for email notifications
 	WebhookURL      string         `json:"webhook_url"`       // Webhook URL for webhook notifications
 	SlackWebhookURL string         `json:"slack_webhook_url"` // Slack webhook URL for Slack notifications
-	Cooldown        int64  `json:"cooldown"`  // nanoseconds
+	Cooldown        int64          `json:"cooldown"`          // nanoseconds
 	LastTrigger     time.Time      `json:"last_trigger"`
 	TriggerCount    int            `json:"trigger_count"`
 	CreatedAt       time.Time      `json:"created_at"`
@@ -712,13 +712,20 @@ func (h *AlertsHandler) AckTrigger(c *gin.Context) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
+	found := false
 	for _, trigger := range h.triggers {
 		if trigger.AlertID == id && !trigger.Acked {
 			now := time.Now()
 			trigger.Acked = true
 			trigger.AckedAt = &now
 			trigger.AckedBy = req.User
+			found = true
 		}
+	}
+
+	if !found {
+		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "trigger not found or already acknowledged"})
+		return
 	}
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "trigger acknowledged"})

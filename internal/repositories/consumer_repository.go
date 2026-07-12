@@ -280,12 +280,21 @@ func (r *NATSConsumerRepository) toDomainConsumer(info *nats.ConsumerInfo, strea
 	key := fmt.Sprintf("%s.%s", streamName, info.Name)
 	paused := info.Config.MaxDeliver == constants.PauseSentinel || r.isPaused(key)
 
+	durableName := ""
+	if info.Config.Durable != "" {
+		durableName = info.Config.Durable
+	} else {
+		durableName = info.Name
+	}
+
 	return &models.Consumer{
 		Name:          info.Name,
 		Stream:        streamName,
 		Status:        "active",
 		NumPending:    info.NumPending,
 		Durable:       info.Config.Durable != "",
+		DurableName:   durableName,
+		FilterSubject: info.Config.FilterSubject,
 		AckPolicy:     utils.AckPolicyToString(int(info.Config.AckPolicy)),
 		DeliverPolicy: utils.DeliverPolicyToString(int(info.Config.DeliverPolicy)),
 		ReplayPolicy:  utils.ReplayPolicyToString(int(info.Config.ReplayPolicy)),

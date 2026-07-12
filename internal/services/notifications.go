@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -356,8 +357,51 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 	}
 
 	var err error
-	_ = config.UseTLS
-	err = smtp.SendMail(addr, auth, config.From, []string{config.To}, []byte(message))
+	if config.UseTLS {
+		tlsConfig := &tls.Config{
+			InsecureSkipVerify: false,
+			ServerName:         config.SMTPHost,
+		}
+		conn, dialErr := tls.Dial("tcp", addr, tlsConfig)
+		if dialErr != nil {
+			return fmt.Errorf("failed to establish TLS connection: %w", dialErr)
+		}
+		defer conn.Close()
+
+		client, err := smtp.NewClient(conn, addr)
+		if err != nil {
+			return fmt.Errorf("failed to create SMTP client: %w", err)
+		}
+		defer client.Close()
+
+		if err := client.Auth(auth); err != nil {
+			return fmt.Errorf("failed to authenticate: %w", err)
+		}
+		if err := client.Mail(config.From); err != nil {
+			return fmt.Errorf("failed to set sender: %w", err)
+		}
+		if err := client.Rcpt(config.To); err != nil {
+			return fmt.Errorf("failed to set recipient: %w", err)
+		}
+		w, err := client.Data()
+		if err != nil {
+			return fmt.Errorf("failed to open data writer: %w", err)
+		}
+		_, err = w.Write([]byte(message))
+		if err != nil {
+			w.Close()
+			return fmt.Errorf("failed to write message: %w", err)
+		}
+		err = w.Close()
+		if err != nil {
+			return fmt.Errorf("failed to close data writer: %w", err)
+		}
+		if err := client.Quit(); err != nil {
+			return fmt.Errorf("failed to quit SMTP: %w", err)
+		}
+	} else {
+		err = smtp.SendMail(addr, auth, config.From, []string{config.To}, []byte(message))
+	}
 
 	if err != nil {
 		return fmt.Errorf("failed to send email: %w", err)

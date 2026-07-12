@@ -259,6 +259,7 @@ func main() {
 		apiGroup.POST("/streams", streamHandler.CreateStream)
 
 		apiGroup.GET("/streams/:name/consumers/:consumer", consumerHandler.GetConsumer)
+		apiGroup.GET("/streams/:name/consumers", consumerHandler.ListConsumers)
 		apiGroup.POST("/streams/:name/consumers", consumerHandler.CreateConsumer)
 		apiGroup.PUT("/streams/:name/consumers/:consumer", consumerHandler.UpdateConsumer)
 		apiGroup.DELETE("/streams/:name/consumers/:consumer", consumerHandler.DeleteConsumer)

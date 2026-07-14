@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
@@ -60,7 +61,7 @@ func (h *ClusterHandler) GetClusterInfo(c *gin.Context) {
 	jsTier := "standard"
 	jsAPI := "0"
 
-	msg, err := h.nc.Request("$JS.API.SERVER.PING", []byte{}, 2*time.Second)
+	msg, err := h.nc.Request(constants.JSServerPing, []byte{}, 2*time.Second)
 	if err == nil && msg != nil {
 		var serverInfo struct {
 			Name       string `json:"server_name"`
@@ -117,7 +118,7 @@ func (h *ClusterHandler) GetClusterInfo(c *gin.Context) {
 //	@Router			/cluster/nodes [get]
 func (h *ClusterHandler) GetClusterNodes(c *gin.Context) {
 	// Try to get cluster info from ROUTERZ
-	msg, err := h.nc.Request("$SYS.CLUSTER.INFO", []byte{}, 2*time.Second)
+	msg, err := h.nc.Request(constants.SysClusterInfo, []byte{}, 2*time.Second)
 	if err != nil {
 		// If not available, return current connection info
 		c.JSON(http.StatusOK, dto.ClusterNodesResponse{

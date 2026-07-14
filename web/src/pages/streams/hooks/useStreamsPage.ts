@@ -21,6 +21,7 @@ import {
   useSelection,
 } from "../../../hooks";
 import { useSSE } from "../../../hooks/useSSE";
+import { getStreamHealthStatus as getStreamHealthStatusByLag } from "../../../constants/thresholds";
 
 export type StreamHealthStatus = "all" | "healthy" | "warning" | "critical";
 
@@ -129,9 +130,7 @@ const defaultFilters: StreamFilters = {
 
 export function getStreamHealthStatus(stream: Stream): StreamHealthStatus {
   const lag = stream.state?.num_pending || 0;
-  if (lag > 10000) return "critical";
-  if (lag > 1000) return "warning";
-  return "healthy";
+  return getStreamHealthStatusByLag(lag);
 }
 
 export function getStreamName(stream: Stream): string {

@@ -18,7 +18,9 @@ export default function AlertsFilters({
         <Filter className="icon-base text-content-tertiary" />
         <Select
           value={filterSeverity}
-          onChange={(value) => onFilterChange(value as any)}
+          onChange={(value) =>
+            onFilterChange(value as "all" | "critical" | "warning" | "info")
+          }
           options={[
             { value: "all", label: t("alerts.allSeverities") },
             { value: "critical", label: t("alerts.critical") },

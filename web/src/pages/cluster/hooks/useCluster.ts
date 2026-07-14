@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ClusterService, StreamsService } from '../../../types'
+import { REFRESH_INTERVALS } from '../../../utils/constants'
 
 interface ClusterInfo {
   cluster_name: string
@@ -63,19 +64,19 @@ export function useCluster(): UseClusterReturn {
   const { data: clusterInfo, refetch: refetchInfo, isLoading: infoLoading, error: infoError } = useQuery({
     queryKey: ['clusterInfo'],
     queryFn: () => ClusterService.getClusterInfo() as Promise<ClusterInfo>,
-    refetchInterval: 10000,
+    refetchInterval: REFRESH_INTERVALS.NORMAL,
   })
 
   const { data: clusterNodes, refetch: refetchNodes, isLoading: nodesLoading, error: nodesError } = useQuery({
     queryKey: ['clusterNodes'],
     queryFn: () => ClusterService.getClusterNodes() as Promise<ClusterNodes>,
-    refetchInterval: 10000,
+    refetchInterval: REFRESH_INTERVALS.NORMAL,
   })
 
   const { data: clusterHealth, refetch: refetchHealth, isLoading: healthLoading, error: healthError } = useQuery({
     queryKey: ['clusterHealth'],
     queryFn: () => ClusterService.getClusterHealth() as Promise<ClusterHealth>,
-    refetchInterval: 5000,
+    refetchInterval: REFRESH_INTERVALS.FAST,
   })
 
   const { data: streamReplicas, refetch: refetchReplicas, isLoading: replicasLoading, error: replicasError } = useQuery({

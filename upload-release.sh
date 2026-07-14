@@ -2,15 +2,24 @@
 set -e
 
 # Upload release assets to GitHub
-# Usage: ./upload-release.sh <tag> <token>
-# Example: ./upload-release.sh v1.0.0 ghp_xxxx
+# Usage: GITHUB_TOKEN=<token> ./upload-release.sh <tag>
+# Example: GITHUB_TOKEN=ghp_xxxx ./upload-release.sh v1.0.0
+#
+# The GitHub token is read from the GITHUB_TOKEN environment variable so it
+# does not leak into the process list / shell history.
+
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "Error: GITHUB_TOKEN environment variable is not set."
+    echo "Usage: GITHUB_TOKEN=<token> ./upload-release.sh <tag>"
+    exit 1
+fi
 
 TAG=$1
-TOKEN=$2
+TOKEN="$GITHUB_TOKEN"
 
-if [ -z "$TAG" ] || [ -z "$TOKEN" ]; then
-    echo "Usage: ./upload-release.sh <tag> <token>"
-    echo "Example: ./upload-release.sh v1.0.0 ghp_xxxx"
+if [ -z "$TAG" ]; then
+    echo "Usage: GITHUB_TOKEN=<token> ./upload-release.sh <tag>"
+    echo "Example: GITHUB_TOKEN=ghp_xxxx ./upload-release.sh v1.0.0"
     exit 1
 fi
 

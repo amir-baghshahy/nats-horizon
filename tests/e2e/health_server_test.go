@@ -161,7 +161,7 @@ func TestAuditLogs(t *testing.T) {
 	requireStatus(t, resp, http.StatusOK)
 
 	var body struct {
-		Logs  []map[string]interface{} `json:"logs"`
+		Logs   []map[string]interface{} `json:"logs"`
 		Offset int                      `json:"offset"`
 		Limit  int                      `json:"limit"`
 		Total  int                      `json:"total"`

@@ -147,7 +147,7 @@ func (h *MetricsHandler) collectMetrics() {
 	now := time.Now()
 
 	// --- I/O phase (no lock held) ---
-	msg, err := h.nc.Request("$JS.API.STREAM.LIST", []byte("{}"), 2*time.Second)
+	msg, err := h.nc.Request(constants.APIStreamList, []byte("{}"), 2*time.Second)
 	if err != nil {
 		return
 	}
@@ -220,7 +220,7 @@ func appendDataPoint(series []MetricSeries, name, label string, t time.Time, val
 
 func (h *MetricsHandler) buildConsumerMetrics(cache *MetricsResponse, now time.Time, streamNames map[string]bool) {
 	for streamName := range streamNames {
-		msg, err := h.nc.Request(fmt.Sprintf("$JS.API.CONSUMER.LIST.%s", streamName), []byte("{}"), constants.LongRequestTimeout)
+		msg, err := h.nc.Request(fmt.Sprintf(constants.APIConsumerListPaged+"%s", streamName), []byte("{}"), constants.LongRequestTimeout)
 		if err != nil {
 			continue
 		}
@@ -259,7 +259,7 @@ func (h *MetricsHandler) buildServerMetrics(cache *MetricsResponse, now time.Tim
 
 func (h *MetricsHandler) buildVarzMetrics(cache *MetricsResponse, now time.Time) {
 	var response serverPingResponse
-	if err := h.requestServerMetric("$SYS.REQ.SERVER.PING.VARZ", map[string]any{}, &response); err != nil {
+	if err := h.requestServerMetric(constants.SysServerPingVarz, map[string]any{}, &response); err != nil {
 		return
 	}
 
@@ -300,7 +300,7 @@ func (h *MetricsHandler) buildVarzMetrics(cache *MetricsResponse, now time.Time)
 
 func (h *MetricsHandler) buildConnzMetrics(cache *MetricsResponse, now time.Time) {
 	var response serverPingResponse
-	if err := h.requestServerMetric("$SYS.REQ.SERVER.PING.CONNZ", map[string]any{"subscriptions": false, "offset": 0, "limit": 1024}, &response); err != nil {
+	if err := h.requestServerMetric(constants.SysServerPingConnz, map[string]any{"subscriptions": false, "offset": 0, "limit": 1024}, &response); err != nil {
 		return
 	}
 

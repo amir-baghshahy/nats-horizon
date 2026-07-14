@@ -346,7 +346,7 @@ func (h *CoreNATShandler) GetServiceDiscovery(c *gin.Context) {
 		MaxPayload   int64  `json:"max_payload"`
 	}
 
-	serverInfo, err := h.nc.Request("$SYS.REQ.SERVER.PING", []byte("{}"), constants.DefaultRequestTimeout)
+	serverInfo, err := h.nc.Request(constants.SysServerPing, []byte("{}"), constants.DefaultRequestTimeout)
 	if err == nil && serverInfo != nil {
 		if err := json.Unmarshal(serverInfo.Data, &serverResp); err != nil {
 			log.Printf("Failed to unmarshal server info: %v", err)

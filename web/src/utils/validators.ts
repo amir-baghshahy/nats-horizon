@@ -40,7 +40,7 @@ export const validateJSON = (
   try {
     const parsed = JSON.parse(str);
     return { valid: true, parsed };
-  } catch (err) {
+  } catch {
     return { valid: false, error: "Invalid JSON format" };
   }
 };

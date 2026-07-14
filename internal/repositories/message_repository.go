@@ -43,10 +43,7 @@ func (r *NATSMessageRepository) Get(ctx context.Context, streamName string, sequ
 		return nil, err
 	}
 
-	headers := make(map[string][]string)
-	for k, v := range msg.Header {
-		headers[k] = v
-	}
+	headers := copyHeaders(msg.Header)
 
 	return &models.Message{
 		Subject:   msg.Subject,
@@ -79,12 +76,6 @@ func (r *NATSMessageRepository) List(ctx context.Context, streamName string, fil
 		startSeq = lastSeq - uint64(limit) + 1
 	} else {
 		startSeq = 1
-	}
-
-	// Determine limit
-	limit = filter.Limit
-	if limit <= 0 {
-		limit = 25
 	}
 
 	// Determine the sequence range to fetch.
@@ -127,10 +118,7 @@ func (r *NATSMessageRepository) List(ctx context.Context, streamName string, fil
 				if err != nil {
 					continue
 				}
-				headers := make(map[string][]string)
-				for k, v := range msg.Header {
-					headers[k] = v
-				}
+				headers := copyHeaders(msg.Header)
 				resCh <- result{
 					seq: seq,
 					msg: &models.Message{
@@ -169,4 +157,14 @@ func (r *NATSMessageRepository) List(ctx context.Context, streamName string, fil
 	}
 
 	return messages, nil
+}
+
+// copyHeaders converts a NATS message header map into the domain representation,
+// copying each key so the result is independent of the source message.
+func copyHeaders(h nats.Header) map[string][]string {
+	headers := make(map[string][]string, len(h))
+	for k, v := range h {
+		headers[k] = v
+	}
+	return headers
 }

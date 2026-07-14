@@ -111,9 +111,7 @@ export default function AlertsPage() {
 
       <div className="shrink-0">
       <AlertsFilters
-        filterSeverity={
-          filterSeverity as "all" | "critical" | "warning" | "info"
-        }
+        filterSeverity={filterSeverity}
         onFilterChange={(value) => setFilterSeverity(value)}
       />
       </div>

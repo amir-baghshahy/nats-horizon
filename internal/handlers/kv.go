@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
@@ -48,7 +49,7 @@ func (h *KVHandler) ListBuckets(c *gin.Context) {
 	for {
 		// Get stream list with pagination
 		req := fmt.Sprintf(`{"offset":%d}`, offset)
-		msg, err := h.nc.Request("$JS.API.STREAM.LIST", []byte(req), 5*time.Second)
+		msg, err := h.nc.Request(constants.APIStreamList, []byte(req), 5*time.Second)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: fmt.Sprintf("Failed to list streams: %v", err)})
 			return

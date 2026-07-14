@@ -66,40 +66,6 @@ export const FORMAT_COLORS: Record<string, string> = {
   hex: "bg-purple-500/20 text-purple-400",
 };
 
-// API Endpoints
-export const API_ENDPOINTS = {
-  // Dashboard
-  DASHBOARD_STATS: "/api/dashboard/stats",
-  ACCOUNT_INFO: "/api/account/info",
-
-  // Core Messaging
-  CORE_PUBLISH: "/api/core/publish",
-  CORE_REQUEST: "/api/core/request",
-  CORE_SUBSCRIBE: "/api/core/subscribe",
-  CORE_SERVICES: "/api/core/services",
-
-  // JetStream
-  STREAMS: "/api/streams",
-  STREAM_DETAIL: (name: string) => `/api/streams/${name}`,
-  CONSUMERS: "/api/consumers",
-  CONSUMER_DETAIL: (name: string) => `/api/consumers/${name}`,
-
-  // System
-  HEALTH: "/api/health",
-  CONNECTIONS: "/api/connections",
-  CLUSTER: "/api/cluster",
-
-  // Monitoring
-  METRICS: "/api/metrics",
-  ALERTS: "/api/alerts",
-
-  // Security
-  SECURITY: "/api/security",
-
-  // Tenancy
-  TENANCY: "/api/tenancy",
-} as const;
-
 // Refetch Intervals (ms)
 export const REFRESH_INTERVALS = {
   FAST: 5000, // 5s - for real-time data

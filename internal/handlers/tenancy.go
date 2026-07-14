@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
@@ -58,23 +59,19 @@ type ConnectionStatus struct {
 type TenancyHandler struct {
 	connections map[string]*ConnectionConfig
 	mu          sync.RWMutex
-	nc          *nats.Conn
-	// Map to track active NATS connections
-	// In a real implementation, you'd maintain actual connection pools
 }
 
 // NewTenancyHandler creates a new tenancy handler
 func NewTenancyHandler(natsURL string, nc *nats.Conn) *TenancyHandler {
 	h := &TenancyHandler{
 		connections: make(map[string]*ConnectionConfig),
-		nc:          nc,
 	}
 
 	// Add default connection from environment
 	// Extract server name from URL for better UX
 	serverName := "NATS Server"
 	if nc != nil && nc.IsConnected() {
-		if msg, err := nc.Request("$SYS.REQ.SERVER.PING", []byte("{}"), 1*time.Second); err == nil && msg != nil {
+		if msg, err := nc.Request(constants.SysServerPing, []byte("{}"), 1*time.Second); err == nil && msg != nil {
 			var serverResp struct {
 				Name string `json:"server_name"`
 			}
@@ -333,7 +330,7 @@ func (h *TenancyHandler) TestConnection(c *gin.Context) {
 	}
 
 	// Try to get server info
-	msg, err := nc.Request("$SYS.REQ.SERVER.PING", []byte("{}"), 2*time.Second)
+	msg, err := nc.Request(constants.SysServerPing, []byte("{}"), 2*time.Second)
 	serverInfo := make(map[string]interface{})
 	if err == nil {
 		json.Unmarshal(msg.Data, &serverInfo)

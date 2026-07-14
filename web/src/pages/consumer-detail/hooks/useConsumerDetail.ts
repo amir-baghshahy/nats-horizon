@@ -10,6 +10,7 @@ import type {
 } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { deleteConsumer, resetConsumerLag, replayMessages, setConsumerState } from "../../../utils/natsOperations";
+import { REFRESH_INTERVALS } from "../../../utils/constants";
 
 export interface ConsumerEditForm {
   ack_policy: string;
@@ -110,7 +111,7 @@ export function useConsumerDetail(): UseConsumerDetailReturn {
     queryKey: ["pendingMessages", consumerData.stream, name],
     queryFn: () => ConsumersService.getStreamsConsumersPending(consumerData.stream ?? "", name || ""),
     enabled: !!consumerData.stream && !!name && activeTab === "messages",
-    refetchInterval: 5000,
+    refetchInterval: REFRESH_INTERVALS.FAST,
   });
 
   const ackMutation = useMutation({

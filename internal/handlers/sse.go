@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
@@ -211,7 +212,7 @@ func (h *SSEHub) MonitorStreams() {
 		case <-h.ctx.Done():
 			return
 		case <-ticker.C:
-			msg, err := h.nc.Request("$JS.API.STREAM.LIST", []byte{}, 2*time.Second)
+			msg, err := h.nc.Request(constants.APIStreamList, []byte{}, 2*time.Second)
 			if err != nil {
 				continue
 			}
@@ -276,7 +277,7 @@ func (h *SSEHub) MonitorConsumers() {
 		case <-h.ctx.Done():
 			return
 		case <-ticker.C:
-			msg, err := h.nc.Request("$JS.API.STREAM.LIST", []byte{}, 2*time.Second)
+			msg, err := h.nc.Request(constants.APIStreamList, []byte{}, 2*time.Second)
 			if err != nil {
 				continue
 			}
@@ -300,7 +301,7 @@ func (h *SSEHub) MonitorConsumers() {
 				wg.Add(1)
 				go func(streamName string) {
 					defer wg.Done()
-					subject := fmt.Sprintf("$JS.API.CONSUMER.LIST.%s", streamName)
+					subject := fmt.Sprintf(constants.APIConsumerListPaged+"%s", streamName)
 					consumerMsg, err := h.nc.Request(subject, []byte{}, 2*time.Second)
 					if err != nil {
 						return
@@ -451,7 +452,7 @@ func (h *SSEHub) BroadcastDashboardStats() {
 	consumerCount := 0
 	totalMessages := uint64(0)
 
-	msg, err := h.nc.Request("$JS.API.STREAM.LIST", []byte{}, 2*time.Second)
+	msg, err := h.nc.Request(constants.APIStreamList, []byte{}, 2*time.Second)
 	if err != nil {
 		return
 	}

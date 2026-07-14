@@ -15,8 +15,6 @@ import (
 )
 
 // NotificationChannel represents a notification destination
-
-// NotificationChannel represents a notification destination
 type NotificationChannel struct {
 	Type    string                 `json:"type"`   // "slack", "webhook", "email"
 	Config  map[string]interface{} `json:"config"` // Channel-specific configuration

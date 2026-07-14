@@ -5,6 +5,7 @@ import type { KVBucketInfo, KVKeyEntry, KVKeyHistoryEntry } from "../../../types
 import { KvService } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { useToast } from "../../../components/Toast";
+import { REFRESH_INTERVALS } from "../../../utils/constants";
 
 export interface UseKVStoreReturn {
   selectedBucket: string | null;
@@ -68,7 +69,7 @@ export function useKVStore(): UseKVStoreReturn {
   const { data: buckets, refetch: refetchBuckets, isLoading: bucketsLoading, error: bucketsError } = useQuery({
     queryKey: ["kvBuckets"],
     queryFn: () => KvService.getKvBuckets(),
-    refetchInterval: 10000,
+    refetchInterval: REFRESH_INTERVALS.NORMAL,
   });
 
   const { data: keys, isLoading: keysLoading, error: keysError } = useQuery<KVKeyEntry[]>({

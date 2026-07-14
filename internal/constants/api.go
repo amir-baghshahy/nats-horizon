@@ -15,6 +15,17 @@ const (
 	APIConsumerCreate = "$JS.API.CONSUMER.CREATE"
 	APIConsumerUpdate = "$JS.API.CONSUMER.UPDATE"
 	APIConsumerDelete = "$JS.API.CONSUMER.DURABLE.DELETE"
+
+	APIConsumerListPaged = "$JS.API.CONSUMER.LIST."
+
+	JSServerPing  = "$JS.API.SERVER.PING"
+	JSAccountInfo = "$JS.API.ACCOUNT.INFO"
+
+	SysServerPing      = "$SYS.REQ.SERVER.PING"
+	SysServerPingConnz = "$SYS.REQ.SERVER.PING.CONNZ"
+	SysServerPingVarz  = "$SYS.REQ.SERVER.PING.VARZ"
+
+	SysClusterInfo = "$SYS.CLUSTER.INFO"
 )
 
 const (

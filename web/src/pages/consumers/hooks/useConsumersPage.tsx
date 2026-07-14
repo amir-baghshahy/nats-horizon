@@ -15,6 +15,7 @@ import {
   resetConsumerLag,
   setConsumerState,
 } from "../../../utils/natsOperations";
+import { getLagColor } from "../../../constants/thresholds";
 import { Activity, AlertCircle, CheckCircle, Clock } from "lucide-react";
 
 export type ConsumerFilterStatus = "all" | "active" | "stuck" | "idle";
@@ -369,12 +370,6 @@ export function useConsumersPage(): UseConsumersPageReturn {
       default:
         return t("consumers.unknown");
     }
-  };
-
-  const getLagColor = (lag: number) => {
-    if (lag > 10000) return "status-error";
-    if (lag > 1000) return "status-warning";
-    return "status-success";
   };
 
   const streamOptions = useMemo(

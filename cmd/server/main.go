@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -126,8 +128,19 @@ func CORSMiddleware(allowedOrigins string) gin.HandlerFunc {
 }
 
 func main() {
+	// Parse environment variables and command line flags
+	portFlag := flag.Int("port", 0, "server port (overrides config file)")
+	flag.Parse()
+
 	// Load config from JSON file (persistent settings)
 	cfg := config.Get()
+
+	// Apply port from flag (highest priority)
+	if *portFlag > 0 {
+		cfg.ServerPort = *portFlag
+	} else if port, err := strconv.Atoi(os.Getenv("PORT")); err == nil && port > 0 {
+		cfg.ServerPort = port
+	}
 
 	gin.SetMode(cfg.GinMode)
 
@@ -139,10 +152,10 @@ func main() {
 		log.Printf("Connecting to NATS at %s...", cfg.NATSURL)
 		natsConn, err = NewNATSConnection(cfg.NATSURL)
 		if err != nil {
-			log.Fatalf("Failed to connect to NATS: %v\\n\\n" +
-				"Please ensure:\\n" +
-				"1. NATS server is running and accessible\\n" +
-				"2. Configuration is correct\\n" +
+			log.Fatalf("Failed to connect to NATS: %v\n\n"+
+				"Please ensure:\n"+
+				"1. NATS server is running and accessible\n"+
+				"2. Configuration is correct\n"+
 				"Run setup again to reconfigure", err)
 		}
 		log.Println("Connected to NATS")
@@ -203,7 +216,7 @@ func main() {
 		securityHandler = handlers.NewSecurityHandler(natsConn.nc, natsConn.js, auditService)
 		historyHandler = handlers.NewHistoryHandler(natsConn.nc, natsConn.js)
 
-		sseHub = handlers.NewSSEHub(natsConn.nc)
+sseHub = handlers.NewSSEHub(natsConn.nc)
 		go sseHub.MonitorStreams()
 		go sseHub.MonitorConsumers()
 		defer metricsHandler.Stop()
@@ -215,7 +228,6 @@ func main() {
 	// Initialize config handler (works without NATS)
 	configHandler := handlers.NewConfigHandler()
 	tenancyHandler := handlers.NewTenancyHandler(cfg.NATSURL, natsConn.nc)
-
 
 	r := gin.New()
 	r.Use(gin.Logger())
@@ -287,7 +299,6 @@ func main() {
 		apiGroup.PUT("/kv/buckets/:name/key", kvHandler.PutKey)
 		apiGroup.DELETE("/kv/buckets/:name/key", kvHandler.DeleteKey)
 		apiGroup.POST("/kv/buckets/:name/purge", kvHandler.PurgeBucket)
-
 
 		// Consumer Ack Management routes
 		apiGroup.GET("/streams/:name/consumers/:consumer/pending", consumerHandler.GetPendingMessages)

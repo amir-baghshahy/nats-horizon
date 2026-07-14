@@ -108,7 +108,9 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
   );
 }
 
-function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: any }) {
+type TranslateFn = ReturnType<typeof useTranslation>["t"];
+
+function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: TranslateFn }) {
   const [open, setOpen] = useState(false);
 
   const label = conn.user || conn.name || (t('connections.anonymous') || 'Anonymous');

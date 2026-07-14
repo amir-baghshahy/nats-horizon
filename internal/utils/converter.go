@@ -54,10 +54,7 @@ func ConsumerToResponse(consumer *models.Consumer) *dto.ConsumerResponse {
 		return nil
 	}
 
-	durable := ""
-	if consumer.Durable {
-		durable = consumer.Name
-	}
+	durable := GetDurableName(consumer)
 
 	return &dto.ConsumerResponse{
 		Name:          consumer.Name,

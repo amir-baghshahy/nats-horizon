@@ -22,10 +22,10 @@ type App struct {
 	nc *nats.Conn
 	js nats.JetStreamContext
 
-	streamUseCase  *services.StreamUseCase
+	streamUseCase   *services.StreamUseCase
 	consumerUseCase *services.ConsumerUseCase
-	messageUseCase *services.MessageUseCase
-	serverUseCase  *services.ServerUseCase
+	messageUseCase  *services.MessageUseCase
+	serverUseCase   *services.ServerUseCase
 
 	natsURL string
 }
@@ -83,10 +83,19 @@ func (a *App) connectNATS(natsURL string) {
 		return
 	}
 
+	a.applyConnection(nc, js, natsURL)
+
+	log.Println("Desktop: Connected to NATS")
+}
+
+func (a *App) applyConnection(nc *nats.Conn, js nats.JetStreamContext, natsURL string) {
 	a.nc = nc
 	a.js = js
 	a.natsURL = natsURL
+	a.initUseCases(nc, js)
+}
 
+func (a *App) initUseCases(nc *nats.Conn, js nats.JetStreamContext) {
 	streamRepo := repositories.NewNATSStreamRepository(nc, js)
 	consumerRepo := repositories.NewNATSConsumerRepository(nc, js)
 	messageRepo := repositories.NewNATSMessageRepository(nc, js)
@@ -95,8 +104,6 @@ func (a *App) connectNATS(natsURL string) {
 	a.consumerUseCase = services.NewConsumerUseCase(consumerRepo)
 	a.messageUseCase = services.NewMessageUseCase(messageRepo)
 	a.serverUseCase = services.NewServerUseCase(nc, js)
-
-	log.Println("Desktop: Connected to NATS")
 }
 
 func (a *App) ShutDown(ctx context.Context) {
@@ -141,18 +148,7 @@ func (a *App) SetNATSURL(url string) error {
 		return fmt.Errorf("failed to get JetStream context: %w", err)
 	}
 
-	a.nc = nc
-	a.js = js
-	a.natsURL = url
-
-	streamRepo := repositories.NewNATSStreamRepository(nc, js)
-	consumerRepo := repositories.NewNATSConsumerRepository(nc, js)
-	messageRepo := repositories.NewNATSMessageRepository(nc, js)
-
-	a.streamUseCase = services.NewStreamUseCase(streamRepo)
-	a.consumerUseCase = services.NewConsumerUseCase(consumerRepo)
-	a.messageUseCase = services.NewMessageUseCase(messageRepo)
-	a.serverUseCase = services.NewServerUseCase(nc, js)
+	a.applyConnection(nc, js, url)
 
 	return nil
 }
@@ -362,7 +358,7 @@ func (a *App) GetKVBuckets() ([]dto.KVBucketInfo, error) {
 
 	for {
 		req := fmt.Sprintf(`{"offset":%d,"limit":%d}`, offset, limit)
-		msg, err := a.nc.Request("$JS.API.STREAM.LIST", []byte(req), 5*time.Second)
+		msg, err := a.nc.Request(constants.APIStreamList, []byte(req), 5*time.Second)
 		if err != nil {
 			return nil, fmt.Errorf("failed to list streams: %w", err)
 		}
@@ -468,7 +464,7 @@ func (a *App) GetClusterInfo() (*dto.ClusterInfoResponse, error) {
 	jsTier := "standard"
 	jsAPI := "0"
 
-	msg, err := a.nc.Request("$JS.API.SERVER.PING", []byte{}, 2*time.Second)
+	msg, err := a.nc.Request(constants.JSServerPing, []byte{}, 2*time.Second)
 	if err == nil && msg != nil {
 		var serverInfo struct {
 			Name       string `json:"server_name"`
@@ -520,7 +516,7 @@ func (a *App) GetSecurityInfo() (interface{}, error) {
 	dataLimit := 0
 	payloadLimit := 0
 
-	accountMsg, err := a.nc.Request("$JS.API.ACCOUNT.INFO", []byte("{}"), 2*time.Second)
+	accountMsg, err := a.nc.Request(constants.JSAccountInfo, []byte("{}"), 2*time.Second)
 	if err == nil && accountMsg != nil {
 		var accountResp struct {
 			Type    string `json:"type"`
@@ -557,7 +553,7 @@ func (a *App) GetSecurityInfo() (interface{}, error) {
 		TLSRequired  bool `json:"tls_required"`
 		TLSVerify    bool `json:"tls_verify"`
 	}
-	serverMsg, err := a.nc.Request("$SYS.REQ.SERVER.PING", []byte("{}"), 2*time.Second)
+	serverMsg, err := a.nc.Request(constants.SysServerPing, []byte("{}"), 2*time.Second)
 	if err == nil && serverMsg != nil {
 		json.Unmarshal(serverMsg.Data, &serverResp)
 	}

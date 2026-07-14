@@ -17,6 +17,7 @@ import {
   TrafficMonitorPanel,
 } from "../components/messaging";
 import { useToast } from "../components/Toast";
+import { REFRESH_INTERVALS } from "../utils/constants";
 import { PageError, PageLoading } from "../components/ui/PageState";
 import { ModalWrapper } from "../components/ui/Modal";
 import { Button } from "../components/ui";
@@ -143,7 +144,7 @@ export function CoreMessagingContent({
   } = useQuery({
     queryKey: ["serviceDiscovery"],
     queryFn: () => CoreNatsService.getCoreServices(),
-    refetchInterval: 10000,
+    refetchInterval: REFRESH_INTERVALS.NORMAL,
   });
 
   const handleSubscribe = (subject: string) => {

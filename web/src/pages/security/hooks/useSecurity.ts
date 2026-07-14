@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { SecurityService } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { formatBytes } from "../../../utils/formatters";
+import { REFRESH_INTERVALS } from "../../../utils/constants";
 
 export interface User {
   name: string;
@@ -77,7 +78,7 @@ export function useSecurity(): UseSecurityReturn {
   } = useQuery({
     queryKey: ["securityInfo"],
     queryFn: () => SecurityService.getSecurityInfo(),
-    refetchInterval: 30000,
+    refetchInterval: REFRESH_INTERVALS.SLOW,
   });
 
   const {
@@ -108,7 +109,7 @@ export function useSecurity(): UseSecurityReturn {
   } = useQuery({
     queryKey: ["connectionSecurity"],
     queryFn: () => SecurityService.getSecurityConnections(),
-    refetchInterval: 10000,
+    refetchInterval: REFRESH_INTERVALS.NORMAL,
   });
 
   const createUserMutation = useMutation({

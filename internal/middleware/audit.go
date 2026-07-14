@@ -59,7 +59,7 @@ func AuditMiddleware(auditSvc *services.AuditService) gin.HandlerFunc {
 		metadata := extractMetadata(c)
 
 		// Create audit event
-		details := buildDetails(method, path, c)
+		details := buildDetails(method, resource)
 
 		if err := auditSvc.LogAction(action, user, resource, details, metadata); err != nil {
 			log.Printf("Failed to log audit event: %v", err)
@@ -148,7 +148,7 @@ func extractMetadata(c *gin.Context) services.Metadata {
 }
 
 // buildDetails creates a human-readable description of the action
-func buildDetails(method, path string, c *gin.Context) string {
+func buildDetails(method, resource string) string {
 	actionMap := map[string]string{
 		"POST":   "Created",
 		"PUT":    "Updated",
@@ -162,7 +162,6 @@ func buildDetails(method, path string, c *gin.Context) string {
 		action = "Accessed"
 	}
 
-	resource := determineResource(path, c)
 	return action + " " + resource
 }
 

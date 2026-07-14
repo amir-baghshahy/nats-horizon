@@ -177,20 +177,3 @@ type ConsumerInfo struct {
 	ReplayPolicy  string
 	MaxDeliver    int64
 }
-
-// GetAllConsumers returns all consumers across all streams
-func (uc *ConsumerUseCase) GetAllConsumers(ctx context.Context) ([]*ConsumerInfo, error) {
-	// This requires cross-stream access
-	// For now, return an error - this needs repository support
-	return nil, fmt.Errorf("cross-stream consumer listing requires repository support")
-}
-
-// FindConsumerByName finds a consumer by name across all streams
-func (uc *ConsumerUseCase) FindConsumerByName(ctx context.Context, name string) (*ConsumerInfo, error) {
-	if name == "" {
-		return nil, fmt.Errorf("consumer name is required")
-	}
-	// This requires cross-stream access
-	// For now, return an error - this needs repository support
-	return nil, fmt.Errorf("cross-stream consumer search requires repository support")
-}

@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
@@ -73,7 +74,7 @@ func (h *HistoryHandler) collectData() {
 	now := time.Now()
 
 	// Collect stream metrics
-	msg, err := h.nc.Request("$JS.API.STREAM.LIST", []byte("{}"), 2*time.Second)
+	msg, err := h.nc.Request(constants.APIStreamList, []byte("{}"), 2*time.Second)
 	if err != nil {
 		return
 	}

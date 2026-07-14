@@ -8,6 +8,7 @@ import type {
 } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { deleteStream, purgeStream } from "../../../utils/natsOperations";
+import { REFRESH_INTERVALS } from "../../../utils/constants";
 
 export interface StreamEditForm {
   subjects: string;
@@ -69,7 +70,7 @@ export function useStreamDetail(): UseStreamDetailReturn {
       ConsumersService.getConsumers().then((consumers) =>
         consumers.filter((consumer: any) => consumer.stream === name),
       ),
-    refetchInterval: 5000,
+    refetchInterval: REFRESH_INTERVALS.FAST,
   });
 
   const updateMutation = useMutation({

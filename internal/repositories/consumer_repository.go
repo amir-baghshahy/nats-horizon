@@ -419,10 +419,7 @@ func (r *NATSConsumerRepository) GetPendingMessages(ctx context.Context, streamN
 			continue
 		}
 
-		headers := make(map[string][]string)
-		for k, v := range raw.Header {
-			headers[k] = v
-		}
+		headers := copyHeaders(raw.Header)
 
 		messages = append(messages, &models.Message{
 			Subject:   raw.Subject,

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ConnectionConfig, ConnectionStatus } from '../../../types'
 import { TenancyService } from '../../../types'
 import { useConfirm } from '../../../components/ConfirmDialog'
+import { REFRESH_INTERVALS } from '../../../utils/constants'
 
 type ConnectionTestResult = {
   healthy?: boolean
@@ -54,7 +55,7 @@ export function useTenancy(): UseTenancyReturn {
   const { data: connections, isLoading: connectionsLoading, error: connectionsError, refetch: refetchConnections } = useQuery({
     queryKey: ['tenancyConnections'],
     queryFn: () => TenancyService.getTenancyConnections(),
-    refetchInterval: 30000,
+    refetchInterval: REFRESH_INTERVALS.SLOW,
   })
 
   const { data: statuses, isLoading: statusesLoading, error: statusesError } = useQuery({

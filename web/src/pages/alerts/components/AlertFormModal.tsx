@@ -56,7 +56,7 @@ export default function AlertFormModal({
       email_address: formData.get("email_address") as string,
       webhook_url: formData.get("webhook_url") as string,
       slack_webhook_url: formData.get("slack_webhook_url") as string,
-      cooldown: 300000000000 as any,
+      cooldown: 300000000000,
     };
     onSubmit(data);
   };

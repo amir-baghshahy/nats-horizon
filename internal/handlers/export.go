@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/amir-baghshahy/nats-horizon/internal/utils"
 	"github.com/gin-gonic/gin"
@@ -427,7 +428,7 @@ func (h *ExportHandler) ExportMessages(c *gin.Context) {
 //	@Router			/export/streams [get]
 func (h *ExportHandler) ExportAllStreams(c *gin.Context) {
 
-	msg, err := h.nc.Request("$JS.API.STREAM.LIST", []byte("{}"), 2*time.Second)
+	msg, err := h.nc.Request(constants.APIStreamList, []byte("{}"), 2*time.Second)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
 		return

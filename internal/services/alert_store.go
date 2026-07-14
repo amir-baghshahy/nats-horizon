@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
-
-	"github.com/amir-baghshahy/nats-horizon/internal/config"
 )
 
 // AlertStore handles persistence of alerts to JSON file
@@ -30,7 +28,7 @@ type PersistedAlert struct {
 	EmailAddress    string         `json:"email_address"`
 	WebhookURL      string         `json:"webhook_url"`
 	SlackWebhookURL string         `json:"slack_webhook_url"`
-	Cooldown        int64  `json:"cooldown"`
+	Cooldown        int64          `json:"cooldown"`
 	LastTrigger     time.Time      `json:"last_trigger"`
 	TriggerCount    int            `json:"trigger_count"`
 	CreatedAt       time.Time      `json:"created_at"`
@@ -193,13 +191,4 @@ func (s *AlertStore) UpdateLastTrigger(id string) error {
 		}
 	}
 	return fmt.Errorf("alert not found")
-}
-
-// SyncFromConfig syncs alerts from config (for migration)
-func (s *AlertStore) SyncFromConfig() {
-	cfg := config.Get()
-	if cfg == nil {
-		return
-	}
-	// This can be used to migrate from config-based alerts to store-based
 }

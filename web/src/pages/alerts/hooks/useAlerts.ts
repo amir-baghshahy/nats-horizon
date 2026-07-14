@@ -4,12 +4,14 @@ import type { Alert, AlertTrigger } from "../../../types";
 import { AlertsService } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { useToast } from "../../../components/Toast";
+import { REFRESH_INTERVALS } from "../../../utils/constants";
 
 export function useAlerts() {
   const [activeTab, setActiveTab] = useState<"alerts" | "triggers">("alerts");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
-  const [filterSeverity, setFilterSeverity] = useState<string>("all");
+  const [filterSeverity, setFilterSeverity] =
+    useState<"all" | "critical" | "warning" | "info">("all");
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -18,13 +20,13 @@ export function useAlerts() {
   const { data: alerts, isLoading: alertsLoading, error: alertsError, refetch: refetchAlerts } = useQuery({
     queryKey: ["alerts"],
     queryFn: () => AlertsService.getAlerts() as Promise<Alert[]>,
-    refetchInterval: 10000,
+    refetchInterval: REFRESH_INTERVALS.NORMAL,
   });
 
   const { data: triggers, isLoading: triggersLoading, error: triggersError, refetch: refetchTriggers } = useQuery({
     queryKey: ["alertTriggers"],
     queryFn: () => AlertsService.getAlertsTriggers() as Promise<AlertTrigger[]>,
-    refetchInterval: 5000,
+    refetchInterval: REFRESH_INTERVALS.FAST,
     enabled: activeTab === "triggers",
   });
 
@@ -68,7 +70,7 @@ export function useAlerts() {
       queryClient.invalidateQueries({ queryKey: ["alertTriggers"] });
       toast("success", `${data.triggered} alert${data.triggered === 1 ? "" : "s"} triggered from ${data.evaluated} checked`);
     },
-    onError: (error: any) => { toast("error", error?.response?.data?.error || "Failed to check alerts"); },
+    onError: (error: any) => { toast("error", error?.body?.error || error?.message || "Failed to check alerts"); },
   });
 
   return {

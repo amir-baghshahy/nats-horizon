@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/amir-baghshahy/nats-horizon/internal/services"
 	"github.com/gin-gonic/gin"
@@ -76,7 +77,7 @@ func (h *SecurityHandler) GetSecurityInfo(c *gin.Context) {
 	dataLimit := 0
 	payloadLimit := 0
 
-	accountMsg, err := h.nc.Request("$JS.API.ACCOUNT.INFO", []byte("{}"), 2*time.Second)
+	accountMsg, err := h.nc.Request(constants.JSAccountInfo, []byte("{}"), 2*time.Second)
 	if err == nil && accountMsg != nil {
 		var accountResp struct {
 			Type    string `json:"type"`
@@ -116,7 +117,7 @@ func (h *SecurityHandler) GetSecurityInfo(c *gin.Context) {
 		TLSRequired  bool `json:"tls_required"`
 		TLSVerify    bool `json:"tls_verify"`
 	}
-	serverMsg, err := h.nc.Request("$SYS.REQ.SERVER.PING", []byte("{}"), 2*time.Second)
+	serverMsg, err := h.nc.Request(constants.SysServerPing, []byte("{}"), 2*time.Second)
 	if err == nil && serverMsg != nil {
 		if err := json.Unmarshal(serverMsg.Data, &serverResp); err != nil {
 			log.Printf("Failed to unmarshal server info: %v", err)
@@ -327,7 +328,7 @@ func (h *SecurityHandler) GetConnectionStatus(c *gin.Context) {
 	tlsRequired := false
 	tlsVerify := false
 
-	serverMsg, err := h.nc.Request("$SYS.REQ.SERVER.PING", []byte("{}"), 2*time.Second)
+	serverMsg, err := h.nc.Request(constants.SysServerPing, []byte("{}"), 2*time.Second)
 	if err == nil && serverMsg != nil {
 		var serverResp struct {
 			Name         string `json:"server_name"`

@@ -118,6 +118,7 @@ func (c *AppConfig) Update(updates map[string]interface{}) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	// Server settings
 	if v, ok := updates["server_port"]; ok {
 		if n, ok := toInt(v); ok {
 			c.ServerPort = n
@@ -128,11 +129,15 @@ func (c *AppConfig) Update(updates map[string]interface{}) error {
 			c.GinMode = s
 		}
 	}
+
+	// NATS settings
 	if v, ok := updates["nats_url"]; ok {
 		if s, ok := v.(string); ok {
 			c.NATSURL = s
 		}
 	}
+
+	// SMTP settings for email alerts
 	if v, ok := updates["smtp_host"]; ok {
 		if s, ok := v.(string); ok {
 			c.SMTPHost = s
@@ -158,6 +163,8 @@ func (c *AppConfig) Update(updates map[string]interface{}) error {
 			c.SMTPFrom = s
 		}
 	}
+
+	// CORS settings
 	if v, ok := updates["cors_allowed_origins"]; ok {
 		if s, ok := v.(string); ok {
 			c.CORSAllowedOrigins = s

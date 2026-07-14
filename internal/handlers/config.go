@@ -129,10 +129,6 @@ func (h *ConfigHandler) UpdateConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":      "Configuration saved successfully",
 		"nats_changed": natsChanged,
-		"config": gin.H{
-			"server_port": cfg.ServerPort,
-			"nats_url":    cfg.NATSURL,
-		},
 	})
 }
 

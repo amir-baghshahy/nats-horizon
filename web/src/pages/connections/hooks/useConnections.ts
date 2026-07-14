@@ -4,6 +4,7 @@ import { useToast } from '../../../components/Toast'
 import { useConfirm } from '../../../components/ConfirmDialog'
 import { HealthService } from '../../../types'
 import type { ConnectionInfo } from '../../../types'
+import { REFRESH_INTERVALS } from '../../../utils/constants'
 
 export interface UseConnectionsReturn {
   searchQuery: string
@@ -39,7 +40,7 @@ export function useConnections(): UseConnectionsReturn {
   const { data: connectionsResponse, isLoading, refetch } = useQuery({
     queryKey: ['connections'],
     queryFn: () => HealthService.getConnections(),
-    refetchInterval: 5000,
+    refetchInterval: REFRESH_INTERVALS.FAST,
   })
 
   const connections = connectionsResponse?.connections || []

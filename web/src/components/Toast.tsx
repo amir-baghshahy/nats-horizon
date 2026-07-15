@@ -53,11 +53,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
         {toasts.map((t, index) => {
           const Icon = ICONS[t.type]
-          const delayClass = index === 0 ? "" : `animate-delay-${Math.min(index * 100, 500)}`
+          const delayStyle = index > 0 ? { animationDelay: `${Math.min(index * 100, 500)}ms` } : undefined
           return (
             <div
               key={t.id}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-lg shadow-lg animate-slide-right animate-duration-200 hover-lift pointer-events-auto ${delayClass} ${COLORS[t.type]}`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-lg shadow-lg animate-slide-right animate-duration-200 hover-lift pointer-events-auto ${COLORS[t.type]}`}
+              style={delayStyle}
             >
               <Icon className="icon-md flex-shrink-0 animate-bounce-in" />
               <span className="text-display-sm flex-1">{t.message}</span>

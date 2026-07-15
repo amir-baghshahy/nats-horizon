@@ -153,6 +153,8 @@
     "showLess": "Show less",
     "showMore": "Show {{count}} more",
     "consumerHealth": "Consumer Health (Highest Lag)",
+    "noConsumerData": "No Consumer Data",
+    "noConsumerDataDescription": "Consumer health metrics will appear here once consumers are active.",
     "critical": "Critical",
     "slow": "Slow",
     "healthy": "Healthy",
@@ -164,7 +166,8 @@
     "memory": "Memory",
     "storage": "Storage",
     "messageRate": "Message Rate",
-    "na": "N/A"
+    "na": "N/A",
+    "connectionsWillAppear": "Client connections will appear here"
   },
   "streams": {
     "title": "Streams",
@@ -811,7 +814,8 @@
     "noStreamTrend": "No Stream Trend",
     "noStreamTrendDescription": "Select a stream to view historical message points.",
     "selectStreamForTrend": "Select a stream to view its trend",
-    "dataPoints": "points"
+    "dataPoints": "points",
+    "dataPoints_other": "points"
   },
   "tenancy": {
     "title": "Multi-Tenancy",
@@ -886,6 +890,9 @@
     "successDesc": "nats-horizon is starting...",
     "failed": "Setup failed. Please try again.",
     "back": "Back",
-    "next": "Next"
+    "next": "Next",
+    "restarting": "Restarting...",
+    "restartingDescription": "Please wait while the server restarts",
+    "finishing": "Finishing..."
   }
 }

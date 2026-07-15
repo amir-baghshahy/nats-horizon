@@ -15,6 +15,7 @@ export default function ClusterHealthCard({ health }: ClusterHealthCardProps) {
 
   const status = health.status || (health.connected ? "ok" : "unknown");
   const isOk = status === "ok" || status === "healthy";
+  const displayStatus = status.charAt(0).toUpperCase() + status.slice(1);
 
   const Icon = isOk ? CheckCircle2 : status === "degraded" ? AlertTriangle : XCircle;
   const tone = isOk
@@ -41,7 +42,7 @@ export default function ClusterHealthCard({ health }: ClusterHealthCardProps) {
       </div>
       <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-display-xs font-medium shrink-0 ring-1 ${tone}`}>
         <Icon className="h-3 w-3" />
-        {status}
+        {displayStatus}
       </span>
     </button>
   );

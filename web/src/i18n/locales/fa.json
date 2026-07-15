@@ -164,7 +164,10 @@
     "memory": "حافظه",
     "storage": "ذخیره‌سازی",
     "messageRate": "نرخ پیام",
-    "na": "نامشخص"
+    "na": "نامشخص",
+    "noConsumerData": "No Consumer Data",
+    "noConsumerDataDescription": "Consumer health metrics will appear here once consumers are active.",
+    "connectionsWillAppear": "Client connections will appear here"
   },
   "streams": {
     "title": "استریم‌ها",
@@ -811,7 +814,8 @@
     "noStreamTrend": "روند استریمی وجود ندارد",
     "noStreamTrendDescription": "یک استریم برای مشاهده نقاط تاریخی پیام انتخاب کنید.",
     "dataPoints": "نقطه",
-    "selectStreamForTrend": "یک جریان را برای مشاهده روند انتخاب کنید"
+    "selectStreamForTrend": "یک جریان را برای مشاهده روند انتخاب کنید",
+    "dataPoints_other": "points"
   },
   "tenancy": {
     "title": "چند‌اجاره‌ای",
@@ -886,6 +890,9 @@
     "successDesc": "nats-horizon در حال راه‌اندازی است...",
     "failed": "راه‌اندازی ناموفق بود. لطفاً دوباره تلاش کنید.",
     "back": "بازگشت",
-    "next": "بعدی"
+    "next": "بعدی",
+    "restarting": "Restarting...",
+    "restartingDescription": "Please wait while the server restarts",
+    "finishing": "Finishing..."
   }
 }

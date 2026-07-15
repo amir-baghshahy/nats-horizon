@@ -95,7 +95,7 @@ export default function HistoryPage({
             <HistoryIcon className="h-4 w-4 text-primary-400" />
             <h3 className="text-display-sm font-semibold">{t("history.streamSummary")}</h3>
             <span className="ml-auto text-display-xs text-content-tertiary">
-              {historyStreams.length} {t("common.streams") || "streams"}
+              {historyStreams.length} {t("common.streams")}
             </span>
           </div>
 
@@ -165,18 +165,18 @@ export default function HistoryPage({
               </span>
             )}
             <span className="ml-auto text-display-xs text-content-tertiary">
-              {chartData.length} {t("history.dataPoints") || "points"}
+              {chartData.length} {t("history.dataPoints")}
             </span>
           </div>
 
           {chartData.length < 2 ? (
-            <EmptyState
-              icon={BarChart3}
-              title={t("history.noStreamTrend")}
-              description={selectedStream === "all"
-                ? (t("history.selectStreamForTrend") || "Select a stream to view its trend")
-                : t("history.noStreamTrendDescription")}
-            />
+              <EmptyState
+                icon={BarChart3}
+                title={t("history.noStreamTrend")}
+                description={selectedStream === "all"
+                  ? t("history.selectStreamForTrend")
+                  : t("history.noStreamTrendDescription")}
+              />
           ) : (
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -213,7 +213,7 @@ export default function HistoryPage({
                         <div className="rounded-lg border border-border-default bg-surface-secondary/95 px-3 py-2 text-display-xs shadow-lg backdrop-blur">
                           <p className="text-content-tertiary mb-1">{label}</p>
                           <p className="font-semibold text-primary-400 tabular-nums">
-                            {(payload[0].value as number).toLocaleString()} {t("common.messages") || "messages"}
+                            {(payload[0].value as number).toLocaleString()} {t("common.messages")}
                           </p>
                         </div>
                       );

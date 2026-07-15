@@ -18,9 +18,9 @@ export default function MessagingHeader({
   const { t } = useTranslation();
 
   return (
-    <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
-        <h1 className="text-display-2xl font-bold md:text-3xl">{t('messages.title')}</h1>
+        <h1 className="text-display-lg font-bold">{t('messages.title')}</h1>
         <p className="mt-1 text-content-tertiary">{t('messages.subtitle')}</p>
       </div>
 

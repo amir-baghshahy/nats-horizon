@@ -21,7 +21,6 @@ export default function SetupWizard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [restarting, setRestarting] = useState(() => {
-    // Check localStorage on mount to persist restart state across page reloads
     return localStorage.getItem(RESTART_KEY) === "true";
   });
 
@@ -37,6 +36,12 @@ export default function SetupWizard() {
 
   const updateField = (field: keyof SetupData, value: string | number) => {
     setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const getErrorMessage = (err: unknown) => {
+    if (err instanceof Error) return err.message;
+    if (typeof err === "string") return err;
+    return "setup.failed";
   };
 
   const finishSetup = async () => {
@@ -56,8 +61,8 @@ export default function SetupWizard() {
       setRestarting(true);
       localStorage.setItem(RESTART_KEY, "true");
       await handleServerRestart();
-    } catch (err: any) {
-      setError(err.message || "setup.failed");
+    } catch (err) {
+      setError(getErrorMessage(err));
       setLoading(false);
     }
   };
@@ -116,15 +121,22 @@ export default function SetupWizard() {
     return (
       <div className="min-h-screen bg-surface-primary flex items-center justify-center p-6">
         <div className="text-center">
-          <div className="animate-spin icon-lg border-4 border-blue-400 border-t-transparent rounded-full mx-auto mb-4" />
-          <h2 className="text-display-xl font-bold text-content-primary">Restarting...</h2>
-          <p className="text-display-sm text-content-tertiary">Please wait</p>
+          <div className="animate-spin icon-lg border-4 border-primary-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <h2 className="text-display-xl font-bold text-content-primary">{t("setup.restarting")}</h2>
+          <p className="text-display-sm text-content-tertiary">{t("setup.restartingDescription")}</p>
         </div>
       </div>
     );
   }
 
   const CurrentIcon = step === 0 ? Globe : step === 1 ? Database : step === 2 ? Mail : Check;
+
+  const stepLabels = [
+    t("setup.welcome"),
+    t("setup.nats"),
+    t("setup.smtp"),
+    t("setup.complete"),
+  ];
 
   return (
     <div className="min-h-screen bg-surface-primary flex items-center justify-center p-4 sm:p-6">
@@ -145,6 +157,16 @@ export default function SetupWizard() {
                   i < step ? "bg-green-500" : "bg-border-default"
                 }`} />
               )}
+            </div>
+          ))}
+        </div>
+        {/* Step labels */}
+        <div className="flex items-center justify-center mb-4 -mt-2">
+          {stepLabels.map((label, i) => (
+            <div key={i} className={`flex-1 text-center text-display-xs font-medium ${
+              i === step ? "text-content-primary" : "text-content-tertiary"
+            }`}>
+              {label}
             </div>
           ))}
         </div>
@@ -201,58 +223,58 @@ export default function SetupWizard() {
             {step === 1 && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-display-sm font-medium mb-2 text-content-primary">NATS URL</label>
+                  <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("setup.natsUrl")}</label>
                   <input
                     type="text"
                     value={data.nats_url}
                     onChange={(e) => updateField("nats_url", e.target.value)}
                     placeholder="nats://localhost:4222"
-                    className="w-full px-4 py-3 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="input"
                   />
                 </div>
                 <div>
-                  <label className="block text-display-sm font-medium mb-2 text-content-primary">Server Port</label>
+                  <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("setup.serverPort")}</label>
                   <input
                     type="number"
                     value={data.server_port}
                     onChange={(e) => updateField("server_port", parseInt(e.target.value) || 3000)}
-                    className="w-full px-4 py-3 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="input"
                   />
                 </div>
               </div>
             )}
 
             {step === 2 && (
-              <div className="space-y-1.5">
-                <p className="text-display-xs text-content-tertiary mb-1.5">{t("setup.smtpOptional")}</p>
-                <div className="grid grid-cols-1 gap-1.5">
+              <div className="space-y-4">
+                <p className="text-display-sm text-content-tertiary mb-1.5">{t("setup.smtpOptional")}</p>
+                <div className="grid grid-cols-1 gap-4">
                   <input
                     type="text"
                     value={data.smtp_host}
                     onChange={(e) => updateField("smtp_host", e.target.value)}
                     placeholder={t("setup.smtpHost")}
-                    className="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="input"
                   />
                   <input
                     type="number"
                     value={data.smtp_port}
                     onChange={(e) => updateField("smtp_port", parseInt(e.target.value) || 587)}
                     placeholder={t("setup.smtpPort")}
-                    className="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="input"
                   />
                   <input
                     type="text"
                     value={data.smtp_username}
                     onChange={(e) => updateField("smtp_username", e.target.value)}
                     placeholder={t("setup.smtpUsername")}
-                    className="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="input"
                   />
                   <input
                     type="password"
                     value={data.smtp_password}
                     onChange={(e) => updateField("smtp_password", e.target.value)}
                     placeholder={t("setup.smtpPassword")}
-                    className="w-full px-3 py-2 rounded-lg border border-border-default bg-surface-primary text-content-primary text-display-xs focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="input"
                   />
                 </div>
               </div>
@@ -284,7 +306,7 @@ export default function SetupWizard() {
           {error && (
             <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-display-sm mb-4">
               <AlertCircle className="icon-base flex-shrink-0" />
-              <span>{t(error)}</span>
+              <span>{error.includes('.') ? t(error) : error}</span>
             </div>
           )}
 

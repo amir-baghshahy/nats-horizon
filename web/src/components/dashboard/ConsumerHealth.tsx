@@ -1,6 +1,7 @@
 import type { ConsumerResponse } from "../../types";
 import { getConsumerStatus } from "../../utils/validators";
 import { useTranslation } from "react-i18next";
+import { Database } from "lucide-react";
 
 interface ConsumerHealthProps {
   consumers: ConsumerResponse[];
@@ -10,7 +11,15 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
   const { t } = useTranslation();
 
   if (!consumers || consumers.length === 0) {
-    return null;
+    return (
+      <div className="card h-full flex flex-col items-center justify-center gap-3 text-center p-6">
+        <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-primary/50 text-content-tertiary">
+          <Database className="h-7 w-7" />
+        </div>
+        <h3 className="text-display-lg font-semibold text-content-primary">{t('dashboard.noConsumerData')}</h3>
+        <p className="text-display-sm text-content-secondary max-w-xs">{t('dashboard.noConsumerDataDescription')}</p>
+      </div>
+    );
   }
 
   const topLagging = [...consumers]
@@ -67,11 +76,10 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
         })}
       </div>
       <div className="p-2 border-t border-border-default bg-surface-primary/50 text-center text-display-xs text-content-tertiary shrink-0">
-        {t('dashboard.consumerHealthFooter', {
+        <span className="truncate block">{t('dashboard.consumerHealthFooter', {
           shown: topLagging.length,
           total: consumers.length,
-          defaultValue: `Showing top ${topLagging.length} of ${consumers.length} consumers`,
-        })}
+        })}</span>
       </div>
     </div>
   );

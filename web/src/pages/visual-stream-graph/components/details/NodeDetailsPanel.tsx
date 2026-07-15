@@ -13,38 +13,40 @@ interface NodeDetailsPanelProps {
 }
 
 export function NodeDetailsPanel({ node, onClose }: NodeDetailsPanelProps) {
-  if (!node) return null
-
   return (
-    <div className="fixed right-0 top-0 h-full w-96 border-l border-border-default bg-surface-secondary shadow-2xl z-50 flex flex-col">
-      {/* Header */}
-      <div className="flex flex-shrink-0 items-center justify-between border-b border-border-default/70 p-4 bg-surface-primary/30">
-        <div className="flex items-center gap-2">
-          {node.type === 'stream' ? (
-            <Database className="h-5 w-5 text-primary-400" />
-          ) : (
-            <Users className="h-5 w-5 text-blue-400" />
-          )}
-          <h2 className="text-display-lg font-semibold text-content-primary truncate max-w-[200px]">
-            {node.data.name}
-          </h2>
-        </div>
-        <button
-          onClick={onClose}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-content-tertiary transition-colors hover:bg-surface-primary hover:text-content-primary"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
+    <div className={`fixed right-0 top-0 h-full w-96 border-l border-border-default bg-surface-secondary shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${node ? 'translate-x-0' : 'translate-x-full'}`}>
+      {node && (
+        <>
+          {/* Header */}
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-border-default/70 p-4 bg-surface-primary/30">
+            <div className="flex items-center gap-2">
+              {node.type === 'stream' ? (
+                <Database className="h-5 w-5 text-primary-400" />
+              ) : (
+                <Users className="h-5 w-5 text-blue-400" />
+              )}
+              <h2 className="text-display-lg font-semibold text-content-primary truncate max-w-[200px]">
+                {node.data.name}
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-content-tertiary transition-colors hover:bg-surface-primary hover:text-content-primary"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {node.type === 'stream' ? (
-          <StreamDetails data={node.data} />
-        ) : (
-          <ConsumerDetails data={node.data} />
-        )}
-      </div>
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {node.type === 'stream' ? (
+              <StreamDetails data={node.data} />
+            ) : (
+              <ConsumerDetails data={node.data} />
+            )}
+          </div>
+        </>
+      )}
     </div>
   )
 }

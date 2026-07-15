@@ -164,7 +164,10 @@
     "messages": "الرسائل",
     "memory": "الذاكرة",
     "storage": "التخزين",
-    "messageRate": "معدل الرسائل"
+    "messageRate": "معدل الرسائل",
+    "noConsumerData": "No Consumer Data",
+    "noConsumerDataDescription": "Consumer health metrics will appear here once consumers are active.",
+    "connectionsWillAppear": "Client connections will appear here"
   },
   "streams": {
     "title": "التدفقات",
@@ -811,7 +814,8 @@
     "noStreamTrend": "لا يوجد اتجاه للتدفق",
     "noStreamTrendDescription": "اختر تدفقاً لعرض نقاط الرسائل التاريخية.",
     "dataPoints": "نقاط",
-    "selectStreamForTrend": "اختر تدفقًا لعرض اتجاهه"
+    "selectStreamForTrend": "اختر تدفقًا لعرض اتجاهه",
+    "dataPoints_other": "points"
   },
   "tenancy": {
     "title": "تعدد الإيجار",
@@ -886,6 +890,9 @@
     "successDesc": "يتم تشغيل nats-horizon...",
     "failed": "فشل الإعداد. يرجى المحاولة مرة أخرى.",
     "back": "رجوع",
-    "next": "التالي"
+    "next": "التالي",
+    "restarting": "Restarting...",
+    "restartingDescription": "Please wait while the server restarts",
+    "finishing": "Finishing..."
   }
 }

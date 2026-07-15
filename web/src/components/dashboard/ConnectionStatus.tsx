@@ -38,7 +38,7 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
             <h3 className="text-display-sm font-semibold leading-tight">{t('dashboard.connectionStatus')}</h3>
             <p className="text-display-xs text-content-tertiary truncate">
               {list.length === 0
-                ? (t('dashboard.noActiveConnections') || 'No active connections')
+                ? t('dashboard.noActiveConnections')
                 : t('dashboard.activeConnections', { count: list.length })}
             </p>
           </div>
@@ -74,9 +74,9 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
       {list.length === 0 && (
         <div className="flex-1 min-h-0 flex flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border-default/50 bg-surface-primary/30 text-center">
           <Radio className="mx-auto mb-1 h-7 w-7 opacity-25" />
-          <p className="text-display-xs text-content-tertiary">{t('dashboard.noActiveConnections') || 'No active connections'}</p>
+          <p className="text-display-xs text-content-tertiary">{t('dashboard.noActiveConnections')}</p>
           <p className="text-display-xs text-content-tertiary/60">
-            {t('dashboard.connectionsWillAppear') || 'Client connections will appear here'}
+            {t('dashboard.connectionsWillAppear')}
           </p>
         </div>
       )}
@@ -95,9 +95,9 @@ export default function ConnectionStatus({ connected, connections }: ConnectionS
               className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border-default/40 py-1.5 text-display-xs text-content-tertiary hover:text-content-primary hover:bg-surface-primary/40 transition-colors mt-1"
             >
               {expanded ? (
-                <><ChevronUp className="h-3 w-3" />{t('dashboard.showLess') || 'Show less'}</>
+                <><ChevronUp className="h-3 w-3" />{t('dashboard.showLess')}</>
               ) : (
-                <><ChevronDown className="h-3 w-3" />{t('dashboard.showMore', { count: list.length - INITIAL_VISIBLE }) || `Show ${list.length - INITIAL_VISIBLE} more`}</>
+                <><ChevronDown className="h-3 w-3" />{t('dashboard.showMore', { count: list.length - INITIAL_VISIBLE })}</>
               )}
             </button>
           )}
@@ -113,7 +113,7 @@ type TranslateFn = ReturnType<typeof useTranslation>["t"];
 function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: TranslateFn }) {
   const [open, setOpen] = useState(false);
 
-  const label = conn.user || conn.name || (t('connections.anonymous') || 'Anonymous');
+  const label = conn.user || conn.name || t('connections.anonymous');
   const addr = conn.ip ? `${conn.ip}${conn.port ? `:${conn.port}` : ''}` : null;
 
   return (
@@ -142,7 +142,7 @@ function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: TranslateFn }) {
         )}
 
         <div className="hidden sm:flex items-center gap-1 shrink-0 text-display-xs text-content-tertiary">
-          <span>{conn.subs_count || 0} subs</span>
+          <span>{conn.subs_count || 0} {t('connections.subs')}</span>
         </div>
 
         <ChevronDown className={`h-3 w-3 text-content-tertiary shrink-0 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
@@ -150,11 +150,11 @@ function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: TranslateFn }) {
 
       {open && (
         <div className="border-t border-border-default/40 px-3 py-2 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1.5 text-display-xs">
-          <DetailRow label={t('dashboard.rtt') || 'RTT'} value={conn.rtt || '—'} />
-          <DetailRow label={t('dashboard.subscriptions') || 'Subs'} value={conn.subs_count ?? 0} />
-          <DetailRow label={t('dashboard.pending') || 'Pending'} value={formatNumber(conn.pending_bytes)} />
+          <DetailRow label={t('dashboard.rtt')} value={conn.rtt || '—'} />
+          <DetailRow label={t('dashboard.subscriptions')} value={conn.subs_count ?? 0} />
+          <DetailRow label={t('dashboard.pending')} value={formatNumber(conn.pending_bytes)} />
           <DetailRow
-            label={t('dashboard.in') || 'In'}
+            label={t('dashboard.in')}
             value={
               <span className="flex items-center gap-1">
                 <Download className="h-2.5 w-2.5" />
@@ -163,7 +163,7 @@ function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: TranslateFn }) {
             }
           />
           <DetailRow
-            label={t('dashboard.out') || 'Out'}
+            label={t('dashboard.out')}
             value={
               <span className="flex items-center gap-1">
                 <Upload className="h-2.5 w-2.5" />
@@ -172,7 +172,7 @@ function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: TranslateFn }) {
             }
           />
           <DetailRow
-            label={t('dashboard.lastActivity') || 'Last active'}
+            label={t('dashboard.lastActivity')}
             value={
               conn.last_activity ? (
                 <span className="flex items-center gap-1">
@@ -184,7 +184,7 @@ function ConnectionRow({ conn, t }: { conn: ConnectionInfo; t: TranslateFn }) {
           />
           {conn.server && (
             <div className="col-span-full border-t border-border-default/30 pt-1.5 mt-0.5 flex items-center gap-2">
-              <span className="text-content-tertiary shrink-0">{t('dashboard.natsServer') || 'NATS server'}</span>
+              <span className="text-content-tertiary shrink-0">{t('dashboard.natsServer')}</span>
               <span className="font-mono text-display-xs text-content-tertiary/70 truncate" title={conn.server}>
                 {conn.server}
               </span>

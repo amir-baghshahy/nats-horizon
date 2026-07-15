@@ -164,7 +164,10 @@
     "memory": "Mémoire",
     "storage": "Stockage",
     "messageRate": "Débit de messages",
-    "na": "N/D"
+    "na": "N/D",
+    "noConsumerData": "No Consumer Data",
+    "noConsumerDataDescription": "Consumer health metrics will appear here once consumers are active.",
+    "connectionsWillAppear": "Client connections will appear here"
   },
   "streams": {
     "title": "Flux",
@@ -811,7 +814,8 @@
     "noStreamTrend": "Aucune tendance de flux",
     "noStreamTrendDescription": "Sélectionnez un flux pour voir les points de messages historiques.",
     "dataPoints": "points",
-    "selectStreamForTrend": "Sélectionnez un stream pour voir sa tendance"
+    "selectStreamForTrend": "Sélectionnez un stream pour voir sa tendance",
+    "dataPoints_other": "points"
   },
   "tenancy": {
     "title": "Multi-location",
@@ -886,6 +890,9 @@
     "successDesc": "nats-horizon démarre...",
     "failed": "La configuration a échoué. Veuillez réessayer.",
     "back": "Retour",
-    "next": "Suivant"
+    "next": "Suivant",
+    "restarting": "Restarting...",
+    "restartingDescription": "Please wait while the server restarts",
+    "finishing": "Finishing..."
   }
 }

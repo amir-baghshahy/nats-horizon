@@ -5,11 +5,15 @@ import { Button } from "../ui";
 interface DashboardHeaderProps {
   sseConnected: boolean;
   onRefresh: () => void;
+  title?: string;
+  subtitle?: string;
 }
 
 export default function DashboardHeader({
   sseConnected,
   onRefresh,
+  title,
+  subtitle,
 }: DashboardHeaderProps) {
   const { t } = useTranslation();
 
@@ -17,9 +21,11 @@ export default function DashboardHeader({
     <div className="flex items-center justify-between mb-4 gap-3">
       <div className="min-w-0">
         <h1 className="text-display-lg font-bold leading-tight">
-          {t("dashboard.title")}
+          {title ?? t("dashboard.title")}
         </h1>
-        <p className="text-display-xs text-content-tertiary">{t("dashboard.subtitle")}</p>
+        <p className="text-display-xs text-content-tertiary">
+          {subtitle ?? t("dashboard.subtitle")}
+        </p>
       </div>
 
       <div className="flex items-center gap-2 shrink-0">

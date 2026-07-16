@@ -163,6 +163,26 @@
     animation: shimmer 2s infinite;
   }
 
+  .table {
+    @apply w-full border-collapse text-sm text-content-primary;
+  }
+
+  .table thead th {
+    @apply border-b border-border-default/70 px-4 py-2.5 text-left text-display-xs font-semibold uppercase tracking-wide text-content-tertiary rtl:text-right;
+  }
+
+  .table tbody td {
+    @apply border-b border-border-default/40 px-4 py-2.5 align-middle;
+  }
+
+  .table tbody tr {
+    @apply transition-colors hover:bg-surface-primary/50;
+  }
+
+  .table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: rgba(51, 65, 85, 0.9) rgba(15, 23, 42, 0.5);

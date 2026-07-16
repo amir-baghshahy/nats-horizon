@@ -99,6 +99,8 @@ export default function SubjectsPage({
         <DashboardHeader
           sseConnected={sseConnected}
           onRefresh={() => refetch()}
+          title={t("subjects.title")}
+          subtitle={t("subjects.subtitle")}
         />
         <PageLoading text={t("subjects.loading")} />
       </div>
@@ -111,6 +113,8 @@ export default function SubjectsPage({
         <DashboardHeader
           sseConnected={sseConnected}
           onRefresh={() => refetch()}
+          title={t("subjects.title")}
+          subtitle={t("subjects.subtitle")}
         />
         <PageError message={t("subjects.errorMessage")} onRetry={refetch} />
       </div>
@@ -123,6 +127,8 @@ export default function SubjectsPage({
         <DashboardHeader
           sseConnected={sseConnected}
           onRefresh={() => refetch()}
+          title={t("subjects.title")}
+          subtitle={t("subjects.subtitle")}
         />
       </div>
 

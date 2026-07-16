@@ -92,7 +92,8 @@
     "collectingData": "Daten werden gesammelt…",
     "openMenu": "Menü öffnen",
     "peak": "Spitze",
-    "skipToContent": "Zum Inhalt springen"
+    "skipToContent": "Zum Inhalt springen",
+    "pageOf": "Seite {{page}} / {{total}}"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -372,7 +373,20 @@
     "terminateConfirm": "Verbindung „{{cid}}“ beenden? Diese Aktion kann nicht rückgängig gemacht werden.",
     "terminate": "Beenden",
     "terminateFailed": "Beenden fehlgeschlagen",
-    "showingConnections": "{{filtered}} von {{total}} Verbindungen"
+    "showingConnections": "{{filtered}} von {{total}} Verbindungen",
+    "dataIn": "Daten ein",
+    "dataOut": "Daten aus",
+    "msgsCount": "{{count}} Nachr.",
+    "inMsgs": "Nachr. ein",
+    "outMsgs": "Nachr. aus",
+    "inBytes": "Bytes ein",
+    "outBytes": "Bytes aus",
+    "pending": "Ausstehend",
+    "rtt": "RTT",
+    "cid": "Client-ID",
+    "lastActivity": "Letzte Aktivität",
+    "serverId": "Server-ID",
+    "clientName": "Client-Name"
   },
   "messages": {
     "title": "Nachrichten",
@@ -492,7 +506,13 @@
     "knownSubjects": "Bekannte Subjects",
     "noSubjectsDiscovered": "Noch keine Subjects entdeckt.",
     "noSubjectsDiscoveredDescription": "Abonnieren, veröffentlichen oder senden Sie eine Anfrage, um hier Subjects zu sehen.",
-    "request": "Anfrage"
+    "request": "Anfrage",
+    "deleteConfirm": "Nachricht #{{seq}} löschen?",
+    "messageDeleted": "Nachricht gelöscht",
+    "deleteFailed": "Nachricht konnte nicht gelöscht werden",
+    "showingRange": "{{count}} von {{total}} Nachrichten",
+    "headersCount": "{{count}} Header",
+    "emptyPayload": "(leer)"
   },
   "cluster": {
     "title": "Cluster-Überwachung",
@@ -536,7 +556,15 @@
     "selectStreamPrompt": "Wählen Sie einen Stream aus, um Replikationsdetails anzuzeigen",
     "standaloneModeTitle": "Eigenständiger Modus",
     "standaloneModeDescription": "Dieser NATS-Server läuft im eigenständigen Modus. Cluster-Überwachungsfunktionen wie Knotenzustand, Replikationsstatus und Raft-Gruppen sind nur in geclusterten Bereitstellungen verfügbar.",
-    "loading": "Cluster-Daten werden geladen..."
+    "loading": "Cluster-Daten werden geladen...",
+    "raftGroup": "RAFT-Gruppe {{group}}",
+    "leader": "Leader",
+    "leaderSince": "seit {{since}}",
+    "peerNodes": "Peer-Knoten",
+    "peer": "Peer",
+    "offline": "Offline",
+    "idle": "Immer",
+    "activeSeq": "Aktive Seq"
   },
   "alerts": {
     "title": "Warnungen & Benachrichtigungen",
@@ -608,7 +636,9 @@
     "loading": "Warnungsauslösungen werden geladen...",
     "alertsLoading": "Warnungen werden geladen...",
     "unableToLoad": "Warnungen konnten nicht geladen werden",
-    "filterBySeverity": "Nach Schweregrad filtern"
+    "filterBySeverity": "Nach Schweregrad filtern",
+    "notify": "Benachrichtigen",
+    "channels": "Kanäle"
   },
   "metrics": {
     "title": "Echtzeit-Metriken",
@@ -648,7 +678,17 @@
     "noMetricsAvailable": "Keine Metriken verfügbar",
     "noMetricsAvailableDescription": "Metriken werden hier angezeigt, sobald Streams erstellt und gesammelt wurden.",
     "duration": "Dauer",
-    "selectStream": "Stream auswählen"
+    "selectStream": "Stream auswählen",
+    "stream": "Stream",
+    "cpuUsage": "CPU-Auslastung",
+    "memory": "Speicher",
+    "routes": "Routen",
+    "slowConsumers": "Langsame Consumer",
+    "sentMessages": "Gesendete Nachrichten",
+    "receivedMessages": "Empfangene Nachrichten",
+    "topConsumersByLag": "Top-Consumer nach Lag",
+    "noConsumerData": "Keine Consumer-Daten",
+    "consumerCount": "{{count}} Consumer"
   },
   "visualStreamGraph": {
     "title": "Visueller Stromgraph",
@@ -735,7 +775,10 @@
     "errorMessage": "Failed to load subjects. Please try refreshing.",
     "totalSubjects": "Total Subjects",
     "totalMessages": "Total Messages",
-    "lastActivity": "Last Activity"
+    "lastActivity": "Last Activity",
+    "share": "Anteil",
+    "lastSeen": "Zuletzt gesehen",
+    "wildcardSubjects": "Wildcard-Subjects"
   },
   "security": {
     "title": "Sicherheit",

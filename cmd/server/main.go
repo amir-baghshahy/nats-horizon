@@ -216,7 +216,7 @@ func main() {
 		securityHandler = handlers.NewSecurityHandler(natsConn.nc, natsConn.js, auditService)
 		historyHandler = handlers.NewHistoryHandler(natsConn.nc, natsConn.js)
 
-sseHub = handlers.NewSSEHub(natsConn.nc)
+		sseHub = handlers.NewSSEHub(natsConn.nc)
 		go sseHub.MonitorStreams()
 		go sseHub.MonitorConsumers()
 		defer metricsHandler.Stop()

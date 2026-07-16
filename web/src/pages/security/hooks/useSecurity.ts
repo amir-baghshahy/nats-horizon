@@ -23,12 +23,15 @@ interface AuditLog {
   user: string;
   resource: string;
   details: string;
+  ip_address?: string;
+  user_agent?: string;
+  metadata?: { stream_name?: string; consumer_name?: string; operation_type?: string; status?: string };
 }
 
 export interface UseSecurityReturn {
-  activeTab: "overview" | "users" | "audit" | "connections";
+  activeTab: "overview" | "users" | "audit";
   setActiveTab: React.Dispatch<
-    React.SetStateAction<"overview" | "users" | "audit" | "connections">
+    React.SetStateAction<"overview" | "users" | "audit">
   >;
   showUserModal: boolean;
   setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,15 +40,12 @@ export interface UseSecurityReturn {
   securityInfo: any;
   users: User[] | undefined;
   auditLogs: AuditLog[] | undefined;
-  connectionStatus: any;
   infoLoading: boolean;
   usersLoading: boolean;
   auditLoading: boolean;
-  connectionsLoading: boolean;
   infoError: unknown;
   usersError: unknown;
   auditError: unknown;
-  connectionsError: unknown;
   getErrorMessage: (error: unknown) => string;
   refetchInfo: () => void;
   createUserMutation: any;
@@ -58,7 +58,7 @@ export interface UseSecurityReturn {
 
 export function useSecurity(): UseSecurityReturn {
   const [activeTab, setActiveTab] = useState<
-    "overview" | "users" | "audit" | "connections"
+    "overview" | "users" | "audit"
   >("overview");
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -100,16 +100,6 @@ export function useSecurity(): UseSecurityReturn {
     queryFn: () =>
       SecurityService.getSecurityAudit() as unknown as Promise<AuditLog[]>,
     enabled: activeTab === "audit",
-  });
-
-  const {
-    data: connectionStatus,
-    isLoading: connectionsLoading,
-    error: connectionsError,
-  } = useQuery({
-    queryKey: ["connectionSecurity"],
-    queryFn: () => SecurityService.getSecurityConnections(),
-    refetchInterval: REFRESH_INTERVALS.NORMAL,
   });
 
   const createUserMutation = useMutation({
@@ -162,15 +152,12 @@ export function useSecurity(): UseSecurityReturn {
     securityInfo,
     users,
     auditLogs,
-    connectionStatus,
     infoLoading,
     usersLoading,
     auditLoading,
-    connectionsLoading,
     infoError,
     usersError,
     auditError,
-    connectionsError,
     getErrorMessage,
     refetchInfo,
     createUserMutation,

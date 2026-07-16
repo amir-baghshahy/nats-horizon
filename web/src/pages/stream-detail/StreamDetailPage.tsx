@@ -6,7 +6,6 @@ import {
   Database,
   Download,
   FileText,
-  Filter,
   HardDrive,
   Loader2,
   MessageSquare,
@@ -14,7 +13,6 @@ import {
   Play,
   Plus,
   RefreshCw,
-  Search,
   Settings,
   Trash2,
   TrendingUp,
@@ -24,6 +22,7 @@ import {
 import { Link } from "react-router-dom";
 import { useStreamDetail } from "./hooks/useStreamDetail";
 import EditStreamModal from "./components/EditStreamModal";
+import StreamMessagesTab from "./components/StreamMessagesTab";
 import { StatCard, PanelCard, EmptyState, Tabs } from "../../components/ui";
 import { Button } from "../../components/ui";
 import { formatBytes } from "../../utils/formatters";
@@ -239,50 +238,7 @@ export default function StreamDetailPage() {
         </div>
       )}
 
-      {activeTab === "messages" && (
-        <PanelCard
-          header={
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 icon-base text-content-tertiary" />
-                  <input
-                    type="text"
-                    placeholder={t("streams.searchMessagesPlaceholder")}
-                    className="input pl-10"
-                  />
-                </div>
-                <Button
-                  variant="secondary"
-                  icon={<Filter className="icon-base" />}
-                  onClick={() => navigate(`/messages`)}
-                >
-                  {t("streams.filters", { defaultValue: "Filters" })}
-                </Button>
-              </div>
-            </div>
-          }
-        >
-          <div className="text-center py-8 text-content-tertiary">
-            <MessageSquare className="icon-lg mx-auto mb-3 opacity-50" />
-            <p>{t("streams.useMessageBrowser")}</p>
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <span className="text-display-sm text-content-tertiary">
-                {(streamData.state?.messages || 0).toLocaleString()}{" "}
-                {t("streams.messages")}
-              </span>
-              <Button
-                variant="primary"
-                onClick={() =>
-                  navigate(`/messages?stream=${encodeURIComponent(name)}`)
-                }
-              >
-                {t("streams.openMessageBrowser")}
-              </Button>
-            </div>
-          </div>
-        </PanelCard>
-      )}
+      {activeTab === "messages" && <StreamMessagesTab stream={name} />}
 
       {activeTab === "consumers" && (
         <div className="space-y-4">

@@ -92,7 +92,8 @@
     "collectingData": "Veriler toplanıyor…",
     "openMenu": "Menüyü aç",
     "peak": "tepe",
-    "skipToContent": "İçeriğe geç"
+    "skipToContent": "İçeriğe geç",
+    "pageOf": "Sayfa {{page}} / {{total}}"
   },
   "nav": {
     "dashboard": "Panel",
@@ -372,7 +373,20 @@
     "terminateConfirm": "„{{cid}}“ bağlantısı sonlandırılsın? Bu işlem geri alınamaz.",
     "terminate": "Sonlandır",
     "terminateFailed": "Bağlantı sonlandırılamadı",
-    "showingConnections": "{{filtered}} / {{total}} bağlantı gösteriliyor"
+    "showingConnections": "{{filtered}} / {{total}} bağlantı gösteriliyor",
+    "dataIn": "Gelen Veri",
+    "dataOut": "Giden Veri",
+    "msgsCount": "{{count}} mesaj",
+    "inMsgs": "Gelen Mesaj",
+    "outMsgs": "Giden Mesaj",
+    "inBytes": "Gelen Bayt",
+    "outBytes": "Giden Bayt",
+    "pending": "Bekleyen",
+    "rtt": "RTT",
+    "cid": "İstemci ID",
+    "lastActivity": "Son Etkinlik",
+    "serverId": "Sunucu ID",
+    "clientName": "İstemci Adı"
   },
   "messages": {
     "title": "Mesajlar",
@@ -492,7 +506,13 @@
     "noTrafficCapturedDescription": "İzleyiciyi başlatın ve seçili konulara mesaj yayımlayın.",
     "recentEvents": "Son Olaylar",
     "replyLabel": "Yanıt: ",
-    "sizeLabel": "Boyut: "
+    "sizeLabel": "Boyut: ",
+    "deleteConfirm": "#{{seq}} numaralı mesaj silinsin mi?",
+    "messageDeleted": "Mesaj silindi",
+    "deleteFailed": "Mesaj silinemedi",
+    "showingRange": "{{total}} mesajdan {{count}} tanesi",
+    "headersCount": "{{count}} başlık",
+    "emptyPayload": "(boş)"
   },
   "cluster": {
     "title": "Küme İzleme",
@@ -536,7 +556,15 @@
     "selectStreamPrompt": "Çoğaltma detaylarını görüntülemek için bir akış seçin",
     "standaloneModeTitle": "Bağımsız Mod",
     "standaloneModeDescription": "Bu NATS sunucusu bağımsız modda çalışıyor. Küme düğüm sağlığı, çoğaltma durumu ve raft grupları gibi küme izleme özellikleri yalnızca kümeli dağıtımlarda kullanılabilir.",
-    "loading": "Küme verileri yükleniyor..."
+    "loading": "Küme verileri yükleniyor...",
+    "raftGroup": "RAFT grubu {{group}}",
+    "leader": "Lider",
+    "leaderSince": "{{since}} since",
+    "peerNodes": "Eş Düğümler",
+    "peer": "Eş",
+    "offline": "Çevrimdışı",
+    "idle": "Boşta",
+    "activeSeq": "Aktif Seq"
   },
   "alerts": {
     "title": "Uyarılar ve Bildirimler",
@@ -608,7 +636,9 @@
     "loading": "Uyarı tetikleyicileri yükleniyor...",
     "alertsLoading": "Uyarılar yükleniyor...",
     "unableToLoad": "Uyarılar yüklenemiyor",
-    "filterBySeverity": "Önem derecesine göre filtrele"
+    "filterBySeverity": "Önem derecesine göre filtrele",
+    "notify": "Bildir",
+    "channels": "Kanallar"
   },
   "metrics": {
     "title": "Gerçek Zamanlı Metrikler",
@@ -648,7 +678,17 @@
     "noMetricsAvailable": "Metrik Yok",
     "noMetricsAvailableDescription": "Metrikler, akışlar oluşturulduktan ve örneklendikten sonra burada görünecek.",
     "duration": "Süre",
-    "selectStream": "Akış seç"
+    "selectStream": "Akış seç",
+    "stream": "Stream",
+    "cpuUsage": "CPU Kullanımı",
+    "memory": "Bellek",
+    "routes": "Rutalar",
+    "slowConsumers": "Yavaş Tüketiciler",
+    "sentMessages": "Gönderilen Mesajlar",
+    "receivedMessages": "Alınan Mesajlar",
+    "topConsumersByLag": "Gecikmeye Göre En İyi Tüketiciler",
+    "noConsumerData": "Tüketici verisi yok",
+    "consumerCount": "{{count}} tüketici"
   },
   "visualStreamGraph": {
     "title": "Görsel Akış Grafiği",
@@ -735,7 +775,10 @@
     "errorMessage": "Failed to load subjects. Please try refreshing.",
     "totalSubjects": "Total Subjects",
     "totalMessages": "Total Messages",
-    "lastActivity": "Last Activity"
+    "lastActivity": "Last Activity",
+    "share": "Pay",
+    "lastSeen": "Son Görülme",
+    "wildcardSubjects": "Joker Konular"
   },
   "security": {
     "title": "Güvenlik",

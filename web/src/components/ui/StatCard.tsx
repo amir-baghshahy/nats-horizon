@@ -43,6 +43,11 @@ interface StatCardProps {
   formatValue?: boolean;
 
   /**
+   * Optional secondary line shown under the label
+   */
+  sub?: string;
+
+  /**
    * Optional click handler
    */
   onClick?: () => void;
@@ -60,6 +65,7 @@ export default function StatCard({
   iconColor = "text-primary-400",
   size = "normal",
   formatValue = true,
+  sub,
   onClick,
 }: StatCardProps) {
   const displayValue =
@@ -86,6 +92,9 @@ export default function StatCard({
         <div className="min-w-0">
           <p className={cn(valueSize, "font-bold leading-tight truncate")}>{displayValue}</p>
           <p className={cn(labelSize, "text-content-secondary truncate")}>{label}</p>
+          {sub && (
+            <p className="text-display-xs text-content-tertiary truncate mt-0.5">{sub}</p>
+          )}
         </div>
       </div>
     </div>

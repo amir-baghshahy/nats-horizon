@@ -21,6 +21,11 @@ export interface UseConnectionsReturn {
     uniqueUsers: number
     totalSubs: number
     avgSubs: number
+    totalDataIn: number
+    totalDataOut: number
+    totalMsgsIn: number
+    totalMsgsOut: number
+    totalPending: number
   }
   servers: string[]
   serverData: Array<{ server: string; connections: number }>
@@ -56,20 +61,21 @@ export function useConnections(): UseConnectionsReturn {
     return matchesSearch && matchesServer
   })
 
+  const sum = (fn: (c: ConnectionInfo) => number | undefined) =>
+    filteredConnections.reduce((acc: number, c: ConnectionInfo) => acc + (fn(c) || 0), 0)
+
+  const totalSubs = sum((c) => c.subs_count)
+
   const stats = {
     total: filteredConnections.length,
     uniqueUsers: new Set(filteredConnections.map((c: ConnectionInfo) => c.user)).size,
-    totalSubs: filteredConnections.reduce(
-      (acc: number, c: ConnectionInfo) => acc + (c.subs_count || 0),
-      0,
-    ),
-    avgSubs:
-      filteredConnections.length > 0
-        ? filteredConnections.reduce(
-            (acc: number, c: ConnectionInfo) => acc + (c.subs_count || 0),
-            0,
-          ) / filteredConnections.length
-        : 0,
+    totalSubs,
+    avgSubs: filteredConnections.length > 0 ? totalSubs / filteredConnections.length : 0,
+    totalDataIn: sum((c) => c.in_bytes),
+    totalDataOut: sum((c) => c.out_bytes),
+    totalMsgsIn: sum((c) => c.in_msgs),
+    totalMsgsOut: sum((c) => c.out_msgs),
+    totalPending: sum((c) => c.pending_bytes),
   }
 
   const servers = [

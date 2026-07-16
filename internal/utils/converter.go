@@ -22,8 +22,8 @@ func StreamToResponse(stream *models.Stream) *dto.StreamResponse {
 			Storage:   stream.Storage,
 			Retention: stream.Retention,
 			Replicas:  stream.Replicas,
-			MaxAge:    stream.MaxAge,
-			MaxBytes:  uint64(stream.MaxBytes),
+			MaxAge:     stream.MaxAge,
+			MaxBytes:   uint64(stream.MaxBytes),
 		},
 		State: &dto.StreamStateResponse{
 			Messages:    stream.Messages,

@@ -92,7 +92,8 @@
     "collectingData": "جارٍ جمع البيانات…",
     "openMenu": "فتح القائمة",
     "peak": "الذروة",
-    "skipToContent": "تخطَّ إلى المحتوى"
+    "skipToContent": "تخطَّ إلى المحتوى",
+    "pageOf": "صفحة {{page}} / {{total}}"
   },
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -372,7 +373,20 @@
     "terminateConfirm": "هل تريد إنهاء الاتصال \"{{cid}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
     "terminate": "إنهاء",
     "terminateFailed": "فشل إنهاء الاتصال",
-    "showingConnections": "عرض {{filtered}} من {{total}} اتصال"
+    "showingConnections": "عرض {{filtered}} من {{total}} اتصال",
+    "dataIn": "البيانات الواردة",
+    "dataOut": "البيانات الصادرة",
+    "msgsCount": "{{count}} رسالة",
+    "inMsgs": "الرسائل الواردة",
+    "outMsgs": "الرسائل الصادرة",
+    "inBytes": "بايت وارد",
+    "outBytes": "بايت صادر",
+    "pending": "معلّق",
+    "rtt": "زمن الذهاب والإياب",
+    "cid": "معرّف العميل",
+    "lastActivity": "آخر نشاط",
+    "serverId": "معرّف الخادم",
+    "clientName": "اسم العميل"
   },
   "messages": {
     "title": "الرسائل",
@@ -492,7 +506,13 @@
     "knownSubjects": "المواضيع المعروفة",
     "noSubjectsDiscovered": "لم يتم اكتشاف أي مواضيع بعد.",
     "noSubjectsDiscoveredDescription": "اشترك أو انشر أو أرسل طلباً لرؤية المواضيع هنا.",
-    "request": "طلب"
+    "request": "طلب",
+    "deleteConfirm": "حذف الرسالة #{{seq}}؟",
+    "messageDeleted": "تم حذف الرسالة",
+    "deleteFailed": "فشل حذف الرسالة",
+    "showingRange": "{{count}} من {{total}} رسالة",
+    "headersCount": "{{count}} ترويسة",
+    "emptyPayload": "(فارغ)"
   },
   "cluster": {
     "title": "مراقبة العنقود",
@@ -536,7 +556,15 @@
     "selectStreamPrompt": "اختر تدفقاً لعرض تفاصيل التكرار",
     "standaloneModeTitle": "الوضع المستقل",
     "standaloneModeDescription": "يعمل خادم NATS هذا في الوضع المستقل. ميزات مراقبة العنقود مثل صحة العقد وحالة التكرار ومجموعات Raft متوفرة فقط في التنفيرات المتجمعة.",
-    "loading": "جاري تحميل بيانات العنقود..."
+    "loading": "جاري تحميل بيانات العنقود...",
+    "raftGroup": "مجموعة RAFT {{group}}",
+    "leader": "القائد",
+    "leaderSince": "منذ {{since}}",
+    "peerNodes": "عقد النظير",
+    "peer": "نظير",
+    "offline": "غير متصل",
+    "idle": "خامل",
+    "activeSeq": "التسلسل النشط"
   },
   "alerts": {
     "title": "التنبيهات والإشعارات",
@@ -608,7 +636,9 @@
     "loading": "جاري تحميل محفزات التنبيه...",
     "alertsLoading": "جاري تحميل التنبيهات...",
     "unableToLoad": "تعذر تحميل التنبيهات",
-    "filterBySeverity": "تصفية حسب الخطورة"
+    "filterBySeverity": "تصفية حسب الخطورة",
+    "notify": "إشعار",
+    "channels": "القنوات"
   },
   "metrics": {
     "title": "المقاييس الفورية",
@@ -648,7 +678,17 @@
     "noMetricsAvailable": "لا توجد مقاييس متاحة",
     "noMetricsAvailableDescription": "ستظهر المقاييس هنا بمجرد إنشاء التدفقات وأخذ العينات.",
     "duration": "المدة",
-    "selectStream": "اختر التدفق"
+    "selectStream": "اختر التدفق",
+    "stream": "البثّة",
+    "cpuUsage": "استخدام المعالج",
+    "memory": "الذاكرة",
+    "routes": "المسارات",
+    "slowConsumers": "المستهلكون البطيئون",
+    "sentMessages": "الرسائل المرسلة",
+    "receivedMessages": "الرسائل المستلمة",
+    "topConsumersByLag": "أبرز المستهلكين حسب التأخير",
+    "noConsumerData": "لا توجد بيانات مستهلكين",
+    "consumerCount": "{{count}} مستهلك"
   },
   "visualStreamGraph": {
     "title": "رسم التدفقات البصري",
@@ -735,7 +775,10 @@
     "errorMessage": "Failed to load subjects. Please try refreshing.",
     "totalSubjects": "Total Subjects",
     "totalMessages": "Total Messages",
-    "lastActivity": "Last Activity"
+    "lastActivity": "Last Activity",
+    "share": "الحصة",
+    "lastSeen": "آخر ظهور",
+    "wildcardSubjects": "مواضيع البدل"
   },
   "security": {
     "title": "الأمان",

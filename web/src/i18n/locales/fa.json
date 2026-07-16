@@ -92,7 +92,8 @@
     "critical": "بحرانی",
     "closeMenu": "بستن منو",
     "openMenu": "باز کردن منو",
-    "skipToContent": "پرش به محتوا"
+    "skipToContent": "پرش به محتوا",
+    "pageOf": "صفحه {{page}} / {{total}}"
   },
   "nav": {
     "dashboard": "داشبورد",
@@ -372,7 +373,20 @@
     "terminateConfirm": "اتصال \"{{cid}}\" قطع شود؟ این عمل قابل بازگشت نیست.",
     "terminate": "قطع",
     "terminateFailed": "قطع اتصال ناموفق بود",
-    "showingConnections": "نمایش {{filtered}} از {{total}} اتصال"
+    "showingConnections": "نمایش {{filtered}} از {{total}} اتصال",
+    "dataIn": "داده ورودی",
+    "dataOut": "داده خروجی",
+    "msgsCount": "{{count}} پیام",
+    "inMsgs": "پیام ورودی",
+    "outMsgs": "پیام خروجی",
+    "inBytes": "بایت ورودی",
+    "outBytes": "بایت خروجی",
+    "pending": "در انتظار",
+    "rtt": "تأخیر رفت‌وبرگشت",
+    "cid": "شناسه کلاینت",
+    "lastActivity": "آخرین فعالیت",
+    "serverId": "شناسه سرور",
+    "clientName": "نام کلاینت"
   },
   "messages": {
     "title": "پیام‌ها",
@@ -492,7 +506,13 @@
     "knownSubjects": "موضوعات شناخته شده",
     "noSubjectsDiscovered": "هنوز موضوعی کشف نشده.",
     "noSubjectsDiscoveredDescription": "برای دیدن موضوعات در اینجا، مشترک شوید، منتشر کنید یا درخواستی ارسال کنید.",
-    "request": "درخواست"
+    "request": "درخواست",
+    "deleteConfirm": "پیام #{{seq}} حذف شود؟",
+    "messageDeleted": "پیام حذف شد",
+    "deleteFailed": "حذف پیام ناموفق بود",
+    "showingRange": "{{count}} از {{total}} پیام",
+    "headersCount": "{{count}} هدر",
+    "emptyPayload": "(خالی)"
   },
   "cluster": {
     "title": "پایش خوشه",
@@ -536,7 +556,15 @@
     "selectStreamPrompt": "یک استریم برای مشاهده جزئیات تکرار انتخاب کنید",
     "standaloneModeTitle": "حالت مستقل",
     "standaloneModeDescription": "این سرور NATS در حالت مستقل اجرا می‌شود. ویژگی‌های پایش خوشه مانند سلامت گره، وضعیت تکرار و گروه‌های raft فقط در استقرارهای خوشه‌ای در دسترس هستند.",
-    "loading": "در حال بارگذاری داده‌های خوشه..."
+    "loading": "در حال بارگذاری داده‌های خوشه...",
+    "raftGroup": "گروه RAFT {{group}}",
+    "leader": "سرگروه",
+    "leaderSince": "از {{since}}",
+    "peerNodes": "گره‌های همتا",
+    "peer": "همتا",
+    "offline": "آفلاین",
+    "idle": "بیکار",
+    "activeSeq": "توالی فعال"
   },
   "alerts": {
     "title": "هشدارها و اعلان‌ها",
@@ -608,7 +636,9 @@
     "create": " ایجاد",
     "loading": "در حال بارگذاری تریگرهای هشدار...",
     "alertsLoading": "در حال بارگذاری هشدارها...",
-    "unableToLoad": "بارگذاری هشدارها ناموفق بود"
+    "unableToLoad": "بارگذاری هشدارها ناموفق بود",
+    "notify": "اطلاع‌رسانی",
+    "channels": "کانال‌ها"
   },
   "metrics": {
     "title": "معیارهای بلادرنگ",
@@ -648,7 +678,17 @@
     "messages": "پیام‌ها",
     "storage": "ذخیره‌سازی",
     "noMetricsAvailable": "معیاری در دسترس نیست",
-    "noMetricsAvailableDescription": "معیارها پس از ایجاد و نمونه‌برداری استریم‌ها نمایش داده می‌شوند."
+    "noMetricsAvailableDescription": "معیارها پس از ایجاد و نمونه‌برداری استریم‌ها نمایش داده می‌شوند.",
+    "stream": "استریم",
+    "cpuUsage": "مصرف CPU",
+    "memory": "حافظه",
+    "routes": "مسیرها",
+    "slowConsumers": "مصرف‌کنندگان کند",
+    "sentMessages": "پیام‌های ارسالی",
+    "receivedMessages": "پیام‌های دریافتی",
+    "topConsumersByLag": "مصرف‌کنندگان برتر بر اساس تأخیر",
+    "noConsumerData": "داده‌ای از مصرف‌کننده نیست",
+    "consumerCount": "{{count}} مصرف‌کننده"
   },
   "visualStreamGraph": {
     "title": "گراف بصری استریم‌ها",
@@ -735,7 +775,10 @@
     "errorMessage": "Failed to load subjects. Please try refreshing.",
     "totalSubjects": "Total Subjects",
     "totalMessages": "Total Messages",
-    "lastActivity": "Last Activity"
+    "lastActivity": "Last Activity",
+    "share": "سهم",
+    "lastSeen": "آخرین مشاهده",
+    "wildcardSubjects": "موضوعات وایلدکارت"
   },
   "security": {
     "title": "امنیت",

@@ -1,7 +1,7 @@
 import { UseConnectionsReturn } from './hooks/useConnections'
 import {
   RefreshCw, XCircle, Server, Users, Network, Activity,
-  ChevronDown, ChevronRight, Cable
+  ChevronDown, ChevronRight, Cable, Download, Upload, Clock, Gauge, Hash
 } from 'lucide-react'
 import ConnectionFilters from '../../components/connections/ConnectionFilters'
 import { HealthService } from '../../types'
@@ -9,6 +9,7 @@ import type { ConnectionInfo } from '../../types'
 import { useTranslation } from 'react-i18next'
 import { StatCard, DataList, PageHeader, PanelCard } from '../../components/ui'
 import { Button } from '../../components/ui';
+import { formatBytes, formatNumber } from '../../utils/formatters'
 
 export default function ConnectionsPage({
   searchQuery,
@@ -44,7 +45,7 @@ export default function ConnectionsPage({
       />
       </div>
 
-      <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="shrink-0 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <StatCard
           icon={Network}
           value={stats.total}
@@ -70,6 +71,24 @@ export default function ConnectionsPage({
           label={t('connections.avgSubsPerConn')}
           iconBg="bg-orange-500/20"
           iconColor="text-orange-400"
+        />
+        <StatCard
+          icon={Download}
+          value={formatBytes(stats.totalDataIn)}
+          label={t('connections.dataIn')}
+          formatValue={false}
+          iconBg="bg-cyan-500/20"
+          iconColor="text-cyan-400"
+          sub={t('connections.msgsCount', { count: formatNumber(stats.totalMsgsIn) })}
+        />
+        <StatCard
+          icon={Upload}
+          value={formatBytes(stats.totalDataOut)}
+          label={t('connections.dataOut')}
+          formatValue={false}
+          iconBg="bg-violet-500/20"
+          iconColor="text-violet-400"
+          sub={t('connections.msgsCount', { count: formatNumber(stats.totalMsgsOut) })}
         />
       </div>
 
@@ -168,15 +187,24 @@ export default function ConnectionsPage({
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">
-                        {conn.user || t('connections.anonymous')}
+                      <span className="font-medium truncate">
+                        {conn.user || conn.name || t('connections.anonymous')}
                       </span>
-                      <span className="text-display-xs text-content-tertiary">•</span>
-                      <span className="text-display-sm text-content-tertiary">
-                        {conn.ip}
-                      </span>
+                      {conn.cid != null && (
+                        <span className="rounded px-1.5 py-0.5 text-display-xs font-mono bg-primary-500/10 text-primary-400 shrink-0">
+                          #{conn.cid}
+                        </span>
+                      )}
+                      {conn.type && (
+                        <span className="hidden sm:inline rounded px-1.5 py-0.5 text-display-xs bg-surface-primary text-content-tertiary shrink-0">
+                          {conn.type}
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-center gap-4 mt-1 text-display-xs text-content-tertiary">
+                      <span className="font-mono">
+                        {conn.ip}{conn.port ? `:${conn.port}` : ''}
+                      </span>
                       <span className="flex items-center gap-1 min-w-0">
                         <Server className="w-3 h-3 shrink-0" />
                         <span className="truncate max-w-[200px]" title={conn.server}>{conn.server}</span>
@@ -184,13 +212,29 @@ export default function ConnectionsPage({
                     </div>
                   </div>
 
-                  <div className="hidden md:flex items-center gap-4 text-display-sm">
-                    <div className="text-center">
-                      <p className="font-medium">{conn.subs_count || 0}</p>
+                  <div className="hidden lg:flex items-center gap-4 text-display-sm">
+                    <div className="text-center min-w-[52px]">
+                      <p className="font-medium tabular-nums">{formatNumber(conn.subs_count || 0)}</p>
                       <p className="text-display-xs text-content-tertiary">{t('connections.subs')}</p>
                     </div>
-                    <div className="text-center">
-                      <p className="font-medium">
+                    <div className="text-center min-w-[64px]">
+                      <p className="font-medium tabular-nums flex items-center justify-center gap-1">
+                        <Download className="h-3 w-3 text-cyan-400" />{formatNumber(conn.in_msgs || 0)}
+                      </p>
+                      <p className="text-display-xs text-content-tertiary">{t('connections.inMsgs')}</p>
+                    </div>
+                    <div className="text-center min-w-[64px]">
+                      <p className="font-medium tabular-nums flex items-center justify-center gap-1">
+                        <Upload className="h-3 w-3 text-violet-400" />{formatNumber(conn.out_msgs || 0)}
+                      </p>
+                      <p className="text-display-xs text-content-tertiary">{t('connections.outMsgs')}</p>
+                    </div>
+                    <div className="text-center min-w-[56px]">
+                      <p className="font-medium tabular-nums">{conn.rtt || '—'}</p>
+                      <p className="text-display-xs text-content-tertiary">{t('connections.rtt')}</p>
+                    </div>
+                    <div className="text-center min-w-[64px]">
+                      <p className="font-medium tabular-nums">
                         {getConnectionDuration(conn.connected_at || '')}
                       </p>
                       <p className="text-display-xs text-content-tertiary">{t('connections.duration')}</p>
@@ -228,16 +272,20 @@ export default function ConnectionsPage({
                 </div>
 
                 {isExpanded && (
-                  <div className="mt-4 pl-8 space-y-4">
-                    <div className="bg-surface-primary/50 rounded-lg p-4">
-                      <p className="text-display-xs text-content-tertiary">
-                        {t('connections.connectedSince')}
-                      </p>
-                      <p className="font-medium text-display-sm">
-                        {conn.connected_at
-                          ? new Date(conn.connected_at).toLocaleString()
-                          : t('dashboard.na')}
-                      </p>
+                  <div className="mt-4 md:pl-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      <DetailItem icon={Download} label={t('connections.inMsgs')} value={formatNumber(conn.in_msgs || 0)} />
+                      <DetailItem icon={Upload} label={t('connections.outMsgs')} value={formatNumber(conn.out_msgs || 0)} />
+                      <DetailItem icon={Download} label={t('connections.inBytes')} value={formatBytes(conn.in_bytes || 0)} />
+                      <DetailItem icon={Upload} label={t('connections.outBytes')} value={formatBytes(conn.out_bytes || 0)} />
+                      <DetailItem icon={Activity} label={t('connections.subs')} value={formatNumber(conn.subs_count || 0)} />
+                      <DetailItem icon={Gauge} label={t('connections.pending')} value={formatBytes(conn.pending_bytes || 0)} />
+                      <DetailItem icon={Gauge} label={t('connections.rtt')} value={conn.rtt || t('dashboard.na')} />
+                      <DetailItem icon={Hash} label={t('connections.cid')} value={conn.cid != null ? `#${conn.cid}` : t('dashboard.na')} />
+                      <DetailItem icon={Clock} label={t('connections.connectedSince')} value={conn.connected_at ? new Date(conn.connected_at).toLocaleString() : t('dashboard.na')} />
+                      <DetailItem icon={Clock} label={t('connections.lastActivity')} value={conn.last_activity ? new Date(conn.last_activity).toLocaleString() : t('dashboard.na')} />
+                      <DetailItem icon={Server} label={t('connections.serverId')} value={conn.server_id || t('dashboard.na')} mono />
+                      {conn.name && <DetailItem icon={Cable} label={t('connections.clientName')} value={conn.name} mono />}
                     </div>
                   </div>
                 )}
@@ -246,6 +294,30 @@ export default function ConnectionsPage({
           )
         }}
       />
+    </div>
+  )
+}
+
+function DetailItem({
+  icon: Icon,
+  label,
+  value,
+  mono,
+}: {
+  icon: typeof Server
+  label: string
+  value: React.ReactNode
+  mono?: boolean
+}) {
+  return (
+    <div className="bg-surface-primary/50 rounded-lg p-3 min-w-0">
+      <p className="flex items-center gap-1.5 text-display-xs text-content-tertiary">
+        <Icon className="h-3 w-3 shrink-0" />
+        <span className="truncate">{label}</span>
+      </p>
+      <p className={`font-medium text-display-sm mt-1 truncate tabular-nums ${mono ? 'font-mono' : ''}`} title={typeof value === 'string' ? value : undefined}>
+        {value}
+      </p>
     </div>
   )
 }

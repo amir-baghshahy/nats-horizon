@@ -21,11 +21,9 @@ export default function SecurityPage({
   infoLoading,
   usersLoading,
   auditLoading,
-  connectionsLoading,
   infoError,
   usersError,
   auditError,
-  connectionsError,
   getErrorMessage,
   refetchInfo,
   createUserMutation,
@@ -39,14 +37,12 @@ export default function SecurityPage({
   const activeLoading =
     infoLoading ||
     (activeTab === 'users' && usersLoading) ||
-    (activeTab === 'audit' && auditLoading) ||
-    connectionsLoading
+    (activeTab === 'audit' && auditLoading)
 
   const activeError =
     infoError ||
     (activeTab === 'users' && usersError) ||
-    (activeTab === 'audit' && auditError) ||
-    connectionsError
+    (activeTab === 'audit' && auditError)
 
   if (activeLoading) {
     return <PageLoading text={t('security.loading')} />

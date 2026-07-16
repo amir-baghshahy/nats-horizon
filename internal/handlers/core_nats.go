@@ -258,7 +258,11 @@ func (h *CoreNATShandler) Subscribe(c *gin.Context) {
 			Size:       len(msg.Data),
 		}
 
-		data, _ := json.Marshal(msgInfo)
+		data, err := json.Marshal(msgInfo)
+		if err != nil {
+			log.Printf("Failed to marshal SSE message: %v", err)
+			return
+		}
 		c.Writer.Write([]byte("data: " + string(data) + "\n\n"))
 		flusher.Flush()
 	})
@@ -277,7 +281,11 @@ func (h *CoreNATShandler) Subscribe(c *gin.Context) {
 		Subject:   subject,
 		Timestamp: time.Now().Unix(),
 	}
-	connData, _ := json.Marshal(connMsg)
+	connData, err := json.Marshal(connMsg)
+	if err != nil {
+		log.Printf("Failed to marshal SSE connection message: %v", err)
+		return
+	}
 	c.Writer.Write([]byte("data: " + string(connData) + "\n\n"))
 	flusher.Flush()
 
@@ -495,9 +503,13 @@ func (h *CoreNATShandler) MonitorTraffic(c *gin.Context) {
 				"stats":     statsList,
 				"timestamp": time.Now().Unix(),
 			}
-			data, _ := json.Marshal(statsMsg)
-			c.Writer.Write([]byte("event: stats\ndata: " + string(data) + "\n\n"))
-			flusher.Flush()
+		data, err := json.Marshal(statsMsg)
+		if err != nil {
+			log.Printf("Failed to marshal traffic stats: %v", err)
+			continue
+		}
+		c.Writer.Write([]byte("event: stats\ndata: " + string(data) + "\n\n"))
+		flusher.Flush()
 		}
 	}
 }

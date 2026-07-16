@@ -92,7 +92,8 @@
     "collectingData": "Collecte des données…",
     "openMenu": "Ouvrir le menu",
     "peak": "pic",
-    "skipToContent": "Aller au contenu"
+    "skipToContent": "Aller au contenu",
+    "pageOf": "Page {{page}} / {{total}}"
   },
   "nav": {
     "dashboard": "Tableau de bord",
@@ -372,7 +373,20 @@
     "terminateConfirm": "Terminer la connexion « {{cid}} » ? Cette action est irréversible.",
     "terminate": "Terminer",
     "terminateFailed": "Échec de la terminaison",
-    "showingConnections": "Affichage de {{filtered}} sur {{total}} connexions"
+    "showingConnections": "Affichage de {{filtered}} sur {{total}} connexions",
+    "dataIn": "Données entrantes",
+    "dataOut": "Données sortantes",
+    "msgsCount": "{{count}} msgs",
+    "inMsgs": "Msgs entrants",
+    "outMsgs": "Msgs sortants",
+    "inBytes": "Octets entrants",
+    "outBytes": "Octets sortants",
+    "pending": "En attente",
+    "rtt": "RTT",
+    "cid": "ID client",
+    "lastActivity": "Dernière activité",
+    "serverId": "ID serveur",
+    "clientName": "Nom du client"
   },
   "messages": {
     "title": "Messages",
@@ -492,7 +506,13 @@
     "knownSubjects": "Sujets connus",
     "noSubjectsDiscovered": "Aucun sujet découvert pour le moment.",
     "noSubjectsDiscoveredDescription": "Abonnez-vous, publiez ou envoyez une requête pour voir les sujets ici.",
-    "request": "Requête"
+    "request": "Requête",
+    "deleteConfirm": "Supprimer le message #{{seq}} ?",
+    "messageDeleted": "Message supprimé",
+    "deleteFailed": "Échec de la suppression du message",
+    "showingRange": "{{count}} sur {{total}} messages",
+    "headersCount": "{{count}} en-têtes",
+    "emptyPayload": "(vide)"
   },
   "cluster": {
     "title": "Surveillance du cluster",
@@ -536,7 +556,15 @@
     "selectStreamPrompt": "Sélectionnez un flux pour voir les détails de réplication",
     "standaloneModeTitle": "Mode autonome",
     "standaloneModeDescription": "Ce serveur NATS fonctionne en mode autonome. Les fonctionnalités de surveillance du cluster comme la santé des nœuds, le statut de réplication et les groupes raft ne sont disponibles que dans les déploiements clusterisés.",
-    "loading": "Chargement des données du cluster..."
+    "loading": "Chargement des données du cluster...",
+    "raftGroup": "Groupe RAFT {{group}}",
+    "leader": "Leader",
+    "leaderSince": "depuis {{since}}",
+    "peerNodes": "Nœuds pairs",
+    "peer": "Pair",
+    "offline": "Hors ligne",
+    "idle": "Inactif",
+    "activeSeq": "Seq active"
   },
   "alerts": {
     "title": "Alertes et notifications",
@@ -608,7 +636,9 @@
     "loading": "Chargement des déclencheurs d'alerte...",
     "alertsLoading": "Chargement des alertes...",
     "unableToLoad": "Impossible de charger les alertes",
-    "filterBySeverity": "Filtrer par sévérité"
+    "filterBySeverity": "Filtrer par sévérité",
+    "notify": "Notifier",
+    "channels": "Canaux"
   },
   "metrics": {
     "title": "Métriques en temps réel",
@@ -648,7 +678,17 @@
     "noMetricsAvailable": "Aucune métrique disponible",
     "noMetricsAvailableDescription": "Les métriques apparaîtront ici une fois les flux créés et échantillonnés.",
     "duration": "Durée",
-    "selectStream": "Sélectionner un stream"
+    "selectStream": "Sélectionner un stream",
+    "stream": "Stream",
+    "cpuUsage": "Utilisation CPU",
+    "memory": "Mémoire",
+    "routes": "Routes",
+    "slowConsumers": "Consommateurs lents",
+    "sentMessages": "Messages envoyés",
+    "receivedMessages": "Messages reçus",
+    "topConsumersByLag": "Principaux consommateurs par lag",
+    "noConsumerData": "Aucune donnée consommateur",
+    "consumerCount": "{{count}} consommateurs"
   },
   "visualStreamGraph": {
     "title": "Graphe Visuel des Flux",
@@ -735,7 +775,10 @@
     "errorMessage": "Failed to load subjects. Please try refreshing.",
     "totalSubjects": "Total Subjects",
     "totalMessages": "Total Messages",
-    "lastActivity": "Last Activity"
+    "lastActivity": "Last Activity",
+    "share": "Part",
+    "lastSeen": "Vu en dernier",
+    "wildcardSubjects": "Sujets génériques"
   },
   "security": {
     "title": "Sécurité",

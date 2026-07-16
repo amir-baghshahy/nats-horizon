@@ -92,7 +92,8 @@
     "skipToContent": "Skip to content",
     "healthy": "Healthy",
     "warning": "Warning",
-    "critical": "Critical"
+    "critical": "Critical",
+    "pageOf": "Page {{page}} / {{total}}"
   },
   "nav": {
     "groups": {
@@ -372,7 +373,20 @@
     "terminateConfirm": "Terminate connection \"{{cid}}\"? This action cannot be undone.",
     "terminate": "Terminate",
     "terminateFailed": "Failed to terminate connection",
-    "showingConnections": "Showing {{filtered}} of {{total}} connections"
+    "showingConnections": "Showing {{filtered}} of {{total}} connections",
+    "dataIn": "Data In",
+    "dataOut": "Data Out",
+    "msgsCount": "{{count}} msgs",
+    "inMsgs": "Msgs In",
+    "outMsgs": "Msgs Out",
+    "inBytes": "Bytes In",
+    "outBytes": "Bytes Out",
+    "pending": "Pending",
+    "rtt": "RTT",
+    "cid": "Client ID",
+    "lastActivity": "Last Activity",
+    "serverId": "Server ID",
+    "clientName": "Client Name"
   },
   "messages": {
     "title": "Messages",
@@ -492,7 +506,13 @@
     "knownSubjects": "Known Subjects",
     "noSubjectsDiscovered": "No subjects discovered yet.",
     "noSubjectsDiscoveredDescription": "Subscribe, publish, or send a request to see subjects here.",
-    "request": "Request"
+    "request": "Request",
+    "deleteConfirm": "Delete message #{{seq}}?",
+    "messageDeleted": "Message deleted",
+    "deleteFailed": "Failed to delete message",
+    "showingRange": "{{count}} of {{total}} messages",
+    "headersCount": "{{count}} headers",
+    "emptyPayload": "(empty)"
   },
   "cluster": {
     "title": "Cluster Monitoring",
@@ -536,7 +556,15 @@
     "selectStreamPrompt": "Select a stream to view replication details",
     "standaloneModeTitle": "Standalone Mode",
     "standaloneModeDescription": "This NATS server is running in standalone mode. Cluster monitoring features like node health, replication status, and raft groups are only available in clustered deployments.",
-    "loading": "Loading cluster data..."
+    "loading": "Loading cluster data...",
+    "raftGroup": "RAFT group {{group}}",
+    "leader": "Leader",
+    "leaderSince": "since {{since}}",
+    "peerNodes": "Peer Nodes",
+    "peer": "Peer",
+    "offline": "Offline",
+    "idle": "Idle",
+    "activeSeq": "Active Seq"
   },
   "alerts": {
     "title": "Alerts & Notifications",
@@ -608,7 +636,9 @@
     "create": " Create",
     "loading": "Loading alert triggers...",
     "alertsLoading": "Loading alerts...",
-    "unableToLoad": "Unable to load alerts"
+    "unableToLoad": "Unable to load alerts",
+    "notify": "Notify",
+    "channels": "Channels"
   },
   "metrics": {
     "title": "Real-time Metrics",
@@ -648,7 +678,17 @@
     "messages": "Messages",
     "storage": "Storage",
     "noMetricsAvailable": "No Metrics Available",
-    "noMetricsAvailableDescription": "Metrics will appear here once streams are created and sampled."
+    "noMetricsAvailableDescription": "Metrics will appear here once streams are created and sampled.",
+    "stream": "Stream",
+    "cpuUsage": "CPU Usage",
+    "memory": "Memory",
+    "routes": "Routes",
+    "slowConsumers": "Slow Consumers",
+    "sentMessages": "Sent Messages",
+    "receivedMessages": "Received Messages",
+    "topConsumersByLag": "Top Consumers by Lag",
+    "noConsumerData": "No consumer data",
+    "consumerCount": "{{count}} consumers"
   },
   "visualStreamGraph": {
     "title": "Visual Stream Graph",
@@ -735,7 +775,10 @@
     "errorMessage": "Failed to load subjects. Please try refreshing.",
     "totalSubjects": "Total Subjects",
     "totalMessages": "Total Messages",
-    "lastActivity": "Last Activity"
+    "lastActivity": "Last Activity",
+    "share": "Share",
+    "lastSeen": "Last Seen",
+    "wildcardSubjects": "Wildcard Subjects"
   },
   "security": {
     "title": "Security",

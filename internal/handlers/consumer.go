@@ -344,7 +344,7 @@ func (h *ConsumerHandler) Pause(c *gin.Context) {
 //	@Param		consumer	path		string	true	"Consumer name"
 //	@Success	200			{object}	dto.SuccessResponse
 //	@Failure	500			{object}	dto.ErrorResponse
-//	@Router		/streams/{name}/consumers/:consumer/resume [post]
+//	@Router		/streams/{name}/consumers/{consumer}/resume [post]
 func (h *ConsumerHandler) Resume(c *gin.Context) {
 	streamName := c.Param("name")
 	consumerName := c.Param("consumer")

@@ -33,6 +33,7 @@ type SSEClient struct {
 	ConnectedAt time.Time
 	LastPing    time.Time
 	closed      bool
+	closeOnce   sync.Once
 	closeChan   chan struct{}
 }
 
@@ -99,7 +100,7 @@ func (h *SSEHub) RemoveClient(id string) {
 		client.mu.Lock()
 		if !client.closed {
 			client.closed = true
-			close(client.closeChan)
+			client.closeOnce.Do(func() { close(client.closeChan) })
 		}
 		client.mu.Unlock()
 		delete(h.clients, id)
@@ -136,11 +137,15 @@ func (h *SSEHub) cleanupDisconnectedClients() {
 
 	now := time.Now()
 	for id, client := range h.clients {
-		// Remove clients that haven't received a ping in 2 minutes
-		if now.Sub(client.LastPing) > 2*time.Minute {
-			log.Printf("Removing stale SSE client: %s (last ping: %v ago)", id, now.Sub(client.LastPing))
+		client.mu.Lock()
+		shouldRemove := !client.closed && now.Sub(client.LastPing) > 2*time.Minute
+		if shouldRemove {
 			client.closed = true
-			close(client.closeChan)
+			client.closeOnce.Do(func() { close(client.closeChan) })
+		}
+		client.mu.Unlock()
+		if shouldRemove {
+			log.Printf("Removing stale SSE client: %s (last ping: %v ago)", id, now.Sub(client.LastPing))
 			delete(h.clients, id)
 		}
 	}

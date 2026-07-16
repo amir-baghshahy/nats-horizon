@@ -29,6 +29,7 @@ import {
   Eye,
   Server,
   Settings,
+  Cog,
 } from "lucide-react";
 
 type NavItem = {
@@ -81,11 +82,12 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Administration",
     titleKey: "nav.groups.administration",
-    icon: Settings,
-    items: [
-      { key: "security", href: "/security", icon: Shield },
-      { key: "tenancy", href: "/tenancy", icon: Globe },
-    ],
+      icon: Settings,
+      items: [
+        { key: "security", href: "/security", icon: Shield },
+        { key: "tenancy", href: "/tenancy", icon: Globe },
+        { key: "settings", href: "/settings", icon: Cog },
+      ],
   },
 ] as const;
 

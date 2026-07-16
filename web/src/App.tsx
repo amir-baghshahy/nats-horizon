@@ -20,6 +20,7 @@ const Alerts = lazy(() => import("./pages/Alerts"));
 const Metrics = lazy(() => import("./pages/Metrics"));
 const History = lazy(() => import("./pages/History"));
 const Tenancy = lazy(() => import("./pages/Tenancy"));
+const Settings = lazy(() => import("./pages/settings/SettingsPage"));
 const VisualStreamGraph = lazy(() => import("./pages/VisualStreamGraph"));
 
 function App() {
@@ -104,6 +105,7 @@ function App() {
             <Route path="/history" element={<History />} />
             <Route path="/security" element={<Security />} />
             <Route path="/tenancy" element={<Tenancy />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </Suspense>
       </div>

@@ -116,7 +116,8 @@
     "visualStreamGraph": "Visual Stream Graph",
     "history": "History",
     "security": "Security",
-    "tenancy": "Tenancy"
+    "tenancy": "Tenancy",
+    "settings": "Settings"
   },
   "app": {
     "title": "nats-ui",
@@ -937,5 +938,36 @@
     "restarting": "Restarting...",
     "restartingDescription": "Please wait while the server restarts",
     "finishing": "Finishing..."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage application configuration",
+    "loading": "Loading settings...",
+    "loadError": "Failed to load settings",
+    "save": "Save Changes",
+    "saved": "Settings saved successfully",
+    "saveFailed": "Failed to save settings",
+    "restarting": "Restarting...",
+    "restartingDescription": "Please wait while the server restarts",
+    "restartTimeout": "Server restart timed out. Please refresh the page.",
+    "connection": "Connection",
+    "server": "Server",
+    "email": "Email",
+    "natsUrl": "NATS Server URL",
+    "serverPort": "Web Port",
+    "ginMode": "Gin Mode",
+    "ginModeDebug": "Debug",
+    "ginModeRelease": "Release",
+    "ginModeTest": "Test",
+    "corsOrigins": "CORS Allowed Origins",
+    "smtpHost": "SMTP Host",
+    "smtpPort": "SMTP Port",
+    "smtpUsername": "Username",
+    "smtpPassword": "Password",
+    "smtpFrom": "From Address",
+    "testConnection": "Test Connection",
+    "testSuccessful": "Connection successful!",
+    "testFailed": "Connection test failed",
+    "testRequired": "Please test the connection before saving"
   }
 }

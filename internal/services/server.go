@@ -567,7 +567,14 @@ func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, 
 		connections = connz.TotalConnections()
 	}
 
+	memoryMax := uint64(accountInfo.Limits.MaxMemory)
+	if isUnlimited(memoryMax) {
+		memoryMax = 0
+	}
 	memoryUsage := 0.0
+	if memoryMax > 0 {
+		memoryUsage = float64(memoryUsed) / float64(memoryMax) * 100
+	}
 
 	storageMax := uint64(accountInfo.Limits.MaxStore)
 	if isUnlimited(storageMax) {
@@ -580,6 +587,7 @@ func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, 
 
 	return &SystemMetrics{
 		MemoryUsed:   memoryUsed,
+		MemoryMax:    memoryMax,
 		MemoryUsage:  memoryUsage,
 		StorageUsed:  accountInfo.Tier.Store,
 		StorageMax:   storageMax,

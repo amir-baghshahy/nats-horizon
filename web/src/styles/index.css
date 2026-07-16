@@ -152,6 +152,42 @@
     animation: pulse-glow 2s ease-in-out infinite;
   }
 
+  @keyframes live-blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.82); }
+  }
+
+  .animate-live-blink {
+    animation: live-blink 1.1s ease-in-out infinite;
+  }
+
+  @keyframes live-glow {
+    0%, 100% { text-shadow: 0 0 6px currentColor; }
+    50% { text-shadow: 0 0 16px currentColor; }
+  }
+
+  .animate-live-glow {
+    animation: live-glow 1.6s ease-in-out infinite;
+  }
+
+  @keyframes event-flash {
+    0% { background-color: rgb(34 197 94 / 0.18); }
+    100% { background-color: transparent; }
+  }
+
+  .animate-event-flash {
+    animation: event-flash 1.2s ease-out;
+  }
+
+  @keyframes border-flow {
+    0%, 100% { border-color: rgb(51 65 85 / 0.35); }
+    50% { border-color: rgb(99 102 241 / 0.55); }
+  }
+
+  .animate-border-flow {
+    animation: border-flow 2.4s ease-in-out infinite;
+  }
+
   .text-gradient {
     @apply bg-gradient-to-r from-primary-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent;
   }

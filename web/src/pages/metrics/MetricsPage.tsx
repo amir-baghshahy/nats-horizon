@@ -81,7 +81,11 @@ function KpiCard({
   tone: keyof typeof TONES;
 }) {
   const TrendIcon =
-    trend && trend > 0 ? ArrowUpRight : trend && trend < 0 ? ArrowDownRight : Minus;
+    trend && trend > 0
+      ? ArrowUpRight
+      : trend && trend < 0
+        ? ArrowDownRight
+        : Minus;
   const trendColor =
     trend && trend > 0
       ? "text-green-400"
@@ -92,19 +96,27 @@ function KpiCard({
     <div className="card p-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0">
-          <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${TONES[tone]}`}>
+          <div
+            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${TONES[tone]}`}
+          >
             <Icon className="h-3.5 w-3.5" />
           </div>
-          <span className="truncate text-display-xs text-content-tertiary">{label}</span>
+          <span className="truncate text-display-xs text-content-tertiary">
+            {label}
+          </span>
         </div>
         {trend !== undefined && (
-          <div className={`flex shrink-0 items-center gap-0.5 text-display-xs font-medium ${trendColor}`}>
+          <div
+            className={`flex shrink-0 items-center gap-0.5 text-display-xs font-medium ${trendColor}`}
+          >
             <TrendIcon className="h-3 w-3" />
             <span>{Math.abs(trend).toFixed(1)}%</span>
           </div>
         )}
       </div>
-      <p className="mt-2 text-display-lg font-bold tabular-nums leading-none">{value}</p>
+      <p className="mt-2 text-display-lg font-bold tabular-nums leading-none">
+        {value}
+      </p>
     </div>
   );
 }
@@ -123,13 +135,17 @@ function StatCardShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl bg-surface-primary/50 p-3">
+    <div className="card p-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
-          <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${TONES[tone]}`}>
+          <div
+            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${TONES[tone]}`}
+          >
             <Icon className="h-3.5 w-3.5" />
           </div>
-          <span className="truncate text-display-xs text-content-tertiary">{label}</span>
+          <span className="truncate text-display-xs text-content-tertiary">
+            {label}
+          </span>
         </div>
         {corner && <div className="shrink-0">{corner}</div>}
       </div>
@@ -151,17 +167,30 @@ function UsageBar({
 }) {
   const { t } = useTranslation();
   const pct = usage ?? (max ? (used / max) * 100 : 0);
-  const barColor = pct > 90 ? "bg-red-400" : pct > 70 ? "bg-yellow-400" : "bg-green-400";
-  const textColor = pct > 90 ? "text-red-400" : pct > 70 ? "text-yellow-400" : "text-green-400";
-  const status = pct > 90 ? t("common.critical") : pct > 70 ? t("common.warning") : t("common.healthy");
+  const barColor =
+    pct > 90 ? "bg-red-400" : pct > 70 ? "bg-yellow-400" : "bg-green-400";
+  const textColor =
+    pct > 90 ? "text-red-400" : pct > 70 ? "text-yellow-400" : "text-green-400";
+  const status =
+    pct > 90
+      ? t("common.critical")
+      : pct > 70
+        ? t("common.warning")
+        : t("common.healthy");
   return (
     <StatCardShell
       icon={HardDrive}
       label={label}
       tone="purple"
-      corner={<span className={`text-display-xs font-medium ${textColor}`}>{status}</span>}
+      corner={
+        <span className={`text-display-xs font-medium ${textColor}`}>
+          {status}
+        </span>
+      }
     >
-      <p className="mt-2 text-display-base font-semibold tabular-nums leading-none">{formatBytes(used || 0)}</p>
+      <p className="mt-2 text-display-base font-semibold tabular-nums leading-none">
+        {formatBytes(used || 0)}
+      </p>
       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border-default">
         <div
           className={`h-full rounded-full transition-all duration-500 ${barColor}`}
@@ -192,7 +221,9 @@ function StatBlock({
 }) {
   return (
     <StatCardShell icon={Icon} label={label} tone={tone}>
-      <p className="mt-2 text-display-base font-semibold tabular-nums leading-none">{value}</p>
+      <p className="mt-2 text-display-base font-semibold tabular-nums leading-none">
+        {value}
+      </p>
       <p className="mt-1.5 text-display-xs text-content-tertiary">{sub}</p>
     </StatCardShell>
   );
@@ -201,7 +232,11 @@ function StatBlock({
 function HeroChart({ series, color }: { series: MetricSeries; color: string }) {
   const { t } = useTranslation();
   const hex = `rgb(${color})`;
-  const chartData = (series.data || []).map((p, i) => ({ i, v: p.value || 0, ts: p.timestamp }));
+  const chartData = (series.data || []).map((p, i) => ({
+    i,
+    v: p.value || 0,
+    ts: p.timestamp,
+  }));
 
   if (chartData.length < 2) {
     return (
@@ -209,7 +244,9 @@ function HeroChart({ series, color }: { series: MetricSeries; color: string }) {
         <div className="icon-lg mb-3 flex items-center justify-center rounded-full bg-border-default/30">
           <TrendingUp className="icon-md text-content-tertiary/50" />
         </div>
-        <p className="text-display-xs text-content-tertiary/60">{t("common.collectingData")}</p>
+        <p className="text-display-xs text-content-tertiary/60">
+          {t("common.collectingData")}
+        </p>
       </div>
     );
   }
@@ -219,7 +256,10 @@ function HeroChart({ series, color }: { series: MetricSeries; color: string }) {
   return (
     <div className="h-32 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+        <AreaChart
+          data={chartData}
+          margin={{ top: 8, right: 8, left: 8, bottom: 0 }}
+        >
           <defs>
             <linearGradient id={`hero-${color}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={hex} stopOpacity={0.35} />
@@ -236,7 +276,10 @@ function HeroChart({ series, color }: { series: MetricSeries; color: string }) {
                 <div className="rounded-lg border border-border-default bg-surface-secondary/95 px-3 py-2 text-display-xs shadow-xl backdrop-blur">
                   <p className="mb-0.5 text-content-tertiary">
                     {p.ts
-                      ? new Date(p.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                      ? new Date(p.ts).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
                       : ""}
                   </p>
                   <p className="font-mono font-semibold" style={{ color: hex }}>
@@ -265,7 +308,15 @@ function HeroChart({ series, color }: { series: MetricSeries; color: string }) {
   );
 }
 
-function TopStreamRow({ stream, max, rank }: { stream: any; max: number; rank: number }) {
+function TopStreamRow({
+  stream,
+  max,
+  rank,
+}: {
+  stream: any;
+  max: number;
+  rank: number;
+}) {
   const rate = stream.messages_per_sec || 0;
   const pct = max > 0 ? (rate / max) * 100 : 0;
   return (
@@ -289,7 +340,8 @@ function TopStreamRow({ stream, max, rank }: { stream: any; max: number; rank: n
           />
         </div>
         <p className="mt-1 text-display-xs text-content-tertiary">
-          {formatBytes(stream.bytes_per_sec || 0)}/s · {formatNumber(stream.messages || 0)} total msgs
+          {formatBytes(stream.bytes_per_sec || 0)}/s ·{" "}
+          {formatNumber(stream.messages || 0)} total msgs
         </p>
       </div>
     </div>
@@ -330,52 +382,67 @@ export default function MetricsPage({
   const totalStorageSeries = aggregateSeries(metrics, "bytes");
   const messagesTrend = getTrend(totalMessagesSeries);
   const storageTrend = getTrend(totalStorageSeries);
-  const durationLabel = t(`metrics.${durations.find((d) => d.value === duration)?.label ?? "last1Hour"}`);
+  const durationLabel = t(
+    `metrics.${durations.find((d) => d.value === duration)?.label ?? "last1Hour"}`,
+  );
   const topStreams = [...rateStreams]
-    .sort((a: any, b: any) => (b.messages_per_sec || 0) - (a.messages_per_sec || 0))
+    .sort(
+      (a: any, b: any) => (b.messages_per_sec || 0) - (a.messages_per_sec || 0),
+    )
     .slice(0, 8);
-  const maxRateMessages = Math.max(...rateStreams.map((s: any) => s.messages_per_sec || 0), 0);
+  const maxRateMessages = Math.max(
+    ...rateStreams.map((s: any) => s.messages_per_sec || 0),
+    0,
+  );
 
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6 animate-fade-in md:h-full md:overflow-hidden">
       <div className="shrink-0">
-      <PageHeader
-        title={t("metrics.title")}
-        subtitle={t("metrics.subtitle")}
-        actions={
-          <>
-            <Select
-              value={duration}
-              onChange={setDuration}
-              options={durations.map((item) => ({
-                value: item.value,
-                label: t(`metrics.${item.label}`),
-              }))}
-              className="w-[140px] shrink-0"
-              aria-label={t("metrics.duration")}
-            />
-            <Button
-              type="button"
-              variant={autoRefresh ? "primary" : "secondary"}
-              size="sm"
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              aria-pressed={autoRefresh}
-              icon={autoRefresh ? <Activity className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
-              className={autoRefresh ? "animate-pulse-glow" : ""}
-            >
-              <span className="hidden sm:inline">{t("metrics.autoRefresh")}</span>
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => refetch()}
-              icon={<RefreshCw className="h-3.5 w-3.5" />}
-              aria-label={t("common.refresh")}
-            />
-          </>
-        }
-      />
+        <PageHeader
+          title={t("metrics.title")}
+          subtitle={t("metrics.subtitle")}
+          actions={
+            <>
+              <Select
+                value={duration}
+                onChange={setDuration}
+                options={durations.map((item) => ({
+                  value: item.value,
+                  label: t(`metrics.${item.label}`),
+                }))}
+                className="w-[140px] shrink-0"
+                aria-label={t("metrics.duration")}
+              />
+              <Button
+                type="button"
+                variant={autoRefresh ? "primary" : "secondary"}
+                size="sm"
+                onClick={() => setAutoRefresh(!autoRefresh)}
+                aria-pressed={autoRefresh}
+                icon={
+                  autoRefresh ? (
+                    <Activity className="h-3.5 w-3.5" />
+                  ) : (
+                    <Clock className="h-3 w-3.5" />
+                  )
+                }
+                className={autoRefresh ? "animate-pulse-glow" : ""}
+              >
+                <span className="hidden sm:inline">
+                  {t("metrics.autoRefresh")}
+                </span>
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => refetch()}
+                icon={<RefreshCw className="h-3.5 w-3.5" />}
+                aria-label={t("common.refresh")}
+              />
+            </>
+          }
+        />
       </div>
 
       {/* KPI overview */}
@@ -410,13 +477,13 @@ export default function MetricsPage({
 
       {/* Hero throughput chart */}
       <div className="shrink-0">
-      <PanelCard
-        title={t("metrics.messages")}
-        subtitle={durationLabel}
-        icon={<TrendingUp className="h-5 w-5 text-primary-400" />}
-      >
-        <HeroChart series={totalMessagesSeries} color="59, 130, 246" />
-      </PanelCard>
+        <PanelCard
+          title={t("metrics.messages")}
+          subtitle={durationLabel}
+          icon={<TrendingUp className="h-5 w-5 text-primary-400" />}
+        >
+          <HeroChart series={totalMessagesSeries} color="59, 130, 246" />
+        </PanelCard>
       </div>
 
       {/* System resources */}
@@ -446,7 +513,9 @@ export default function MetricsPage({
           value={
             <>
               {formatBytes(rateTotalBytes)}
-              <span className="ml-1 text-display-sm text-content-tertiary">/ {rates?.duration || 60}s</span>
+              <span className="ml-1 text-display-sm text-content-tertiary">
+                / {rates?.duration || 60}s
+              </span>
             </>
           }
           sub={`${formatNumber(rateTotalMessages)} messages`}
@@ -468,12 +537,19 @@ export default function MetricsPage({
           />
         }
         footer={
-          <Badge variant="info">{t("metrics.streamCount", { count: rateStreams.length })}</Badge>
+          <Badge variant="info">
+            {t("metrics.streamCount", { count: rateStreams.length })}
+          </Badge>
         }
       >
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
           {topStreams.map((stream: any, i: number) => (
-            <TopStreamRow key={stream.name} stream={stream} max={maxRateMessages} rank={i + 1} />
+            <TopStreamRow
+              key={stream.name}
+              stream={stream}
+              max={maxRateMessages}
+              rank={i + 1}
+            />
           ))}
         </div>
       </PanelCard>

@@ -21,8 +21,6 @@ export default function StreamsHeader({
       title={t("streams.title")}
       subtitle={t("streams.subtitle")}
       sseConnected={sseConnected}
-      sseLabel={t("common.live")}
-      sseDisconnectedLabel={t("common.connecting")}
        actions={
          <>
            <Button variant="secondary" icon={<RefreshCw className="icon-base" />} onClick={onRefetch}>

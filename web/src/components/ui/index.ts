@@ -5,6 +5,7 @@ export { default as LoadingSpinner } from "./LoadingSpinner";
 export { default as Select } from "./Select";
 export { default as Button } from "./Button";
 export { default as PageHeader } from "./PageHeader";
+export { default as LiveIndicator } from "./LiveIndicator";
 export { default as FilterBar } from "./FilterBar";
 export { default as PanelCard } from "./PanelCard";
 export { default as DataList } from "./DataList";

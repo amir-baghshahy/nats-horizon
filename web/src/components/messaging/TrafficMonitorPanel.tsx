@@ -2,8 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { Activity, Play, RefreshCw, StopCircle } from "lucide-react";
 import { Button } from "../ui";
 import { formatBytes } from "../../utils/formatters";
+import MonitorEventItem from "./MonitorEventItem";
 
-interface MonitorEvent {
+export interface MonitorEvent {
   type?: string;
   subject?: string;
   reply?: string;
@@ -79,13 +80,19 @@ export default function TrafficMonitorPanel({
   const totalBytes = subjectStats.reduce((sum, stat) => sum + stat.bytes, 0);
 
   return (
-    <div className="space-y-6">
-      <div className="card">
+    <div className="space-y-4 h-full flex flex-col">
+      <div className="card p-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <Activity className="h-5 w-5 text-primary-400" />
+              <Activity className={`h-5 w-5 text-primary-400 ${isMonitoring ? "animate-spin-slow" : ""}`} />
               <h2 className="text-display-xl font-bold">{t('messages.trafficMonitor')}</h2>
+              {isMonitoring && (
+                <span className="flex items-center gap-1.5 rounded-full bg-green-500/15 px-2 py-0.5 text-display-xs font-medium text-green-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-live-blink" />
+                  {t('messages.live')}
+                </span>
+              )}
             </div>
             <p className="text-display-sm leading-6 text-content-tertiary">
               {t('messages.trafficMonitorDescription')}
@@ -123,131 +130,81 @@ export default function TrafficMonitorPanel({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <div className="card">
+      <div className={`grid gap-3 md:grid-cols-4 ${isMonitoring ? "animate-border-flow rounded-xl" : ""}`}>
+        <div className="card p-3">
           <p className="text-display-xs text-content-tertiary">{t('messages.status')}</p>
-          <p className="mt-2 text-display-2xl font-bold">{isMonitoring ? t('messages.live') : t('messages.idle')}</p>
+          <p className={`mt-1 text-display-lg font-bold ${isMonitoring ? "text-green-400 animate-live-glow" : ""}`}>
+            {isMonitoring ? t('messages.live') : t('messages.idle')}
+          </p>
         </div>
-        <div className="card">
+        <div className="card p-3">
           <p className="text-display-xs text-content-tertiary">{t('messages.subjects')}</p>
-          <p className="mt-2 text-display-2xl font-bold">{subjectStats.length}</p>
+          <p className="mt-1 text-display-lg font-bold">{subjectStats.length}</p>
         </div>
-        <div className="card">
+        <div className="card p-3">
           <p className="text-display-xs text-content-tertiary">{t('messages.messagesLabel')}</p>
-          <p className="mt-2 text-display-2xl font-bold">{totalMessages.toLocaleString()}</p>
+          <p className="mt-1 text-display-lg font-bold">{totalMessages.toLocaleString()}</p>
         </div>
-        <div className="card">
+        <div className="card p-3">
           <p className="text-display-xs text-content-tertiary">{t('messages.bytes')}</p>
-          <p className="mt-2 text-display-2xl font-bold">{formatBytes(totalBytes)}</p>
+          <p className="mt-1 text-display-lg font-bold">{formatBytes(totalBytes)}</p>
         </div>
       </div>
 
-      <div className="card overflow-hidden">
-        <div className="border-b border-border-default p-4">
-          <h3 className="font-semibold">{t('messages.subjectTraffic')}</h3>
-        </div>
-        {subjectStats.length > 0 ? (
-          <div className="divide-y divide-border-default">
-            {subjectStats.map((stat) => (
-              <div key={stat.subject} className="p-4">
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <div className="min-w-0">
-                    <p className="font-mono text-display-sm font-medium truncate">{stat.subject}</p>
-                    <p className="mt-1 text-display-xs text-content-tertiary">
-                      {t('messages.lastSeen')} {formatTimestamp(stat.last_seen)}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-3 text-display-sm">
-                    <span>
-                      <span className="text-content-tertiary">{t('messages.messagesLabel')}:</span>{" "}
-                      <span className="font-mono">{stat.count.toLocaleString()}</span>
-                    </span>
-                    <span>
-                      <span className="text-content-tertiary">{t('messages.bytesLabel')}:</span>{" "}
-                      <span className="font-mono">{formatBytes(stat.bytes)}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+      <div className="grid gap-4 md:grid-cols-2 flex-1 min-h-0">
+        <div className="card overflow-hidden flex flex-col h-full">
+          <div className="border-b border-border-default p-3">
+            <h3 className="font-semibold text-display-sm">{t('messages.subjectTraffic')}</h3>
           </div>
-        ) : (
-          <div className="p-8 text-center text-content-tertiary">
-            <Activity className="mx-auto mb-3 h-12 w-12 opacity-50" />
-            <p>{t('messages.noTrafficCaptured')}</p>
-            <p className="mt-1 text-display-sm">{t('messages.noTrafficCapturedDescription')}</p>
-          </div>
-        )}
-      </div>
-
-      <div className="card overflow-hidden">
-        <div className="border-b border-border-default p-4">
-          <h3 className="font-semibold">{t('messages.recentEvents')}</h3>
-        </div>
-        {events.length > 0 ? (
-          <div className="max-h-[520px] overflow-y-auto divide-y divide-border-default">
-            {events.map((event, index) => (
-              <div key={`${event.type}-${event.subject}-${event.timestamp}-${index}`} className="p-4">
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={`rounded-full px-2 py-0.5 text-display-xs font-medium ${
-                      event.type === "message"
-                        ? "bg-primary-500/15 text-primary-300"
-                        : "bg-blue-500/15 text-blue-300"
-                    }`}>
-                      {event.type || t('messages.event')}
-                    </span>
-                    {event.subject && (
-                      <span className="font-mono text-display-sm text-primary-300 truncate">
-                        {event.subject}
+          {subjectStats.length > 0 ? (
+            <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin divide-y divide-border-default">
+              {subjectStats.map((stat) => (
+                <div key={stat.subject} className="p-3">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    <div className="min-w-0">
+                      <p className="font-mono text-display-sm font-medium truncate">{stat.subject}</p>
+                      <p className="mt-0.5 text-display-xs text-content-tertiary">
+                        {t('messages.lastSeen')} {formatTimestamp(stat.last_seen)}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-3 text-display-sm">
+                      <span>
+                        <span className="text-content-tertiary">{t('messages.messagesLabel')}:</span>{" "}
+                        <span className="font-mono">{stat.count.toLocaleString()}</span>
                       </span>
-                    )}
-                    <span className="text-display-xs text-content-tertiary">
-                      {formatTimestamp(event.timestamp)}
-                    </span>
+                      <span>
+                        <span className="text-content-tertiary">{t('messages.bytesLabel')}:</span>{" "}
+                        <span className="font-mono">{formatBytes(stat.bytes)}</span>
+                      </span>
+                    </div>
                   </div>
-
-                  {event.type === "message" && (
-                    <div className="space-y-2 text-display-sm">
-                      {event.reply && (
-                        <p className="text-content-tertiary">
-                          {t('messages.replyLabel')}: <span className="font-mono">{event.reply}</span>
-                        </p>
-                      )}
-                      {event.size !== undefined && (
-                        <p className="text-content-tertiary">
-                          {t('messages.sizeLabel')}: <span className="font-mono">{formatBytes(event.size)}</span>
-                        </p>
-                      )}
-                      {event.data && (
-                        <pre className="max-h-32 overflow-auto rounded-lg bg-surface-primary p-3 text-display-xs">
-                          <code>{event.data}</code>
-                        </pre>
-                      )}
-                    </div>
-                  )}
-
-                  {event.type === "stats" && event.stats && (
-                    <div className="grid gap-2 md:grid-cols-2">
-                      {event.stats.map((stat) => (
-                        <div key={stat.subject} className="rounded-lg bg-surface-primary p-3 text-display-sm">
-                          <p className="font-mono text-primary-300 truncate">{stat.subject}</p>
-                          <p className="mt-1 text-content-tertiary">
-                            {stat.count.toLocaleString()} {t('messages.messagesAnd')} {formatBytes(stat.bytes)}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 text-center text-content-tertiary">
+              <Activity className="mx-auto mb-2 h-10 w-10 opacity-50" />
+              <p className="text-display-sm">{t('messages.noTrafficCaptured')}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="card overflow-hidden flex flex-col h-full">
+          <div className="border-b border-border-default p-3">
+            <h3 className="font-semibold text-display-sm">{t('messages.recentEvents')}</h3>
           </div>
-        ) : (
-          <div className="p-8 text-center text-content-tertiary">
-            <p>{t('messages.eventsEmpty')}</p>
+          {events.length > 0 ? (
+            <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin divide-y divide-border-default">
+              {events.map((event, index) => (
+                <MonitorEventItem key={`${event.type}-${event.subject}-${event.timestamp}-${index}`} event={event} index={index} />
+              ))}
+            </div>
+          ) : (
+          <div className="p-6 text-center text-content-tertiary">
+            <p className="text-display-sm">{t('messages.eventsEmpty')}</p>
           </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

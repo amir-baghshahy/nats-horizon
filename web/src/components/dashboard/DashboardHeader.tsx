@@ -1,6 +1,6 @@
 import { RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Button } from "../ui";
+import { Button, LiveIndicator } from "../ui";
 
 interface DashboardHeaderProps {
   sseConnected: boolean;
@@ -29,21 +29,7 @@ export default function DashboardHeader({
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-surface-primary rounded-lg border border-border-default">
-          {sseConnected ? (
-            <>
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-display-xs text-green-400">{t("common.live")}</span>
-            </>
-          ) : (
-            <>
-              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-              <span className="text-display-xs text-yellow-400">
-                {t("common.polling")}
-              </span>
-            </>
-          )}
-        </div>
+        <LiveIndicator connected={sseConnected} />
 
         <Button
           variant="secondary"

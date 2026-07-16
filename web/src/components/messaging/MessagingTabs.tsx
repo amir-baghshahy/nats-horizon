@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { Activity, Hash, MessageSquare, Server } from 'lucide-react';
+import { Activity, MessageSquare, Server } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
-export type MessagingTab = "messages" | "request" | "monitor" | "services" | "subjects";
+export type MessagingTab = "messages" | "request" | "monitor" | "services";
 
 interface MessagingTabsProps {
   activeTab: MessagingTab;
@@ -21,7 +21,6 @@ export default function MessagingTabs({
     { id: "messages", label: t('messages.messagesCount', { count: messagesCount }), icon: MessageSquare },
     { id: "request", label: t('messages.requestReply'), icon: MessageSquare },
     { id: "monitor", label: t('messages.trafficMonitor'), icon: Activity },
-    { id: "subjects", label: t('messages.subjects'), icon: Hash },
     { id: "services", label: t('messages.services'), icon: Server },
   ];
 

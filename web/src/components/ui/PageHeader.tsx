@@ -1,12 +1,11 @@
 import { LucideIcon } from "lucide-react";
+import LiveIndicator from "./LiveIndicator";
 
 interface PageHeaderProps {
   title: string;
   subtitle?: string;
   icon?: LucideIcon;
   sseConnected?: boolean;
-  sseLabel?: string;
-  sseDisconnectedLabel?: string;
   actions?: React.ReactNode;
 }
 
@@ -15,8 +14,6 @@ export default function PageHeader({
   subtitle,
   icon: Icon,
   sseConnected,
-  sseLabel,
-  sseDisconnectedLabel,
   actions,
 }: PageHeaderProps) {
   return (
@@ -35,19 +32,10 @@ export default function PageHeader({
 
       <div className="flex items-center gap-2 shrink-0">
         {sseConnected !== undefined && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-surface-primary rounded-lg border border-border-default">
-            {sseConnected ? (
-              <>
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-display-xs text-green-400">{sseLabel || "Live"}</span>
-              </>
-            ) : (
-              <>
-                <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-                <span className="text-display-xs text-yellow-400">{sseDisconnectedLabel || "Connecting..."}</span>
-              </>
-            )}
-          </div>
+          <LiveIndicator
+            connected={sseConnected}
+            className={!sseConnected ? "opacity-80" : ""}
+          />
         )}
         {actions}
       </div>

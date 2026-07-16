@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { MessageSquare, Trash2, CheckCircle, Zap } from "lucide-react";
+import { MessageSquare, Trash2 } from "lucide-react";
 import EmptyState from "../ui/EmptyState";
 import MessageItem from "./MessageItem";
-import { Button } from "../ui";
+import { Button, LiveIndicator } from "../ui";
 import type { Message, MessageFormat } from "../../hooks/useMessageList";
 
 interface MessageListProps {
@@ -53,19 +53,7 @@ export default function MessageList({
   return (
     <div className="card overflow-hidden p-0">
       <div className="flex items-center justify-between p-4 border-b border-border-default">
-        <div className="flex items-center gap-2 px-4 py-2 bg-surface-primary rounded-lg border border-border-default">
-          {sseConnected ? (
-            <>
-              <CheckCircle className="icon-base text-green-400" />
-              <span className="text-display-sm text-green-400">{t('common.sseConnected')}</span>
-            </>
-          ) : (
-            <>
-              <Zap className="icon-base text-yellow-400" />
-              <span className="text-display-sm text-yellow-400">{t('common.polling')}</span>
-            </>
-          )}
-        </div>
+        <LiveIndicator connected={sseConnected} />
 
         <div className="flex items-center gap-2">
           <button

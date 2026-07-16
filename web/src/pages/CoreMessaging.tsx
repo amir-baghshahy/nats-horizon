@@ -12,7 +12,6 @@ import {
   SubscriptionBar,
   MessagingTabs,
   MessagingHeader,
-  SubjectExplorer,
   ServiceDiscoveryPanel,
   TrafficMonitorPanel,
 } from "../components/messaging";
@@ -32,10 +31,7 @@ import type { ServiceInfo } from "../components/messaging/ServiceDiscoveryPanel"
 import type { Message } from "../hooks/useMessageList";
 import type { PublishForm as PublishFormType } from "../components/messaging/PublishForm";
 import type { RequestForm as RequestFormType } from "../components/messaging/RequestForm";
-import {
-  PublishForm,
-  RequestForm,
-} from "../components/messaging";
+import { PublishForm, RequestForm } from "../components/messaging";
 
 interface CoreMessagingContentProps {
   activeTab?: MessagingTab;
@@ -57,9 +53,12 @@ export function CoreMessagingContent({
   );
   const activeTab = controlledTab ?? uncontrolledTab;
   const setActiveTab = setControlledTab ?? setUncontrolledTab;
-  const [uncontrolledShowPublishModal, setUncontrolledShowPublishModal] = useState(false);
-  const showPublishModal = controlledShowPublishModal ?? uncontrolledShowPublishModal;
-  const setShowPublishModal = setControlledShowPublishModal ?? setUncontrolledShowPublishModal;
+  const [uncontrolledShowPublishModal, setUncontrolledShowPublishModal] =
+    useState(false);
+  const showPublishModal =
+    controlledShowPublishModal ?? uncontrolledShowPublishModal;
+  const setShowPublishModal =
+    setControlledShowPublishModal ?? setUncontrolledShowPublishModal;
   const [subscriptions, setSubscriptions] = useState<Set<string>>(new Set());
   const [autoScroll, setAutoScroll] = usePersistedState<boolean>(
     "core:autoScroll",
@@ -79,6 +78,7 @@ export function CoreMessagingContent({
   const [requestResponse, setRequestResponse] = useState<any>(null);
   const [monitorSubjects, setMonitorSubjects] = useState("");
   const [monitorEvents, setMonitorEvents] = useState<any[]>([]);
+  const [isMonitoring, setIsMonitoring] = useState(false);
   const monitorSourceRef = useRef<EventSource | null>(null);
 
   const { connected: sseConnected } = useSSE("core-messaging");
@@ -105,10 +105,8 @@ export function CoreMessagingContent({
     onMessage: (message) => {
       addMessage(message);
     },
-    onStatusChange: (connected) => {
-      if (connected) {
-        setSubscriptions(new Set(getSubscriptions()));
-      }
+    onStatusChange: () => {
+      setSubscriptions(new Set(getSubscriptions()));
     },
   });
 
@@ -224,6 +222,7 @@ export function CoreMessagingContent({
       .join("&");
     const source = new EventSource(`/api/core/monitor?${params}`);
     monitorSourceRef.current = source;
+    setIsMonitoring(true);
 
     source.addEventListener("message", (event) => {
       try {
@@ -249,12 +248,14 @@ export function CoreMessagingContent({
       toast("error", t("messages.trafficMonitorDisconnected"));
       source.close();
       monitorSourceRef.current = null;
+      setIsMonitoring(false);
     };
   };
 
   const stopMonitor = () => {
     monitorSourceRef.current?.close();
     monitorSourceRef.current = null;
+    setIsMonitoring(false);
   };
 
   useEffect(() => {
@@ -265,17 +266,6 @@ export function CoreMessagingContent({
     if (error instanceof Error) return error.message;
     return t("messages.serviceDiscoveryError");
   };
-
-  const knownSubjects = Array.from(
-    new Set(
-      [
-        ...subscriptions,
-        ...messages.map((message) => message.subject),
-        publishForm.subject,
-        requestForm.subject,
-      ].filter((subject): subject is string => Boolean(subject)),
-    ),
-  );
 
   if (serviceInfoLoading) {
     return <PageLoading text={t("messages.loadingCoreMessaging")} />;
@@ -344,8 +334,6 @@ export function CoreMessagingContent({
           />
         )}
 
-        {activeTab === "subjects" && <SubjectExplorer subjects={knownSubjects} />}
-
         {activeTab === "services" && (
           <ServiceDiscoveryPanel
             serviceInfo={serviceInfo as ServiceInfo}
@@ -358,7 +346,7 @@ export function CoreMessagingContent({
           <TrafficMonitorPanel
             subjects={monitorSubjects}
             onSubjectsChange={setMonitorSubjects}
-            isMonitoring={Boolean(monitorSourceRef.current)}
+            isMonitoring={isMonitoring}
             events={monitorEvents}
             onStart={startMonitor}
             onStop={stopMonitor}
@@ -370,7 +358,9 @@ export function CoreMessagingContent({
         <ModalWrapper isOpen={true} onClose={() => setShowPublishModal(false)}>
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in"
-            onClick={(e) => { if (e.target === e.currentTarget) setShowPublishModal(false); }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowPublishModal(false);
+            }}
           >
             <div
               className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto scrollbar-thin"

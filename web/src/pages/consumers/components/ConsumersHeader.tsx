@@ -46,8 +46,6 @@ export default function ConsumersHeader({
       title={t('consumers.title')}
       subtitle={t('consumers.subtitle')}
       sseConnected={sseConnected}
-      sseLabel={t('common.live')}
-      sseDisconnectedLabel={t('common.connecting')}
       actions={
         <>
           {selectedCount > 0 && (

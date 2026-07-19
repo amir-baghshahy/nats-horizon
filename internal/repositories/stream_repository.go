@@ -77,17 +77,6 @@ type streamListResponse struct {
 	Limit  int `json:"limit"`
 }
 
-func storageToString(storage int) string {
-	switch storage {
-	case 0:
-		return "file"
-	case 1:
-		return "memory"
-	default:
-		return fmt.Sprintf("%d", storage)
-	}
-}
-
 func (r *NATSStreamRepository) List(ctx context.Context) ([]*models.Stream, error) {
 	subject := constants.APIStreamList
 
@@ -263,7 +252,7 @@ func (r *NATSStreamRepository) toDomainStream(info *nats.StreamInfo) *models.Str
 	return &models.Stream{
 		Name:      info.Config.Name,
 		Subjects:  info.Config.Subjects,
-		Storage:   storageToString(int(info.Config.Storage)),
+		Storage:   natsutil.StorageTypeToString(int(info.Config.Storage)),
 		Retention: retention,
 		Replicas:  int(info.Config.Replicas),
 		MaxAge:    maxAge,

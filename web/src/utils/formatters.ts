@@ -125,10 +125,4 @@ export const formatJSON = (data: string): string => {
   }
 };
 
-/**
- * Truncate string to max length with ellipsis
- */
-export const truncate = (str: string, maxLength: number = 100): string => {
-  if (!str || str.length <= maxLength) return str;
-  return str.substring(0, maxLength) + "...";
-};
+

@@ -13,6 +13,18 @@ const (
 	subjectConsumerList = "$JS.API.CONSUMER.LIST"
 )
 
+// StorageTypeToString maps a NATS storage type integer to its string form.
+func StorageTypeToString(storage int) string {
+	switch storage {
+	case 0:
+		return "file"
+	case 1:
+		return "memory"
+	default:
+		return "file"
+	}
+}
+
 // StreamInfo represents minimal stream info from list responses.
 type StreamInfo struct {
 	Name      string

@@ -11,20 +11,10 @@ import (
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/utils"
 	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/natsutil"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
-
-func storageTypeToString(storage int) string {
-	switch storage {
-	case 0:
-		return "file"
-	case 1:
-		return "memory"
-	default:
-		return fmt.Sprintf("%d", storage)
-	}
-}
 
 // ExportHandler handles data export operations
 type ExportHandler struct {
@@ -105,7 +95,7 @@ func (h *ExportHandler) exportStreamCSV(c *gin.Context, info *nats.StreamInfo, i
 	writer.Write([]string{"Bytes", fmt.Sprintf("%d", info.State.Bytes)})
 	writer.Write([]string{"Consumers", fmt.Sprintf("%d", info.State.Consumers)})
 	writer.Write([]string{"Created", info.State.FirstTime.Format(time.RFC3339)})
-	writer.Write([]string{"Storage", storageTypeToString(int(info.Config.Storage))})
+	writer.Write([]string{"Storage", natsutil.StorageTypeToString(int(info.Config.Storage))})
 	writer.Write([]string{"Replicas", fmt.Sprintf("%d", info.Config.Replicas)})
 }
 
@@ -125,7 +115,7 @@ func (h *ExportHandler) exportStreamJSON(c *gin.Context, info *nats.StreamInfo, 
 				"max_age":      info.Config.MaxAge,
 				"max_bytes":    info.Config.MaxBytes,
 				"max_msg_size": info.Config.MaxMsgSize,
-				"storage":      storageTypeToString(int(info.Config.Storage)),
+				"storage":      natsutil.StorageTypeToString(int(info.Config.Storage)),
 				"replicas":     info.Config.Replicas,
 			},
 			"state": gin.H{
@@ -177,7 +167,7 @@ Created: %s
 		info.Config.Retention,
 		info.Config.MaxAge,
 		info.Config.MaxBytes,
-		storageTypeToString(int(info.Config.Storage)),
+		natsutil.StorageTypeToString(int(info.Config.Storage)),
 		info.Config.Replicas,
 		info.State.Msgs,
 		info.State.Bytes,

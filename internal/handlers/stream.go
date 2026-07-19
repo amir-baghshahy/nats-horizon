@@ -53,7 +53,7 @@ func (h *StreamHandler) GetStream(c *gin.Context) {
 	name := c.Param("name")
 	stream, err := h.useCase.GetStream(c.Request.Context(), name)
 	if err != nil {
-		apihttp.JSONInternalError(c, err, "Stream not found")
+		apihttp.JSONNotFound(c, "stream", name)
 		return
 	}
 	c.JSON(http.StatusOK, utils.StreamToResponse(stream))

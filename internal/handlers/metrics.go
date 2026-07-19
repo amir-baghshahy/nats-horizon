@@ -143,6 +143,37 @@ func (h *MetricsHandler) startCollector() {
 	}()
 }
 
+func deepCopyMetricsResponse(src *MetricsResponse) *MetricsResponse {
+	dst := &MetricsResponse{
+		Streams:   make([]MetricSeries, 0, len(src.Streams)),
+		Consumers: make([]MetricSeries, 0, len(src.Consumers)),
+		System:    make([]MetricSeries, 0, len(src.System)),
+		Timestamp: src.Timestamp,
+	}
+	for _, s := range src.Streams {
+		dst.Streams = append(dst.Streams, MetricSeries{
+			Name:   s.Name,
+			Labels: s.Labels,
+			Data:   append([]MetricDataPoint{}, s.Data...),
+		})
+	}
+	for _, s := range src.Consumers {
+		dst.Consumers = append(dst.Consumers, MetricSeries{
+			Name:   s.Name,
+			Labels: s.Labels,
+			Data:   append([]MetricDataPoint{}, s.Data...),
+		})
+	}
+	for _, s := range src.System {
+		dst.System = append(dst.System, MetricSeries{
+			Name:   s.Name,
+			Labels: s.Labels,
+			Data:   append([]MetricDataPoint{}, s.Data...),
+		})
+	}
+	return dst
+}
+
 // collectMetrics collects metrics from NATS.
 // All NATS I/O is done without holding h.mu; only the final cache swap acquires the lock.
 func (h *MetricsHandler) collectMetrics() {
@@ -175,13 +206,11 @@ func (h *MetricsHandler) collectMetrics() {
 		streamNames[s.Config.Name] = true
 	}
 
-	// Build temp cache with all I/O done before acquiring the lock.
-	tmp := &MetricsResponse{
-		Streams:   make([]MetricSeries, 0),
-		Consumers: make([]MetricSeries, 0),
-		System:    make([]MetricSeries, 0),
-		Timestamp: now.Unix(),
-	}
+	// Deep copy existing cache so we can accumulate without holding the lock during I/O.
+	h.mu.RLock()
+	tmp := deepCopyMetricsResponse(h.metricsCache)
+	h.mu.RUnlock()
+	tmp.Timestamp = now.Unix()
 
 	for _, stream := range streamList.Streams {
 		name := stream.Config.Name
@@ -194,10 +223,7 @@ func (h *MetricsHandler) collectMetrics() {
 
 	// --- Write phase: lock only for the pointer swap ---
 	h.mu.Lock()
-	h.metricsCache.Streams = tmp.Streams
-	h.metricsCache.Consumers = tmp.Consumers
-	h.metricsCache.System = tmp.System
-	h.metricsCache.Timestamp = tmp.Timestamp
+	h.metricsCache = tmp
 	h.mu.Unlock()
 }
 
@@ -207,8 +233,8 @@ func appendDataPoint(series []MetricSeries, name, label string, t time.Time, val
 	for i := range series {
 		if series[i].Name == name && series[i].Labels["type"] == label {
 			series[i].Data = append(series[i].Data, MetricDataPoint{Timestamp: t.Unix(), Value: value})
-			if len(series[i].Data) > 100 {
-				series[i].Data = series[i].Data[len(series[i].Data)-100:]
+			if len(series[i].Data) > maxDataPoints {
+				series[i].Data = series[i].Data[len(series[i].Data)-maxDataPoints:]
 			}
 			return series
 		}
@@ -329,13 +355,15 @@ func (h *MetricsHandler) requestServerMetric(subject string, payload any, target
 	return json.Unmarshal(msg.Data, target)
 }
 
+const maxDataPoints = 10000
+
 func (h *MetricsHandler) appendMetric(series *[]MetricSeries, name, metricType string, value float64, now time.Time) {
 	for i := range *series {
 		if (*series)[i].Name == name && (*series)[i].Labels["type"] == metricType {
 			point := MetricDataPoint{Timestamp: now.Unix(), Value: value}
 			(*series)[i].Data = append((*series)[i].Data, point)
-			if len((*series)[i].Data) > 100 {
-				(*series)[i].Data = (*series)[i].Data[len((*series)[i].Data)-100:]
+			if len((*series)[i].Data) > maxDataPoints {
+				(*series)[i].Data = (*series)[i].Data[len((*series)[i].Data)-maxDataPoints:]
 			}
 			return
 		}

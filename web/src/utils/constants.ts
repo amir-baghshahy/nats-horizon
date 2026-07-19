@@ -1,12 +1,5 @@
 // Status Types
-export const STATUS_TYPES = {
-  SUCCESS: "success",
-  WARNING: "warning",
-  ERROR: "error",
-  UNKNOWN: "unknown",
-} as const;
-
-export type StatusType = (typeof STATUS_TYPES)[keyof typeof STATUS_TYPES];
+export type StatusType = "success" | "warning" | "error" | "unknown";
 
 // Semantic tone tokens — single source of truth for status color intent.
 // Every status-colored surface (badges, toasts, indicators) should derive from these.
@@ -48,8 +41,6 @@ export const STATUS_TONES = {
   },
 } as const;
 
-export type StatusTone = keyof typeof STATUS_TONES;
-
 // Status Colors Mapping (derived from the tone tokens above)
 export const STATUS_COLORS: Record<StatusType, string> = {
   success: `${STATUS_TONES.success.text} ${STATUS_TONES.success.bg}`,
@@ -83,12 +74,3 @@ export const LIMITS = {
   MAX_CONSUMER_LAG_CRITICAL: 10000,
 } as const;
 
-// Connection Status
-export const CONNECTION_STATUS = {
-  CONNECTED: "connected",
-  DISCONNECTED: "disconnected",
-  CONNECTING: "connecting",
-} as const;
-
-export type ConnectionStatusType =
-  (typeof CONNECTION_STATUS)[keyof typeof CONNECTION_STATUS];

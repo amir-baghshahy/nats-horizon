@@ -1,4 +1,3 @@
-import { formatBytes } from "./formatters";
 /**
  * Validate NATS subject format
  */
@@ -61,25 +60,6 @@ export const validateTimeout = (
 
   if (timeout > 60000) {
     return { valid: false, error: "Timeout cannot exceed 60000ms" };
-  }
-
-  return { valid: true };
-};
-
-/**
- * Validate payload size
- */
-export const validatePayloadSize = (
-  payload: string,
-  maxSize: number = 10 * 1024 * 1024,
-): { valid: boolean; error?: string } => {
-  const size = new Blob([payload]).size;
-
-  if (size > maxSize) {
-    return {
-      valid: false,
-      error: `Payload exceeds maximum size of ${formatBytes(maxSize)}`,
-    };
   }
 
   return { valid: true };

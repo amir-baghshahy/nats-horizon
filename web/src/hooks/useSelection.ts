@@ -37,7 +37,10 @@ export function useSelection<T>(): SelectionState<T> {
     setSelected(new Set(items));
   }, []);
 
-  const isSelected = useCallback((item: T) => selectedRef.current.has(item), []);
+  const isSelected = useCallback(
+    (item: T) => selectedRef.current.has(item),
+    [],
+  );
 
   return {
     selected,

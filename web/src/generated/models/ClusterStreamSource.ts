@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ClusterStreamSource = {
-    domain?: string;
-    name?: string;
+  domain?: string;
+  name?: string;
 };
-

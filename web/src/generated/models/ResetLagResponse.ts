@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ResetLagResponse = {
-    message?: string;
-    new_sequence?: number;
+  message?: string;
+  new_sequence?: number;
 };
-

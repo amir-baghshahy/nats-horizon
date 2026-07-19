@@ -43,8 +43,8 @@ export default function ConsumersHeader({
 
   return (
     <PageHeader
-      title={t('consumers.title')}
-      subtitle={t('consumers.subtitle')}
+      title={t("consumers.title")}
+      subtitle={t("consumers.subtitle")}
       sseConnected={sseConnected}
       actions={
         <>
@@ -56,7 +56,7 @@ export default function ConsumersHeader({
                 variant="secondary"
                 icon={<Play className="icon-base" />}
               >
-                {t('consumers.resume', { count: selectedCount })}
+                {t("consumers.resume", { count: selectedCount })}
               </Button>
               <Button
                 onClick={onBulkPause}
@@ -64,7 +64,7 @@ export default function ConsumersHeader({
                 variant="secondary"
                 icon={<Pause className="icon-base" />}
               >
-                {t('consumers.pause', { count: selectedCount })}
+                {t("consumers.pause", { count: selectedCount })}
               </Button>
               <Button
                 onClick={onBulkDelete}
@@ -73,7 +73,7 @@ export default function ConsumersHeader({
                 icon={<Trash2 className="icon-base" />}
                 className="text-status-error"
               >
-                {t('consumers.deleteSelected', { count: selectedCount })}
+                {t("consumers.deleteSelected", { count: selectedCount })}
               </Button>
             </>
           )}
@@ -87,7 +87,7 @@ export default function ConsumersHeader({
             variant="primary"
             icon={<Plus className="icon-base" />}
           >
-            {t('consumers.createConsumer')}
+            {t("consumers.createConsumer")}
           </Button>
         </>
       }
@@ -107,35 +107,37 @@ export function ConsumersStats({ stats }: ConsumersStatsProps) {
       <StatCard
         icon={MessageSquare}
         value={stats.total}
-        label={t('consumers.total')}
+        label={t("consumers.total")}
       />
       <StatCard
         icon={CheckCircle}
         value={stats.active}
-        label={t('consumers.active')}
+        label={t("consumers.active")}
         iconBg="bg-green-500/20"
         iconColor="text-green-400"
       />
       <StatCard
         icon={AlertCircle}
         value={stats.stuck}
-        label={t('consumers.stuck')}
+        label={t("consumers.stuck")}
         iconBg="bg-red-500/20"
         iconColor="text-red-400"
       />
       <StatCard
         icon={Clock}
         value={stats.idle}
-        label={t('consumers.idle')}
+        label={t("consumers.idle")}
         iconBg="bg-orange-500/20"
         iconColor="text-orange-400"
       />
       <StatCard
         icon={TrendingUp}
-        value={stats.totalLag >= 1000
-          ? `${(stats.totalLag / 1000).toFixed(1)}K`
-          : stats.totalLag.toLocaleString()}
-        label={t('consumers.totalLag')}
+        value={
+          stats.totalLag >= 1000
+            ? `${(stats.totalLag / 1000).toFixed(1)}K`
+            : stats.totalLag.toLocaleString()
+        }
+        label={t("consumers.totalLag")}
         iconBg="bg-purple-500/20"
         iconColor="text-purple-400"
         formatValue={false}
@@ -143,7 +145,7 @@ export function ConsumersStats({ stats }: ConsumersStatsProps) {
       <StatCard
         icon={Zap}
         value={Math.floor(stats.avgAckRate)}
-        label={t('consumers.avgAckRate')}
+        label={t("consumers.avgAckRate")}
         iconBg="bg-cyan-500/20"
         iconColor="text-cyan-400"
       />

@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type NackMessageRequest = {
-    /**
-     * Redelivery delay in seconds
-     */
-    delay?: number;
-    sequence: number;
+  /**
+   * Redelivery delay in seconds
+   */
+  delay?: number;
+  sequence: number;
 };
-

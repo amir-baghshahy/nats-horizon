@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type MetricDataPoint = {
-    label?: string;
-    timestamp?: number;
-    value?: number;
+  label?: string;
+  timestamp?: number;
+  value?: number;
 };
-

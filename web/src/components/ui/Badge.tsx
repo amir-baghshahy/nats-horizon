@@ -7,7 +7,10 @@ interface BadgeProps {
   className?: string;
 }
 
-const toneVariant: Record<Exclude<BadgeProps["variant"], "default" | undefined>, string> = {
+const toneVariant: Record<
+  Exclude<BadgeProps["variant"], "default" | undefined>,
+  string
+> = {
   success: `${STATUS_TONES.success.text} ${STATUS_TONES.success.bg}`,
   warning: `${STATUS_TONES.warning.text} ${STATUS_TONES.warning.bg}`,
   danger: `${STATUS_TONES.error.text} ${STATUS_TONES.error.bg}`,

@@ -72,8 +72,8 @@ export default function MessagesPage() {
       {/* Header Section */}
       <section className="shrink-0">
         <MessagesHeader
-          title={t('messages.messageBrowser')}
-          description={t('messages.messageBrowserDescription')}
+          title={t("messages.messageBrowser")}
+          description={t("messages.messageBrowserDescription")}
           selectedCount={selectedMessages.size}
           onExport={handleExportSelected}
           onDelete={handleBulkDelete}

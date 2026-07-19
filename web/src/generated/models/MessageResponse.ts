@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type MessageResponse = {
-    data?: string;
-    headers?: Record<string, Array<string>>;
-    sequence?: number;
-    subject?: string;
-    timestamp?: string;
+  data?: string;
+  headers?: Record<string, Array<string>>;
+  sequence?: number;
+  subject?: string;
+  timestamp?: string;
 };
-

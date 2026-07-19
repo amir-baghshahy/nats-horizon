@@ -17,7 +17,11 @@ export default function ClusterHealthCard({ health }: ClusterHealthCardProps) {
   const isOk = status === "ok" || status === "healthy";
   const displayStatus = status.charAt(0).toUpperCase() + status.slice(1);
 
-  const Icon = isOk ? CheckCircle2 : status === "degraded" ? AlertTriangle : XCircle;
+  const Icon = isOk
+    ? CheckCircle2
+    : status === "degraded"
+      ? AlertTriangle
+      : XCircle;
   const tone = isOk
     ? "text-green-400 bg-green-500/15 ring-green-500/25"
     : status === "degraded"
@@ -26,7 +30,7 @@ export default function ClusterHealthCard({ health }: ClusterHealthCardProps) {
 
   return (
     <button
-      onClick={() => navigate('/cluster')}
+      onClick={() => navigate("/cluster")}
       className="card w-full text-start flex items-center justify-between gap-3 hover:-translate-y-0.5 transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
     >
       <div className="flex items-center gap-2.5 min-w-0">
@@ -34,13 +38,17 @@ export default function ClusterHealthCard({ health }: ClusterHealthCardProps) {
           <Network className="h-3.5 w-3.5 text-primary-400" />
         </div>
         <div className="min-w-0">
-          <p className="text-display-sm font-semibold leading-tight">{t('dashboard.clusterHealth', { defaultValue: 'Cluster Health' })}</p>
+          <p className="text-display-sm font-semibold leading-tight">
+            {t("dashboard.clusterHealth", { defaultValue: "Cluster Health" })}
+          </p>
           <p className="text-display-xs text-content-tertiary truncate">
-            {health.connected_server?.id || t('dashboard.notSpecified')}
+            {health.connected_server?.id || t("dashboard.notSpecified")}
           </p>
         </div>
       </div>
-      <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-display-xs font-medium shrink-0 ring-1 ${tone}`}>
+      <span
+        className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-display-xs font-medium shrink-0 ring-1 ${tone}`}
+      >
         <Icon className="h-3 w-3" />
         {displayStatus}
       </span>

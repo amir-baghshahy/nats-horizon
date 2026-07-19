@@ -1,26 +1,28 @@
-import { X, Database, Users, TrendingUp, Activity, Globe } from 'lucide-react'
-import { formatNumber, formatBytes } from '../../../../utils/formatters'
+import { X, Database, Users, TrendingUp, Activity, Globe } from "lucide-react";
+import { formatNumber, formatBytes } from "../../../../utils/formatters";
 
 interface GraphNode {
-  id: string
-  type: 'stream' | 'consumer' | 'subject'
-  data: any
+  id: string;
+  type: "stream" | "consumer" | "subject";
+  data: any;
 }
 
 interface NodeDetailsPanelProps {
-  node: GraphNode | null
-  onClose: () => void
+  node: GraphNode | null;
+  onClose: () => void;
 }
 
 export function NodeDetailsPanel({ node, onClose }: NodeDetailsPanelProps) {
   return (
-    <div className={`fixed right-0 top-0 h-full w-96 border-l border-border-default bg-surface-secondary shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${node ? 'translate-x-0' : 'translate-x-full'}`}>
+    <div
+      className={`fixed right-0 top-0 h-full w-96 border-l border-border-default bg-surface-secondary shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${node ? "translate-x-0" : "translate-x-full"}`}
+    >
       {node && (
         <>
           {/* Header */}
           <div className="flex flex-shrink-0 items-center justify-between border-b border-border-default/70 p-4 bg-surface-primary/30">
             <div className="flex items-center gap-2">
-              {node.type === 'stream' ? (
+              {node.type === "stream" ? (
                 <Database className="h-5 w-5 text-primary-400" />
               ) : (
                 <Users className="h-5 w-5 text-blue-400" />
@@ -39,7 +41,7 @@ export function NodeDetailsPanel({ node, onClose }: NodeDetailsPanelProps) {
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {node.type === 'stream' ? (
+            {node.type === "stream" ? (
               <StreamDetails data={node.data} />
             ) : (
               <ConsumerDetails data={node.data} />
@@ -48,7 +50,7 @@ export function NodeDetailsPanel({ node, onClose }: NodeDetailsPanelProps) {
         </>
       )}
     </div>
-  )
+  );
 }
 
 function StreamDetails({ data }: { data: any }) {
@@ -57,12 +59,18 @@ function StreamDetails({ data }: { data: any }) {
       {/* Health Status */}
       <div className="rounded-xl border border-border-default/60 bg-surface-primary/50 p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-display-sm text-content-tertiary">Health Status</span>
-          <span className={`text-display-xs font-medium capitalize ${
-            data.health === 'critical' ? 'text-red-400' :
-            data.health === 'warning' ? 'text-orange-400' :
-            'text-green-400'
-          }`}>
+          <span className="text-display-sm text-content-tertiary">
+            Health Status
+          </span>
+          <span
+            className={`text-display-xs font-medium capitalize ${
+              data.health === "critical"
+                ? "text-red-400"
+                : data.health === "warning"
+                  ? "text-orange-400"
+                  : "text-green-400"
+            }`}
+          >
             {data.health}
           </span>
         </div>
@@ -118,7 +126,7 @@ function StreamDetails({ data }: { data: any }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function ConsumerDetails({ data }: { data: any }) {
@@ -127,12 +135,18 @@ function ConsumerDetails({ data }: { data: any }) {
       {/* Health Status */}
       <div className="rounded-xl border border-border-default/60 bg-surface-primary/50 p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-display-sm text-content-tertiary">Health Status</span>
-          <span className={`text-display-xs font-medium capitalize ${
-            data.health === 'critical' ? 'text-red-400' :
-            data.health === 'warning' ? 'text-orange-400' :
-            'text-green-400'
-          }`}>
+          <span className="text-display-sm text-content-tertiary">
+            Health Status
+          </span>
+          <span
+            className={`text-display-xs font-medium capitalize ${
+              data.health === "critical"
+                ? "text-red-400"
+                : data.health === "warning"
+                  ? "text-orange-400"
+                  : "text-green-400"
+            }`}
+          >
             {data.health}
           </span>
         </div>
@@ -147,28 +161,32 @@ function ConsumerDetails({ data }: { data: any }) {
         <div className="space-y-3 text-display-sm">
           <div className="flex items-center justify-between">
             <span className="text-content-tertiary">Consumer Lag</span>
-            <span className={`font-medium tabular-nums ${
-              data.lag > 1000 ? 'text-orange-400' : 'text-green-400'
-            }`}>
+            <span
+              className={`font-medium tabular-nums ${
+                data.lag > 1000 ? "text-orange-400" : "text-green-400"
+              }`}
+            >
               {formatNumber(data.lag || 0)}
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-content-tertiary">Ack Rate</span>
             <span className="font-medium text-content-primary tabular-nums">
-              {data.ackRate || '0'}/s
+              {data.ackRate || "0"}/s
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-content-tertiary">Status</span>
-            <span className={`font-medium capitalize ${
-              data.status === 'paused' ? 'text-orange-400' : 'text-green-400'
-            }`}>
-              {data.status || 'unknown'}
+            <span
+              className={`font-medium capitalize ${
+                data.status === "paused" ? "text-orange-400" : "text-green-400"
+              }`}
+            >
+              {data.status || "unknown"}
             </span>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

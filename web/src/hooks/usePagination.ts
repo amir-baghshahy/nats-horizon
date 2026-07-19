@@ -27,7 +27,7 @@ export interface UsePaginationReturn extends Pagination {
 export function usePagination(
   options: UsePaginationOptions = {},
 ): UsePaginationReturn {
-  const { perPage = 20, initialPage = 1, urlKey = 'page' } = options;
+  const { perPage = 20, initialPage = 1, urlKey = "page" } = options;
   const [searchParams, setSearchParams] = useSearchParams();
   const itemsLengthRef = useRef(0);
 

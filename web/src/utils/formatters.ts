@@ -64,10 +64,13 @@ export const formatNumber = (num: number): string => {
 };
 
 /**
- * Format message format type to display string
+ * Format an ISO date string or epoch value as a localized date-time string.
  */
-export const formatMessageFormat = (format: string): string => {
-  return format.toUpperCase();
+export const formatDateTime = (value: string | number | undefined): string => {
+  if (value === undefined || value === null || value === "") return "N/A";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return "N/A";
+  return date.toLocaleString();
 };
 
 /**
@@ -81,7 +84,7 @@ export const detectMessageFormat = (
     JSON.parse(data);
     return "json";
   } catch {
-    return detectBinaryOrText(data)
+    return detectBinaryOrText(data);
   }
 };
 

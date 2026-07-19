@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import { Loader2 } from "lucide-react";
-import { cn } from "../../utils/designTokens";
+import { cn } from "../../utils/cn";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "danger" | "ghost";
@@ -25,7 +25,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       className = "",
       ...props
     },
-    ref
+    ref,
   ) => {
     // Base button styles (from design system)
     const baseStyles = cn(
@@ -35,7 +35,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       "transition-all duration-200",
       "disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none",
       "rounded-lg", // Consistent border radius
-      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-primary"
+      "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-primary",
     );
 
     // Variant styles (from design system)
@@ -78,7 +78,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           sizeStyles[size],
           widthStyles,
           loading && "opacity-70",
-          className
+          className,
         )}
         {...props}
       >
@@ -90,17 +90,21 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ) : (
           <>
             {icon && iconPosition === "left" && (
-              <span className={cn("flex-shrink-0", iconSizes[size])}>{icon}</span>
+              <span className={cn("flex-shrink-0", iconSizes[size])}>
+                {icon}
+              </span>
             )}
             {children}
             {icon && iconPosition === "right" && (
-              <span className={cn("flex-shrink-0", iconSizes[size])}>{icon}</span>
+              <span className={cn("flex-shrink-0", iconSizes[size])}>
+                {icon}
+              </span>
             )}
           </>
         )}
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";

@@ -1,109 +1,117 @@
-import { useState, useCallback } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { ClusterService, StreamsService } from '../../../types'
-import { REFRESH_INTERVALS } from '../../../utils/constants'
-
-interface ClusterInfo {
-  cluster_name: string
-  is_clustered: boolean
-  server_name: string
-  cluster_url?: string
-  jetstream: { enabled: boolean; domain?: string; tier?: number; api_level?: number }
-}
-
-interface ClusterNodes {
-  nodes: Array<{ id: string; name: string; current: boolean; healthy: boolean; lag: number; active: boolean }>
-  clustered: boolean
-  cluster_name?: string
-}
-
-interface ClusterHealth {
-  connected: boolean
-  status: string
-  server_status?: string
-  connected_server?: { id: string; url: string }
-  jetstream?: { status: string; domain?: string; tiers?: number }
-}
-
-interface StreamReplica {
-  stream: string
-  replicas: number
-  placement?: { cluster: string; tags: string[] }
-  mirror?: { name: string; domain?: string }
-  sources?: Array<{ name: string; domain?: string }>
-  cluster?: { name: string; replicas?: number[] }
-  is_clustered: boolean
-}
+import { useState, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ClusterService,
+  StreamsService,
+  ClusterInfoResponse,
+  ClusterNodesResponse,
+  ClusterHealthResponse,
+  ClusterStreamReplicaResponse,
+} from "../../../types";
+import { REFRESH_INTERVALS } from "../../../utils/constants";
 
 export interface UseClusterReturn {
-  selectedStream: string | null
-  setSelectedStream: React.Dispatch<React.SetStateAction<string | null>>
-  clusterInfo: ClusterInfo | undefined
-  clusterNodes: ClusterNodes | undefined
-  clusterHealth: ClusterHealth | undefined
-  streamReplicas: StreamReplica | undefined
-  streams: any
-  infoLoading: boolean
-  nodesLoading: boolean
-  healthLoading: boolean
-  streamsLoading: boolean
-  replicasLoading: boolean
-  infoError: unknown
-  nodesError: unknown
-  healthError: unknown
-  streamsError: unknown
-  replicasError: unknown
-  refreshAll: () => void
-  getErrorMessage: (error: unknown) => string
-  refetchReplicas: () => void
+  selectedStream: string | null;
+  setSelectedStream: React.Dispatch<React.SetStateAction<string | null>>;
+  clusterInfo: ClusterInfoResponse | undefined;
+  clusterNodes: ClusterNodesResponse | undefined;
+  clusterHealth: ClusterHealthResponse | undefined;
+  streamReplicas: ClusterStreamReplicaResponse | undefined;
+  streams: any;
+  infoLoading: boolean;
+  nodesLoading: boolean;
+  healthLoading: boolean;
+  streamsLoading: boolean;
+  replicasLoading: boolean;
+  infoError: unknown;
+  nodesError: unknown;
+  healthError: unknown;
+  streamsError: unknown;
+  replicasError: unknown;
+  refreshAll: () => void;
+  getErrorMessage: (error: unknown) => string;
+  refetchReplicas: () => void;
 }
 
 export function useCluster(): UseClusterReturn {
-  const [selectedStream, setSelectedStream] = useState<string | null>(null)
+  const [selectedStream, setSelectedStream] = useState<string | null>(null);
 
-  const { data: clusterInfo, refetch: refetchInfo, isLoading: infoLoading, error: infoError } = useQuery({
-    queryKey: ['clusterInfo'],
-    queryFn: () => ClusterService.getClusterInfo() as Promise<ClusterInfo>,
+  const {
+    data: clusterInfo,
+    refetch: refetchInfo,
+    isLoading: infoLoading,
+    error: infoError,
+  } = useQuery({
+    queryKey: ["clusterInfo"],
+    queryFn: () => ClusterService.getClusterInfo(),
     refetchInterval: REFRESH_INTERVALS.NORMAL,
-  })
+  });
 
-  const { data: clusterNodes, refetch: refetchNodes, isLoading: nodesLoading, error: nodesError } = useQuery({
-    queryKey: ['clusterNodes'],
-    queryFn: () => ClusterService.getClusterNodes() as Promise<ClusterNodes>,
+  const {
+    data: clusterNodes,
+    refetch: refetchNodes,
+    isLoading: nodesLoading,
+    error: nodesError,
+  } = useQuery({
+    queryKey: ["clusterNodes"],
+    queryFn: () => ClusterService.getClusterNodes(),
     refetchInterval: REFRESH_INTERVALS.NORMAL,
-  })
+  });
 
-  const { data: clusterHealth, refetch: refetchHealth, isLoading: healthLoading, error: healthError } = useQuery({
-    queryKey: ['clusterHealth'],
-    queryFn: () => ClusterService.getClusterHealth() as Promise<ClusterHealth>,
+  const {
+    data: clusterHealth,
+    refetch: refetchHealth,
+    isLoading: healthLoading,
+    error: healthError,
+  } = useQuery({
+    queryKey: ["clusterHealth"],
+    queryFn: () => ClusterService.getClusterHealth(),
     refetchInterval: REFRESH_INTERVALS.FAST,
-  })
+  });
 
-  const { data: streamReplicas, refetch: refetchReplicas, isLoading: replicasLoading, error: replicasError } = useQuery({
-    queryKey: ['streamReplicas', selectedStream],
-    queryFn: () => selectedStream
-      ? ClusterService.getClusterStreamsReplicas(selectedStream) as Promise<StreamReplica>
-      : Promise.resolve({} as StreamReplica),
+  const {
+    data: streamReplicas,
+    refetch: refetchReplicas,
+    isLoading: replicasLoading,
+    error: replicasError,
+  } = useQuery({
+    queryKey: ["streamReplicas", selectedStream],
+    queryFn: () =>
+      selectedStream
+        ? ClusterService.getClusterStreamsReplicas(selectedStream)
+        : Promise.resolve({} as ClusterStreamReplicaResponse),
     enabled: !!selectedStream,
-  })
+  });
 
-  const { data: streams, isLoading: streamsLoading, error: streamsError, refetch: refetchStreams } = useQuery({
-    queryKey: ['streams'],
+  const {
+    data: streams,
+    isLoading: streamsLoading,
+    error: streamsError,
+    refetch: refetchStreams,
+  } = useQuery({
+    queryKey: ["streams"],
     queryFn: () => StreamsService.getStreams(),
-  })
+  });
 
   const refreshAll = useCallback(() => {
-    refetchInfo()
-    refetchNodes()
-    refetchHealth()
-    refetchStreams()
-    if (selectedStream) refetchReplicas()
-  }, [refetchInfo, refetchNodes, refetchHealth, refetchStreams, refetchReplicas, selectedStream])
+    refetchInfo();
+    refetchNodes();
+    refetchHealth();
+    refetchStreams();
+    if (selectedStream) refetchReplicas();
+  }, [
+    refetchInfo,
+    refetchNodes,
+    refetchHealth,
+    refetchStreams,
+    refetchReplicas,
+    selectedStream,
+  ]);
 
   const getErrorMessage = useCallback((error: unknown) => {
-    if (error instanceof Error) return error.message
-    return "Unable to load cluster data"
-  }, [])
+    if (error instanceof Error) return error.message;
+    return "Unable to load cluster data";
+  }, []);
 
   return {
     selectedStream,
@@ -126,5 +134,5 @@ export function useCluster(): UseClusterReturn {
     refreshAll,
     getErrorMessage,
     refetchReplicas,
-  }
+  };
 }

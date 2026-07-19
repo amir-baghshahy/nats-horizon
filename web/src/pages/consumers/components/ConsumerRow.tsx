@@ -1,12 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import {
-  ChevronDown,
-  ChevronRight,
-  Eye,
-  Pause,
-  Play,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, Eye, Pause, Play } from "lucide-react";
 import type { ConsumerResponse as Consumer } from "../../../types";
 import { Button } from "../../../components/ui";
 
@@ -70,7 +64,9 @@ export default function ConsumerRow({
 
           <div className="flex items-center gap-2">
             {getStatusIcon(consumer)}
-            <span className="text-display-sm">{getStatusLabel(consumer.status || "")}</span>
+            <span className="text-display-sm">
+              {getStatusLabel(consumer.status || "")}
+            </span>
           </div>
 
           <div className="flex-1 min-w-0">
@@ -95,15 +91,25 @@ export default function ConsumerRow({
               <p className={`font-medium ${getLagColor(consumer.lag || 0)}`}>
                 {(consumer.lag || 0).toLocaleString()}
               </p>
-              <p className="text-display-xs text-content-tertiary">{t("consumers.totalLag")}</p>
+              <p className="text-display-xs text-content-tertiary">
+                {t("consumers.totalLag")}
+              </p>
             </div>
             <div className="text-center">
-              <p className="font-medium">{consumer.ack_rate || t("common.na")}</p>
-              <p className="text-display-xs text-content-tertiary">{t("consumers.avgAckRate")}</p>
+              <p className="font-medium">
+                {consumer.ack_rate || t("common.na")}
+              </p>
+              <p className="text-display-xs text-content-tertiary">
+                {t("consumers.avgAckRate")}
+              </p>
             </div>
             <div className="text-center">
-              <p className="font-medium">{consumer.num_pending || consumer.lag || 0}</p>
-              <p className="text-display-xs text-content-tertiary">{t("consumers.pending")}</p>
+              <p className="font-medium">
+                {consumer.num_pending || consumer.lag || 0}
+              </p>
+              <p className="text-display-xs text-content-tertiary">
+                {t("consumers.pending")}
+              </p>
             </div>
           </div>
 
@@ -137,34 +143,69 @@ export default function ConsumerRow({
           <div className="mt-4 ps-8 space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-surface-primary/50 rounded-lg p-3">
-                <p className="text-display-xs text-content-tertiary">{t("consumers.deliveryPolicy")}</p>
-                <p className="font-medium">{(consumer.config as { delivery?: string })?.delivery || "all"}</p>
+                <p className="text-display-xs text-content-tertiary">
+                  {t("consumers.deliveryPolicy")}
+                </p>
+                <p className="font-medium">
+                  {(consumer.config as { delivery?: string })?.delivery ||
+                    "all"}
+                </p>
               </div>
               <div className="bg-surface-primary/50 rounded-lg p-3">
-                <p className="text-display-xs text-content-tertiary">{t("consumers.ackPolicy")}</p>
-                <p className="font-medium">{consumer.config?.ack_policy || "explicit"}</p>
+                <p className="text-display-xs text-content-tertiary">
+                  {t("consumers.ackPolicy")}
+                </p>
+                <p className="font-medium">
+                  {consumer.config?.ack_policy || "explicit"}
+                </p>
               </div>
               <div className="bg-surface-primary/50 rounded-lg p-3">
-                <p className="text-display-xs text-content-tertiary">{t("consumers.replayPolicy")}</p>
-                <p className="font-medium">{consumer.config?.replay_policy || "instant"}</p>
+                <p className="text-display-xs text-content-tertiary">
+                  {t("consumers.replayPolicy")}
+                </p>
+                <p className="font-medium">
+                  {consumer.config?.replay_policy || "instant"}
+                </p>
               </div>
               <div className="bg-surface-primary/50 rounded-lg p-3">
-                <p className="text-display-xs text-content-tertiary">{t("consumers.maxDeliveries")}</p>
-                <p className="font-medium">{consumer.config?.max_deliver || "-1"}</p>
+                <p className="text-display-xs text-content-tertiary">
+                  {t("consumers.maxDeliveries")}
+                </p>
+                <p className="font-medium">
+                  {consumer.config?.max_deliver || "-1"}
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3 pt-2">
-              <Button variant="secondary" size="sm" onClick={() => onViewDetails(consumerName)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => onViewDetails(consumerName)}
+              >
                 {t("consumers.editConfiguration")}
               </Button>
-              <Button variant="secondary" size="sm" onClick={() => onViewDetails(consumerName)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => onViewDetails(consumerName)}
+              >
                 {t("consumers.viewMessages")}
               </Button>
-              <Button variant="secondary" size="sm" onClick={() => onResetLag(consumer)} disabled={resetLagPending}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => onResetLag(consumer)}
+                disabled={resetLagPending}
+              >
                 {t("consumers.resetLag")}
               </Button>
-              <Button variant="secondary" size="sm" className="text-status-error" onClick={() => onDelete(consumer)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="text-status-error"
+                onClick={() => onDelete(consumer)}
+              >
                 {t("consumers.deleteConsumerBtn")}
               </Button>
             </div>

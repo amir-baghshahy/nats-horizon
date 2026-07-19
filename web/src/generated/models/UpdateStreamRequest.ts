@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UpdateStreamRequest = {
-    max_age?: string;
-    max_bytes?: number;
-    replicas?: number;
-    subjects?: Array<string>;
+  max_age?: string;
+  max_bytes?: number;
+  replicas?: number;
+  subjects?: Array<string>;
 };
-

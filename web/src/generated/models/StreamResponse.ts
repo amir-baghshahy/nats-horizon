@@ -2,10 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { StreamConfigResponse } from './StreamConfigResponse';
-import type { StreamStateResponse } from './StreamStateResponse';
+import type { StreamConfigResponse } from "./StreamConfigResponse";
+import type { StreamStateResponse } from "./StreamStateResponse";
 export type StreamResponse = {
-    config?: StreamConfigResponse;
-    state?: StreamStateResponse;
+  config?: StreamConfigResponse;
+  state?: StreamStateResponse;
 };
-

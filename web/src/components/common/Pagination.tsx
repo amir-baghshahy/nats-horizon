@@ -30,11 +30,15 @@ export default function Pagination({
       for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
       pages.push(1);
-      if (page > 3) pages.push('...');
-      for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
+      if (page > 3) pages.push("...");
+      for (
+        let i = Math.max(2, page - 1);
+        i <= Math.min(totalPages - 1, page + 1);
+        i++
+      ) {
         pages.push(i);
       }
-      if (page < totalPages - 2) pages.push('...');
+      if (page < totalPages - 2) pages.push("...");
       pages.push(totalPages);
     }
     return pages;
@@ -43,7 +47,7 @@ export default function Pagination({
   return (
     <div className="flex items-center justify-between flex-wrap gap-3">
       <div className="text-display-sm text-content-tertiary">
-        {t('common.showing', { start: startItem, end: endItem, total })}
+        {t("common.showing", { start: startItem, end: endItem, total })}
       </div>
 
       <div className="flex items-center gap-1.5">
@@ -51,13 +55,13 @@ export default function Pagination({
           onClick={() => onPageChange(page - 1)}
           disabled={!hasPrevPage}
           className="p-2 rounded-lg border border-border-default hover:bg-surface-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          aria-label={t('common.previousPage')}
+          aria-label={t("common.previousPage")}
         >
           <ChevronLeft className="icon-base" />
         </button>
 
         {getPageNumbers().map((p, idx) =>
-          typeof p === 'number' ? (
+          typeof p === "number" ? (
             <button
               key={idx}
               onClick={() => onPageChange(p)}
@@ -70,15 +74,20 @@ export default function Pagination({
               {p}
             </button>
           ) : (
-            <span key={idx} className="px-1 text-content-tertiary text-display-sm">...</span>
-          )
+            <span
+              key={idx}
+              className="px-1 text-content-tertiary text-display-sm"
+            >
+              ...
+            </span>
+          ),
         )}
 
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={!hasNextPage}
           className="p-2 rounded-lg border border-border-default hover:bg-surface-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          aria-label={t('common.nextPage')}
+          aria-label={t("common.nextPage")}
         >
           <ChevronRight className="icon-base" />
         </button>

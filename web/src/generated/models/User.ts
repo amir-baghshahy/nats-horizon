@@ -2,13 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { UserPermissions } from './UserPermissions';
+import type { UserPermissions } from "./UserPermissions";
 export type User = {
-    account?: string;
-    created_at?: string;
-    enabled?: boolean;
-    name?: string;
-    permissions?: UserPermissions;
-    updated_at?: string;
+  account?: string;
+  created_at?: string;
+  enabled?: boolean;
+  name?: string;
+  permissions?: UserPermissions;
+  updated_at?: string;
 };
-

@@ -2,13 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ClusterConnectedServer } from './ClusterConnectedServer';
-import type { ClusterJetStreamHealth } from './ClusterJetStreamHealth';
+import type { ClusterConnectedServer } from "./ClusterConnectedServer";
+import type { ClusterJetStreamHealth } from "./ClusterJetStreamHealth";
 export type ClusterHealthResponse = {
-    connected?: boolean;
-    connected_server?: ClusterConnectedServer;
-    jetstream?: ClusterJetStreamHealth;
-    server_status?: string;
-    status?: string;
+  connected?: boolean;
+  connected_server?: ClusterConnectedServer;
+  jetstream?: ClusterJetStreamHealth;
+  server_status?: string;
+  status?: string;
 };
-

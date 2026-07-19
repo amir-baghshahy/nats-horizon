@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AckMessageResponse = {
-    message?: string;
-    sequence?: number;
+  message?: string;
+  sequence?: number;
 };
-

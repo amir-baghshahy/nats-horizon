@@ -25,8 +25,14 @@ export default function PageHeader({
           </div>
         )}
         <div className="min-w-0">
-          <h1 className="text-display-lg font-bold leading-tight truncate">{title}</h1>
-          {subtitle && <p className="text-display-xs text-content-tertiary truncate">{subtitle}</p>}
+          <h1 className="text-display-lg font-bold leading-tight truncate">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="text-display-xs text-content-tertiary truncate">
+              {subtitle}
+            </p>
+          )}
         </div>
       </div>
 

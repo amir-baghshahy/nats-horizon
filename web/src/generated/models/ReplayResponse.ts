@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ReplayResponse = {
-    message?: string;
-    replay_id?: string;
+  message?: string;
+  replay_id?: string;
 };
-

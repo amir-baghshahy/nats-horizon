@@ -7,13 +7,13 @@ interface ModalWrapperProps {
 }
 
 const FOCUSABLE_SELECTOR = [
-  'a[href]',
-  'button:not([disabled])',
-  'textarea:not([disabled])',
-  'input:not([disabled])',
-  'select:not([disabled])',
+  "a[href]",
+  "button:not([disabled])",
+  "textarea:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
   '[tabindex]:not([tabindex="-1"])',
-].join(',');
+].join(",");
 
 /**
  * Modal shell that handles global modal behavior for every dialog in the app:
@@ -36,7 +36,9 @@ export function ModalWrapper({ isOpen, onClose, children }: ModalWrapperProps) {
 
     previouslyFocused.current = document.activeElement as HTMLElement | null;
 
-    const scrollContainer = document.querySelector("main > div") as HTMLElement | null;
+    const scrollContainer = document.querySelector(
+      "main > div",
+    ) as HTMLElement | null;
     const previousBodyOverflow = document.body.style.overflow;
     const previousScrollOverflow = scrollContainer?.style.overflow;
     document.body.style.overflow = "hidden";
@@ -44,8 +46,10 @@ export function ModalWrapper({ isOpen, onClose, children }: ModalWrapperProps) {
 
     const getFocusable = () =>
       Array.from(
-        container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-      ).filter((el) => el.offsetParent !== null || el === document.activeElement);
+        container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+      ).filter(
+        (el) => el.offsetParent !== null || el === document.activeElement,
+      );
 
     const dialog = container.querySelector<HTMLElement>('[role="dialog"]');
     const focusTimer = window.setTimeout(() => {
@@ -85,7 +89,8 @@ export function ModalWrapper({ isOpen, onClose, children }: ModalWrapperProps) {
       window.clearTimeout(focusTimer);
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousBodyOverflow;
-      if (scrollContainer) scrollContainer.style.overflow = previousScrollOverflow ?? "";
+      if (scrollContainer)
+        scrollContainer.style.overflow = previousScrollOverflow ?? "";
       previouslyFocused.current?.focus?.();
     };
   }, [isOpen, onClose]);

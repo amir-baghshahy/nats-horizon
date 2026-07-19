@@ -3,11 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ClusterNodeResponse = {
-    active?: boolean;
-    current?: boolean;
-    healthy?: boolean;
-    id?: string;
-    lag?: number;
-    name?: string;
+  active?: boolean;
+  current?: boolean;
+  healthy?: boolean;
+  id?: string;
+  lag?: number;
+  name?: string;
 };
-

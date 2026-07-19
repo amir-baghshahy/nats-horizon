@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type PublishMessageRequest = {
-    headers?: Record<string, Array<string>>;
-    payload?: string;
-    reply_to?: string;
-    subject: string;
+  headers?: Record<string, Array<string>>;
+  payload?: string;
+  reply_to?: string;
+  subject: string;
 };
-

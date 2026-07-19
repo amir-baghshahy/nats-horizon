@@ -1,35 +1,39 @@
-import { useEffect, useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import { useQuery } from '@tanstack/react-query'
-import { HealthService, MetricsService } from '../types'
-import { TrendingUp, TrendingDown, Activity, HardDrive, Cpu } from 'lucide-react'
+import { useEffect, useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { HealthService, MetricsService } from "../types";
 import {
-  AreaChart, Area, ResponsiveContainer, Tooltip, YAxis
-} from 'recharts'
-import { formatBytes } from '../utils/formatters'
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  HardDrive,
+  Cpu,
+} from "lucide-react";
+import { AreaChart, Area, ResponsiveContainer, Tooltip, YAxis } from "recharts";
+import { formatBytes } from "../utils/formatters";
 
 interface DataPoint {
-  timestamp: number
-  value: number
+  timestamp: number;
+  value: number;
 }
 
 interface ChartPoint {
-  t: number
-  v: number
+  t: number;
+  v: number;
 }
 
 interface MetricsGraphProps {
-  title: string
-  icon: React.ReactNode
-  color: string
-  queryKey: string[]
-  queryFn: () => Promise<any>
-  getValue: (data: any) => number
-  maxPoints?: number
-  formatValue?: (v: number) => string
+  title: string;
+  icon: React.ReactNode;
+  color: string;
+  queryKey: string[];
+  queryFn: () => Promise<any>;
+  getValue: (data: any) => number;
+  maxPoints?: number;
+  formatValue?: (v: number) => string;
 }
 
-const DEFAULT_FORMAT = (v: number) => v.toLocaleString()
+const DEFAULT_FORMAT = (v: number) => v.toLocaleString();
 
 export function MetricsGraph({
   title,
@@ -41,49 +45,62 @@ export function MetricsGraph({
   maxPoints = 30,
   formatValue = DEFAULT_FORMAT,
 }: MetricsGraphProps) {
-  const { t } = useTranslation()
-  const [dataPoints, setDataPoints] = useState<DataPoint[]>([])
+  const { t } = useTranslation();
+  const [dataPoints, setDataPoints] = useState<DataPoint[]>([]);
 
   // Store getValue in a ref to avoid re-creating useEffect when it changes
-  const getValueRef = useRef(getValue)
-  getValueRef.current = getValue
+  const getValueRef = useRef(getValue);
+  getValueRef.current = getValue;
 
   const { data } = useQuery({
     queryKey,
     queryFn,
     refetchInterval: 2000,
-  })
+  });
 
   useEffect(() => {
-    if (data == null) return
+    if (data == null) return;
     try {
-      const value = getValueRef.current(data)
-      const now = Date.now()
-      setDataPoints(prev => {
-        const updated = [...prev, { timestamp: now, value }]
-        return updated.length > maxPoints ? updated.slice(-maxPoints) : updated
-      })
+      const value = getValueRef.current(data);
+      const now = Date.now();
+      setDataPoints((prev) => {
+        const updated = [...prev, { timestamp: now, value }];
+        return updated.length > maxPoints ? updated.slice(-maxPoints) : updated;
+      });
     } catch (err) {
-      console.error('Failed to extract value for metrics graph:', err)
+      console.error("Failed to extract value for metrics graph:", err);
     }
-  }, [data, maxPoints])
+  }, [data, maxPoints]);
 
-  const currentValue = dataPoints.length > 0 ? dataPoints[dataPoints.length - 1].value : 0
-  const previousValue = dataPoints.length > 1 ? dataPoints[dataPoints.length - 2].value : currentValue
-  const change = currentValue - previousValue
-  const changePercent = previousValue > 0 ? ((change / previousValue) * 100) : 0
+  const currentValue =
+    dataPoints.length > 0 ? dataPoints[dataPoints.length - 1].value : 0;
+  const previousValue =
+    dataPoints.length > 1
+      ? dataPoints[dataPoints.length - 2].value
+      : currentValue;
+  const change = currentValue - previousValue;
+  const changePercent = previousValue > 0 ? (change / previousValue) * 100 : 0;
 
-  const isPositiveGood = title === t('messages.messagesLabel') || title === t('messages.messageRate')
+  const isPositiveGood =
+    title === t("messages.messagesLabel") ||
+    title === t("messages.messageRate");
   const trendColor =
-    change > 0 ? (isPositiveGood ? 'text-green-400' : 'text-red-400')
-    : change < 0 ? (isPositiveGood ? 'text-red-400' : 'text-green-400')
-    : 'text-content-tertiary'
+    change > 0
+      ? isPositiveGood
+        ? "text-green-400"
+        : "text-red-400"
+      : change < 0
+        ? isPositiveGood
+          ? "text-red-400"
+          : "text-green-400"
+        : "text-content-tertiary";
 
-  const chartData: ChartPoint[] = dataPoints.map(p => ({ t: p.timestamp, v: p.value }))
+  const chartData: ChartPoint[] = dataPoints.map((p) => ({
+    t: p.timestamp,
+    v: p.value,
+  }));
 
-  const hexColor = color.startsWith('rgb')
-    ? rgbToHex(color)
-    : color
+  const hexColor = color.startsWith("rgb") ? rgbToHex(color) : color;
 
   return (
     <div className="card flex flex-col gap-2">
@@ -91,42 +108,68 @@ export function MetricsGraph({
         <div className="flex items-center gap-2">
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-            style={{ backgroundColor: color.replace(')', ', 0.15)').replace('rgb', 'rgba') }}
+            style={{
+              backgroundColor: color
+                .replace(")", ", 0.15)")
+                .replace("rgb", "rgba"),
+            }}
           >
             {icon}
           </div>
           <div className="min-w-0">
-            <p className="text-display-xs text-content-tertiary truncate leading-tight">{title}</p>
-            <p className="text-display-base font-bold leading-tight tabular-nums">{formatValue(currentValue)}</p>
+            <p className="text-display-xs text-content-tertiary truncate leading-tight">
+              {title}
+            </p>
+            <p className="text-display-base font-bold leading-tight tabular-nums">
+              {formatValue(currentValue)}
+            </p>
           </div>
         </div>
-        <div className={`flex items-center gap-0.5 text-display-xs font-medium ${trendColor}`}>
-          {change > 0 ? <TrendingUp className="w-3 h-3" /> : change < 0 ? <TrendingDown className="w-3 h-3" /> : null}
-          <span>{change >= 0 ? '+' : ''}{changePercent.toFixed(1)}%</span>
+        <div
+          className={`flex items-center gap-0.5 text-display-xs font-medium ${trendColor}`}
+        >
+          {change > 0 ? (
+            <TrendingUp className="w-3 h-3" />
+          ) : change < 0 ? (
+            <TrendingDown className="w-3 h-3" />
+          ) : null}
+          <span>
+            {change >= 0 ? "+" : ""}
+            {changePercent.toFixed(1)}%
+          </span>
         </div>
       </div>
 
       <div className="h-14 w-full">
         {chartData.length >= 2 ? (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
+            <AreaChart
+              data={chartData}
+              margin={{ top: 2, right: 2, left: 2, bottom: 2 }}
+            >
               <defs>
-                <linearGradient id={`grad-${hexColor}`} x1="0" y1="0" x2="0" y2="1">
+                <linearGradient
+                  id={`grad-${hexColor}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
                   <stop offset="5%" stopColor={hexColor} stopOpacity={0.3} />
                   <stop offset="95%" stopColor={hexColor} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <YAxis domain={['dataMin', 'dataMax']} hide />
+              <YAxis domain={["dataMin", "dataMax"]} hide />
               <Tooltip
                 content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null
+                  if (!active || !payload?.length) return null;
                   return (
                     <div className="rounded-lg border border-border-default bg-surface-secondary/95 px-2 py-1 text-display-xs shadow-lg">
                       <span className="font-mono" style={{ color: hexColor }}>
                         {formatValue(payload[0].value as number)}
                       </span>
                     </div>
-                  )
+                  );
                 }}
               />
               <Area
@@ -143,93 +186,127 @@ export function MetricsGraph({
           </ResponsiveContainer>
         ) : (
           <div className="flex h-full items-center justify-center text-display-xs text-content-tertiary/60">
-            {t('common.collectingData') || 'Collecting data…'}
+            {t("common.collectingData") || "Collecting data…"}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
 
 function rgbToHex(rgb: string): string {
-  const match = rgb.match(/\d+/g)
-  if (!match || match.length < 3) return '#94a3b8'
-  const [r, g, b] = match.map(Number)
-  return '#' + [r, g, b].map(n => n.toString(16).padStart(2, '0')).join('')
+  const match = rgb.match(/\d+/g);
+  if (!match || match.length < 3) return "#94a3b8";
+  const [r, g, b] = match.map(Number);
+  return "#" + [r, g, b].map((n) => n.toString(16).padStart(2, "0")).join("");
 }
 
 export function SystemMetrics() {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       <MetricsGraph
-        title={t('messages.messagesLabel')}
+        title={t("messages.messagesLabel")}
         icon={<Activity className="icon-base text-green-400" />}
         color="rgb(74, 222, 128)"
-        queryKey={['dashboardStats']}
+        queryKey={["dashboardStats"]}
         queryFn={() => HealthService.getDashboardStats()}
         getValue={(data) => data?.messages || 0}
       />
       <MetricsGraph
-        title={t('common.memory')}
+        title={t("common.memory")}
         icon={<Cpu className="icon-base text-orange-400" />}
         color="rgb(251, 146, 60)"
-        queryKey={['systemMetrics']}
+        queryKey={["systemMetrics"]}
         queryFn={() => MetricsService.getMetricsSystem()}
         getValue={(data) => data?.memory?.used || 0}
-        formatValue={(v) => v >= 1048576 ? `${(v / 1048576).toFixed(1)}MB` : v >= 1024 ? `${(v / 1024).toFixed(0)}KB` : `${v}B`}
+        formatValue={(v) =>
+          v >= 1048576
+            ? `${(v / 1048576).toFixed(1)}MB`
+            : v >= 1024
+              ? `${(v / 1024).toFixed(0)}KB`
+              : `${v}B`
+        }
       />
       <MetricsGraph
-        title={t('common.storage')}
+        title={t("common.storage")}
         icon={<HardDrive className="icon-base text-purple-400" />}
         color="rgb(192, 132, 252)"
-        queryKey={['systemMetrics-storage']}
+        queryKey={["systemMetrics-storage"]}
         queryFn={() => MetricsService.getMetricsSystem()}
         getValue={(data) => data?.storage?.used || 0}
-        formatValue={(v) => v >= 1048576 ? `${(v / 1048576).toFixed(1)}MB` : v >= 1024 ? `${(v / 1024).toFixed(0)}KB` : `${v}B`}
+        formatValue={(v) =>
+          v >= 1048576
+            ? `${(v / 1048576).toFixed(1)}MB`
+            : v >= 1024
+              ? `${(v / 1024).toFixed(0)}KB`
+              : `${v}B`
+        }
       />
       <MetricsGraph
-        title={t('messages.messageRate')}
+        title={t("messages.messageRate")}
         icon={<TrendingUp className="icon-base text-cyan-400" />}
         color="rgb(34, 211, 238)"
-        queryKey={['rateMetrics']}
+        queryKey={["rateMetrics"]}
         queryFn={() => MetricsService.getMetricsRates()}
         getValue={(data) =>
-          data?.streams?.reduce((sum: number, s: any) => sum + (s?.messages_per_sec || 0), 0) || 0
+          data?.streams?.reduce(
+            (sum: number, s: any) => sum + (s?.messages_per_sec || 0),
+            0,
+          ) || 0
         }
         formatValue={(v) => `${v.toFixed(1)} msg/s`}
       />
     </div>
-  )
+  );
 }
 
 export function ResourceUsageBar({
-  label, used, max, color,
-}: { label: string; used: number; max: number; color: string }) {
-  const { t } = useTranslation()
-  const percentage = max > 0 ? (used / max) * 100 : 0
+  label,
+  used,
+  max,
+  color,
+}: {
+  label: string;
+  used: number;
+  max: number;
+  color: string;
+}) {
+  const { t } = useTranslation();
+  const percentage = max > 0 ? (used / max) * 100 : 0;
 
   return (
     <div className="bg-surface-primary rounded-lg p-3">
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-display-xs font-medium">{label}</span>
-        <span className="text-display-xs text-content-tertiary">{formatBytes(used)} / {formatBytes(max)}</span>
+        <span className="text-display-xs text-content-tertiary">
+          {formatBytes(used)} / {formatBytes(max)}
+        </span>
       </div>
       <div className="w-full bg-border-default rounded-full h-1.5 overflow-hidden">
         <div
           className="h-full transition-all duration-500 rounded-full"
-          style={{ width: `${Math.min(percentage, 100)}%`, backgroundColor: color }}
+          style={{
+            width: `${Math.min(percentage, 100)}%`,
+            backgroundColor: color,
+          }}
         />
       </div>
       <div className="flex items-center justify-between mt-1">
-        <span className={`text-display-xs ${percentage > 90 ? 'text-red-400' : percentage > 70 ? 'text-yellow-400' : 'text-green-400'}`}>
+        <span
+          className={`text-display-xs ${percentage > 90 ? "text-red-400" : percentage > 70 ? "text-yellow-400" : "text-green-400"}`}
+        >
           {percentage.toFixed(1)}%
         </span>
         <span className="text-display-xs text-content-tertiary">
-          {percentage > 90 ? t('common.critical') : percentage > 70 ? t('common.warning') : t('common.healthy')}
+          {percentage > 90
+            ? t("common.critical")
+            : percentage > 70
+              ? t("common.warning")
+              : t("common.healthy")}
         </span>
       </div>
     </div>
-  )
+  );
 }

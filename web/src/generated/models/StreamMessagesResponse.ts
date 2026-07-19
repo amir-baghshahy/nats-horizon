@@ -2,10 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { StreamMessage } from './StreamMessage';
+import type { StreamMessage } from "./StreamMessage";
 export type StreamMessagesResponse = {
-    messages?: Array<StreamMessage>;
-    stream?: string;
-    total?: number;
+  messages?: Array<StreamMessage>;
+  stream?: string;
+  total?: number;
 };
-

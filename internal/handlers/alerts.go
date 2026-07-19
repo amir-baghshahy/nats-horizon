@@ -11,6 +11,7 @@ import (
 
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/amir-baghshahy/nats-horizon/internal/services"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
@@ -444,13 +445,13 @@ func (h *AlertsHandler) ListAlerts(c *gin.Context) {
 func (h *AlertsHandler) CreateAlert(c *gin.Context) {
 	var alert Alert
 	if err := c.ShouldBindJSON(&alert); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
 	// Validation
 	if alert.Name == "" {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "name is required"})
+		apihttp.JSONError(c, http.StatusBadRequest, "name is required", "")
 		return
 	}
 
@@ -461,7 +462,7 @@ func (h *AlertsHandler) CreateAlert(c *gin.Context) {
 		"critical": true,
 	}
 	if !validSeverities[alert.Severity] {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid severity, must be one of: info, warning, critical"})
+		apihttp.JSONError(c, http.StatusBadRequest, "invalid severity, must be one of: info, warning, critical", "")
 		return
 	}
 
@@ -474,7 +475,7 @@ func (h *AlertsHandler) CreateAlert(c *gin.Context) {
 		"storage":      true,
 	}
 	if !validTypes[alert.Condition.Type] {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid condition type, must be one of: lag, latency, messages, consumer_lag, storage"})
+		apihttp.JSONError(c, http.StatusBadRequest, "invalid condition type, must be one of: lag, latency, messages, consumer_lag, storage", "")
 		return
 	}
 
@@ -487,13 +488,13 @@ func (h *AlertsHandler) CreateAlert(c *gin.Context) {
 		"<=": true,
 	}
 	if !validOperators[alert.Condition.Operator] {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "invalid operator, must be one of: >, <, =, >=, <="})
+		apihttp.JSONError(c, http.StatusBadRequest, "invalid operator, must be one of: >, <, =, >=, <=", "")
 		return
 	}
 
 	// Validate threshold
 	if alert.Condition.Threshold < 0 {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "threshold must be non-negative"})
+		apihttp.JSONError(c, http.StatusBadRequest, "threshold must be non-negative", "")
 		return
 	}
 
@@ -533,7 +534,7 @@ func (h *AlertsHandler) GetAlert(c *gin.Context) {
 	h.mu.RUnlock()
 
 	if !exists {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "alert not found"})
+		apihttp.JSONNotFound(c, "alert", id)
 		return
 	}
 
@@ -558,7 +559,7 @@ func (h *AlertsHandler) UpdateAlert(c *gin.Context) {
 
 	var updates Alert
 	if err := c.ShouldBindJSON(&updates); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
@@ -567,7 +568,7 @@ func (h *AlertsHandler) UpdateAlert(c *gin.Context) {
 
 	alert, exists := h.alerts[id]
 	if !exists {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "alert not found"})
+		apihttp.JSONNotFound(c, "alert", id)
 		return
 	}
 
@@ -607,7 +608,7 @@ func (h *AlertsHandler) DeleteAlert(c *gin.Context) {
 	defer h.mu.Unlock()
 
 	if _, exists := h.alerts[id]; !exists {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "alert not found"})
+		apihttp.JSONNotFound(c, "alert", id)
 		return
 	}
 
@@ -724,7 +725,7 @@ func (h *AlertsHandler) AckTrigger(c *gin.Context) {
 	}
 
 	if !found {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "trigger not found or already acknowledged"})
+		apihttp.JSONNotFound(c, "trigger", id)
 		return
 	}
 

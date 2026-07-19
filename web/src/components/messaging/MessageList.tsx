@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { MessageSquare, Trash2 } from "lucide-react";
 import EmptyState from "../ui/EmptyState";
 import MessageItem from "./MessageItem";
@@ -42,8 +42,8 @@ export default function MessageList({
     return (
       <EmptyState
         icon={MessageSquare}
-        title={t('messages.noMessagesYet')}
-        description={t('messages.noMessagesYetDescription')}
+        title={t("messages.noMessagesYet")}
+        description={t("messages.noMessagesYetDescription")}
       />
     );
   }
@@ -59,14 +59,21 @@ export default function MessageList({
           <button
             onClick={onToggleAutoScroll}
             className={`px-4 py-2 rounded-lg transition-colors ${
-              autoScroll ? "bg-green-500/20 text-green-400" : "hover:bg-surface-primary"
+              autoScroll
+                ? "bg-green-500/20 text-green-400"
+                : "hover:bg-surface-primary"
             }`}
           >
-            {t('messages.autoScroll')}: {autoScroll ? t('common.on') : t('common.off')}
+            {t("messages.autoScroll")}:{" "}
+            {autoScroll ? t("common.on") : t("common.off")}
           </button>
 
-          <Button variant="secondary" onClick={onClearMessages} icon={<Trash2 className="icon-base" />}>
-            {t('common.clear')}
+          <Button
+            variant="secondary"
+            onClick={onClearMessages}
+            icon={<Trash2 className="icon-base" />}
+          >
+            {t("common.clear")}
           </Button>
         </div>
       </div>
@@ -80,9 +87,7 @@ export default function MessageList({
             (messageFormats.get(timestamp) || "text") === "hex"
               ? "text"
               : ((messageFormats.get(timestamp) || "text") as
-                  | "json"
-                  | "binary"
-                  | "text");
+                  "json" | "binary" | "text");
 
           return (
             <MessageItem
@@ -102,7 +107,11 @@ export default function MessageList({
 
       {messages.length > maxDisplayed && (
         <div className="p-3 bg-surface-primary border-t border-border-default text-center text-display-sm text-content-tertiary">
-          {t('messages.showingCount', { shown: maxDisplayed, total: messages.length, hidden: messages.length - maxDisplayed })}
+          {t("messages.showingCount", {
+            shown: maxDisplayed,
+            total: messages.length,
+            hidden: messages.length - maxDisplayed,
+          })}
         </div>
       )}
     </div>

@@ -12,6 +12,7 @@ import (
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/models"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/natsutil"
 
 	"github.com/nats-io/nats.go"
 )
@@ -103,16 +104,20 @@ func (uc *ServerUseCase) GetDashboardStats(ctx context.Context) (*DashboardStats
 
 // AccountInfo represents JetStream account information
 type AccountInfo struct {
-	Memory       uint64
-	Storage      uint64
-	Streams      int
-	Consumers    int
-	Domain       string
-	MaxMemory    uint64
-	MaxStorage   uint64
-	MaxStreams   int
-	MaxConsumers int
+	Memory        uint64
+	Storage       uint64
+	Streams       int
+	Consumers     int
+	Domain        string
+	MaxMemory     uint64
+	MaxStorage    uint64
+	MaxStreams    int
+	MaxConsumers  int
+	CPU           float64
+	SlowConsumers int
 }
+
+const slowConsumerPendingThreshold = 1000
 
 // GetAccountInfo returns JetStream account information with actual server memory.
 func (uc *ServerUseCase) GetAccountInfo(ctx context.Context) (*AccountInfo, error) {
@@ -121,8 +126,10 @@ func (uc *ServerUseCase) GetAccountInfo(ctx context.Context) (*AccountInfo, erro
 	}
 
 	var memoryUsed uint64
+	var cpuUsed float64
 	if varz, err := uc.getVarz(); err == nil {
-		memoryUsed = varz.Data.Memory
+		memoryUsed = varz.Memory
+		cpuUsed = varz.CPU
 	}
 
 	info, err := uc.js.AccountInfo()
@@ -148,17 +155,52 @@ func (uc *ServerUseCase) GetAccountInfo(ctx context.Context) (*AccountInfo, erro
 		maxConsumers = 0
 	}
 
+	slowConsumers := 0
+	if uc.nc != nil && uc.nc.IsConnected() {
+		slowConsumers = uc.countSlowConsumers(ctx)
+	}
+
 	return &AccountInfo{
-		Memory:       memoryUsed,
-		Storage:      info.Tier.Store,
-		Streams:      info.Tier.Streams,
-		Consumers:    info.Tier.Consumers,
-		Domain:       info.Domain,
-		MaxMemory:    memoryMax,
-		MaxStorage:   storageMax,
-		MaxStreams:   maxStreams,
-		MaxConsumers: maxConsumers,
+		Memory:        memoryUsed,
+		Storage:       info.Tier.Store,
+		Streams:       info.Tier.Streams,
+		Consumers:     info.Tier.Consumers,
+		Domain:        info.Domain,
+		MaxMemory:     memoryMax,
+		MaxStorage:    storageMax,
+		MaxStreams:    maxStreams,
+		MaxConsumers:  maxConsumers,
+		CPU:           cpuUsed,
+		SlowConsumers: slowConsumers,
 	}, nil
+}
+
+func (uc *ServerUseCase) countSlowConsumers(ctx context.Context) int {
+	if uc.js == nil || uc.nc == nil {
+		return 0
+	}
+
+	streams := uc.js.Streams()
+
+	slowCount := 0
+	for streamInfo := range streams {
+		if ctx.Err() != nil {
+			return slowCount
+		}
+
+		consumers, err := natsutil.RequestConsumerList(ctx, uc.nc, streamInfo.Config.Name)
+		if err != nil {
+			continue
+		}
+
+		for _, consumer := range consumers.Consumers {
+			if consumer.NumPending > slowConsumerPendingThreshold {
+				slowCount++
+			}
+		}
+	}
+
+	return slowCount
 }
 
 // Connections represents NATS connection information
@@ -401,14 +443,8 @@ func (uc *ServerUseCase) getConnz() (*connzResponse, error) {
 }
 
 type varzResponse struct {
-	Data struct {
-		Memory uint64  `json:"memory"`
-		CPU    float64 `json:"cpu"`
-	} `json:"data"`
-	Server struct {
-		Name string `json:"name"`
-		ID   string `json:"id"`
-	} `json:"server"`
+	Memory uint64  `json:"memory"`
+	CPU    float64 `json:"cpu"`
 }
 
 func (uc *ServerUseCase) getVarz() (*varzResponse, error) {
@@ -554,7 +590,7 @@ func isUnlimited(val uint64) bool {
 func (uc *ServerUseCase) GetSystemMetrics(ctx context.Context) (*SystemMetrics, error) {
 	var memoryUsed uint64
 	if varz, err := uc.getVarz(); err == nil {
-		memoryUsed = varz.Data.Memory
+		memoryUsed = varz.Memory
 	}
 
 	accountInfo, err := uc.js.AccountInfo()

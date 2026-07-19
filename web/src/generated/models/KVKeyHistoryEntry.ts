@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type KVKeyHistoryEntry = {
-    created?: string;
-    key?: string;
-    operation?: string;
-    revision?: number;
-    value?: string;
+  created?: string;
+  key?: string;
+  operation?: string;
+  revision?: number;
+  value?: string;
 };
-

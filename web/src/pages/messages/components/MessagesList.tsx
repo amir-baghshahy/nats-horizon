@@ -17,18 +17,10 @@ import EmptyState from "../../../components/ui/EmptyState";
 import PanelCard from "../../../components/ui/PanelCard";
 import { Button } from "../../../components/ui";
 import { formatBytes } from "../../../utils/formatters";
-
-interface Message {
-  sequence: number;
-  subject: string;
-  data: any;
-  size: number;
-  timestamp: string;
-  headers?: Record<string, string[]>;
-}
+import type { StreamMessage } from "../../../types";
 
 interface MessagesListProps {
-  messages: Message[];
+  messages: StreamMessage[];
   isLoading: boolean;
   selected: Set<number>;
   viewMode: "list" | "grid";
@@ -53,7 +45,10 @@ const parseMessageData = (data: any): string => {
   return JSON.stringify(data, null, 2);
 };
 
-const formatTimestamp = (timestamp: string, t: (key: string, opts?: any) => string) => {
+const formatTimestamp = (
+  timestamp: string,
+  t: (key: string, opts?: any) => string,
+) => {
   const date = new Date(timestamp);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
@@ -61,9 +56,12 @@ const formatTimestamp = (timestamp: string, t: (key: string, opts?: any) => stri
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
 
-  if (days > 0) return t("common.ago", { time: t("common.days", { count: days }) });
-  if (hours > 0) return t("common.ago", { time: t("common.hours", { count: hours }) });
-  if (minutes > 0) return t("common.ago", { time: t("common.minutes", { count: minutes }) });
+  if (days > 0)
+    return t("common.ago", { time: t("common.days", { count: days }) });
+  if (hours > 0)
+    return t("common.ago", { time: t("common.hours", { count: hours }) });
+  if (minutes > 0)
+    return t("common.ago", { time: t("common.minutes", { count: minutes }) });
   return t("common.justNow");
 };
 
@@ -88,7 +86,7 @@ export default function MessagesList({
       <PanelCard>
         <div className="p-6 text-center text-content-tertiary">
           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
-          {t('common.loading')}
+          {t("common.loading")}
         </div>
       </PanelCard>
     );
@@ -99,8 +97,8 @@ export default function MessagesList({
       <PanelCard>
         <EmptyState
           icon={MessageSquare}
-          title={t('messages.noMessagesYet')}
-          description={t('messages.noMessagesYetDescription')}
+          title={t("messages.noMessagesYet")}
+          description={t("messages.noMessagesYetDescription")}
         />
       </PanelCard>
     );
@@ -115,14 +113,16 @@ export default function MessagesList({
             <div className="flex items-center gap-4">
               <input
                 type="checkbox"
-                checked={selected.size === messages.length && messages.length > 0}
+                checked={
+                  selected.size === messages.length && messages.length > 0
+                }
                 onChange={onSelectAll}
                 className="icon-base rounded"
               />
               <span className="text-display-sm text-content-tertiary">
                 {selected.size > 0
-                  ? `${selected.size} ${t('common.selected')}`
-                  : t('messages.messageCount', { count: messages.length })}
+                  ? `${selected.size} ${t("common.selected")}`
+                  : t("messages.messageCount", { count: messages.length })}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -151,19 +151,19 @@ export default function MessagesList({
         </div>
       }
       footer={
-        <span>{t('messages.messageCount', { count: messages.length })}</span>
+        <span>{t("messages.messageCount", { count: messages.length })}</span>
       }
     >
-
       {/* Messages */}
       <div className="overflow-y-auto scrollbar-thin flex-1 min-h-0 divide-y divide-border-default">
         {messages.map((message, index) => {
-          const sequence = message.sequence;
+          const sequence = message.sequence ?? 0;
           const isExpanded = expanded.has(sequence);
           const isSelected = selected.has(sequence);
           const messageData = parseMessageData(message.data);
           const headers = message.headers || {};
-          const delayClass = index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
+          const delayClass =
+            index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
 
           return (
             <div
@@ -198,13 +198,15 @@ export default function MessagesList({
                       <span className="font-mono text-display-sm text-primary-400">
                         #{sequence}
                       </span>
-                      <span className="text-display-sm font-medium">{message.subject}</span>
+                      <span className="text-display-sm font-medium">
+                        {message.subject ?? "N/A"}
+                      </span>
                       <span className="text-display-xs text-content-tertiary">
                         {formatBytes(message.size || 0)}
                       </span>
                       <span className="text-display-xs text-content-tertiary flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {formatTimestamp(message.timestamp, t)}
+                        {formatTimestamp(message.timestamp ?? "", t)}
                       </span>
                     </div>
                     <div className="text-display-sm text-content-tertiary truncate">
@@ -217,14 +219,14 @@ export default function MessagesList({
                     <button
                       onClick={() => onToggleExpand(sequence)}
                       className="p-2 hover:bg-surface-primary rounded-lg hover-lift active-scale"
-                      title={t('messages.viewFullMessage')}
+                      title={t("messages.viewFullMessage")}
                     >
                       <Eye className="icon-base text-content-tertiary" />
                     </button>
                     <button
                       onClick={() => onCopy(messageData, sequence)}
                       className="p-2 hover:bg-surface-primary rounded-lg hover-lift active-scale"
-                      title={t('messages.copyMessage')}
+                      title={t("messages.copyMessage")}
                     >
                       {copiedMessage === sequence ? (
                         <Check className="icon-base text-green-400 animate-bounce-in" />
@@ -236,7 +238,7 @@ export default function MessagesList({
                       onClick={() => onDelete(sequence)}
                       disabled={isDeletePending}
                       className="p-2 hover:bg-red-500/20 rounded-lg hover-lift active-scale text-status-error"
-                      title={t('messages.deleteMessage')}
+                      title={t("messages.deleteMessage")}
                     >
                       <Trash2 className="icon-base" />
                     </button>
@@ -250,12 +252,14 @@ export default function MessagesList({
                     <div className="bg-surface-primary/50 rounded-lg p-4 hover-scale">
                       <h4 className="text-display-sm font-medium mb-3 flex items-center gap-2">
                         <FileText className="icon-base" />
-                        {t('messages.headers')}
+                        {t("messages.headers")}
                       </h4>
                       <div className="grid grid-cols-2 gap-2 text-display-sm">
                         {Object.entries(headers).map(([key, value]) => (
                           <div key={key} className="flex">
-                            <span className="text-content-tertiary mr-2">{key}:</span>
+                            <span className="text-content-tertiary mr-2">
+                              {key}:
+                            </span>
                             <span className="font-mono text-display-xs">
                               {String(value)}
                             </span>
@@ -269,21 +273,21 @@ export default function MessagesList({
                       <div className="flex items-center justify-between mb-3">
                         <h4 className="text-display-sm font-medium flex items-center gap-2">
                           <Code className="icon-base" />
-                          {t('messages.payload')}
+                          {t("messages.payload")}
                         </h4>
                         <button
                           onClick={() => onToggleExpand(sequence)}
                           className="text-display-xs text-primary-400 hover:underline flex items-center gap-1"
                         >
                           <Maximize2 className="w-3 h-3" />
-                          {t('messages.collapse')}
+                          {t("messages.collapse")}
                         </button>
                       </div>
                       <pre className="text-display-sm bg-surface-primary p-3 rounded overflow-x-auto">
                         <code className="text-green-400">
                           {messageData.length > MAX_DISPLAY_PAYLOAD_SIZE
                             ? messageData.slice(0, MAX_DISPLAY_PAYLOAD_SIZE) +
-                              t('messages.truncated')
+                              t("messages.truncated")
                             : messageData}
                         </code>
                       </pre>
@@ -292,46 +296,66 @@ export default function MessagesList({
                     {/* Metadata */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="bg-surface-primary/50 rounded-lg p-3">
-                        <p className="text-display-xs text-content-tertiary">{t('messages.sequence')}</p>
-                        <p className="font-mono text-display-sm">{sequence.toLocaleString()}</p>
-                      </div>
-                      <div className="bg-surface-primary/50 rounded-lg p-3">
-                        <p className="text-display-xs text-content-tertiary">{t('messages.timestamp')}</p>
-                        <p className="text-display-sm">
-                          {new Date(message.timestamp || Date.now()).toLocaleString()}
+                        <p className="text-display-xs text-content-tertiary">
+                          {t("messages.sequence")}
+                        </p>
+                        <p className="font-mono text-display-sm">
+                          {sequence.toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-surface-primary/50 rounded-lg p-3">
-                        <p className="text-display-xs text-content-tertiary">{t('common.size')}</p>
-                        <p className="text-display-sm">{formatBytes(message.size || 0)}</p>
+                        <p className="text-display-xs text-content-tertiary">
+                          {t("messages.timestamp")}
+                        </p>
+                        <p className="text-display-sm">
+                          {new Date(
+                            message.timestamp || Date.now(),
+                          ).toLocaleString()}
+                        </p>
                       </div>
                       <div className="bg-surface-primary/50 rounded-lg p-3">
-                        <p className="text-display-xs text-content-tertiary">{t('messages.subject')}</p>
-                        <p className="text-display-sm font-mono truncate">{message.subject}</p>
+                        <p className="text-display-xs text-content-tertiary">
+                          {t("common.size")}
+                        </p>
+                        <p className="text-display-sm">
+                          {formatBytes(message.size || 0)}
+                        </p>
+                      </div>
+                      <div className="bg-surface-primary/50 rounded-lg p-3">
+                        <p className="text-display-xs text-content-tertiary">
+                          {t("messages.subject")}
+                        </p>
+                        <p className="text-display-sm font-mono truncate">
+                          {message.subject ?? "N/A"}
+                        </p>
                       </div>
                     </div>
 
                     {/* Actions */}
-                     <div className="flex items-center gap-3 pt-2">
-                       <Button variant="secondary" size="sm" onClick={() => onCopy(messageData, sequence)}>
-                         {copiedMessage === sequence ? (
-                           <>
-                              <Check className="w-3 h-3" /> {t('messages.copied')}
-                           </>
-                         ) : (
-                           t('messages.copyPayload')
-                         )}
-                       </Button>
-                       <Button
-                         variant="secondary"
-                         size="sm"
-                         className="text-status-error"
-                         onClick={() => onDelete(sequence)}
-                         disabled={isDeletePending}
-                       >
-                         {t('common.delete')}
-                       </Button>
-                     </div>
+                    <div className="flex items-center gap-3 pt-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => onCopy(messageData, sequence)}
+                      >
+                        {copiedMessage === sequence ? (
+                          <>
+                            <Check className="w-3 h-3" /> {t("messages.copied")}
+                          </>
+                        ) : (
+                          t("messages.copyPayload")
+                        )}
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="text-status-error"
+                        onClick={() => onDelete(sequence)}
+                        disabled={isDeletePending}
+                      >
+                        {t("common.delete")}
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>

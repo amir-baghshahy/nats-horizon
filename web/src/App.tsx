@@ -4,6 +4,7 @@ import { useDirection } from "./hooks/useDirection";
 import Layout from "./components/Layout";
 import { PageLoading } from "./components/ui/PageState";
 import SetupWizard from "./pages/setup/SetupWizard";
+import { ConfigService } from "./types";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Streams = lazy(() => import("./pages/Streams"));
@@ -34,16 +35,9 @@ function App() {
   useEffect(() => {
     const checkSetup = async () => {
       try {
-        const res = await fetch("/api/config/setup");
-        if (res.ok) {
-          const data = await res.json();
-          setSetupCompleted(data.setup_completed);
-        } else {
-          // If endpoint doesn't exist, assume setup is completed (backward compat)
-          setSetupCompleted(true);
-        }
+        const data = await ConfigService.getConfigSetup();
+        setSetupCompleted(data.setup_completed);
       } catch {
-        // If can't reach API, assume setup is completed
         setSetupCompleted(true);
       }
     };
@@ -101,7 +95,10 @@ function App() {
             <Route path="/cluster" element={<Cluster />} />
             <Route path="/alerts" element={<Alerts />} />
             <Route path="/metrics" element={<Metrics />} />
-            <Route path="/visual-stream-graph" element={<VisualStreamGraph />} />
+            <Route
+              path="/visual-stream-graph"
+              element={<VisualStreamGraph />}
+            />
             <Route path="/history" element={<History />} />
             <Route path="/security" element={<Security />} />
             <Route path="/tenancy" element={<Tenancy />} />

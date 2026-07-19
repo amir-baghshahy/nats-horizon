@@ -23,7 +23,9 @@ export interface Notification {
 
 interface NotificationStore {
   notifications: Notification[];
-  addNotification: (notification: Omit<Notification, "id" | "timestamp" | "read">) => void;
+  addNotification: (
+    notification: Omit<Notification, "id" | "timestamp" | "read">,
+  ) => void;
   removeNotification: (id: string) => void;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
@@ -69,16 +71,17 @@ export const useNotifications = create<NotificationStore>()(
       removeNotification: (id) => {
         set((state) => ({
           notifications: state.notifications.filter((n) => n.id !== id),
-          unreadCount: state.notifications.filter((n) => n.id === id && !n.read).length > 0
-            ? state.unreadCount - 1
-            : state.unreadCount,
+          unreadCount:
+            state.notifications.filter((n) => n.id === id && !n.read).length > 0
+              ? state.unreadCount - 1
+              : state.unreadCount,
         }));
       },
 
       markAsRead: (id) => {
         set((state) => ({
           notifications: state.notifications.map((n) =>
-            n.id === id ? { ...n, read: true } : n
+            n.id === id ? { ...n, read: true } : n,
           ),
           unreadCount: state.notifications.find((n) => n.id === id && !n.read)
             ? Math.max(0, state.unreadCount - 1)
@@ -99,9 +102,12 @@ export const useNotifications = create<NotificationStore>()(
     }),
     {
       name: "nats-notifications",
-      partialize: (state) => ({ notifications: state.notifications, unreadCount: state.unreadCount }),
-    }
-  )
+      partialize: (state) => ({
+        notifications: state.notifications,
+        unreadCount: state.unreadCount,
+      }),
+    },
+  ),
 );
 
 // Convenience functions
@@ -142,7 +148,12 @@ export const notify = {
     });
   },
 
-  persistent: (type: NotificationType, title: string, message?: string, action?: Notification["action"]) => {
+  persistent: (
+    type: NotificationType,
+    title: string,
+    message?: string,
+    action?: Notification["action"],
+  ) => {
     return useNotifications.getState().addNotification({
       type,
       title,

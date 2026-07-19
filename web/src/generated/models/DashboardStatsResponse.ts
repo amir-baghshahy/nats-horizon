@@ -3,11 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export type DashboardStatsResponse = {
-    bytes?: number;
-    connections?: number;
-    consumers?: number;
-    messages?: number;
-    server_status?: string;
-    streams?: number;
+  bytes?: number;
+  connections?: number;
+  consumers?: number;
+  messages?: number;
+  server_status?: string;
+  streams?: number;
 };
-

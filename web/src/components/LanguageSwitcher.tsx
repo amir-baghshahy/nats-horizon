@@ -50,7 +50,9 @@ export default function LanguageSwitcher() {
         aria-label={t("language.select")}
       >
         <Globe className="h-3.5 w-3.5 shrink-0" />
-        <span className="flex-1 text-left truncate">{LANGUAGE_LABELS[currentLang]}</span>
+        <span className="flex-1 text-left truncate">
+          {LANGUAGE_LABELS[currentLang]}
+        </span>
         <ChevronUp
           className={`h-3 w-3 shrink-0 transition-transform duration-150 ${open ? "rotate-0" : "rotate-180"}`}
         />
@@ -72,7 +74,9 @@ export default function LanguageSwitcher() {
                 {lang.toUpperCase()}
               </span>
               <span className="flex-1 text-left">{LANGUAGE_LABELS[lang]}</span>
-              {currentLang === lang && <Check className="h-3 w-3 text-primary-400 shrink-0" />}
+              {currentLang === lang && (
+                <Check className="h-3 w-3 text-primary-400 shrink-0" />
+              )}
             </button>
           ))}
         </div>

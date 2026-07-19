@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
-	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/amir-baghshahy/nats-horizon/internal/services"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
@@ -156,7 +156,7 @@ func (h *SecurityHandler) GetSecurityInfo(c *gin.Context) {
 //	@Failure		501	{object}	dto.ErrorResponse
 //	@Router			/security/users [get]
 func (h *SecurityHandler) GetUsers(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, dto.ErrorResponse{Error: "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)"})
+	apihttp.JSONError(c, http.StatusNotImplemented, "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)", "")
 }
 
 // CreateUser is not implemented. NATS user management requires operator-level
@@ -172,7 +172,7 @@ func (h *SecurityHandler) GetUsers(c *gin.Context) {
 //	@Failure		501		{object}	dto.ErrorResponse
 //	@Router			/security/users [post]
 func (h *SecurityHandler) CreateUser(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, dto.ErrorResponse{Error: "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)"})
+	apihttp.JSONError(c, http.StatusNotImplemented, "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)", "")
 }
 
 // UpdateUser is not implemented. NATS user management requires operator-level
@@ -189,7 +189,7 @@ func (h *SecurityHandler) CreateUser(c *gin.Context) {
 //	@Failure		501		{object}	dto.ErrorResponse
 //	@Router			/security/users/{name} [put]
 func (h *SecurityHandler) UpdateUser(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, dto.ErrorResponse{Error: "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)"})
+	apihttp.JSONError(c, http.StatusNotImplemented, "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)", "")
 }
 
 // DeleteUser is not implemented. NATS user management requires operator-level
@@ -204,7 +204,7 @@ func (h *SecurityHandler) UpdateUser(c *gin.Context) {
 //	@Failure		501		{object}	dto.ErrorResponse
 //	@Router			/security/users/{name} [delete]
 func (h *SecurityHandler) DeleteUser(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, dto.ErrorResponse{Error: "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)"})
+	apihttp.JSONError(c, http.StatusNotImplemented, "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)", "")
 }
 
 // GetAuditLogs returns audit logs from the audit stream
@@ -251,10 +251,7 @@ func (h *SecurityHandler) GetAuditLogs(c *gin.Context) {
 		// Both filters - not directly supported, get all and filter
 		allEvents, getErr := h.auditSvc.GetLogs(offset, limit*2)
 		if getErr != nil {
-			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error:   "Failed to get audit logs",
-				Details: getErr.Error(),
-			})
+			apihttp.JSONInternalError(c, getErr, "Failed to get audit logs")
 			return
 		}
 		for _, event := range allEvents {
@@ -268,10 +265,7 @@ func (h *SecurityHandler) GetAuditLogs(c *gin.Context) {
 	} else if action != "" {
 		actionEvents, err := h.auditSvc.GetLogsByAction(action, limit)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error:   "Failed to get audit logs by action",
-				Details: err.Error(),
-			})
+			apihttp.JSONInternalError(c, err, "Failed to get audit logs by action")
 			return
 		}
 		for _, event := range actionEvents {
@@ -280,10 +274,7 @@ func (h *SecurityHandler) GetAuditLogs(c *gin.Context) {
 	} else if user != "" {
 		userEvents, err := h.auditSvc.GetLogsByUser(user, limit)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error:   "Failed to get audit logs by user",
-				Details: err.Error(),
-			})
+			apihttp.JSONInternalError(c, err, "Failed to get audit logs by user")
 			return
 		}
 		for _, event := range userEvents {
@@ -292,10 +283,7 @@ func (h *SecurityHandler) GetAuditLogs(c *gin.Context) {
 	} else {
 		allLogs, err := h.auditSvc.GetLogs(offset, limit)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-				Error:   "Failed to get audit logs",
-				Details: err.Error(),
-			})
+			apihttp.JSONInternalError(c, err, "Failed to get audit logs")
 			return
 		}
 		for _, event := range allLogs {

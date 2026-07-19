@@ -1,11 +1,11 @@
-import { useTranslation } from 'react-i18next'
-import { AlertCircle } from 'lucide-react'
-import LoadingSpinner from './LoadingSpinner'
-import { Button } from './Button'
+import { useTranslation } from "react-i18next";
+import { AlertCircle } from "lucide-react";
+import LoadingSpinner from "./LoadingSpinner";
+import { Button } from "./Button";
 
 export function PageLoading({ text }: { text?: string }) {
-  const { t } = useTranslation()
-  const displayText = text || t('common.loading')
+  const { t } = useTranslation();
+  const displayText = text || t("common.loading");
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center p-4 md:p-8">
@@ -13,11 +13,17 @@ export function PageLoading({ text }: { text?: string }) {
         <LoadingSpinner size="large" text={displayText} />
       </div>
     </div>
-  )
+  );
 }
 
-export function PageError({ message, onRetry }: { message: string; onRetry?: () => void }) {
-  const { t } = useTranslation()
+export function PageError({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry?: () => void;
+}) {
+  const { t } = useTranslation();
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center p-4 md:p-8">
@@ -27,16 +33,20 @@ export function PageError({ message, onRetry }: { message: string; onRetry?: () 
             <AlertCircle className="h-6 w-6" />
           </div>
           <div className="flex-1">
-            <h2 className="text-display-lg font-semibold text-content-primary">{t('common.unableToLoadData')}</h2>
-            <p className="mt-2 text-display-sm leading-6 text-content-tertiary">{message}</p>
+            <h2 className="text-display-lg font-semibold text-content-primary">
+              {t("common.unableToLoadData")}
+            </h2>
+            <p className="mt-2 text-display-sm leading-6 text-content-tertiary">
+              {message}
+            </p>
             {onRetry && (
               <Button variant="secondary" onClick={onRetry} className="mt-5">
-                {t('common.tryAgain')}
+                {t("common.tryAgain")}
               </Button>
             )}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

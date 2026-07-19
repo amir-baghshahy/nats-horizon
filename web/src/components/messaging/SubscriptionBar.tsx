@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 
 interface SubscriptionBarProps {
@@ -31,12 +31,12 @@ export default function SubscriptionBar({
         <div className="flex-1 relative">
           <input
             type="text"
-            placeholder={t('messages.enterSubjectPlaceholder')}
+            placeholder={t("messages.enterSubjectPlaceholder")}
             className="input w-full font-mono"
             onKeyPress={handleKeyPress}
           />
           <p className="text-display-xs text-content-tertiary mt-2">
-            {t('messages.subscriptionHelp')}
+            {t("messages.subscriptionHelp")}
           </p>
         </div>
 
@@ -51,7 +51,7 @@ export default function SubscriptionBar({
                 <button
                   onClick={() => onUnsubscribe(sub)}
                   className="hover:text-red-400 transition-colors"
-                  aria-label={`${t('messages.unsubscribeFrom')} ${sub}`}
+                  aria-label={`${t("messages.unsubscribeFrom")} ${sub}`}
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -63,8 +63,9 @@ export default function SubscriptionBar({
 
       {subscriptions.size === 0 && (
         <p className="text-display-xs text-content-tertiary mt-2">
-          {t('messages.tip')}: {t('messages.tipSingle')}{" "}
-          <code className="bg-surface-primary px-1 rounded">*</code> {t('messages.tipAll')}{" "}
+          {t("messages.tip")}: {t("messages.tipSingle")}{" "}
+          <code className="bg-surface-primary px-1 rounded">*</code>{" "}
+          {t("messages.tipAll")}{" "}
           <code className="bg-surface-primary px-1 rounded">&gt;</code>
         </p>
       )}

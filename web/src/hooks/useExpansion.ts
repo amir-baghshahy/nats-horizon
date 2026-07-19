@@ -27,7 +27,10 @@ export function useExpansion<T>(): ExpansionState<T> {
     });
   }, []);
 
-  const isExpanded = useCallback((item: T) => expandedRef.current.has(item), []);
+  const isExpanded = useCallback(
+    (item: T) => expandedRef.current.has(item),
+    [],
+  );
 
   return {
     expanded,

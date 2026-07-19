@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 
-export function usePersistedState<T>(key: string, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+export function usePersistedState<T>(
+  key: string,
+  defaultValue: T,
+): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [state, setState] = useState<T>(() => {
     try {
       const item = localStorage.getItem(`nats-horizon:${key}`);

@@ -30,34 +30,48 @@ export default function StreamSelector({
     <PanelCard className="mb-4">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
-          <label className="block text-display-sm text-content-tertiary mb-2">{t('messages.selectStream')}</label>
+          <label className="block text-display-sm text-content-tertiary mb-2">
+            {t("messages.selectStream")}
+          </label>
           <Select
             value={selectedStream}
             onChange={onStreamChange}
-            options={streams?.map((stream: any) => ({
-              value: stream.config?.name || stream.name,
-              label: `${stream.config?.name || stream.name} (${stream.state?.messages?.toLocaleString()} messages)`
-            })) || []}
-            placeholder={t('messages.selectStream')}
+            options={
+              streams?.map((stream: any) => ({
+                value: stream.config?.name || stream.name,
+                label: `${stream.config?.name || stream.name} (${stream.state?.messages?.toLocaleString()} messages)`,
+              })) || []
+            }
+            placeholder={t("messages.selectStream")}
             className="w-full"
           />
         </div>
         <div className="flex-1 relative">
-          <label className="block text-display-sm text-content-tertiary mb-2">{t('messages.searchMessages')}</label>
+          <label className="block text-display-sm text-content-tertiary mb-2">
+            {t("messages.searchMessages")}
+          </label>
           <Search className="absolute left-3 top-9 icon-base text-content-tertiary" />
           <input
             type="text"
-            placeholder={t('messages.searchMessagesPlaceholder')}
+            placeholder={t("messages.searchMessagesPlaceholder")}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="input pl-10 w-full"
           />
         </div>
         <div className="flex items-end gap-3">
-          <Button variant="secondary" onClick={onToggleFilters} icon={<Filter className="icon-base" />}>
-            {showFilters ? t('messages.lessFilters') : t('messages.filters')}
+          <Button
+            variant="secondary"
+            onClick={onToggleFilters}
+            icon={<Filter className="icon-base" />}
+          >
+            {showFilters ? t("messages.lessFilters") : t("messages.filters")}
           </Button>
-          <Button variant="secondary" onClick={onRefresh} icon={<RefreshCw className="icon-base" />} />
+          <Button
+            variant="secondary"
+            onClick={onRefresh}
+            icon={<RefreshCw className="icon-base" />}
+          />
         </div>
       </div>
     </PanelCard>

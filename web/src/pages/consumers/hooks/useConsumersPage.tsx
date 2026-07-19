@@ -217,7 +217,11 @@ export function useConsumersPage(): UseConsumersPageReturn {
     });
     if (ok) {
       const consumersToResume = filteredConsumers.filter(
-        (consumer) => consumer.name && consumer.stream && selectedConsumers.has(consumer.name) && consumer.paused
+        (consumer) =>
+          consumer.name &&
+          consumer.stream &&
+          selectedConsumers.has(consumer.name) &&
+          consumer.paused,
       );
 
       if (consumersToResume.length === 0) {
@@ -232,11 +236,14 @@ export function useConsumersPage(): UseConsumersPageReturn {
             stream: consumer.stream!,
             name: consumer.name!,
             paused: false,
-          })
-        )
+          }),
+        ),
       );
 
-      toast("success", t("consumers.bulkResumeSuccess", { count: consumersToResume.length }));
+      toast(
+        "success",
+        t("consumers.bulkResumeSuccess", { count: consumersToResume.length }),
+      );
       clearConsumerSelection();
     }
   };
@@ -252,7 +259,11 @@ export function useConsumersPage(): UseConsumersPageReturn {
     });
     if (ok) {
       const consumersToPause = filteredConsumers.filter(
-        (consumer) => consumer.name && consumer.stream && selectedConsumers.has(consumer.name) && !consumer.paused
+        (consumer) =>
+          consumer.name &&
+          consumer.stream &&
+          selectedConsumers.has(consumer.name) &&
+          !consumer.paused,
       );
 
       if (consumersToPause.length === 0) {
@@ -267,11 +278,14 @@ export function useConsumersPage(): UseConsumersPageReturn {
             stream: consumer.stream!,
             name: consumer.name!,
             paused: true,
-          })
-        )
+          }),
+        ),
       );
 
-      toast("success", t("consumers.bulkPauseSuccess", { count: consumersToPause.length }));
+      toast(
+        "success",
+        t("consumers.bulkPauseSuccess", { count: consumersToPause.length }),
+      );
       clearConsumerSelection();
     }
   };
@@ -287,7 +301,10 @@ export function useConsumersPage(): UseConsumersPageReturn {
     });
     if (ok) {
       const consumersToDelete = filteredConsumers.filter(
-        (consumer) => consumer.name && consumer.stream && selectedConsumers.has(consumer.name)
+        (consumer) =>
+          consumer.name &&
+          consumer.stream &&
+          selectedConsumers.has(consumer.name),
       );
 
       if (consumersToDelete.length === 0) {
@@ -300,17 +317,23 @@ export function useConsumersPage(): UseConsumersPageReturn {
           deleteMutation.mutateAsync({
             stream: consumer.stream!,
             name: consumer.name!,
-          })
-        )
+          }),
+        ),
       );
 
       const succeeded = results.filter((r) => r.status === "fulfilled").length;
       const failed = results.filter((r) => r.status === "rejected").length;
 
       if (failed > 0) {
-        toast("warning", t("consumers.partialDeleteSuccess", { succeeded, failed }));
+        toast(
+          "warning",
+          t("consumers.partialDeleteSuccess", { succeeded, failed }),
+        );
       } else {
-        toast("success", t("consumers.bulkDeleteSuccess", { count: succeeded }));
+        toast(
+          "success",
+          t("consumers.bulkDeleteSuccess", { count: succeeded }),
+        );
       }
       clearConsumerSelection();
     }

@@ -87,59 +87,59 @@ export default function AlertsPage() {
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
       <div className="shrink-0">
-      <AlertsHeader
-        onNewAlert={() => {
-          setSelectedAlert(null);
-          setShowCreateModal(true);
-        }}
-        onCheckAlerts={() => checkAlertsMutation.mutate()}
-        isChecking={checkAlertsMutation.isPending}
-      />
+        <AlertsHeader
+          onNewAlert={() => {
+            setSelectedAlert(null);
+            setShowCreateModal(true);
+          }}
+          onCheckAlerts={() => checkAlertsMutation.mutate()}
+          isChecking={checkAlertsMutation.isPending}
+        />
       </div>
 
       <div className="shrink-0">
-      <AlertsStats alerts={alerts || []} triggers={triggers || []} />
+        <AlertsStats alerts={alerts || []} triggers={triggers || []} />
       </div>
 
       <div className="shrink-0">
-      <AlertsTabs
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        unackedCount={unackedTriggers.length}
-      />
+        <AlertsTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          unackedCount={unackedTriggers.length}
+        />
       </div>
 
       <div className="shrink-0">
-      <AlertsFilters
-        filterSeverity={filterSeverity}
-        onFilterChange={(value) => setFilterSeverity(value)}
-      />
+        <AlertsFilters
+          filterSeverity={filterSeverity}
+          onFilterChange={(value) => setFilterSeverity(value)}
+        />
       </div>
 
       <div className="flex-1 min-h-0 flex flex-col">
-      {activeTab === "alerts" && (
-        <AlertsList
-          alerts={filteredAlerts}
-          isTogglePending={toggleAlertMutation.isPending}
-          onToggle={(alert: Alert) => toggleAlertMutation.mutate(alert)}
-          onEdit={(alert: Alert) => {
-            setSelectedAlert(alert);
-            setShowCreateModal(true);
-          }}
-          onDelete={handleDeleteAlert}
-          confirm={confirm}
-        />
-      )}
+        {activeTab === "alerts" && (
+          <AlertsList
+            alerts={filteredAlerts}
+            isTogglePending={toggleAlertMutation.isPending}
+            onToggle={(alert: Alert) => toggleAlertMutation.mutate(alert)}
+            onEdit={(alert: Alert) => {
+              setSelectedAlert(alert);
+              setShowCreateModal(true);
+            }}
+            onDelete={handleDeleteAlert}
+            confirm={confirm}
+          />
+        )}
 
-      {activeTab === "triggers" && (
-        <AlertsTriggersList
-          triggers={triggers || []}
-          isAckPending={ackTriggerMutation.isPending}
-          onAcknowledge={(alertId: string) =>
-            ackTriggerMutation.mutate(alertId)
-          }
-        />
-      )}
+        {activeTab === "triggers" && (
+          <AlertsTriggersList
+            triggers={triggers || []}
+            isAckPending={ackTriggerMutation.isPending}
+            onAcknowledge={(alertId: string) =>
+              ackTriggerMutation.mutate(alertId)
+            }
+          />
+        )}
       </div>
 
       <AlertFormModal

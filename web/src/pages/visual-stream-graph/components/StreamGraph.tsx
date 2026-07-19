@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect } from "react";
 import ReactFlow, {
   Background,
   Controls,
@@ -7,38 +7,45 @@ import ReactFlow, {
   useEdgesState,
   BackgroundVariant,
   NodeTypes,
-} from 'reactflow'
+} from "reactflow";
 // CSS import for React Flow
-import 'reactflow/dist/style.css'
-import { StreamNode } from './nodes/StreamNode'
-import { ConsumerNode } from './nodes/ConsumerNode'
+import "reactflow/dist/style.css";
+import { StreamNode } from "./nodes/StreamNode";
+import { ConsumerNode } from "./nodes/ConsumerNode";
 
 const nodeTypes: NodeTypes = {
   stream: StreamNode,
   consumer: ConsumerNode,
-}
+};
 
 interface StreamGraphProps {
-  initialNodes: any[]
-  initialEdges: any[]
-  onNodeClick?: (node: any) => void
+  initialNodes: any[];
+  initialEdges: any[];
+  onNodeClick?: (node: any) => void;
 }
 
-export function StreamGraph({ initialNodes, initialEdges, onNodeClick }: StreamGraphProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+export function StreamGraph({
+  initialNodes,
+  initialEdges,
+  onNodeClick,
+}: StreamGraphProps) {
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   useEffect(() => {
-    setNodes(initialNodes)
-  }, [initialNodes, setNodes])
+    setNodes(initialNodes);
+  }, [initialNodes, setNodes]);
 
   useEffect(() => {
-    setEdges(initialEdges)
-  }, [initialEdges, setEdges])
+    setEdges(initialEdges);
+  }, [initialEdges, setEdges]);
 
-  const handleNodeClick = useCallback((_: any, node: any) => {
-    onNodeClick?.(node)
-  }, [onNodeClick])
+  const handleNodeClick = useCallback(
+    (_: any, node: any) => {
+      onNodeClick?.(node);
+    },
+    [onNodeClick],
+  );
 
   return (
     <div className="h-full w-full bg-surface-primary">
@@ -55,7 +62,7 @@ export function StreamGraph({ initialNodes, initialEdges, onNodeClick }: StreamG
         maxZoom={1.5}
         defaultEdgeOptions={{
           animated: true,
-          style: { stroke: '#64748b', strokeWidth: 2 },
+          style: { stroke: "#64748b", strokeWidth: 2 },
         }}
       >
         <Background
@@ -67,12 +74,12 @@ export function StreamGraph({ initialNodes, initialEdges, onNodeClick }: StreamG
         <Controls className="!bg-surface-secondary !border !border-border-default/60 !text-content-primary" />
         <MiniMap
           nodeColor={(node) => {
-            return node.type === 'stream' ? '#3b82f6' : '#60a5fa'
+            return node.type === "stream" ? "#3b82f6" : "#60a5fa";
           }}
           maskColor="rgba(0, 0, 0, 0.8)"
           className="!bg-surface-secondary !border !border-border-default/60"
         />
       </ReactFlow>
     </div>
-  )
+  );
 }

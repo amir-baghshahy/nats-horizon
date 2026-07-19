@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UserPermissions = {
-    publish?: Record<string, string>;
-    subscribe?: Record<string, string>;
+  publish?: Record<string, string>;
+  subscribe?: Record<string, string>;
 };
-

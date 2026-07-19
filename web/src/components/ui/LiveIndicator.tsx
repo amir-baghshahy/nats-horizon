@@ -5,7 +5,10 @@ interface LiveIndicatorProps {
   className?: string;
 }
 
-export default function LiveIndicator({ connected, className = "" }: LiveIndicatorProps) {
+export default function LiveIndicator({
+  connected,
+  className = "",
+}: LiveIndicatorProps) {
   const { t } = useTranslation();
 
   return (

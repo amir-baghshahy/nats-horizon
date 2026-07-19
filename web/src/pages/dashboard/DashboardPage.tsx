@@ -1,12 +1,16 @@
-import { UseDashboardReturn } from './hooks/useDashboard'
-import { SystemMetrics } from '../../components/MetricsGraph'
+import { UseDashboardReturn } from "./hooks/useDashboard";
+import { SystemMetrics } from "../../components/MetricsGraph";
 import {
-  DashboardHeader, StatsGrid, SecondaryStatsGrid,
-  ConnectionStatus, ConsumerHealth, ClusterHealthCard
-} from '../../components/dashboard'
-import { PageLoading, PageError } from '../../components/ui/PageState'
-import { Database } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+  DashboardHeader,
+  StatsGrid,
+  SecondaryStatsGrid,
+  ConnectionStatus,
+  ConsumerHealth,
+  ClusterHealthCard,
+} from "../../components/dashboard";
+import { PageLoading, PageError } from "../../components/ui/PageState";
+import { Database } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function DashboardPage({
   sseConnected,
@@ -19,8 +23,8 @@ export default function DashboardPage({
   isError,
   refetch,
 }: UseDashboardReturn) {
-  const hasData = consumers && consumers.length > 0
-  const { t } = useTranslation()
+  const hasData = consumers && consumers.length > 0;
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -29,9 +33,9 @@ export default function DashboardPage({
           sseConnected={sseConnected}
           onRefresh={() => refetch()}
         />
-        <PageLoading text={t('dashboard.loadingMessage')} />
+        <PageLoading text={t("dashboard.loadingMessage")} />
       </div>
-    )
+    );
   }
 
   if (isError) {
@@ -41,9 +45,9 @@ export default function DashboardPage({
           sseConnected={sseConnected}
           onRefresh={() => refetch()}
         />
-        <PageError message={t('dashboard.errorMessage')} onRetry={refetch} />
+        <PageError message={t("dashboard.errorMessage")} onRetry={refetch} />
       </div>
-    )
+    );
   }
 
   return (
@@ -67,7 +71,9 @@ export default function DashboardPage({
 
       {/* Real-time Metrics Section */}
       <section className="shrink-0 animate-slide-up animate-delay-200">
-        <h2 className="text-display-sm font-semibold mb-2 text-content-primary">{t('dashboard.realTimeMetrics')}</h2>
+        <h2 className="text-display-sm font-semibold mb-2 text-content-primary">
+          {t("dashboard.realTimeMetrics")}
+        </h2>
         <SystemMetrics />
       </section>
 
@@ -79,7 +85,7 @@ export default function DashboardPage({
           </div>
           <div className="flex-1 min-h-0">
             <ConnectionStatus
-              connected={stats.server_status === 'connected'}
+              connected={stats.server_status === "connected"}
               connections={connections?.connections || []}
             />
           </div>
@@ -93,12 +99,16 @@ export default function DashboardPage({
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-primary/50 text-content-tertiary">
                 <Database className="h-16 w-16" />
               </div>
-              <h3 className="text-display-lg font-semibold text-content-primary">{t('common.noData')}</h3>
-              <p className="mt-2 text-display-sm leading-6 text-content-secondary">{t('dashboard.noDataDescription')}</p>
+              <h3 className="text-display-lg font-semibold text-content-primary">
+                {t("common.noData")}
+              </h3>
+              <p className="mt-2 text-display-sm leading-6 text-content-secondary">
+                {t("dashboard.noDataDescription")}
+              </p>
             </div>
           )}
         </div>
       </section>
     </div>
-  )
+  );
 }

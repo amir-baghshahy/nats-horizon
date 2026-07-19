@@ -21,16 +21,24 @@ export default function StreamsHeader({
       title={t("streams.title")}
       subtitle={t("streams.subtitle")}
       sseConnected={sseConnected}
-       actions={
-         <>
-           <Button variant="secondary" icon={<RefreshCw className="icon-base" />} onClick={onRefetch}>
-             {t("common.refresh")}
-           </Button>
-           <Button variant="primary" icon={<Plus className="icon-base" />} onClick={onShowCreateModal}>
-             {t("streams.createStream")}
-           </Button>
-         </>
-       }
+      actions={
+        <>
+          <Button
+            variant="secondary"
+            icon={<RefreshCw className="icon-base" />}
+            onClick={onRefetch}
+          >
+            {t("common.refresh")}
+          </Button>
+          <Button
+            variant="primary"
+            icon={<Plus className="icon-base" />}
+            onClick={onShowCreateModal}
+          >
+            {t("streams.createStream")}
+          </Button>
+        </>
+      }
     />
   );
 }

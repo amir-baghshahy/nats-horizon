@@ -9,6 +9,8 @@ import {
 import { useTranslation } from "react-i18next";
 import type { Alert } from "../../../types";
 import { PanelCard, EmptyState } from "../../../components/ui";
+import { formatDateTime } from "../../../utils/formatters";
+import { SEVERITY_COLORS } from "../../../constants/thresholds";
 
 interface AlertsListProps {
   alerts: Alert[];
@@ -18,15 +20,6 @@ interface AlertsListProps {
   onDelete: (alert: Alert) => void;
   confirm: (options: any) => Promise<boolean>;
 }
-
-const SEVERITY_COLORS: Record<string, string> = {
-  info: "bg-blue-500/20 text-blue-400 border-blue-500/50",
-  warning: "bg-yellow-500/20 text-yellow-400 border-yellow-500/50",
-  critical: "bg-red-500/20 text-red-400 border-red-500/50",
-};
-
-const formatTimestamp = (timestamp: string) =>
-  new Date(timestamp).toLocaleString();
 
 const formatCooldown = (nanos: number) => {
   const seconds = nanos / 1000000000;
@@ -128,7 +121,7 @@ export default function AlertsList({
                       {alert.last_trigger && (
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {formatTimestamp(alert.last_trigger)}
+                          {formatDateTime(alert.last_trigger)}
                         </span>
                       )}
                     </div>

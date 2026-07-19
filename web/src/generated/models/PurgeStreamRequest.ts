@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type PurgeStreamRequest = {
-    sequence?: number;
-    subject?: string;
+  sequence?: number;
+  subject?: string;
 };
-

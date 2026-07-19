@@ -41,43 +41,65 @@ export default function CreateStreamModal({
     <ModalWrapper isOpen={true} onClose={onClose}>
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
-        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
       >
-        <div className="card max-w-md w-full" role="dialog" aria-modal="true" aria-labelledby="create-stream-title">
+        <div
+          className="card max-w-md w-full"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="create-stream-title"
+        >
           <div className="flex items-center justify-between mb-4">
-            <h2 id="create-stream-title" className="text-display-base font-semibold">{t("streams.createStream")}</h2>
-            <button type="button" onClick={onClose} className="p-1.5 hover:bg-surface-primary rounded-lg transition-colors">
+            <h2
+              id="create-stream-title"
+              className="text-display-base font-semibold"
+            >
+              {t("streams.createStream")}
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 hover:bg-surface-primary rounded-lg transition-colors"
+            >
               <X className="icon-base" />
             </button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-               <label className="block text-display-sm font-medium mb-2">
-               {t("streams.streamName")}
-             </label>
+              <label className="block text-display-sm font-medium mb-2">
+                {t("streams.streamName")}
+              </label>
               <input
                 type="text"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                 placeholder={t("streams.streamNamePlaceholder")}
+                placeholder={t("streams.streamNamePlaceholder")}
                 className="input w-full"
                 required
               />
             </div>
             <div>
-               <label className="block text-display-sm font-medium mb-2">{t("streams.subjects")}</label>
+              <label className="block text-display-sm font-medium mb-2">
+                {t("streams.subjects")}
+              </label>
               <input
                 type="text"
                 value={subjects}
                 onChange={(event) => setSubjects(event.target.value)}
-                 placeholder={t("streams.subjectsPlaceholder")}
+                placeholder={t("streams.subjectsPlaceholder")}
                 className="input w-full"
                 required
               />
-               <p className="text-display-xs text-content-tertiary mt-1">{t("streams.subjectsHelp")}</p>
+              <p className="text-display-xs text-content-tertiary mt-1">
+                {t("streams.subjectsHelp")}
+              </p>
             </div>
             <div>
-               <label className="block text-display-sm font-medium mb-2">{t("streams.storage")}</label>
+              <label className="block text-display-sm font-medium mb-2">
+                {t("streams.storage")}
+              </label>
               <Select
                 value={storage}
                 onChange={(value) => setStorage(value as "file" | "memory")}
@@ -90,7 +112,9 @@ export default function CreateStreamModal({
               />
             </div>
             <div>
-               <label className="block text-display-sm font-medium mb-2">{t("streams.replicas")}</label>
+              <label className="block text-display-sm font-medium mb-2">
+                {t("streams.replicas")}
+              </label>
               <input
                 type="number"
                 value={replicas}
@@ -101,17 +125,22 @@ export default function CreateStreamModal({
               />
             </div>
             <div className="flex items-center gap-3 pt-4">
-               <Button type="button" onClick={onClose} variant="secondary">
-                 {t("common.cancel")}
-               </Button>
-               <Button type="submit" disabled={isPending} variant="primary" loading={isPending}>
-                 {isPending ? t("streams.creating") : t("streams.createStream")}
-               </Button>
+              <Button type="button" onClick={onClose} variant="secondary">
+                {t("common.cancel")}
+              </Button>
+              <Button
+                type="submit"
+                disabled={isPending}
+                variant="primary"
+                loading={isPending}
+              >
+                {isPending ? t("streams.creating") : t("streams.createStream")}
+              </Button>
             </div>
           </form>
         </div>
       </div>
     </ModalWrapper>,
-    document.body
+    document.body,
   );
 }

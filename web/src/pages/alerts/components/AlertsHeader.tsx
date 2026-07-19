@@ -24,21 +24,21 @@ export default function AlertsHeader({
       subtitle={t("alerts.subtitle")}
       actions={
         <>
-           <Button
-             variant="primary"
-             icon={<Plus className="icon-base" />}
-             onClick={onNewAlert}
-           >
-             {t("alerts.newAlert")}
-           </Button>
-           <Button
-             variant="secondary"
-             icon={<Zap className="icon-base" />}
-             onClick={onCheckAlerts}
-             loading={isChecking}
-           >
-             {t("alerts.checkNow")}
-           </Button>
+          <Button
+            variant="primary"
+            icon={<Plus className="icon-base" />}
+            onClick={onNewAlert}
+          >
+            {t("alerts.newAlert")}
+          </Button>
+          <Button
+            variant="secondary"
+            icon={<Zap className="icon-base" />}
+            onClick={onCheckAlerts}
+            loading={isChecking}
+          >
+            {t("alerts.checkNow")}
+          </Button>
           {rightElement}
         </>
       }

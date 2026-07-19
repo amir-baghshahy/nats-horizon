@@ -1,7 +1,12 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { useEffect, useRef, useState } from "react";
 import { Clock } from "lucide-react";
-import { formatBytes, formatTimestamp, formatJSON, detectMessageFormat } from "../../utils/formatters";
+import {
+  formatBytes,
+  formatTimestamp,
+  formatJSON,
+  detectMessageFormat,
+} from "../../utils/formatters";
 import type { MonitorEvent } from "./TrafficMonitorPanel";
 
 interface MonitorEventItemProps {
@@ -9,16 +14,27 @@ interface MonitorEventItemProps {
   index: number;
 }
 
-function MetaRow({ label, children }: { label: string; children: React.ReactNode }) {
+function MetaRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-start gap-2 min-w-0">
       <span className="shrink-0 text-content-tertiary">{label}</span>
-      <span className="min-w-0 break-all font-mono text-content-primary">{children}</span>
+      <span className="min-w-0 break-all font-mono text-content-primary">
+        {children}
+      </span>
     </div>
   );
 }
 
-export default function MonitorEventItem({ event, index }: MonitorEventItemProps) {
+export default function MonitorEventItem({
+  event,
+  index,
+}: MonitorEventItemProps) {
   const { t } = useTranslation();
   const [flash, setFlash] = useState(false);
   const prevTimestamp = useRef<number | string | undefined>(event.timestamp);
@@ -39,7 +55,7 @@ export default function MonitorEventItem({ event, index }: MonitorEventItemProps
       <div key={`stats-${index}`} className={`p-3 ${flashClass}`}>
         <div className="mb-2 flex items-center gap-2">
           <span className="rounded-full bg-blue-500/15 px-2 py-0.5 text-display-xs font-medium text-blue-300">
-            {event.type || t('messages.event')}
+            {event.type || t("messages.event")}
           </span>
           <span className="text-display-xs text-content-tertiary">
             {formatTimestamp(Number(event.timestamp))}
@@ -47,10 +63,16 @@ export default function MonitorEventItem({ event, index }: MonitorEventItemProps
         </div>
         <div className="grid gap-2 md:grid-cols-2">
           {event.stats.map((stat) => (
-            <div key={stat.subject} className="rounded-lg bg-surface-primary p-2 text-display-sm">
-              <p className="truncate font-mono text-primary-300">{stat.subject}</p>
+            <div
+              key={stat.subject}
+              className="rounded-lg bg-surface-primary p-2 text-display-sm"
+            >
+              <p className="truncate font-mono text-primary-300">
+                {stat.subject}
+              </p>
               <p className="mt-0.5 text-content-tertiary">
-                {stat.count.toLocaleString()} {t('messages.messagesAnd')} {formatBytes(stat.bytes)}
+                {stat.count.toLocaleString()} {t("messages.messagesAnd")}{" "}
+                {formatBytes(stat.bytes)}
               </p>
             </div>
           ))}
@@ -59,14 +81,19 @@ export default function MonitorEventItem({ event, index }: MonitorEventItemProps
     );
   }
 
-  const isJson = event.data ? detectMessageFormat(event.data) === "json" : false;
+  const isJson = event.data
+    ? detectMessageFormat(event.data) === "json"
+    : false;
   const prettyData = isJson ? formatJSON(event.data!) : event.data;
 
   return (
-    <div key={`${event.type}-${event.subject}-${event.timestamp}-${index}`} className={`p-3 ${flashClass}`}>
+    <div
+      key={`${event.type}-${event.subject}-${event.timestamp}-${index}`}
+      className={`p-3 ${flashClass}`}
+    >
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-primary-500/15 px-2 py-0.5 text-display-xs font-medium text-primary-300">
-          {event.type || t('messages.event')}
+          {event.type || t("messages.event")}
         </span>
         {event.subject && (
           <span className="truncate font-mono text-display-sm text-primary-300">
@@ -81,12 +108,10 @@ export default function MonitorEventItem({ event, index }: MonitorEventItemProps
 
       <div className="space-y-1.5 text-display-sm">
         {event.reply && (
-          <MetaRow label={t('messages.replyLabel')}>
-            {event.reply}
-          </MetaRow>
+          <MetaRow label={t("messages.replyLabel")}>{event.reply}</MetaRow>
         )}
         {event.size !== undefined && (
-          <MetaRow label={t('messages.sizeLabel')}>
+          <MetaRow label={t("messages.sizeLabel")}>
             {formatBytes(event.size)}
           </MetaRow>
         )}

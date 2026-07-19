@@ -8,6 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write .",
+    "check-format": "prettier --check .",
     "generate:api": "npx openapi-typescript-codegen --input ../api/swagger/openapi.json --output src/generated --client fetch",
     "generate:api:full": "cd .. && make generate-api && cd web"
   },

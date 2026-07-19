@@ -19,7 +19,12 @@ export default function AlertsTabs({
     <Tabs
       tabs={[
         { id: "alerts", label: t("alerts.alertRules"), icon: Settings },
-        { id: "triggers", label: t("alerts.triggeredAlerts"), icon: Eye, badge: unackedCount },
+        {
+          id: "triggers",
+          label: t("alerts.triggeredAlerts"),
+          icon: Eye,
+          badge: unackedCount,
+        },
       ]}
       activeTab={activeTab}
       onTabChange={(id) => onTabChange(id as "alerts" | "triggers")}

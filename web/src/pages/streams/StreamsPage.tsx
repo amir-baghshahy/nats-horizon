@@ -62,12 +62,12 @@ export default function StreamsPage() {
       {/* Filters & List Section */}
       <section className="flex-1 min-h-0 flex flex-col gap-4 animate-slide-up animate-delay-100">
         <div className="shrink-0">
-        <StreamsFilters
-          filters={filters}
-          hasActiveFilters={hasActiveFilters}
-          updateFilter={updateFilter}
-          resetFilters={resetFilters}
-        />
+          <StreamsFilters
+            filters={filters}
+            hasActiveFilters={hasActiveFilters}
+            updateFilter={updateFilter}
+            resetFilters={resetFilters}
+          />
         </div>
 
         <StreamsList
@@ -83,7 +83,9 @@ export default function StreamsPage() {
           toggleExpansion={toggleExpansion}
           isExpanded={isExpanded}
           goToPage={goToPage}
-          onViewDetails={(streamName) => navigate(`/streams/${encodeURIComponent(streamName)}`)}
+          onViewDetails={(streamName) =>
+            navigate(`/streams/${encodeURIComponent(streamName)}`)
+          }
           onDelete={handleDelete}
           onPurge={handlePurge}
           onExportStream={handleExportStream}

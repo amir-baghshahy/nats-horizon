@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type SubjectInfo = {
-    count?: number;
-    last_seen?: string;
-    name?: string;
+  count?: number;
+  last_seen?: string;
+  name?: string;
 };
-

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
@@ -76,19 +78,13 @@ func (h *CoreNATShandler) activeSubscriptions() []dto.ActiveSubscription {
 func (h *CoreNATShandler) PublishMessage(c *gin.Context) {
 	var req dto.PublishMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
-	// Validate payload size
 	if len(req.Payload) > constants.MaxMessageSize {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Payload too large",
-			Details: fmt.Sprintf("Maximum size is %d bytes", constants.MaxMessageSize),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Payload too large",
+			fmt.Sprintf("Maximum size is %d bytes", constants.MaxMessageSize))
 		return
 	}
 
@@ -100,18 +96,12 @@ func (h *CoreNATShandler) PublishMessage(c *gin.Context) {
 	}
 
 	if err := h.nc.PublishMsg(msg); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to publish message",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to publish message")
 		return
 	}
 
 	if err := h.nc.Flush(); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to flush connection",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to flush connection")
 		return
 	}
 
@@ -140,17 +130,12 @@ func (h *CoreNATShandler) PublishMessage(c *gin.Context) {
 func (h *CoreNATShandler) Request(c *gin.Context) {
 	var req dto.RequestMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
 	if !h.nc.IsConnected() {
-		c.JSON(http.StatusServiceUnavailable, dto.ErrorResponse{
-			Error: "NATS not connected",
-		})
+		apihttp.JSONError(c, http.StatusServiceUnavailable, "NATS not connected", "")
 		return
 	}
 
@@ -159,7 +144,6 @@ func (h *CoreNATShandler) Request(c *gin.Context) {
 		timeout = time.Duration(req.Timeout) * time.Millisecond
 	}
 
-	// Use RequestMsg for simpler request/reply pattern
 	msgResp, err := h.nc.RequestMsg(&nats.Msg{
 		Subject: req.Subject,
 		Data:    []byte(req.Payload),
@@ -168,21 +152,14 @@ func (h *CoreNATShandler) Request(c *gin.Context) {
 
 	if err != nil {
 		if err == nats.ErrTimeout {
-			c.JSON(http.StatusRequestTimeout, dto.ErrorResponse{
-				Error: "Request timeout - no response received",
-			})
+			apihttp.JSONError(c, http.StatusRequestTimeout, "Request timeout - no response received", "")
 			return
 		}
 		if err == nats.ErrNoResponders {
-			c.JSON(http.StatusServiceUnavailable, dto.ErrorResponse{
-				Error: "No responders available for this subject",
-			})
+			apihttp.JSONError(c, http.StatusServiceUnavailable, "No responders available for this subject", "")
 			return
 		}
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to receive response",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to receive response")
 		return
 	}
 
@@ -213,16 +190,12 @@ func (h *CoreNATShandler) Request(c *gin.Context) {
 func (h *CoreNATShandler) Subscribe(c *gin.Context) {
 	subject := c.Query("subject")
 	if subject == "" {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "subject parameter required",
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "subject parameter required", "")
 		return
 	}
 
 	if strings.HasPrefix(subject, "$SYS.") || strings.HasPrefix(subject, "$JS.") {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "subscription to internal system subjects is not allowed",
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "subscription to internal system subjects is not allowed", "")
 		return
 	}
 
@@ -236,9 +209,7 @@ func (h *CoreNATShandler) Subscribe(c *gin.Context) {
 
 	flusher, ok := c.Writer.(http.Flusher)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "Streaming not supported",
-		})
+		apihttp.JSONError(c, http.StatusInternalServerError, "Streaming not supported", "")
 		return
 	}
 
@@ -268,10 +239,7 @@ func (h *CoreNATShandler) Subscribe(c *gin.Context) {
 	})
 	if err != nil {
 		log.Printf("Subscribe error: %v", err)
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to subscribe",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to subscribe")
 		return
 	}
 	defer sub.Unsubscribe()
@@ -397,9 +365,7 @@ func (h *CoreNATShandler) GetServiceDiscovery(c *gin.Context) {
 func (h *CoreNATShandler) MonitorTraffic(c *gin.Context) {
 	subjects := c.QueryArray("subjects")
 	if len(subjects) == 0 {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "subjects parameter required; provide at least one subject to monitor",
-		})
+		apihttp.JSONBadRequest(c, "subjects parameter required; provide at least one subject to monitor")
 		return
 	}
 
@@ -418,9 +384,7 @@ func (h *CoreNATShandler) MonitorTraffic(c *gin.Context) {
 
 	flusher, ok := c.Writer.(http.Flusher)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error: "Streaming not supported",
-		})
+		apihttp.JSONInternalError(c, errors.New("SSE not supported"), "Streaming not supported")
 		return
 	}
 
@@ -503,13 +467,13 @@ func (h *CoreNATShandler) MonitorTraffic(c *gin.Context) {
 				"stats":     statsList,
 				"timestamp": time.Now().Unix(),
 			}
-		data, err := json.Marshal(statsMsg)
-		if err != nil {
-			log.Printf("Failed to marshal traffic stats: %v", err)
-			continue
-		}
-		c.Writer.Write([]byte("event: stats\ndata: " + string(data) + "\n\n"))
-		flusher.Flush()
+			data, err := json.Marshal(statsMsg)
+			if err != nil {
+				log.Printf("Failed to marshal traffic stats: %v", err)
+				continue
+			}
+			c.Writer.Write([]byte("event: stats\ndata: " + string(data) + "\n\n"))
+			flusher.Flush()
 		}
 	}
 }

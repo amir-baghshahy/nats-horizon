@@ -3,9 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { ConsumersService, StreamsService } from "../../../types";
-import type {
-  StreamResponse,
-} from "../../../types";
+import type { StreamResponse } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { deleteStream, purgeStream } from "../../../utils/natsOperations";
 import { REFRESH_INTERVALS } from "../../../utils/constants";
@@ -47,7 +45,9 @@ export function useStreamDetail(): UseStreamDetailReturn {
   const { confirm } = useConfirm();
   const { t } = useTranslation();
 
-  const [activeTab, setActiveTab] = useState<"overview" | "messages" | "consumers" | "config">("overview");
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "messages" | "consumers" | "config"
+  >("overview");
   const [isPaused, setIsPaused] = useState(false);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -74,8 +74,12 @@ export function useStreamDetail(): UseStreamDetailReturn {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (payload: { subjects?: string[]; replicas?: number; max_age?: string; max_bytes?: number }) =>
-      StreamsService.putStreams(name || "", payload),
+    mutationFn: (payload: {
+      subjects?: string[];
+      replicas?: number;
+      max_age?: string;
+      max_bytes?: number;
+    }) => StreamsService.putStreams(name || "", payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stream", name] });
       refetch();
@@ -126,9 +130,9 @@ export function useStreamDetail(): UseStreamDetailReturn {
   const handleDeleteStream = async () => {
     if (!name) return;
     const ok = await confirm({
-      title: t('streams.deleteStream'),
-      message: t('streams.deleteStreamConfirm', { name }),
-      confirmLabel: t('common.delete'),
+      title: t("streams.deleteStream"),
+      message: t("streams.deleteStreamConfirm", { name }),
+      confirmLabel: t("common.delete"),
       variant: "danger",
     });
     if (!ok) return;

@@ -1,11 +1,21 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Settings as SettingsIcon, Save, AlertCircle, CheckCircle, Globe, Mail, Shield, RefreshCw } from "lucide-react";
+import {
+  Settings as SettingsIcon,
+  Save,
+  AlertCircle,
+  CheckCircle,
+  Globe,
+  Mail,
+  Shield,
+  RefreshCw,
+} from "lucide-react";
 import PanelCard from "../../components/ui/PanelCard";
 import Button from "../../components/ui/Button";
 import Select from "../../components/ui/Select";
 import PageHeader from "../../components/ui/PageHeader";
 import { PageLoading } from "../../components/ui/PageState";
+import { ConfigService, TenancyService, HealthService } from "../../types";
 
 interface ConfigData {
   nats_url: string;
@@ -51,22 +61,19 @@ export default function SettingsPage() {
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const res = await fetch("/api/config");
-        if (res.ok) {
-          const data = await res.json();
-          const natsUrl = data.nats_url ?? "nats://localhost:4222";
-          setConfig({
-            nats_url: natsUrl,
-            gin_mode: data.gin_mode ?? "release",
-            smtp_host: data.smtp_host ?? "",
-            smtp_port: data.smtp_port ?? 587,
-            smtp_username: data.smtp_username ?? "",
-            smtp_password: data.smtp_password ?? "",
-            smtp_from: data.smtp_from ?? "",
-            cors_allowed_origins: data.cors_allowed_origins ?? "*",
-          });
-          setOriginalNatsUrl(natsUrl);
-        }
+        const data = await ConfigService.getConfig();
+        const natsUrl = data.nats_url ?? "nats://localhost:4222";
+        setConfig({
+          nats_url: natsUrl,
+          gin_mode: data.gin_mode ?? "release",
+          smtp_host: data.smtp_host ?? "",
+          smtp_port: data.smtp_port ?? 587,
+          smtp_username: data.smtp_username ?? "",
+          smtp_password: data.smtp_password ?? "",
+          smtp_from: data.smtp_from ?? "",
+          cors_allowed_origins: data.cors_allowed_origins ?? "*",
+        });
+        setOriginalNatsUrl(natsUrl);
       } catch {
         setError(t("settings.loadError"));
       } finally {
@@ -82,8 +89,8 @@ export default function SettingsPage() {
         for (let i = 0; i < 30; i++) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
           try {
-            const response = await fetch("/api/health");
-            if (response.ok) {
+            const response = await HealthService.getHealth();
+            if (response) {
               localStorage.removeItem(RESTART_KEY);
               window.location.reload();
               return;
@@ -101,7 +108,7 @@ export default function SettingsPage() {
   }, [restarting]);
 
   const updateField = (field: keyof ConfigData, value: string | number) => {
-    setConfig(prev => ({ ...prev, [field]: value }));
+    setConfig((prev) => ({ ...prev, [field]: value }));
     if (field === "nats_url") {
       setTestResult(null);
     }
@@ -113,22 +120,17 @@ export default function SettingsPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/tenancy/connections/test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: config.nats_url }),
+      const data = await TenancyService.postTenancyConnectionsTest({
+        url: config.nats_url,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || data.message || "settings.testFailed");
-      }
 
       if (data.healthy) {
         setTestResult({ healthy: true });
       } else {
-        setTestResult({ healthy: false, error: data.error || "settings.testFailed" });
+        setTestResult({
+          healthy: false,
+          error: data.error || t("settings.testFailed"),
+        });
       }
     } catch {
       setTestResult({ healthy: false, error: t("settings.testFailed") });
@@ -152,24 +154,14 @@ export default function SettingsPage() {
     setSuccess("");
 
     try {
-      const res = await fetch("/api/config", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(config),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "settings.saveFailed");
-      }
+      await ConfigService.putConfig(config);
 
       setSuccess("settings.saved");
 
       setRestarting(true);
       localStorage.setItem(RESTART_KEY, "true");
       try {
-        await fetch("/api/config/restart", { method: "POST" });
+        await ConfigService.postConfigRestart();
       } catch {
         // Ignore - connection will drop during restart
       }
@@ -185,8 +177,12 @@ export default function SettingsPage() {
       <div className="flex min-h-[70vh] items-center justify-center p-4 md:p-8">
         <div className="text-center">
           <div className="animate-spin icon-lg border-4 border-primary-500 border-t-transparent rounded-full mx-auto mb-4" />
-          <h2 className="text-display-xl font-bold text-content-primary">{t("settings.restarting")}</h2>
-          <p className="text-display-sm text-content-tertiary">{t("settings.restartingDescription")}</p>
+          <h2 className="text-display-xl font-bold text-content-primary">
+            {t("settings.restarting")}
+          </h2>
+          <p className="text-display-sm text-content-tertiary">
+            {t("settings.restartingDescription")}
+          </p>
         </div>
       </div>
     );
@@ -239,11 +235,17 @@ export default function SettingsPage() {
 
       <div className="flex-1 min-h-0 overflow-y-auto space-y-4 scrollbar-thin">
         <PanelCard
-          header={<h3 className="text-display-lg font-semibold flex items-center gap-2"><Globe className="icon-md" /> {t("settings.connection")}</h3>}
+          header={
+            <h3 className="text-display-lg font-semibold flex items-center gap-2">
+              <Globe className="icon-md" /> {t("settings.connection")}
+            </h3>
+          }
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("settings.natsUrl")}</label>
+              <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                {t("settings.natsUrl")}
+              </label>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -263,11 +265,13 @@ export default function SettingsPage() {
                 </Button>
               </div>
               {testResult && (
-                <div className={`mt-2 p-2 rounded-lg text-display-sm flex items-center gap-2 ${
-                  testResult.healthy
-                    ? "bg-green-500/10 text-green-400"
-                    : "bg-red-500/10 text-red-400"
-                }`}>
+                <div
+                  className={`mt-2 p-2 rounded-lg text-display-sm flex items-center gap-2 ${
+                    testResult.healthy
+                      ? "bg-green-500/10 text-green-400"
+                      : "bg-red-500/10 text-red-400"
+                  }`}
+                >
                   {testResult.healthy ? (
                     <>
                       <CheckCircle className="icon-sm" />
@@ -276,7 +280,9 @@ export default function SettingsPage() {
                   ) : (
                     <>
                       <AlertCircle className="icon-sm" />
-                      <span>{testResult.error || t("settings.testFailed")}</span>
+                      <span>
+                        {testResult.error || t("settings.testFailed")}
+                      </span>
                     </>
                   )}
                 </div>
@@ -286,11 +292,17 @@ export default function SettingsPage() {
         </PanelCard>
 
         <PanelCard
-          header={<h3 className="text-display-lg font-semibold flex items-center gap-2"><Shield className="icon-md" /> {t("settings.server")}</h3>}
+          header={
+            <h3 className="text-display-lg font-semibold flex items-center gap-2">
+              <Shield className="icon-md" /> {t("settings.server")}
+            </h3>
+          }
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("settings.ginMode")}</label>
+              <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                {t("settings.ginMode")}
+              </label>
               <Select
                 value={config.gin_mode}
                 onChange={(value) => updateField("gin_mode", value)}
@@ -303,11 +315,15 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("settings.corsOrigins")}</label>
+              <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                {t("settings.corsOrigins")}
+              </label>
               <input
                 type="text"
                 value={config.cors_allowed_origins}
-                onChange={(e) => updateField("cors_allowed_origins", e.target.value)}
+                onChange={(e) =>
+                  updateField("cors_allowed_origins", e.target.value)
+                }
                 placeholder="*"
                 className="input w-full"
               />
@@ -316,11 +332,17 @@ export default function SettingsPage() {
         </PanelCard>
 
         <PanelCard
-          header={<h3 className="text-display-lg font-semibold flex items-center gap-2"><Mail className="icon-md" /> {t("settings.email")}</h3>}
+          header={
+            <h3 className="text-display-lg font-semibold flex items-center gap-2">
+              <Mail className="icon-md" /> {t("settings.email")}
+            </h3>
+          }
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("settings.smtpHost")}</label>
+              <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                {t("settings.smtpHost")}
+              </label>
               <input
                 type="text"
                 value={config.smtp_host}
@@ -330,16 +352,22 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("settings.smtpPort")}</label>
+              <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                {t("settings.smtpPort")}
+              </label>
               <input
                 type="number"
                 value={config.smtp_port}
-                onChange={(e) => updateField("smtp_port", parseInt(e.target.value) || 587)}
+                onChange={(e) =>
+                  updateField("smtp_port", parseInt(e.target.value) || 587)
+                }
                 className="input w-full"
               />
             </div>
             <div>
-              <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("settings.smtpUsername")}</label>
+              <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                {t("settings.smtpUsername")}
+              </label>
               <input
                 type="text"
                 value={config.smtp_username}
@@ -349,7 +377,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("settings.smtpPassword")}</label>
+              <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                {t("settings.smtpPassword")}
+              </label>
               <input
                 type="password"
                 value={config.smtp_password}
@@ -359,7 +389,9 @@ export default function SettingsPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("settings.smtpFrom")}</label>
+              <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                {t("settings.smtpFrom")}
+              </label>
               <input
                 type="text"
                 value={config.smtp_from}

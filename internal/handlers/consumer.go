@@ -14,6 +14,7 @@ import (
 	"github.com/amir-baghshahy/nats-horizon/internal/models"
 	usecase "github.com/amir-baghshahy/nats-horizon/internal/services"
 	"github.com/amir-baghshahy/nats-horizon/internal/utils"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
@@ -57,10 +58,7 @@ func (h *ConsumerHandler) ListConsumers(c *gin.Context) {
 
 	consumers, err := h.useCase.ListConsumers(c.Request.Context(), streamName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to list consumers",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to list consumers")
 		return
 	}
 
@@ -85,10 +83,7 @@ func (h *ConsumerHandler) GetConsumer(c *gin.Context) {
 
 	consumer, err := h.useCase.GetConsumer(c.Request.Context(), streamName, name)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{
-			Error:   "Consumer not found",
-			Details: err.Error(),
-		})
+		apihttp.JSONNotFound(c, "consumer", name)
 		return
 	}
 
@@ -111,10 +106,7 @@ func (h *ConsumerHandler) CreateConsumer(c *gin.Context) {
 	streamName := c.Param("name")
 	var req dto.CreateConsumerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
@@ -131,10 +123,7 @@ func (h *ConsumerHandler) CreateConsumer(c *gin.Context) {
 
 	result, err := h.useCase.CreateConsumer(c.Request.Context(), streamName, consumer)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to create consumer",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to create consumer")
 		return
 	}
 
@@ -159,10 +148,7 @@ func (h *ConsumerHandler) UpdateConsumer(c *gin.Context) {
 	name := c.Param("consumer")
 	var req dto.UpdateConsumerRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
@@ -177,10 +163,7 @@ func (h *ConsumerHandler) UpdateConsumer(c *gin.Context) {
 
 	result, err := h.useCase.UpdateConsumer(c.Request.Context(), streamName, consumer)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to update consumer",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to update consumer")
 		return
 	}
 
@@ -196,6 +179,7 @@ func (h *ConsumerHandler) UpdateConsumer(c *gin.Context) {
 //	@Param		name		path		string	true	"Stream name"
 //	@Param		consumer	path		string	true	"Consumer name"
 //	@Success	200			{object}	dto.SuccessResponse
+//	@Failure	404			{object}	dto.ErrorResponse
 //	@Failure	500			{object}	dto.ErrorResponse
 //	@Router		/streams/{name}/consumers/{consumer} [delete]
 func (h *ConsumerHandler) DeleteConsumer(c *gin.Context) {
@@ -203,10 +187,7 @@ func (h *ConsumerHandler) DeleteConsumer(c *gin.Context) {
 	name := c.Param("consumer")
 
 	if err := h.useCase.DeleteConsumer(c.Request.Context(), streamName, name); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to delete consumer",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to delete consumer")
 		return
 	}
 
@@ -223,6 +204,7 @@ func (h *ConsumerHandler) DeleteConsumer(c *gin.Context) {
 //	@Param		consumer	path		string				true	"Consumer name"
 //	@Param		request		body		dto.ResetLagRequest	false	"Reset lag options"
 //	@Success	200			{object}	dto.ResetLagResponse
+//	@Failure	400			{object}	dto.ErrorResponse
 //	@Failure	500			{object}	dto.ErrorResponse
 //	@Router		/streams/{name}/consumers/{consumer}/lag-reset [post]
 func (h *ConsumerHandler) ResetLag(c *gin.Context) {
@@ -231,10 +213,7 @@ func (h *ConsumerHandler) ResetLag(c *gin.Context) {
 
 	var req dto.ResetLagRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
@@ -245,10 +224,7 @@ func (h *ConsumerHandler) ResetLag(c *gin.Context) {
 	}
 
 	if err := h.useCase.ResetLag(c.Request.Context(), resetReq); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to reset lag",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to reset lag")
 		return
 	}
 
@@ -268,6 +244,7 @@ func (h *ConsumerHandler) ResetLag(c *gin.Context) {
 //	@Param		consumer	path		string				true	"Consumer name"
 //	@Param		request		body		dto.ReplayRequest	false	"Replay options"
 //	@Success	200			{object}	dto.ReplayResponse
+//	@Failure	400			{object}	dto.ErrorResponse
 //	@Failure	500			{object}	dto.ErrorResponse
 //	@Router		/streams/{name}/consumers/{consumer}/replay [post]
 func (h *ConsumerHandler) Replay(c *gin.Context) {
@@ -276,10 +253,7 @@ func (h *ConsumerHandler) Replay(c *gin.Context) {
 
 	var req dto.ReplayRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
@@ -293,10 +267,7 @@ func (h *ConsumerHandler) Replay(c *gin.Context) {
 
 	replayID, err := h.useCase.ReplayMessages(c.Request.Context(), replayReq)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to start replay",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to start replay")
 		return
 	}
 
@@ -315,6 +286,8 @@ func (h *ConsumerHandler) Replay(c *gin.Context) {
 //	@Param		name		path		string	true	"Stream name"
 //	@Param		consumer	path		string	true	"Consumer name"
 //	@Success	200			{object}	dto.SuccessResponse
+//	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	404			{object}	dto.ErrorResponse
 //	@Failure	500			{object}	dto.ErrorResponse
 //	@Router		/streams/{name}/consumers/{consumer}/pause [post]
 func (h *ConsumerHandler) Pause(c *gin.Context) {
@@ -327,7 +300,7 @@ func (h *ConsumerHandler) Pause(c *gin.Context) {
 	}
 
 	if err := h.useCase.PauseConsumer(c.Request.Context(), req); err != nil {
-		respondWithError(c, http.StatusInternalServerError, "Failed to pause consumer", err.Error())
+		apihttp.JSONInternalError(c, err, "Failed to pause consumer")
 		return
 	}
 
@@ -343,6 +316,8 @@ func (h *ConsumerHandler) Pause(c *gin.Context) {
 //	@Param		name		path		string	true	"Stream name"
 //	@Param		consumer	path		string	true	"Consumer name"
 //	@Success	200			{object}	dto.SuccessResponse
+//	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	404			{object}	dto.ErrorResponse
 //	@Failure	500			{object}	dto.ErrorResponse
 //	@Router		/streams/{name}/consumers/{consumer}/resume [post]
 func (h *ConsumerHandler) Resume(c *gin.Context) {
@@ -355,7 +330,7 @@ func (h *ConsumerHandler) Resume(c *gin.Context) {
 	}
 
 	if err := h.useCase.ResumeConsumer(c.Request.Context(), req); err != nil {
-		respondWithError(c, http.StatusInternalServerError, "Failed to resume consumer", err.Error())
+		apihttp.JSONInternalError(c, err, "Failed to resume consumer")
 		return
 	}
 
@@ -399,7 +374,7 @@ func (h *ConsumerHandler) fetchStreamNames() ([]string, error) {
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{array}		dto.ConsumerResponse
-//	@Failure	500	{object}	dto.ErrorResponse
+//	@Failure	503	{object}	dto.ErrorResponse
 //	@Router		/consumers [get]
 func (h *ConsumerHandler) ListAll(c *gin.Context) {
 	streamNames, err := h.fetchStreamNames()
@@ -408,7 +383,7 @@ func (h *ConsumerHandler) ListAll(c *gin.Context) {
 		if strings.HasPrefix(err.Error(), "NATS unavailable") {
 			status = http.StatusServiceUnavailable
 		}
-		c.JSON(status, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONError(c, status, err.Error(), "")
 		return
 	}
 
@@ -437,10 +412,16 @@ func (h *ConsumerHandler) ListAll(c *gin.Context) {
 	var wg sync.WaitGroup
 	wg.Add(len(streamNames))
 
+	const maxConcurrent = 16
+	semaphore := make(chan struct{}, maxConcurrent)
+
 	for i, name := range streamNames {
 		i, name := i, name
+		semaphore <- struct{}{}
 		go func() {
 			defer wg.Done()
+			defer func() { <-semaphore }()
+
 			subject := fmt.Sprintf("%s.%s", constants.APIConsumerList, name)
 			msg, err := h.nc.Request(subject, []byte{}, constants.DefaultRequestTimeout)
 			if err != nil {
@@ -509,7 +490,7 @@ func (h *ConsumerHandler) GetConsumerByName(c *gin.Context) {
 		if strings.HasPrefix(err.Error(), "NATS unavailable") {
 			status = http.StatusServiceUnavailable
 		}
-		c.JSON(status, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONError(c, status, err.Error(), "")
 		return
 	}
 
@@ -541,9 +522,7 @@ func (h *ConsumerHandler) GetConsumerByName(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusNotFound, dto.ErrorResponse{
-		Error: "Consumer not found",
-	})
+	apihttp.JSONNotFound(c, "Consumer", name)
 }
 
 // DeleteStreamMessage handles DELETE /streams/:name/messages/:sequence
@@ -556,6 +535,7 @@ func (h *ConsumerHandler) GetConsumerByName(c *gin.Context) {
 //	@Param		sequence	path		string	true	"Message sequence number"
 //	@Success	200			{object}	dto.SuccessResponse
 //	@Failure	400			{object}	dto.ErrorResponse
+//	@Failure	404			{object}	dto.ErrorResponse
 //	@Failure	500			{object}	dto.ErrorResponse
 //	@Router		/streams/{name}/messages/{sequence} [delete]
 func (h *ConsumerHandler) DeleteStreamMessage(c *gin.Context) {
@@ -564,17 +544,12 @@ func (h *ConsumerHandler) DeleteStreamMessage(c *gin.Context) {
 
 	sequence, err := strconv.ParseUint(sequenceStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: "Invalid sequence number",
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid sequence number", "")
 		return
 	}
 
 	if err := h.messageUseCase.DeleteMessage(c.Request.Context(), streamName, sequence); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to delete message",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to delete message")
 		return
 	}
 
@@ -591,6 +566,7 @@ func (h *ConsumerHandler) DeleteStreamMessage(c *gin.Context) {
 //	@Param		request	body		dto.PublishMessageRequest	true	"Message to publish"
 //	@Success	200		{object}	dto.SuccessResponse
 //	@Failure	400		{object}	dto.ErrorResponse
+//	@Failure	404		{object}	dto.ErrorResponse
 //	@Failure	500		{object}	dto.ErrorResponse
 //	@Router		/streams/{name}/messages/publish [post]
 func (h *ConsumerHandler) PublishMessage(c *gin.Context) {
@@ -598,33 +574,23 @@ func (h *ConsumerHandler) PublishMessage(c *gin.Context) {
 
 	var req dto.PublishMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
 	if len(req.Payload) > constants.MaxMessageSize {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error: fmt.Sprintf("Message data exceeds maximum size of %d MB", constants.MaxMessageSize>>20),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Message data exceeds maximum size",
+			fmt.Sprintf("Maximum size is %d MB", constants.MaxMessageSize>>20))
 		return
 	}
 
 	if _, err := h.js.StreamInfo(streamName); err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{
-			Error:   "Stream not found",
-			Details: err.Error(),
-		})
+		apihttp.JSONNotFound(c, "stream", streamName)
 		return
 	}
 
 	if err := h.messageUseCase.PublishToStream(c.Request.Context(), req.Subject, []byte(req.Payload)); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to publish message",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to publish message")
 		return
 	}
 
@@ -656,10 +622,7 @@ func (h *ConsumerHandler) GetPendingMessages(c *gin.Context) {
 
 	messages, err := h.useCase.GetPendingMessages(c.Request.Context(), streamName, consumerName, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get pending messages",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to get pending messages")
 		return
 	}
 
@@ -702,18 +665,12 @@ func (h *ConsumerHandler) AckMessage(c *gin.Context) {
 
 	var req dto.AckMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
 	if err := h.useCase.AckMessage(c.Request.Context(), streamName, consumerName, req.Sequence); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to acknowledge message",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to acknowledge message")
 		return
 	}
 
@@ -742,18 +699,12 @@ func (h *ConsumerHandler) NackMessage(c *gin.Context) {
 
 	var req dto.NackMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
 	if err := h.useCase.NackMessage(c.Request.Context(), streamName, consumerName, req.Sequence); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to negatively acknowledge message",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to negatively acknowledge message")
 		return
 	}
 
@@ -766,9 +717,9 @@ func (h *ConsumerHandler) NackMessage(c *gin.Context) {
 //	@Tags		consumers
 //	@Accept		json
 //	@Produce	json
-//	@Param		name		path		string						true	"Stream name"
-//	@Param		consumer	path		string						true	"Consumer name"
-//	@Param		request		body		dto.AckTermMessageRequest	true	"Termination request"
+//	@Param		name		path		string							true	"Stream name"
+//	@Param		consumer	path		string							true	"Consumer name"
+//	@Param		request		body		dto.AckTermMessageRequest		true	"Termination request"
 //	@Success	200			{object}	dto.SuccessResponse
 //	@Failure	400			{object}	dto.ErrorResponse
 //	@Failure	500			{object}	dto.ErrorResponse
@@ -779,24 +730,14 @@ func (h *ConsumerHandler) AckTermMessage(c *gin.Context) {
 
 	var req dto.AckTermMessageRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
 	if err := h.useCase.TerminateMessage(c.Request.Context(), streamName, consumerName, req.Sequence); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to terminate message",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to terminate message")
 		return
 	}
 
 	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "Message acknowledged and terminated"})
-}
-
-func respondWithError(c *gin.Context, status int, errMsg, details string) {
-	c.JSON(status, dto.ErrorResponse{Error: errMsg, Details: details})
 }

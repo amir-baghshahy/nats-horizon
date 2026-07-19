@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type KVBucketInfo = {
-    bucket_name?: string;
-    bytes?: number;
-    name?: string;
-    values?: number;
+  bucket_name?: string;
+  bytes?: number;
+  name?: string;
+  values?: number;
 };
-

@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/models"
-
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/natsutil"
 	"github.com/nats-io/nats.go"
 )
 
@@ -71,6 +72,9 @@ type streamListResponse struct {
 			LastTs    string `json:"last_ts"`
 		} `json:"state"`
 	} `json:"streams"`
+	Total  int `json:"total"`
+	Offset int `json:"offset"`
+	Limit  int `json:"limit"`
 }
 
 func storageToString(storage int) string {
@@ -85,18 +89,83 @@ func storageToString(storage int) string {
 }
 
 func (r *NATSStreamRepository) List(ctx context.Context) ([]*models.Stream, error) {
-	msg, err := r.nc.Request("$JS.API.STREAM.LIST", []byte(`{}`), 5*time.Second)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list streams: %w", err)
+	subject := constants.APIStreamList
+
+	var allStreams []struct {
+		Config struct {
+			Name      string   `json:"name"`
+			Subjects  []string `json:"subjects"`
+			Retention string   `json:"retention"`
+			Storage   string   `json:"storage"`
+			Replicas  int      `json:"num_replicas"`
+			MaxAge    int64    `json:"max_age"`
+			MaxBytes  int64    `json:"max_bytes"`
+		} `json:"config"`
+		Created string `json:"created"`
+		State   struct {
+			Msgs      uint64 `json:"messages"`
+			Bytes     uint64 `json:"bytes"`
+			Consumers int    `json:"consumer_count"`
+			FirstSeq  uint64 `json:"first_seq"`
+			LastSeq   uint64 `json:"last_seq"`
+			FirstTs   string `json:"first_ts"`
+			LastTs    string `json:"last_ts"`
+		} `json:"state"`
+	}
+	offset := 0
+	limit := 100
+
+	for {
+		reqBody, err := json.Marshal(map[string]int{"offset": offset, "limit": limit})
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal stream list request: %w", err)
+		}
+
+		msg, err := natsutil.RequestWithTimeout(ctx, r.nc, subject, reqBody, constants.DefaultRequestTimeout)
+		if err != nil {
+			return nil, fmt.Errorf("failed to list streams: %w", err)
+		}
+
+		var response struct {
+			Streams []struct {
+				Config struct {
+					Name      string   `json:"name"`
+					Subjects  []string `json:"subjects"`
+					Retention string   `json:"retention"`
+					Storage   string   `json:"storage"`
+					Replicas  int      `json:"num_replicas"`
+					MaxAge    int64    `json:"max_age"`
+					MaxBytes  int64    `json:"max_bytes"`
+				} `json:"config"`
+				Created string `json:"created"`
+				State   struct {
+					Msgs      uint64 `json:"messages"`
+					Bytes     uint64 `json:"bytes"`
+					Consumers int    `json:"consumer_count"`
+					FirstSeq  uint64 `json:"first_seq"`
+					LastSeq   uint64 `json:"last_seq"`
+					FirstTs   string `json:"first_ts"`
+					LastTs    string `json:"last_ts"`
+				} `json:"state"`
+			} `json:"streams"`
+			Total  int `json:"total"`
+			Offset int `json:"offset"`
+			Limit  int `json:"limit"`
+		}
+		if err := json.Unmarshal(msg.Data, &response); err != nil {
+			return nil, fmt.Errorf("failed to parse stream list: %w", err)
+		}
+
+		allStreams = append(allStreams, response.Streams...)
+
+		if offset+len(response.Streams) >= response.Total {
+			break
+		}
+		offset += len(response.Streams)
 	}
 
-	var response streamListResponse
-	if err := json.Unmarshal(msg.Data, &response); err != nil {
-		return nil, fmt.Errorf("failed to parse stream list: %w", err)
-	}
-
-	streams := make([]*models.Stream, 0, len(response.Streams))
-	for _, s := range response.Streams {
+	streams := make([]*models.Stream, 0, len(allStreams))
+	for _, s := range allStreams {
 		firstTs, _ := time.Parse(time.RFC3339Nano, s.State.FirstTs)
 		lastTs, _ := time.Parse(time.RFC3339Nano, s.State.LastTs)
 		createdAt, _ := time.Parse(time.RFC3339Nano, s.Created)

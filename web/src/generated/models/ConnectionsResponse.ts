@@ -2,9 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ConnectionInfo } from './ConnectionInfo';
+import type { ConnectionInfo } from "./ConnectionInfo";
 export type ConnectionsResponse = {
-    connections?: Array<ConnectionInfo>;
-    total?: number;
+  connections?: Array<ConnectionInfo>;
+  total?: number;
 };
-

@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type KVBucketCreateResponse = {
-    history?: number;
-    name?: string;
-    values?: number;
+  history?: number;
+  name?: string;
+  values?: number;
 };
-

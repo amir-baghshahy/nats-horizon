@@ -3,10 +3,152 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"net"
+	"net/url"
 	"os"
 	"path/filepath"
 	"sync"
 )
+
+// ValidationError represents a configuration validation error
+type ValidationError struct {
+	Field   string
+	Message string
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("%s: %s", e.Field, e.Message)
+}
+
+// Validate checks the configuration for validity
+func (c *AppConfig) Validate() error {
+	var errors []*ValidationError
+
+	if c.ServerPort < 1 || c.ServerPort > 65535 {
+		errors = append(errors, &ValidationError{
+			Field:   "server_port",
+			Message: fmt.Sprintf("must be between 1 and 65535, got %d", c.ServerPort),
+		})
+	}
+
+	if c.GinMode != "" {
+		switch c.GinMode {
+		case "debug", "release", "test":
+			// valid
+		default:
+			errors = append(errors, &ValidationError{
+				Field:   "gin_mode",
+				Message: fmt.Sprintf("must be 'debug', 'release', or 'test', got '%s'", c.GinMode),
+			})
+		}
+	}
+
+	if c.NATSURL != "" {
+		if _, err := url.Parse(c.NATSURL); err != nil {
+			errors = append(errors, &ValidationError{
+				Field:   "nats_url",
+				Message: fmt.Sprintf("invalid URL: %v", err),
+			})
+		}
+	}
+
+	if c.SMTPHost != "" {
+		if c.SMTPPort < 1 || c.SMTPPort > 65535 {
+			errors = append(errors, &ValidationError{
+				Field:   "smtp_port",
+				Message: fmt.Sprintf("must be between 1 and 65535 when SMTP is configured, got %d", c.SMTPPort),
+			})
+		}
+		if c.SMTPFrom == "" {
+			errors = append(errors, &ValidationError{
+				Field:   "smtp_from",
+				Message: "must be set when SMTP host is configured",
+			})
+		}
+	}
+
+	if len(errors) > 0 {
+		return &ValidationErrors{Errors: errors}
+	}
+
+	return nil
+}
+
+// ValidationErrors holds multiple validation errors
+type ValidationErrors struct {
+	Errors []*ValidationError
+}
+
+func (e *ValidationErrors) Error() string {
+	var msgs []string
+	for _, err := range e.Errors {
+		msgs = append(msgs, err.Error())
+	}
+	return fmt.Sprintf("configuration validation failed: %s", joinWithAnd(msgs))
+}
+
+func joinWithAnd(parts []string) string {
+	if len(parts) == 0 {
+		return ""
+	}
+	if len(parts) == 1 {
+		return parts[0]
+	}
+	if len(parts) == 2 {
+		return parts[0] + " and " + parts[1]
+	}
+	return fmt.Sprintf("%s, and %s", joinWithComma(parts[:len(parts)-1]), parts[len(parts)-1])
+}
+
+func joinWithComma(parts []string) string {
+	result := ""
+	for i, p := range parts {
+		if i > 0 {
+			result += ", "
+		}
+		result += p
+	}
+	return result
+}
+
+// IsLocalhost returns true if the address is localhost
+func IsLocalhost(addr string) bool {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return false
+	}
+	return host == "localhost" || host == "127.0.0.1" || host == "::1"
+}
+
+// ValidateNATSURL validates a NATS URL
+func ValidateNATSURL(rawURL string) error {
+	if rawURL == "" {
+		return fmt.Errorf("NATS URL cannot be empty")
+	}
+
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return fmt.Errorf("invalid NATS URL: %w", err)
+	}
+
+	if u.Scheme != "nats" && u.Scheme != "tls" {
+		return fmt.Errorf("NATS URL scheme must be 'nats' or 'tls', got '%s'", u.Scheme)
+	}
+
+	if u.Host == "" {
+		return fmt.Errorf("NATS URL must have a host")
+	}
+
+	return nil
+}
+
+// ValidatePort validates a port number
+func ValidatePort(port int) error {
+	if port < 1 || port > 65535 {
+		return fmt.Errorf("port must be between 1 and 65535, got %d", port)
+	}
+	return nil
+}
 
 // AppConfig holds all application settings
 type AppConfig struct {
@@ -46,7 +188,7 @@ func Get() *AppConfig {
 			GinMode:            "release",
 			NATSURL:            "nats://localhost:4222",
 			SMTPPort:           587,
-			CORSAllowedOrigins: "*",
+			CORSAllowedOrigins: "",
 		}
 		instance.load()
 	})

@@ -12,6 +12,7 @@ import (
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
@@ -138,7 +139,7 @@ func (h *TenancyHandler) GetConnection(c *gin.Context) {
 	h.mu.RUnlock()
 
 	if !exists {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "connection not found"})
+		apihttp.JSONNotFound(c, "connection", id)
 		return
 	}
 
@@ -159,17 +160,17 @@ func (h *TenancyHandler) GetConnection(c *gin.Context) {
 func (h *TenancyHandler) CreateConnection(c *gin.Context) {
 	var req ConnectionConfig
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONBadRequest(c, err.Error())
 		return
 	}
 
 	if req.Name == "" || req.URL == "" {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "name and url are required"})
+		apihttp.JSONBadRequest(c, "name and url are required")
 		return
 	}
 
 	if err := validateNATSURL(req.URL); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONBadRequest(c, err.Error())
 		return
 	}
 
@@ -210,7 +211,7 @@ func (h *TenancyHandler) UpdateConnection(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONBadRequest(c, err.Error())
 		return
 	}
 
@@ -219,7 +220,7 @@ func (h *TenancyHandler) UpdateConnection(c *gin.Context) {
 
 	existing, exists := h.connections[id]
 	if !exists {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "connection not found"})
+		apihttp.JSONNotFound(c, "connection", id)
 		return
 	}
 
@@ -259,13 +260,13 @@ func (h *TenancyHandler) DeleteConnection(c *gin.Context) {
 
 	conn, exists := h.connections[id]
 	if !exists {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "connection not found"})
+		apihttp.JSONNotFound(c, "connection", id)
 		return
 	}
 
 	// Prevent deleting default connection
 	if conn.IsDefault {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "cannot delete default connection"})
+		apihttp.JSONBadRequest(c, "cannot delete default connection")
 		return
 	}
 
@@ -291,12 +292,12 @@ func (h *TenancyHandler) TestConnection(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONBadRequest(c, err.Error())
 		return
 	}
 
 	if err := validateNATSURL(req.URL); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONBadRequest(c, err.Error())
 		return
 	}
 
@@ -417,7 +418,7 @@ func (h *TenancyHandler) GetConnectionStatus(c *gin.Context) {
 //	@Param			id	path		string	true	"Connection ID"
 //	@Success		200	{object}	ConnectionConfig
 //	@Failure		404	{object}	dto.ErrorResponse
-//	@Router			/tenancy/connections/{id}/default [get]
+//	@Router			/tenancy/connections/{id}/default [put]
 func (h *TenancyHandler) SetDefaultConnection(c *gin.Context) {
 	id := c.Param("id")
 
@@ -426,7 +427,7 @@ func (h *TenancyHandler) SetDefaultConnection(c *gin.Context) {
 
 	conn, exists := h.connections[id]
 	if !exists {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "connection not found"})
+		apihttp.JSONNotFound(c, "connection", id)
 		return
 	}
 

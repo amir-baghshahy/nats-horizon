@@ -2,10 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { MetricDataPoint } from './MetricDataPoint';
+import type { MetricDataPoint } from "./MetricDataPoint";
 export type MetricSeries = {
-    data?: Array<MetricDataPoint>;
-    labels?: Record<string, string>;
-    name?: string;
+  data?: Array<MetricDataPoint>;
+  labels?: Record<string, string>;
+  name?: string;
 };
-

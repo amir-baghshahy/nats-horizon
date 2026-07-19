@@ -23,37 +23,45 @@ export default function StatsGrid({ stats, limits }: StatsGridProps) {
       <StatCard
         icon={Database}
         value={stats.streams || 0}
-        label={withQuota(t('dashboard.streams'), stats.streams || 0, limits?.max_streams)}
+        label={withQuota(
+          t("dashboard.streams"),
+          stats.streams || 0,
+          limits?.max_streams,
+        )}
         iconBg="bg-primary-500/20"
         iconColor="text-primary-400"
-        onClick={() => navigate('/streams')}
+        onClick={() => navigate("/streams")}
       />
 
       <StatCard
         icon={Users}
         value={stats.consumers || 0}
-        label={withQuota(t('dashboard.consumers'), stats.consumers || 0, limits?.max_consumers)}
+        label={withQuota(
+          t("dashboard.consumers"),
+          stats.consumers || 0,
+          limits?.max_consumers,
+        )}
         iconBg="bg-blue-500/20"
         iconColor="text-blue-400"
-        onClick={() => navigate('/consumers')}
+        onClick={() => navigate("/consumers")}
       />
 
       <StatCard
         icon={MessageSquare}
         value={stats.messages || 0}
-        label={t('dashboard.totalMessages')}
+        label={t("dashboard.totalMessages")}
         iconBg="bg-green-500/20"
         iconColor="text-green-400"
-        onClick={() => navigate('/messages')}
+        onClick={() => navigate("/messages")}
       />
 
       <StatCard
         icon={Activity}
         value={stats.connections || 0}
-        label={t('dashboard.connections')}
+        label={t("dashboard.connections")}
         iconBg="bg-cyan-500/20"
         iconColor="text-cyan-400"
-        onClick={() => navigate('/connections')}
+        onClick={() => navigate("/connections")}
       />
     </div>
   );

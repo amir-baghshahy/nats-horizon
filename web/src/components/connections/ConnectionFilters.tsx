@@ -25,7 +25,7 @@ export default function ConnectionFilters({
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-content-tertiary" />
           <input
             type="text"
-            placeholder={t('connections.searchPlaceholder')}
+            placeholder={t("connections.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="input w-full pl-10"
@@ -38,7 +38,7 @@ export default function ConnectionFilters({
             onChange={(e) => setFilterServer(e.target.value)}
             className="input w-full min-w-40 lg:w-auto"
           >
-            <option value="all">{t('connections.allServers')}</option>
+            <option value="all">{t("connections.allServers")}</option>
             {servers
               .filter((server) => server !== "all")
               .map((server) => (

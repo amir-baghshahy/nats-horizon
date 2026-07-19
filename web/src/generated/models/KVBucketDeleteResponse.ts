@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type KVBucketDeleteResponse = {
-    message?: string;
-    name?: string;
+  message?: string;
+  name?: string;
 };
-

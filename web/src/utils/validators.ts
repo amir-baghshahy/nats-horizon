@@ -86,22 +86,6 @@ export const validatePayloadSize = (
 };
 
 /**
- * Get API health status from error rate
- */
-export const getHealthStatus = (
-  totalRequests: number,
-  errors: number,
-): "success" | "warning" | "error" => {
-  if (totalRequests === 0) return "success";
-
-  const errorRate = (errors / totalRequests) * 100;
-
-  if (errorRate > 5) return "error";
-  if (errorRate > 1) return "warning";
-  return "success";
-};
-
-/**
  * Get consumer health status from lag
  */
 export const getConsumerStatus = (

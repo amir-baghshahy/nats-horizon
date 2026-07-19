@@ -1,23 +1,15 @@
 import { Eye, Clock, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { AlertTrigger } from "../../../types";
-import { PanelCard, EmptyState } from "../../../components/ui";
-import { Button } from "../../../components/ui";
+import { PanelCard, EmptyState, Button } from "../../../components/ui";
+import { formatDateTime } from "../../../utils/formatters";
+import { SEVERITY_COLORS } from "../../../constants/thresholds";
 
 interface AlertsTriggersListProps {
   triggers: AlertTrigger[];
   isAckPending: boolean;
   onAcknowledge: (alertId: string) => void;
 }
-
-const SEVERITY_COLORS: Record<string, string> = {
-  info: "bg-blue-500/20 text-blue-400 border-blue-500/50",
-  warning: "bg-yellow-500/20 text-yellow-400 border-yellow-500/50",
-  critical: "bg-red-500/20 text-red-400 border-red-500/50",
-};
-
-const formatTimestamp = (timestamp: string) =>
-  new Date(timestamp).toLocaleString();
 
 export default function AlertsTriggersList({
   triggers,
@@ -76,7 +68,7 @@ export default function AlertsTriggersList({
                 <div className="flex items-center gap-4 text-display-xs text-content-tertiary">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {formatTimestamp(trigger.triggered_at || "")}
+                    {formatDateTime(trigger.triggered_at)}
                   </span>
                   {trigger.acked_by && (
                     <span>

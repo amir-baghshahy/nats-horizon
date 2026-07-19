@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/config"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +21,13 @@ func NewConfigHandler() *ConfigHandler {
 }
 
 // RestartServer triggers a server restart by re-executing the binary
+//
+//	@Summary	Restart server
+//	@Description	Restarts the server process
+//	@Tags		config
+//	@Produce	json
+//	@Success	200	{object}	map[string]interface{}
+//	@Router		/config/restart [post]
 func (h *ConfigHandler) RestartServer(c *gin.Context) {
 	cfg := config.Get()
 
@@ -28,23 +36,15 @@ func (h *ConfigHandler) RestartServer(c *gin.Context) {
 		"nats_url": cfg.NATSURL,
 	})
 
-	// Restart the server after a short delay to allow response to be sent
 	go func() {
 		time.Sleep(500 * time.Millisecond)
-
-		// Get the path to the current binary
 		exe, err := os.Executable()
 		if err != nil {
 			log.Printf("Failed to get executable path: %v", err)
 			return
 		}
-
-		// Prepare the same arguments that were used originally
 		args := os.Args[1:]
-
-		// Replace the current process with a new one
 		env := os.Environ()
-
 		err = syscall.Exec(exe, append([]string{exe}, args...), env)
 		if err != nil {
 			log.Printf("Failed to restart server: %v", err)
@@ -53,6 +53,13 @@ func (h *ConfigHandler) RestartServer(c *gin.Context) {
 }
 
 // GetConfig returns current configuration
+//
+//	@Summary	Get current configuration
+//	@Description	Returns the current server configuration
+//	@Tags		config
+//	@Produce	json
+//	@Success	200	{object}	map[string]interface{}
+//	@Router		/config [get]
 func (h *ConfigHandler) GetConfig(c *gin.Context) {
 	cfg := config.Get()
 	c.JSON(http.StatusOK, gin.H{
@@ -69,6 +76,17 @@ func (h *ConfigHandler) GetConfig(c *gin.Context) {
 }
 
 // UpdateConfig updates configuration
+//
+//	@Summary	Update configuration
+//	@Description	Updates server configuration
+//	@Tags		config
+//	@Accept		json
+//	@Produce	json
+//	@Param		request	body		map[string]interface{}	true	"Configuration update request"
+//	@Success	200		{object}	map[string]interface{}
+//	@Failure	400		{object}	dto.ErrorResponse
+//	@Failure	500		{object}	dto.ErrorResponse
+//	@Router		/config [put]
 func (h *ConfigHandler) UpdateConfig(c *gin.Context) {
 	var req struct {
 		ServerPort         int    `json:"server_port"`
@@ -83,12 +101,11 @@ func (h *ConfigHandler) UpdateConfig(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
 
 	cfg := config.Get()
-
 	oldNATSURL := cfg.NATSURL
 
 	if req.ServerPort > 0 {
@@ -120,7 +137,7 @@ func (h *ConfigHandler) UpdateConfig(c *gin.Context) {
 	}
 
 	if err := cfg.Save(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save config"})
+		apihttp.JSONInternalError(c, err, "failed to save config")
 		return
 	}
 
@@ -133,16 +150,32 @@ func (h *ConfigHandler) UpdateConfig(c *gin.Context) {
 }
 
 // CompleteSetup marks setup as completed
+//
+//	@Summary	Complete setup
+//	@Description	Marks the initial setup as completed
+//	@Tags		config
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	map[string]interface{}
+//	@Failure	500	{object}	dto.ErrorResponse
+//	@Router		/config/setup/complete [post]
 func (h *ConfigHandler) CompleteSetup(c *gin.Context) {
 	cfg := config.Get()
 	if err := cfg.MarkSetupCompleted(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save setup status"})
+		apihttp.JSONInternalError(c, err, "failed to save setup status")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Setup completed"})
 }
 
 // CheckSetup returns whether setup is completed
+//
+//	@Summary	Check setup status
+//	@Description	Returns whether the initial setup has been completed
+//	@Tags		config
+//	@Produce	json
+//	@Success	200	{object}	map[string]interface{}
+//	@Router		/config/setup [get]
 func (h *ConfigHandler) CheckSetup(c *gin.Context) {
 	cfg := config.Get()
 	c.JSON(http.StatusOK, gin.H{

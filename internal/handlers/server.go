@@ -11,6 +11,7 @@ import (
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/amir-baghshahy/nats-horizon/internal/models"
 	"github.com/amir-baghshahy/nats-horizon/internal/services"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -67,10 +68,7 @@ func (h *ServerHandler) GetDashboardStats(c *gin.Context) {
 func (h *ServerHandler) GetAccountInfo(c *gin.Context) {
 	info, err := h.useCase.GetAccountInfo(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get account info",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to get account info")
 		return
 	}
 
@@ -88,7 +86,9 @@ func (h *ServerHandler) GetAccountInfo(c *gin.Context) {
 			"max_streams":   info.MaxStreams,
 			"max_consumers": info.MaxConsumers,
 		},
-		"domain": info.Domain,
+		"domain":         info.Domain,
+		"cpu":            info.CPU,
+		"slow_consumers": info.SlowConsumers,
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -106,10 +106,7 @@ func (h *ServerHandler) GetAccountInfo(c *gin.Context) {
 func (h *ServerHandler) GetConnections(c *gin.Context) {
 	conns, err := h.useCase.GetConnections(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get connections",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to get connections")
 		return
 	}
 
@@ -154,10 +151,7 @@ func (h *ServerHandler) GetConnections(c *gin.Context) {
 func (h *ServerHandler) GetSubjects(c *gin.Context) {
 	subjects, err := h.useCase.GetSubjects(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get subjects",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to get subjects")
 		return
 	}
 
@@ -191,7 +185,7 @@ func (h *ServerHandler) GetSubjects(c *gin.Context) {
 func (h *ServerHandler) GetMessages(c *gin.Context) {
 	stream := c.Query("stream")
 	if stream == "" {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "stream parameter required"})
+		apihttp.JSONError(c, http.StatusBadRequest, "stream parameter required", "")
 		return
 	}
 
@@ -209,10 +203,7 @@ func (h *ServerHandler) GetMessages(c *gin.Context) {
 		Limit: limit,
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get messages",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to get messages")
 		return
 	}
 
@@ -240,7 +231,7 @@ func (h *ServerHandler) GetMessages(c *gin.Context) {
 func (h *ServerHandler) GetStreamMessagesByPage(c *gin.Context) {
 	stream := c.Query("stream")
 	if stream == "" {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "stream parameter required"})
+		apihttp.JSONError(c, http.StatusBadRequest, "stream parameter required", "")
 		return
 	}
 
@@ -264,7 +255,7 @@ func (h *ServerHandler) GetStreamMessagesByPage(c *gin.Context) {
 	// Get stream info for total count and sequence bounds
 	streamInfo, err := h.streamUseCase.GetStream(c.Request.Context(), stream)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "Stream not found", Details: err.Error()})
+		apihttp.JSONNotFound(c, "stream", stream)
 		return
 	}
 
@@ -283,10 +274,7 @@ func (h *ServerHandler) GetStreamMessagesByPage(c *gin.Context) {
 		Sequence: startSeq,
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get messages",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to get messages")
 		return
 	}
 
@@ -327,10 +315,7 @@ func toStreamMessages(messages []*models.Message) []dto.StreamMessage {
 func (h *ServerHandler) GetSystemMetrics(c *gin.Context) {
 	metrics, err := h.useCase.GetSystemMetrics(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get system metrics",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to get system metrics")
 		return
 	}
 
@@ -374,10 +359,7 @@ func (h *ServerHandler) GetRateMetrics(c *gin.Context) {
 
 	metrics, windowSeconds, err := h.useCase.GetRateMetrics(c.Request.Context(), duration)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get rate metrics",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to get rate metrics")
 		return
 	}
 
@@ -396,8 +378,6 @@ func (h *ServerHandler) GetRateMetrics(c *gin.Context) {
 		}
 	}
 
-	// duration reflects the actual measured window (seconds since the previous poll),
-	// not the requested query param — deltas above are only meaningful against it.
 	c.JSON(http.StatusOK, gin.H{
 		"streams":   streamMetrics,
 		"duration":  math.Round(windowSeconds*10) / 10,
@@ -413,15 +393,14 @@ func (h *ServerHandler) GetRateMetrics(c *gin.Context) {
 //	@Produce	json
 //	@Param		id	path		string	true	"Connection ID"
 //	@Success	200	{object}	dto.SuccessResponse
+//	@Failure	400	{object}	dto.ErrorResponse
+//	@Failure	404	{object}	dto.ErrorResponse
 //	@Failure	500	{object}	dto.ErrorResponse
 //	@Router		/connections/{id} [delete]
 func (h *ServerHandler) TerminateConnection(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.useCase.TerminateConnection(c.Request.Context(), id); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to terminate connection",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to terminate connection")
 		return
 	}
 
@@ -455,6 +434,51 @@ func HealthCheck(useCase *services.ServerUseCase) gin.HandlerFunc {
 	}
 }
 
+// LivenessCheck handles GET /healthz/live
+//
+//	@Summary	Liveness probe - is the process running?
+//	@Tags		health
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	dto.HealthResponse
+//	@Router		/healthz/live [get]
+func LivenessCheck() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, dto.HealthResponse{
+			Status:    "ok",
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+	}
+}
+
+// ReadinessCheck handles GET /healthz/ready
+//
+//	@Summary	Readiness probe - is the app ready to serve traffic?
+//	@Tags		health
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	dto.HealthResponse
+//	@Failure	503	{object}	dto.HealthResponse
+//	@Router		/healthz/ready [get]
+func ReadinessCheck(useCase *services.ServerUseCase) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		conns, err := useCase.GetConnections(c.Request.Context())
+		if err != nil || !conns.Connected {
+			c.JSON(http.StatusServiceUnavailable, dto.HealthResponse{
+				Status:    "not ready",
+				NATS:      "disconnected",
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, dto.HealthResponse{
+			Status:    "ready",
+			NATS:      "connected",
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+	}
+}
+
 // GetServerInfo handles GET /server/info
 //
 //	@Summary	Get server information
@@ -462,14 +486,12 @@ func HealthCheck(useCase *services.ServerUseCase) gin.HandlerFunc {
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{object}	object	"Server information"
+//	@Failure	500	{object}	dto.ErrorResponse
 //	@Router		/server/info [get]
 func (h *ServerHandler) GetServerInfo(c *gin.Context) {
 	info, err := h.useCase.GetServerInfo(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to get server info",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to get server info")
 		return
 	}
 	c.JSON(http.StatusOK, info)

@@ -35,7 +35,7 @@ i18n
       order: ["querystring", "localStorage", "navigator"],
       caches: ["localStorage"],
       lookupLocalStorage: "i18nextLng",
-      lookupQuerystring: 'lng',
+      lookupQuerystring: "lng",
     },
   });
 

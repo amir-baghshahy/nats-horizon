@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type PurgeStreamResponse = {
-    message?: string;
-    remaining?: number;
+  message?: string;
+  remaining?: number;
 };
-

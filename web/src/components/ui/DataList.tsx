@@ -43,7 +43,9 @@ export default function DataList<T>({
     >
       {/* Optional header */}
       {header && (
-        <div className="p-4 border-b border-border-default flex-shrink-0">{header}</div>
+        <div className="p-4 border-b border-border-default flex-shrink-0">
+          {header}
+        </div>
       )}
 
       {/* Loading state */}
@@ -57,7 +59,9 @@ export default function DataList<T>({
           {EmptyIcon && <EmptyIcon className="icon-lg mb-4 opacity-50" />}
           <h3 className="text-display-lg font-semibold mb-1">{emptyTitle}</h3>
           {emptyDescription && (
-            <p className="text-display-sm text-center max-w-sm mb-4">{emptyDescription}</p>
+            <p className="text-display-sm text-center max-w-sm mb-4">
+              {emptyDescription}
+            </p>
           )}
           {emptyAction}
         </div>
@@ -66,7 +70,11 @@ export default function DataList<T>({
           {items.map((item, index) => (
             <div
               key={getKey(item)}
-              className={animate ? `animate-slide-in animate-duration-200 ${index > 0 ? `animate-delay-${Math.min(index * 50, 300)}` : ""}` : ""}
+              className={
+                animate
+                  ? `animate-slide-in animate-duration-200 ${index > 0 ? `animate-delay-${Math.min(index * 50, 300)}` : ""}`
+                  : ""
+              }
             >
               {renderItem(item, index)}
             </div>

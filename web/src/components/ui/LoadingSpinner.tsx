@@ -22,7 +22,9 @@ export default function LoadingSpinner({
       <div
         className={`${sizeClasses[size]} rounded-full border-border-default border-t-primary-500 animate-spin`}
       />
-      {text && <p className="mt-3 text-display-sm text-content-tertiary">{text}</p>}
+      {text && (
+        <p className="mt-3 text-display-sm text-content-tertiary">{text}</p>
+      )}
     </div>
   );
 }

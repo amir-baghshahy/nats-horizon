@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
-	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/amir-baghshahy/nats-horizon/internal/utils"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
@@ -74,7 +74,7 @@ func (h *ExportHandler) ExportStream(c *gin.Context) {
 
 	info, err := h.js.StreamInfo(streamName)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "stream not found"})
+		apihttp.JSONNotFound(c, "stream", streamName)
 		return
 	}
 
@@ -86,7 +86,7 @@ func (h *ExportHandler) ExportStream(c *gin.Context) {
 	case FormatTXT:
 		h.exportStreamTXT(c, info, includeMessages)
 	default:
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "unsupported format"})
+		apihttp.JSONError(c, http.StatusBadRequest, "unsupported format", "")
 	}
 }
 
@@ -210,7 +210,7 @@ func (h *ExportHandler) ExportConsumer(c *gin.Context) {
 
 	info, err := h.js.ConsumerInfo(streamName, consumerName)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "consumer not found"})
+		apihttp.JSONNotFound(c, "consumer", consumerName)
 		return
 	}
 
@@ -222,7 +222,7 @@ func (h *ExportHandler) ExportConsumer(c *gin.Context) {
 	case FormatTXT:
 		h.exportConsumerTXT(c, streamName, info)
 	default:
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: "unsupported format"})
+		apihttp.JSONError(c, http.StatusBadRequest, "unsupported format", "")
 	}
 }
 
@@ -347,7 +347,7 @@ func (h *ExportHandler) ExportMessages(c *gin.Context) {
 		Limit   int    `json:"limit"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{Error: fmt.Sprintf("invalid request body: %v", err)})
+		apihttp.JSONError(c, http.StatusBadRequest, "Invalid request body", err.Error())
 		return
 	}
 
@@ -368,14 +368,14 @@ func (h *ExportHandler) ExportMessages(c *gin.Context) {
 	}
 
 	if _, err := h.js.AddConsumer(streamName, cfg); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: fmt.Sprintf("failed to create consumer: %v", err)})
+		apihttp.JSONInternalError(c, err, "Failed to create consumer")
 		return
 	}
 	defer h.js.DeleteConsumer(streamName, consumerName)
 
 	msgInfo, err := h.js.ConsumerInfo(streamName, consumerName)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONInternalError(c, err, "Failed to get consumer info")
 		return
 	}
 
@@ -385,7 +385,7 @@ func (h *ExportHandler) ExportMessages(c *gin.Context) {
 	messages := []gin.H{}
 	sub, err := h.js.PullSubscribe(streamName, consumerName, nil)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONInternalError(c, err, "Failed to subscribe")
 		return
 	}
 	defer sub.Unsubscribe()
@@ -430,7 +430,7 @@ func (h *ExportHandler) ExportAllStreams(c *gin.Context) {
 
 	msg, err := h.nc.Request(constants.APIStreamList, []byte("{}"), 2*time.Second)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONInternalError(c, err, "Failed to list streams")
 		return
 	}
 
@@ -447,7 +447,7 @@ func (h *ExportHandler) ExportAllStreams(c *gin.Context) {
 	}
 
 	if err := json.Unmarshal(msg.Data, &response); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONInternalError(c, err, "Failed to parse stream list")
 		return
 	}
 

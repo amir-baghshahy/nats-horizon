@@ -6,7 +6,10 @@ import type { StreamFilters } from "../hooks/useStreamsPage";
 interface StreamsFiltersProps {
   filters: StreamFilters;
   hasActiveFilters: boolean;
-  updateFilter: <K extends keyof StreamFilters>(field: K, value: StreamFilters[K]) => void;
+  updateFilter: <K extends keyof StreamFilters>(
+    field: K,
+    value: StreamFilters[K],
+  ) => void;
   resetFilters: () => void;
 }
 
@@ -27,7 +30,9 @@ export default function StreamsFilters({
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:w-[420px] xl:flex-none">
           <Select
             value={filters.storage}
-            onChange={(value) => updateFilter("storage", value as StreamFilters["storage"])}
+            onChange={(value) =>
+              updateFilter("storage", value as StreamFilters["storage"])
+            }
             options={[
               { value: "all", label: t("streams.allStorage") },
               { value: "file", label: t("streams.file") },
@@ -37,7 +42,9 @@ export default function StreamsFilters({
           />
           <Select
             value={filters.status}
-            onChange={(value) => updateFilter("status", value as StreamFilters["status"])}
+            onChange={(value) =>
+              updateFilter("status", value as StreamFilters["status"])
+            }
             options={[
               { value: "all", label: t("streams.allStatus") },
               { value: "healthy", label: t("streams.healthy") },

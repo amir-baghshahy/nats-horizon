@@ -39,7 +39,7 @@ export default function MessagesHeader({
                 variant="secondary"
                 icon={<Download className="icon-base" />}
               >
-                {t('messages.exportCount', { count: selectedCount })}
+                {t("messages.exportCount", { count: selectedCount })}
               </Button>
               <Button
                 onClick={onDelete}
@@ -48,7 +48,7 @@ export default function MessagesHeader({
                 icon={<Trash2 className="icon-base" />}
                 className="text-status-error"
               >
-                {t('messages.deleteCount', { count: selectedCount })}
+                {t("messages.deleteCount", { count: selectedCount })}
               </Button>
             </>
           )}
@@ -57,7 +57,7 @@ export default function MessagesHeader({
             variant="primary"
             icon={<Send className="icon-base" />}
           >
-            {t('messages.publishMessage')}
+            {t("messages.publishMessage")}
           </Button>
           {rightElement}
         </>

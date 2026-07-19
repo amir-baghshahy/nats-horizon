@@ -161,19 +161,3 @@ func (uc *ConsumerUseCase) GetPendingMessages(ctx context.Context, streamName, c
 	}
 	return uc.consumerRepo.GetPendingMessages(ctx, streamName, consumerName, limit)
 }
-
-// ConsumerInfo represents basic consumer information for cross-stream queries
-type ConsumerInfo struct {
-	Name          string
-	Stream        string
-	Status        string
-	Lag           uint64
-	AckRate       string
-	NumPending    uint64
-	Paused        bool
-	Durable       string
-	AckPolicy     string
-	DeliverPolicy string
-	ReplayPolicy  string
-	MaxDeliver    int64
-}

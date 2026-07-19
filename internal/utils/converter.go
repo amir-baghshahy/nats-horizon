@@ -22,8 +22,8 @@ func StreamToResponse(stream *models.Stream) *dto.StreamResponse {
 			Storage:   stream.Storage,
 			Retention: stream.Retention,
 			Replicas:  stream.Replicas,
-			MaxAge:     stream.MaxAge,
-			MaxBytes:   uint64(stream.MaxBytes),
+			MaxAge:    stream.MaxAge,
+			MaxBytes:  uint64(stream.MaxBytes),
 		},
 		State: &dto.StreamStateResponse{
 			Messages:    stream.Messages,
@@ -133,87 +133,10 @@ func ReplayPolicyToString(policy int) string {
 	}
 }
 
-// MessageToResponse converts a domain Message to MessageResponse DTO
-func MessageToResponse(msg *models.Message) *dto.MessageResponse {
-	if msg == nil {
-		return nil
-	}
-
-	return &dto.MessageResponse{
-		Subject:   msg.Subject,
-		Sequence:  msg.Sequence,
-		Data:      string(msg.Data),
-		Headers:   msg.Headers,
-		Timestamp: formatTime(msg.Timestamp),
-	}
-}
-
-// MessagesToResponse converts a slice of domain Messages to MessageResponse DTOs
-func MessagesToResponse(messages []*models.Message) []*dto.MessageResponse {
-	responses := make([]*dto.MessageResponse, len(messages))
-	for i, msg := range messages {
-		responses[i] = MessageToResponse(msg)
-	}
-	return responses
-}
-
 // formatTime converts time.Time to ISO string format
 func formatTime(t time.Time) string {
 	if t.IsZero() {
 		return ""
 	}
 	return t.UTC().Format(time.RFC3339)
-}
-
-// ParseTime parses an ISO string to time.Time
-func ParseTime(s string) (time.Time, error) {
-	if s == "" {
-		return time.Time{}, nil
-	}
-	return time.Parse(time.RFC3339, s)
-}
-
-// IsValidStorage checks if storage type is valid
-func IsValidStorage(storage string) bool {
-	return storage == constants.StorageFile || storage == constants.StorageMemory
-}
-
-// IsValidRetention checks if retention policy is valid
-func IsValidRetention(retention string) bool {
-	switch retention {
-	case constants.RetentionLimits, constants.RetentionInterest, constants.RetentionWorkQueue:
-		return true
-	default:
-		return false
-	}
-}
-
-// IsValidAckPolicy checks if ack policy is valid
-func IsValidAckPolicy(policy string) bool {
-	switch policy {
-	case constants.AckPolicyNone, constants.AckPolicyAll, constants.AckPolicyExplicit:
-		return true
-	default:
-		return false
-	}
-}
-
-// IsValidDeliverPolicy checks if deliver policy is valid
-func IsValidDeliverPolicy(policy string) bool {
-	switch policy {
-	case constants.DeliverPolicyAll, constants.DeliverPolicyLast, constants.DeliverPolicyNew:
-		return true
-	default:
-		return false
-	}
-}
-
-// IsValidReplayPolicy checks if replay policy is valid
-func IsValidReplayPolicy(policy string) bool {
-	switch policy {
-	case constants.ReplayPolicyInstant, constants.ReplayPolicyOriginal:
-		return true
-	default:
-		return false
-	}
 }

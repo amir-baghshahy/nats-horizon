@@ -180,255 +180,269 @@ export default function StreamDetailPage() {
       </div>
 
       <div className="shrink-0">
-      <Tabs
-        tabs={[
-          { id: "overview", label: t("streams.overview"), icon: Activity },
-          { id: "messages", label: t("streams.messages"), icon: MessageSquare },
-          { id: "consumers", label: t("streams.consumers"), icon: Users },
-          { id: "config", label: t("streams.configuration"), icon: Settings },
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
+        <Tabs
+          tabs={[
+            { id: "overview", label: t("streams.overview"), icon: Activity },
+            {
+              id: "messages",
+              label: t("streams.messages"),
+              icon: MessageSquare,
+            },
+            { id: "consumers", label: t("streams.consumers"), icon: Users },
+            { id: "config", label: t("streams.configuration"), icon: Settings },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin flex flex-col">
-      {activeTab === "overview" && (
-        <div className="space-y-6">
-          <PanelCard title={t("streams.streamInformation")}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-surface-primary/50 rounded-lg p-4">
-                <p className="text-display-xs text-content-tertiary mb-1">
-                  {t("streams.firstSequence")}
-                </p>
-                <p className="font-mono font-medium">
-                  {streamData.state?.first_seq?.toLocaleString() || "N/A"}
-                </p>
+        {activeTab === "overview" && (
+          <div className="space-y-6">
+            <PanelCard title={t("streams.streamInformation")}>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="bg-surface-primary/50 rounded-lg p-4">
+                  <p className="text-display-xs text-content-tertiary mb-1">
+                    {t("streams.firstSequence")}
+                  </p>
+                  <p className="font-mono font-medium">
+                    {streamData.state?.first_seq?.toLocaleString() || "N/A"}
+                  </p>
+                </div>
+                <div className="bg-surface-primary/50 rounded-lg p-4">
+                  <p className="text-display-xs text-content-tertiary mb-1">
+                    {t("streams.lastSequence")}
+                  </p>
+                  <p className="font-mono font-medium">
+                    {streamData.state?.last_seq?.toLocaleString() || "N/A"}
+                  </p>
+                </div>
+                <div className="bg-surface-primary/50 rounded-lg p-4">
+                  <p className="text-display-xs text-content-tertiary mb-1">
+                    {t("streams.created")}
+                  </p>
+                  <p className="text-display-sm">
+                    {streamData.state?.first_ts
+                      ? new Date(
+                          streamData.state?.first_ts,
+                        ).toLocaleDateString()
+                      : "N/A"}
+                  </p>
+                </div>
+                <div className="bg-surface-primary/50 rounded-lg p-4">
+                  <p className="text-display-xs text-content-tertiary mb-1">
+                    {t("streams.lastMessage")}
+                  </p>
+                  <p className="text-display-sm">
+                    {streamData.state?.last_ts
+                      ? new Date(streamData.state?.last_ts).toLocaleString()
+                      : "N/A"}
+                  </p>
+                </div>
               </div>
-              <div className="bg-surface-primary/50 rounded-lg p-4">
-                <p className="text-display-xs text-content-tertiary mb-1">
-                  {t("streams.lastSequence")}
-                </p>
-                <p className="font-mono font-medium">
-                  {streamData.state?.last_seq?.toLocaleString() || "N/A"}
-                </p>
-              </div>
-              <div className="bg-surface-primary/50 rounded-lg p-4">
-                <p className="text-display-xs text-content-tertiary mb-1">
-                  {t("streams.created")}
-                </p>
-                <p className="text-display-sm">
-                  {streamData.state?.first_ts
-                    ? new Date(streamData.state?.first_ts).toLocaleDateString()
-                    : "N/A"}
-                </p>
-              </div>
-              <div className="bg-surface-primary/50 rounded-lg p-4">
-                <p className="text-display-xs text-content-tertiary mb-1">
-                  {t("streams.lastMessage")}
-                </p>
-                <p className="text-display-sm">
-                  {streamData.state?.last_ts
-                    ? new Date(streamData.state?.last_ts).toLocaleString()
-                    : "N/A"}
-                </p>
-              </div>
-            </div>
-          </PanelCard>
-        </div>
-      )}
+            </PanelCard>
+          </div>
+        )}
 
-      {activeTab === "messages" && <StreamMessagesTab stream={name} />}
+        {activeTab === "messages" && <StreamMessagesTab stream={name} />}
 
-      {activeTab === "consumers" && (
-        <div className="space-y-4">
-          {consumers.length === 0 ? (
-            <EmptyState
-              icon={Users}
-              title={t("streams.noConsumers")}
-              action={{
-                label: t("streams.createConsumer"),
-                onClick: () => setActiveTab("consumers"),
-              }}
-            />
-          ) : (
-            consumers.map((consumer: any) => (
-              <PanelCard key={consumer.name}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-2 h-2 rounded-full ${consumer.status === "active" ? "status-success" : "status-warning"}`}
-                    />
-                    <div>
-                      <Link
-                        to={`/consumers/${encodeURIComponent(consumer.name)}`}
-                        className="font-medium text-primary-400 hover:underline"
+        {activeTab === "consumers" && (
+          <div className="space-y-4">
+            {consumers.length === 0 ? (
+              <EmptyState
+                icon={Users}
+                title={t("streams.noConsumers")}
+                action={{
+                  label: t("streams.createConsumer"),
+                  onClick: () => setActiveTab("consumers"),
+                }}
+              />
+            ) : (
+              consumers.map((consumer: any) => (
+                <PanelCard key={consumer.name}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-2 h-2 rounded-full ${consumer.status === "active" ? "status-success" : "status-warning"}`}
+                      />
+                      <div>
+                        <Link
+                          to={`/consumers/${encodeURIComponent(consumer.name)}`}
+                          className="font-medium text-primary-400 hover:underline"
+                        >
+                          {consumer.name}
+                        </Link>
+                        <p className="text-display-xs text-content-tertiary mt-1">
+                          {consumer.config?.durable
+                            ? t("streams.durable")
+                            : t("streams.ephemeral")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-center">
+                        <p className="font-medium">
+                          {(consumer.lag || 0).toLocaleString()}
+                        </p>
+                        <p className="text-display-xs text-content-tertiary">
+                          {t("streams.lag")}
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium">
+                          {consumer.ack_rate || "N/A"}
+                        </p>
+                        <p className="text-display-xs text-content-tertiary">
+                          {t("streams.ackRate")}
+                        </p>
+                      </div>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() =>
+                          navigate(
+                            `/consumers/${encodeURIComponent(consumer.name)}`,
+                          )
+                        }
                       >
-                        {consumer.name}
-                      </Link>
-                      <p className="text-display-xs text-content-tertiary mt-1">
-                        {consumer.config?.durable
-                          ? t("streams.durable")
-                          : t("streams.ephemeral")}
-                      </p>
+                        {t("streams.manage")}
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <p className="font-medium">
-                        {(consumer.lag || 0).toLocaleString()}
-                      </p>
-                      <p className="text-display-xs text-content-tertiary">
-                        {t("streams.lag")}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="font-medium">
-                        {consumer.ack_rate || "N/A"}
-                      </p>
-                      <p className="text-display-xs text-content-tertiary">
-                        {t("streams.ackRate")}
-                      </p>
-                    </div>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() =>
-                        navigate(
-                          `/consumers/${encodeURIComponent(consumer.name)}`,
-                        )
-                      }
-                    >
-                      {t("streams.manage")}
-                    </Button>
+                </PanelCard>
+              ))
+            )}
+          </div>
+        )}
+
+        {activeTab === "config" && (
+          <div className="space-y-6">
+            <PanelCard title={t("streams.streamConfiguration")}>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-content-tertiary">
+                      {t("streams.name")}
+                    </span>
+                    <span className="font-medium">
+                      {streamData.config?.name}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-content-tertiary">
+                      {t("streams.storage")}
+                    </span>
+                    <span className="font-medium">
+                      {streamData.config?.storage}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-content-tertiary">
+                      {t("streams.retention")}
+                    </span>
+                    <span className="font-medium">
+                      {streamData.config?.retention}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-content-tertiary">
+                      {t("streams.replicas")}
+                    </span>
+                    <span className="font-medium">
+                      {streamData.config?.replicas}
+                    </span>
                   </div>
                 </div>
-              </PanelCard>
-            ))
-          )}
-        </div>
-      )}
-
-      {activeTab === "config" && (
-        <div className="space-y-6">
-          <PanelCard title={t("streams.streamConfiguration")}>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-content-tertiary">{t("streams.name")}</span>
-                  <span className="font-medium">{streamData.config?.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-content-tertiary">
-                    {t("streams.storage")}
-                  </span>
-                  <span className="font-medium">
-                    {streamData.config?.storage}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-content-tertiary">
-                    {t("streams.retention")}
-                  </span>
-                  <span className="font-medium">
-                    {streamData.config?.retention}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-content-tertiary">
-                    {t("streams.replicas")}
-                  </span>
-                  <span className="font-medium">
-                    {streamData.config?.replicas}
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-content-tertiary">{t("streams.maxAge")}</span>
-                  <span className="font-medium">
-                    {streamData.config?.max_age
-                      ? streamData.config.max_age
-                      : t("common.none")}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-content-tertiary">
-                    {t("streams.maxBytes")}
-                  </span>
-                  <span className="font-medium">
-                    {formatBytes(streamData.config?.max_bytes || 0)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-content-tertiary">
-                    {t("streams.maxMsgSize")}
-                  </span>
-                  <span className="font-medium">
-                    {formatBytes((streamData.config as any)?.max_msg_size || 0)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-content-tertiary">
-                    {t("streams.subjects")}
-                  </span>
-                  <span className="font-mono text-display-sm">
-                    {streamData.config?.subjects?.join(", ")}
-                  </span>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-content-tertiary">
+                      {t("streams.maxAge")}
+                    </span>
+                    <span className="font-medium">
+                      {streamData.config?.max_age
+                        ? streamData.config.max_age
+                        : t("common.none")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-content-tertiary">
+                      {t("streams.maxBytes")}
+                    </span>
+                    <span className="font-medium">
+                      {formatBytes(streamData.config?.max_bytes || 0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-content-tertiary">
+                      {t("streams.maxMsgSize")}
+                    </span>
+                    <span className="font-medium">
+                      {formatBytes(
+                        (streamData.config as any)?.max_msg_size || 0,
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-content-tertiary">
+                      {t("streams.subjects")}
+                    </span>
+                    <span className="font-mono text-display-sm">
+                      {streamData.config?.subjects?.join(", ")}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </PanelCard>
+            </PanelCard>
 
-          <PanelCard title={t("streams.streamActions")}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <Button
-                variant="secondary"
-                icon={<FileText className="icon-base" />}
-                onClick={handleEditConfig}
-              >
-                {t("streams.editConfig")}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={handlePurgeStream}
-                disabled={loadingAction === "purge"}
-                icon={
-                  loadingAction === "purge" ? (
-                    <Loader2 className="icon-base animate-spin" />
-                  ) : (
-                    <Zap className="icon-base" />
-                  )
-                }
-              >
-                {t("streams.purgeStream")}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={handleDeleteStream}
-                disabled={loadingAction === "delete"}
-                className="text-status-error"
-                icon={
-                  loadingAction === "delete" ? (
-                    <Loader2 className="icon-base animate-spin" />
-                  ) : (
-                    <Trash2 className="icon-base" />
-                  )
-                }
-              >
-                {t("streams.deleteStream")}
-              </Button>
-              <Button
-                variant="secondary"
-                icon={<CopyIcon className="icon-base" />}
-                onClick={handleCloneStream}
-              >
-                {t("streams.cloneStream")}
-              </Button>
-            </div>
-          </PanelCard>
-        </div>
-      )}
+            <PanelCard title={t("streams.streamActions")}>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Button
+                  variant="secondary"
+                  icon={<FileText className="icon-base" />}
+                  onClick={handleEditConfig}
+                >
+                  {t("streams.editConfig")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handlePurgeStream}
+                  disabled={loadingAction === "purge"}
+                  icon={
+                    loadingAction === "purge" ? (
+                      <Loader2 className="icon-base animate-spin" />
+                    ) : (
+                      <Zap className="icon-base" />
+                    )
+                  }
+                >
+                  {t("streams.purgeStream")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleDeleteStream}
+                  disabled={loadingAction === "delete"}
+                  className="text-status-error"
+                  icon={
+                    loadingAction === "delete" ? (
+                      <Loader2 className="icon-base animate-spin" />
+                    ) : (
+                      <Trash2 className="icon-base" />
+                    )
+                  }
+                >
+                  {t("streams.deleteStream")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  icon={<CopyIcon className="icon-base" />}
+                  onClick={handleCloneStream}
+                >
+                  {t("streams.cloneStream")}
+                </Button>
+              </div>
+            </PanelCard>
+          </div>
+        )}
       </div>
 
       {showEditModal && (

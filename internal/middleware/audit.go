@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"log"
 	"strings"
 	"time"
@@ -182,15 +183,21 @@ func getStatusCodeString(status int) string {
 }
 
 // AuditCleanupMiddleware periodically cleans up old audit logs
-func AuditCleanupMiddleware(auditSvc *services.AuditService) {
+func AuditCleanupMiddleware(auditSvc *services.AuditService, ctx context.Context) {
 	ticker := time.NewTicker(24 * time.Hour) // Run daily
 	defer ticker.Stop()
 
-	for range ticker.C {
-		if err := auditSvc.Cleanup(); err != nil {
-			log.Printf("Failed to cleanup audit logs: %v", err)
-		} else {
-			log.Println("Audit log cleanup completed successfully")
+	for {
+		select {
+		case <-ctx.Done():
+			log.Println("Audit cleanup middleware stopped")
+			return
+		case <-ticker.C:
+			if err := auditSvc.Cleanup(); err != nil {
+				log.Printf("Failed to cleanup audit logs: %v", err)
+			} else {
+				log.Println("Audit log cleanup completed successfully")
+			}
 		}
 	}
 }

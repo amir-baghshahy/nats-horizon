@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ClusterJetStreamInfo = {
-    api_level?: string;
-    domain?: string;
-    enabled?: boolean;
-    tier?: string;
+  api_level?: string;
+  domain?: string;
+  enabled?: boolean;
+  tier?: string;
 };
-

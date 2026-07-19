@@ -81,17 +81,28 @@ export default function StreamMessagesTab({ stream }: { stream: string }) {
   const del = async (seq: number) => {
     const ok = await confirm({
       title: t("messages.deleteMessage"),
-      message: t("messages.deleteConfirm", { defaultValue: "Delete message #{{seq}}?", seq }),
+      message: t("messages.deleteConfirm", {
+        defaultValue: "Delete message #{{seq}}?",
+        seq,
+      }),
       confirmLabel: t("common.delete"),
       variant: "danger",
     });
     if (!ok) return;
     try {
       await MessagesService.deleteStreamsMessages(stream, String(seq));
-      toast("success", t("messages.messageDeleted", { defaultValue: "Message deleted" }));
+      toast(
+        "success",
+        t("messages.messageDeleted", { defaultValue: "Message deleted" }),
+      );
       refetch();
     } catch {
-      toast("error", t("messages.deleteFailed", { defaultValue: "Failed to delete message" }));
+      toast(
+        "error",
+        t("messages.deleteFailed", {
+          defaultValue: "Failed to delete message",
+        }),
+      );
     }
   };
 
@@ -124,14 +135,21 @@ export default function StreamMessagesTab({ stream }: { stream: string }) {
               >
                 {PAGE_SIZE_OPTIONS.map((s) => (
                   <option key={s} value={s}>
-                    {t("messages.perPage", { count: s, defaultValue: "{{count}} / page" })}
+                    {t("messages.perPage", {
+                      count: s,
+                      defaultValue: "{{count}} / page",
+                    })}
                   </option>
                 ))}
               </select>
               <Button
                 variant="secondary"
                 size="sm"
-                icon={<RefreshCw className={`icon-base ${isFetching ? "animate-spin" : ""}`} />}
+                icon={
+                  <RefreshCw
+                    className={`icon-base ${isFetching ? "animate-spin" : ""}`}
+                  />
+                }
                 onClick={() => refetch()}
               />
             </div>
@@ -157,7 +175,11 @@ export default function StreamMessagesTab({ stream }: { stream: string }) {
               {t("common.previous", { defaultValue: "Previous" })}
             </Button>
             <span className="text-display-xs text-content-tertiary tabular-nums">
-              {t("common.pageOf", { defaultValue: "Page {{page}} / {{total}}", page, total: totalPages })}
+              {t("common.pageOf", {
+                defaultValue: "Page {{page}} / {{total}}",
+                page,
+                total: totalPages,
+              })}
             </span>
             <Button
               variant="secondary"
@@ -210,9 +232,15 @@ export default function StreamMessagesTab({ stream }: { stream: string }) {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1 flex-wrap">
-                        <span className="font-mono text-display-sm text-primary-400">#{seq}</span>
-                        <span className="text-display-sm font-medium truncate">{message.subject}</span>
-                        <span className="text-display-xs text-content-tertiary">{formatBytes(message.size || 0)}</span>
+                        <span className="font-mono text-display-sm text-primary-400">
+                          #{seq}
+                        </span>
+                        <span className="text-display-sm font-medium truncate">
+                          {message.subject}
+                        </span>
+                        <span className="text-display-xs text-content-tertiary">
+                          {formatBytes(message.size || 0)}
+                        </span>
                         <span className="text-display-xs text-content-tertiary flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {relTime(message.timestamp)}
@@ -220,12 +248,21 @@ export default function StreamMessagesTab({ stream }: { stream: string }) {
                         {Object.keys(headers).length > 0 && (
                           <span className="text-display-xs text-content-tertiary flex items-center gap-1">
                             <FileText className="w-3 h-3" />
-                            {t("messages.headersCount", { defaultValue: "{{count}} headers", count: Object.keys(headers).length })}
+                            {t("messages.headersCount", {
+                              defaultValue: "{{count}} headers",
+                              count: Object.keys(headers).length,
+                            })}
                           </span>
                         )}
                       </div>
                       <div className="text-display-sm text-content-tertiary truncate font-mono">
-                        {payload.substring(0, 120) || <span className="italic">{t("messages.emptyPayload", { defaultValue: "(empty)" })}</span>}
+                        {payload.substring(0, 120) || (
+                          <span className="italic">
+                            {t("messages.emptyPayload", {
+                              defaultValue: "(empty)",
+                            })}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -262,8 +299,12 @@ export default function StreamMessagesTab({ stream }: { stream: string }) {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-display-sm">
                             {Object.entries(headers).map(([key, value]) => (
                               <div key={key} className="flex gap-2">
-                                <span className="text-content-tertiary">{key}:</span>
-                                <span className="font-mono text-display-xs break-all">{value.join(", ")}</span>
+                                <span className="text-content-tertiary">
+                                  {key}:
+                                </span>
+                                <span className="font-mono text-display-xs break-all">
+                                  {value.join(", ")}
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -278,8 +319,12 @@ export default function StreamMessagesTab({ stream }: { stream: string }) {
                         <pre className="text-display-sm bg-surface-primary p-3 rounded overflow-x-auto max-h-96">
                           <code className="text-green-400">
                             {payload.length > MAX_DISPLAY_PAYLOAD_SIZE
-                              ? payload.slice(0, MAX_DISPLAY_PAYLOAD_SIZE) + t("messages.truncated")
-                              : payload || t("messages.emptyPayload", { defaultValue: "(empty)" })}
+                              ? payload.slice(0, MAX_DISPLAY_PAYLOAD_SIZE) +
+                                t("messages.truncated")
+                              : payload ||
+                                t("messages.emptyPayload", {
+                                  defaultValue: "(empty)",
+                                })}
                           </code>
                         </pre>
                       </div>

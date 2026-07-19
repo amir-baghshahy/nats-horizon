@@ -82,19 +82,21 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Administration",
     titleKey: "nav.groups.administration",
-      icon: Settings,
-      items: [
-        { key: "security", href: "/security", icon: Shield },
-        { key: "tenancy", href: "/tenancy", icon: Globe },
-        { key: "settings", href: "/settings", icon: Cog },
-      ],
+    icon: Settings,
+    items: [
+      { key: "security", href: "/security", icon: Shield },
+      { key: "tenancy", href: "/tenancy", icon: Globe },
+      { key: "settings", href: "/settings", icon: Cog },
+    ],
   },
 ] as const;
 
 export default function Layout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    new Set(),
+  );
   const { t } = useTranslation();
 
   const { data: health } = useQuery({
@@ -121,7 +123,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     group.items.some(
       (item) =>
         location.pathname === item.href ||
-        location.pathname.startsWith(item.href + "/")
+        location.pathname.startsWith(item.href + "/"),
     );
 
   return (
@@ -243,7 +245,9 @@ export default function Layout({ children }: { children: ReactNode }) {
                                   : "text-content-tertiary group-hover:text-content-primary"
                               }`}
                             />
-                            <span className="truncate">{t(`nav.${item.key}`)}</span>
+                            <span className="truncate">
+                              {t(`nav.${item.key}`)}
+                            </span>
                           </Link>
                         );
                       })}

@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type CheckAlertsResponse = {
-    evaluated?: number;
-    timestamp?: number;
-    triggered?: number;
+  evaluated?: number;
+  timestamp?: number;
+  triggered?: number;
 };
-

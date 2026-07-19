@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -11,7 +12,7 @@ import (
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
-	"github.com/amir-baghshahy/nats-horizon/internal/dto"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
@@ -384,7 +385,7 @@ func (h *SSEHub) HandleSSE(c *gin.Context) {
 
 	flusher, ok := c.Writer.(http.Flusher)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Streaming not supported"})
+		apihttp.JSONInternalError(c, errors.New("SSE not supported"), "Streaming not supported")
 		return
 	}
 

@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type PublishMessageResponse = {
-    size?: number;
-    subject?: string;
-    success?: boolean;
-    timestamp?: number;
+  size?: number;
+  subject?: string;
+  success?: boolean;
+  timestamp?: number;
 };
-

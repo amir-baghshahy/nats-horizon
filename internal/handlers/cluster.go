@@ -9,6 +9,7 @@ import (
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
 )
@@ -22,24 +23,6 @@ type ClusterHandler struct {
 // NewClusterHandler creates a new cluster handler
 func NewClusterHandler(nc *nats.Conn, js nats.JetStreamContext) *ClusterHandler {
 	return &ClusterHandler{nc: nc, js: js}
-}
-
-// ClusterInfo represents cluster information
-type ClusterInfo struct {
-	Name     string     `json:"name"`
-	Leader   string     `json:"leader"`
-	Replicas []NodeInfo `json:"replicas"`
-	Healthy  bool       `json:"healthy"`
-}
-
-// NodeInfo represents information about a cluster node
-type NodeInfo struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Current bool   `json:"current"`
-	Healthy bool   `json:"healthy"`
-	Lag     uint64 `json:"lag"`
-	Active  bool   `json:"active"`
 }
 
 // GetClusterInfo returns cluster information
@@ -146,7 +129,7 @@ func (h *ClusterHandler) GetClusterNodes(c *gin.Context) {
 	}
 
 	if err := json.Unmarshal(msg.Data, &clusterInfo); err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: err.Error()})
+		apihttp.JSONInternalError(c, err, "Failed to parse cluster info")
 		return
 	}
 
@@ -184,7 +167,7 @@ func (h *ClusterHandler) GetStreamReplicas(c *gin.Context) {
 
 	info, err := h.js.StreamInfo(streamName)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "stream not found"})
+		apihttp.JSONNotFound(c, "stream", streamName)
 		return
 	}
 

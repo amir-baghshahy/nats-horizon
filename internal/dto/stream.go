@@ -29,7 +29,7 @@ type StreamStateResponse struct {
 
 type CreateStreamRequest struct {
 	Name      string   `json:"name" binding:"required"`
-	Subjects  []string `json:"subjects" binding:"required,min=1"`
+	Subjects  []string `json:"subjects" binding:"required,min=1,dive,required"`
 	Storage   string   `json:"storage" binding:"required,oneof=file memory"`
 	Retention string   `json:"retention" binding:"omitempty,oneof=limits interest workqueue"`
 	Replicas  int      `json:"replicas" binding:"omitempty,min=1,max=5"`

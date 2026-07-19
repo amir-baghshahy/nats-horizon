@@ -65,7 +65,8 @@ export default function Tabs<T extends string = string>({
 
     let next = current;
     if (e.key === forward) next = (current + 1) % tabs.length;
-    else if (e.key === backward) next = (current - 1 + tabs.length) % tabs.length;
+    else if (e.key === backward)
+      next = (current - 1 + tabs.length) % tabs.length;
     else if (e.key === "Home") next = 0;
     else if (e.key === "End") next = tabs.length - 1;
     else return;
@@ -136,13 +137,13 @@ export default function Tabs<T extends string = string>({
   }
 
   return (
-      <div
-        ref={tabsRef}
-        role="tablist"
-        aria-orientation="horizontal"
-        onKeyDown={handleKeyDown}
-        className="relative mb-4 flex w-fit items-center gap-1 rounded-lg bg-surface-primary p-1"
-      >
+    <div
+      ref={tabsRef}
+      role="tablist"
+      aria-orientation="horizontal"
+      onKeyDown={handleKeyDown}
+      className="relative mb-4 flex w-fit items-center gap-1 rounded-lg bg-surface-primary p-1"
+    >
       <span
         aria-hidden="true"
         className="absolute bottom-1 top-1 rounded-lg bg-primary-600 shadow-lg shadow-primary-500/30 transition-all duration-300 ease-in-out"

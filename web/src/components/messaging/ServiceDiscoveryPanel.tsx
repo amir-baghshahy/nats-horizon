@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import { Network, RefreshCw, Server } from "lucide-react";
 import { Button } from "../ui";
 
@@ -29,32 +29,42 @@ export default function ServiceDiscoveryPanel({
         <div className="mb-6 flex items-center justify-between gap-4">
           <h2 className="flex items-center gap-2 text-display-xl font-bold">
             <Server className="h-5 w-5" />
-            {t('messages.serviceDiscovery')}
+            {t("messages.serviceDiscovery")}
           </h2>
-          <Button variant="secondary" onClick={onRefresh} icon={<RefreshCw className="h-4 w-4" />}>
-            {t('common.refresh')}
+          <Button
+            variant="secondary"
+            onClick={onRefresh}
+            icon={<RefreshCw className="h-4 w-4" />}
+          >
+            {t("common.refresh")}
           </Button>
         </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl bg-surface-primary/50 p-4">
-            <p className="text-display-xs text-content-tertiary">{t('messages.serverName')}</p>
+            <p className="text-display-xs text-content-tertiary">
+              {t("messages.serverName")}
+            </p>
             <p className="mt-1 truncate text-display-sm font-mono">
-              {serviceInfo?.server_name || t('messages.natsServer')}
+              {serviceInfo?.server_name || t("messages.natsServer")}
             </p>
           </div>
           <div className="rounded-xl bg-surface-primary/50 p-4">
-            <p className="text-display-xs text-content-tertiary">{t('messages.version')}</p>
+            <p className="text-display-xs text-content-tertiary">
+              {t("messages.version")}
+            </p>
             <p className="mt-1 text-display-sm">
-              {serviceInfo?.version || t('messages.notAvailable')}
+              {serviceInfo?.version || t("messages.notAvailable")}
             </p>
           </div>
           <div className="rounded-xl bg-surface-primary/50 p-4">
-            <p className="text-display-xs text-content-tertiary">{t('messages.maxPayload')}</p>
+            <p className="text-display-xs text-content-tertiary">
+              {t("messages.maxPayload")}
+            </p>
             <p className="mt-1 text-display-sm">
               {serviceInfo?.max_payload
                 ? `${(serviceInfo.max_payload / 1024).toFixed(0)} KB`
-                : t('messages.notAvailable')}
+                : t("messages.notAvailable")}
             </p>
           </div>
         </div>
@@ -63,7 +73,7 @@ export default function ServiceDiscoveryPanel({
       <div className="card">
         <h3 className="mb-4 flex items-center gap-2 text-display-lg font-semibold">
           <Network className="h-5 w-5 text-primary-400" />
-          {t('messages.activeSubscriptions')}
+          {t("messages.activeSubscriptions")}
         </h3>
         {subscriptionList.length > 0 ? (
           <div className="flex flex-wrap gap-2">
@@ -79,7 +89,7 @@ export default function ServiceDiscoveryPanel({
         ) : (
           <div className="rounded-xl border border-dashed border-border-default bg-surface-primary/30 p-8 text-center text-content-tertiary">
             <Network className="mx-auto mb-3 h-12 w-12 opacity-50" />
-            <p>{t('messages.subscribeToMonitor')}</p>
+            <p>{t("messages.subscribeToMonitor")}</p>
           </div>
         )}
       </div>

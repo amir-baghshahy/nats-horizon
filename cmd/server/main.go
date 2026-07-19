@@ -9,11 +9,11 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
-	"strings"
 	"syscall"
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/config"
+	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/handlers"
 	"github.com/amir-baghshahy/nats-horizon/internal/middleware"
 	"github.com/amir-baghshahy/nats-horizon/internal/repositories"
@@ -43,87 +43,29 @@ type NATSConnection struct {
 	js nats.JetStreamContext
 }
 
-// NewNATSConnection creates a new NATS connection
 func NewNATSConnection(url string) (*NATSConnection, error) {
 	nc, err := nats.Connect(url,
-		nats.RetryOnFailedConnect(true),
-		nats.MaxReconnects(-1),
 		nats.ReconnectWait(2*time.Second),
-		nats.Timeout(30*time.Second),
-		nats.DrainTimeout(30*time.Second),
-		nats.PingInterval(2*time.Minute),
-		nats.MaxPingsOutstanding(5),
-		nats.DisconnectErrHandler(func(nc *nats.Conn, err error) {
-			log.Printf("NATS disconnected: %v", err)
-		}),
-		nats.ReconnectHandler(func(nc *nats.Conn) {
-			log.Printf("NATS reconnected to %s", nc.ConnectedUrl())
-		}),
+		nats.MaxReconnects(10),
+		nats.Timeout(5*time.Second),
 	)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := nc.Flush(); err != nil {
-		nc.Close()
-		return nil, err
-	}
-
-	if !nc.IsConnected() {
-		nc.Close()
-		return nil, fmt.Errorf("failed to establish connection")
+		return nil, fmt.Errorf("failed to connect to NATS: %w", err)
 	}
 
 	js, err := nc.JetStream()
 	if err != nil {
 		nc.Close()
-		return nil, err
+		return nil, fmt.Errorf("failed to create JetStream context: %w", err)
 	}
 
 	return &NATSConnection{nc: nc, js: js}, nil
+
 }
 
-// Close closes the NATS connection
-func (n *NATSConnection) Close() {
-	if n.nc != nil {
-		n.nc.Close()
-	}
-}
-
-// IsConnected returns whether NATS is connected
-func (n *NATSConnection) IsConnected() bool {
-	return n.nc != nil && n.nc.IsConnected()
-}
-
-// CORSMiddleware creates a CORS middleware with configurable origins
-func CORSMiddleware(allowedOrigins string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		origin := c.Request.Header.Get("Origin")
-
-		allowed := false
-		if allowedOrigins == "*" {
-			allowed = true
-		} else {
-			for _, allowedOrigin := range strings.Split(allowedOrigins, ",") {
-				if strings.TrimSpace(allowedOrigin) == origin {
-					allowed = true
-					break
-				}
-			}
-		}
-
-		if allowed {
-			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
-		}
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
-			return
-		}
-
-		c.Next()
+func (c *NATSConnection) Close() {
+	if c.nc != nil {
+		c.nc.Close()
 	}
 }
 
@@ -134,6 +76,11 @@ func main() {
 
 	// Load config from JSON file (persistent settings)
 	cfg := config.Get()
+
+	// Validate configuration
+	if err := cfg.Validate(); err != nil {
+		log.Fatalf("Configuration validation failed: %v", err)
+	}
 
 	// Apply port from flag (highest priority)
 	if *portFlag > 0 {
@@ -232,15 +179,23 @@ func main() {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(middleware.PanicRecovery())
-	r.Use(CORSMiddleware(cfg.CORSAllowedOrigins))
+	r.Use(middleware.SecurityHeaders())
+	r.Use(middleware.RequestID())
+	r.Use(middleware.LoggingMiddleware())
+	r.Use(middleware.RequestSizeLimitMiddleware())
+	r.Use(middleware.RateLimitMiddleware(middleware.NewRateLimiter(100, time.Minute, 5*time.Minute)))
+	r.Use(middleware.CORSMiddlewareWithValidation(cfg.CORSAllowedOrigins))
 	r.Use(middleware.AuditMiddleware(auditService))
 
 	// Start audit cleanup goroutine
-	go middleware.AuditCleanupMiddleware(auditService)
+	auditCtx, auditCancel := context.WithCancel(context.Background())
+	go middleware.AuditCleanupMiddleware(auditService, auditCtx)
 
 	apiGroup := r.Group("/api")
 	{
 		apiGroup.GET("/health", handlers.HealthCheck(serverUseCase))
+		apiGroup.GET("/healthz/live", handlers.LivenessCheck())
+		apiGroup.GET("/healthz/ready", handlers.ReadinessCheck(serverUseCase))
 		apiGroup.GET("/server/info", serverHandler.GetServerInfo)
 		apiGroup.GET("/account/info", serverHandler.GetAccountInfo)
 		apiGroup.GET("/dashboard/stats", serverHandler.GetDashboardStats)
@@ -356,7 +311,7 @@ func main() {
 		apiGroup.PUT("/tenancy/connections/:id", tenancyHandler.UpdateConnection)
 		apiGroup.DELETE("/tenancy/connections/:id", tenancyHandler.DeleteConnection)
 		apiGroup.POST("/tenancy/connections/test", tenancyHandler.TestConnection)
-		apiGroup.GET("/tenancy/connections/:id/default", tenancyHandler.SetDefaultConnection)
+		apiGroup.PUT("/tenancy/connections/:id/default", tenancyHandler.SetDefaultConnection)
 		apiGroup.GET("/tenancy/status", tenancyHandler.GetConnectionStatus)
 		// History routes
 		apiGroup.GET("/history/streams/:name", historyHandler.GetStreamHistory)
@@ -370,8 +325,11 @@ func main() {
 	})
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", cfg.ServerPort),
-		Handler: r,
+		Addr:         fmt.Sprintf(":%d", cfg.ServerPort),
+		Handler:      r,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 
 	log.Printf("Server starting on http://localhost:%d", cfg.ServerPort)
@@ -387,8 +345,18 @@ func main() {
 	<-quit
 
 	log.Println("Shutting down server...")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	auditCancel()
+
+	ctx, cancel := context.WithTimeout(context.Background(), constants.ShutdownTimeout)
 	defer cancel()
-	srv.Shutdown(ctx)
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Printf("Server shutdown error: %v", err)
+	}
+
+	if natsConn != nil {
+		natsConn.Close()
+	}
+
 	log.Println("Server exited")
 }

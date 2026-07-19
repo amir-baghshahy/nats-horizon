@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ClusterJetStreamHealth = {
-    domain?: string;
-    error?: string;
-    status?: string;
-    tiers?: any;
+  domain?: string;
+  error?: string;
+  status?: string;
+  tiers?: any;
 };
-

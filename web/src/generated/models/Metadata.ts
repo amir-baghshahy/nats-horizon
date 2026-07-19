@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type Metadata = {
-    consumer_name?: string;
-    operation_type?: string;
-    status?: string;
-    stream_name?: string;
+  consumer_name?: string;
+  operation_type?: string;
+  status?: string;
+  stream_name?: string;
 };
-

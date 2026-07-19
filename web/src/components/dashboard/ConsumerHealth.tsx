@@ -16,8 +16,12 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
         <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-primary/50 text-content-tertiary">
           <Database className="h-7 w-7" />
         </div>
-        <h3 className="text-display-lg font-semibold text-content-primary">{t('dashboard.noConsumerData')}</h3>
-        <p className="text-display-sm text-content-secondary max-w-xs">{t('dashboard.noConsumerDataDescription')}</p>
+        <h3 className="text-display-lg font-semibold text-content-primary">
+          {t("dashboard.noConsumerData")}
+        </h3>
+        <p className="text-display-sm text-content-secondary max-w-xs">
+          {t("dashboard.noConsumerDataDescription")}
+        </p>
       </div>
     );
   }
@@ -31,7 +35,9 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
   return (
     <div className="card overflow-hidden flex flex-col h-full min-h-0">
       <div className="p-3 border-b border-border-default bg-surface-primary/50 shrink-0">
-        <h3 className="text-display-base font-semibold">{t('dashboard.consumerHealth')}</h3>
+        <h3 className="text-display-base font-semibold">
+          {t("dashboard.consumerHealth")}
+        </h3>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin p-3 space-y-2">
@@ -41,10 +47,10 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
 
           const statusText =
             status === "error"
-              ? t('dashboard.critical')
+              ? t("dashboard.critical")
               : status === "warning"
-                ? t('dashboard.slow')
-                : t('dashboard.healthy');
+                ? t("dashboard.slow")
+                : t("dashboard.healthy");
 
           return (
             <div
@@ -52,9 +58,11 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
               className="flex items-center justify-between p-2.5 bg-surface-primary rounded-lg"
             >
               <div className="flex-1 min-w-0">
-                <p className="text-display-sm font-medium truncate">{consumer.name}</p>
+                <p className="text-display-sm font-medium truncate">
+                  {consumer.name}
+                </p>
                 <p className="text-display-xs text-content-tertiary truncate">
-                  {consumer.stream || t('dashboard.notSpecified')}
+                  {consumer.stream || t("dashboard.notSpecified")}
                 </p>
               </div>
               <div className="text-right shrink-0 ml-2">
@@ -69,17 +77,21 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
                 >
                   {lag.toLocaleString()} lag
                 </p>
-                <p className="text-display-xs text-content-tertiary">{statusText}</p>
+                <p className="text-display-xs text-content-tertiary">
+                  {statusText}
+                </p>
               </div>
             </div>
           );
         })}
       </div>
       <div className="p-2 border-t border-border-default bg-surface-primary/50 text-center text-display-xs text-content-tertiary shrink-0">
-        <span className="truncate block">{t('dashboard.consumerHealthFooter', {
-          shown: topLagging.length,
-          total: consumers.length,
-        })}</span>
+        <span className="truncate block">
+          {t("dashboard.consumerHealthFooter", {
+            shown: topLagging.length,
+            total: consumers.length,
+          })}
+        </span>
       </div>
     </div>
   );

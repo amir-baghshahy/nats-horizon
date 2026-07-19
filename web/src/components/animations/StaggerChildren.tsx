@@ -26,8 +26,9 @@ export default function StaggerChildren({
   const enhancedChildren = childrenArray.map((child, index) => {
     if (!isValidElement(child)) return child;
 
-    const childDelay = delay + (index * increment);
-    const delayClass = DELAY_CLASSES[childDelay as keyof typeof DELAY_CLASSES] || "";
+    const childDelay = delay + index * increment;
+    const delayClass =
+      DELAY_CLASSES[childDelay as keyof typeof DELAY_CLASSES] || "";
 
     return cloneElement(child as React.ReactElement<any>, {
       className: `${delayClass} animate-fade-in-up ${child.props?.className || ""} ${className}`,

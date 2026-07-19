@@ -34,7 +34,11 @@ export default function Select({
   const isRTL = i18n.dir() === "rtl";
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +58,8 @@ export default function Select({
   const focusOption = useCallback((index: number) => {
     const dropdown = dropdownRef.current;
     if (!dropdown) return;
-    const optionEls = dropdown.querySelectorAll<HTMLButtonElement>('[role="option"]');
+    const optionEls =
+      dropdown.querySelectorAll<HTMLButtonElement>('[role="option"]');
     const el = optionEls[index];
     if (el) {
       el.focus();
@@ -63,7 +68,10 @@ export default function Select({
   }, []);
 
   const open = () => {
-    const initial = Math.max(0, options.findIndex((o) => o.value === value));
+    const initial = Math.max(
+      0,
+      options.findIndex((o) => o.value === value),
+    );
     setActiveIndex(initial);
     setIsOpen(true);
   };
@@ -74,7 +82,10 @@ export default function Select({
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (!buttonRef.current?.contains(target) && !dropdownRef.current?.contains(target)) {
+      if (
+        !buttonRef.current?.contains(target) &&
+        !dropdownRef.current?.contains(target)
+      ) {
         setIsOpen(false);
       }
     };
@@ -189,7 +200,9 @@ export default function Select({
             style={{
               top: `${dropdownPosition.top}px`,
               left: isRTL ? "auto" : `${dropdownPosition.left}px`,
-              right: isRTL ? `${window.innerWidth - dropdownPosition.left}px` : "auto",
+              right: isRTL
+                ? `${window.innerWidth - dropdownPosition.left}px`
+                : "auto",
               width: `${dropdownPosition.width}px`,
             }}
             role="listbox"
@@ -218,7 +231,7 @@ export default function Select({
               </button>
             ))}
           </div>,
-          document.body
+          document.body,
         )}
     </div>
   );

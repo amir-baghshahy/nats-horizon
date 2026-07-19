@@ -3,6 +3,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AckMessageRequest = {
-    sequence: number;
+  sequence: number;
 };
-

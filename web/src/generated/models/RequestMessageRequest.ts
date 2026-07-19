@@ -3,9 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type RequestMessageRequest = {
-    headers?: Record<string, Array<string>>;
-    payload?: string;
-    subject: string;
-    timeout?: number;
+  headers?: Record<string, Array<string>>;
+  payload?: string;
+  subject: string;
+  timeout?: number;
 };
-

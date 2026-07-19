@@ -19,7 +19,6 @@ export default function BulkActions({
   actions,
   onClearSelection,
 }: BulkActionsProps) {
-
   if (selectedCount === 0) {
     return null;
   }
@@ -27,7 +26,8 @@ export default function BulkActions({
   const variantClasses = {
     danger: "bg-red-500/20 text-red-400 hover:bg-red-500/30",
     primary: "bg-primary-500/20 text-primary-400 hover:bg-primary-500/30",
-    secondary: "bg-surface-primary text-content-primary hover:bg-surface-primary/80",
+    secondary:
+      "bg-surface-primary text-content-primary hover:bg-surface-primary/80",
   };
 
   return (

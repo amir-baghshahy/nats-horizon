@@ -3,13 +3,12 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ConnectionConfig = {
-    created_at?: string;
-    description?: string;
-    enabled?: boolean;
-    id?: string;
-    is_default?: boolean;
-    name?: string;
-    updated_at?: string;
-    url?: string;
+  created_at?: string;
+  description?: string;
+  enabled?: boolean;
+  id?: string;
+  is_default?: boolean;
+  name?: string;
+  updated_at?: string;
+  url?: string;
 };
-

@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ReplayRequest = {
-    end_seq?: number;
-    filter_subject?: string;
-    start_seq?: number;
+  end_seq?: number;
+  filter_subject?: string;
+  start_seq?: number;
 };
-

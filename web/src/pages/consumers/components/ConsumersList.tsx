@@ -55,14 +55,17 @@ export default function ConsumersList({
               <input
                 type="checkbox"
                 checked={
-                  selectedConsumers.size === consumers.length && consumers.length > 0
+                  selectedConsumers.size === consumers.length &&
+                  consumers.length > 0
                 }
                 onChange={onToggleAll}
                 className="icon-base rounded"
               />
               <span className="text-display-sm text-content-tertiary">
                 {selectedConsumers.size > 0
-                  ? t("consumers.selectedCount", { count: selectedConsumers.size })
+                  ? t("consumers.selectedCount", {
+                      count: selectedConsumers.size,
+                    })
                   : t("consumers.consumerCount", { count: consumers.length })}
               </span>
             </div>
@@ -72,7 +75,8 @@ export default function ConsumersList({
       renderItem={(consumer, index) => {
         const consumerName = consumer.name || "";
         if (!consumerName) return null;
-        const delayClass = index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
+        const delayClass =
+          index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
 
         return (
           <div

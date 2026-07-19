@@ -2,6 +2,7 @@ import PanelCard from "../../components/ui/PanelCard";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Database, Mail, Globe, Check, AlertCircle } from "lucide-react";
+import { ConfigService, HealthService } from "../../types";
 
 interface SetupData {
   nats_url: string;
@@ -35,7 +36,7 @@ export default function SetupWizard() {
   });
 
   const updateField = (field: keyof SetupData, value: string | number) => {
-    setData(prev => ({ ...prev, [field]: value }));
+    setData((prev) => ({ ...prev, [field]: value }));
   };
 
   const getErrorMessage = (err: unknown) => {
@@ -49,13 +50,8 @@ export default function SetupWizard() {
     setError("");
 
     try {
-      await fetch("/api/config", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      await fetch("/api/config/setup/complete", { method: "POST" });
+      await ConfigService.putConfig(data);
+      await ConfigService.postConfigSetupComplete();
 
       setLoading(false);
       setRestarting(true);
@@ -69,7 +65,7 @@ export default function SetupWizard() {
 
   const handleServerRestart = async () => {
     try {
-      await fetch("/api/config/restart", { method: "POST" });
+      await ConfigService.postConfigRestart();
     } catch {
       // Ignore - connection will drop during restart
     }
@@ -77,8 +73,8 @@ export default function SetupWizard() {
     for (let i = 0; i < 30; i++) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       try {
-        const response = await fetch("/api/health");
-        if (response.ok) {
+        const response = await HealthService.getHealth();
+        if (response) {
           localStorage.removeItem(RESTART_KEY);
           window.location.reload();
           return;
@@ -99,8 +95,8 @@ export default function SetupWizard() {
         for (let i = 0; i < 30; i++) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
           try {
-            const response = await fetch("/api/health");
-            if (response.ok) {
+            const response = await HealthService.getHealth();
+            if (response) {
               localStorage.removeItem(RESTART_KEY);
               window.location.reload();
               return;
@@ -122,14 +118,19 @@ export default function SetupWizard() {
       <div className="min-h-screen bg-surface-primary flex items-center justify-center p-6">
         <div className="text-center">
           <div className="animate-spin icon-lg border-4 border-primary-500 border-t-transparent rounded-full mx-auto mb-4" />
-          <h2 className="text-display-xl font-bold text-content-primary">{t("setup.restarting")}</h2>
-          <p className="text-display-sm text-content-tertiary">{t("setup.restartingDescription")}</p>
+          <h2 className="text-display-xl font-bold text-content-primary">
+            {t("setup.restarting")}
+          </h2>
+          <p className="text-display-sm text-content-tertiary">
+            {t("setup.restartingDescription")}
+          </p>
         </div>
       </div>
     );
   }
 
-  const CurrentIcon = step === 0 ? Globe : step === 1 ? Database : step === 2 ? Mail : Check;
+  const CurrentIcon =
+    step === 0 ? Globe : step === 1 ? Database : step === 2 ? Mail : Check;
 
   const stepLabels = [
     t("setup.welcome"),
@@ -145,17 +146,27 @@ export default function SetupWizard() {
         <div className="flex items-center justify-center mb-6">
           {[0, 1, 2, 3].map((i) => (
             <div key={i} className="flex items-center">
-              <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
-                i < step ? "bg-green-500 text-white" :
-                i === step ? "bg-primary-600 text-white" :
-                "bg-border-default text-content-tertiary"
-              }`}>
-                {i < step ? <Check className="icon-md" /> : <CurrentIcon className="icon-md" />}
+              <div
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+                  i < step
+                    ? "bg-green-500 text-white"
+                    : i === step
+                      ? "bg-primary-600 text-white"
+                      : "bg-border-default text-content-tertiary"
+                }`}
+              >
+                {i < step ? (
+                  <Check className="icon-md" />
+                ) : (
+                  <CurrentIcon className="icon-md" />
+                )}
               </div>
               {i < 3 && (
-                <div className={`w-12 h-1 mx-2 rounded-full ${
-                  i < step ? "bg-green-500" : "bg-border-default"
-                }`} />
+                <div
+                  className={`w-12 h-1 mx-2 rounded-full ${
+                    i < step ? "bg-green-500" : "bg-border-default"
+                  }`}
+                />
               )}
             </div>
           ))}
@@ -163,9 +174,12 @@ export default function SetupWizard() {
         {/* Step labels */}
         <div className="flex items-center justify-center mb-4 -mt-2">
           {stepLabels.map((label, i) => (
-            <div key={i} className={`flex-1 text-center text-display-xs font-medium ${
-              i === step ? "text-content-primary" : "text-content-tertiary"
-            }`}>
+            <div
+              key={i}
+              className={`flex-1 text-center text-display-xs font-medium ${
+                i === step ? "text-content-primary" : "text-content-tertiary"
+              }`}
+            >
               {label}
             </div>
           ))}
@@ -196,25 +210,33 @@ export default function SetupWizard() {
           <div className="mb-4">
             {step === 0 && (
               <div className="text-center py-4">
-                <p className="text-display-sm text-content-tertiary mb-6">{t("setup.introText")}</p>
+                <p className="text-display-sm text-content-tertiary mb-6">
+                  {t("setup.introText")}
+                </p>
                 <div className="flex gap-4 justify-center flex-wrap">
                   <div className="text-center">
                     <div className="icon-lg rounded-lg bg-blue-500/20 flex items-center justify-center mx-auto mb-2">
                       <Database className="w-6 h-6 text-blue-400" />
                     </div>
-                    <p className="text-display-xs text-content-tertiary">{t("setup.feature1")}</p>
+                    <p className="text-display-xs text-content-tertiary">
+                      {t("setup.feature1")}
+                    </p>
                   </div>
                   <div className="text-center">
                     <div className="icon-lg rounded-lg bg-green-500/20 flex items-center justify-center mx-auto mb-2">
                       <Mail className="w-6 h-6 text-green-400" />
                     </div>
-                    <p className="text-display-xs text-content-tertiary">{t("setup.feature2")}</p>
+                    <p className="text-display-xs text-content-tertiary">
+                      {t("setup.feature2")}
+                    </p>
                   </div>
                   <div className="text-center">
                     <div className="icon-lg rounded-lg bg-purple-500/20 flex items-center justify-center mx-auto mb-2">
                       <Globe className="w-6 h-6 text-purple-400" />
                     </div>
-                    <p className="text-display-xs text-content-tertiary">{t("setup.feature3")}</p>
+                    <p className="text-display-xs text-content-tertiary">
+                      {t("setup.feature3")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -223,7 +245,9 @@ export default function SetupWizard() {
             {step === 1 && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("setup.natsUrl")}</label>
+                  <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                    {t("setup.natsUrl")}
+                  </label>
                   <input
                     type="text"
                     value={data.nats_url}
@@ -233,11 +257,18 @@ export default function SetupWizard() {
                   />
                 </div>
                 <div>
-                  <label className="block text-display-sm font-medium mb-2 text-content-primary">{t("setup.serverPort")}</label>
+                  <label className="block text-display-sm font-medium mb-2 text-content-primary">
+                    {t("setup.serverPort")}
+                  </label>
                   <input
                     type="number"
                     value={data.server_port}
-                    onChange={(e) => updateField("server_port", parseInt(e.target.value) || 3000)}
+                    onChange={(e) =>
+                      updateField(
+                        "server_port",
+                        parseInt(e.target.value) || 3000,
+                      )
+                    }
                     className="input"
                   />
                 </div>
@@ -246,7 +277,9 @@ export default function SetupWizard() {
 
             {step === 2 && (
               <div className="space-y-4">
-                <p className="text-display-sm text-content-tertiary mb-1.5">{t("setup.smtpOptional")}</p>
+                <p className="text-display-sm text-content-tertiary mb-1.5">
+                  {t("setup.smtpOptional")}
+                </p>
                 <div className="grid grid-cols-1 gap-4">
                   <input
                     type="text"
@@ -258,21 +291,27 @@ export default function SetupWizard() {
                   <input
                     type="number"
                     value={data.smtp_port}
-                    onChange={(e) => updateField("smtp_port", parseInt(e.target.value) || 587)}
+                    onChange={(e) =>
+                      updateField("smtp_port", parseInt(e.target.value) || 587)
+                    }
                     placeholder={t("setup.smtpPort")}
                     className="input"
                   />
                   <input
                     type="text"
                     value={data.smtp_username}
-                    onChange={(e) => updateField("smtp_username", e.target.value)}
+                    onChange={(e) =>
+                      updateField("smtp_username", e.target.value)
+                    }
                     placeholder={t("setup.smtpUsername")}
                     className="input"
                   />
                   <input
                     type="password"
                     value={data.smtp_password}
-                    onChange={(e) => updateField("smtp_password", e.target.value)}
+                    onChange={(e) =>
+                      updateField("smtp_password", e.target.value)
+                    }
                     placeholder={t("setup.smtpPassword")}
                     className="input"
                   />
@@ -285,16 +324,22 @@ export default function SetupWizard() {
                 <div className="bg-surface-primary rounded-lg p-4 space-y-2">
                   <div className="flex justify-between text-display-sm">
                     <span className="text-content-tertiary">NATS URL:</span>
-                    <span className="font-mono text-content-primary">{data.nats_url}</span>
+                    <span className="font-mono text-content-primary">
+                      {data.nats_url}
+                    </span>
                   </div>
                   <div className="flex justify-between text-display-sm">
                     <span className="text-content-tertiary">Server Port:</span>
-                    <span className="font-mono text-content-primary">{data.server_port}</span>
+                    <span className="font-mono text-content-primary">
+                      {data.server_port}
+                    </span>
                   </div>
                   {data.smtp_host && (
                     <div className="flex justify-between text-display-sm">
                       <span className="text-content-tertiary">SMTP:</span>
-                      <span className="font-mono text-content-primary">{data.smtp_host}</span>
+                      <span className="font-mono text-content-primary">
+                        {data.smtp_host}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -306,7 +351,7 @@ export default function SetupWizard() {
           {error && (
             <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-display-sm mb-4">
               <AlertCircle className="icon-base flex-shrink-0" />
-              <span>{error.includes('.') ? t(error) : error}</span>
+              <span>{error.includes(".") ? t(error) : error}</span>
             </div>
           )}
 

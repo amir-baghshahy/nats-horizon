@@ -10,6 +10,7 @@ import (
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/models"
 	"github.com/amir-baghshahy/nats-horizon/internal/utils"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/natsutil"
 	"github.com/nats-io/nats.go"
 )
 
@@ -45,22 +46,45 @@ type consumerListResponse struct {
 			NumPending uint64 `json:"num_pending"`
 		} `json:"state"`
 	} `json:"consumers"`
+	Total  int `json:"total"`
+	Offset int `json:"offset"`
+	Limit  int `json:"limit"`
 }
 
 func (r *NATSConsumerRepository) List(ctx context.Context, streamName string) ([]*models.Consumer, error) {
-	subject := fmt.Sprintf("$JS.API.CONSUMER.LIST.%s", streamName)
-	msg, err := r.nc.Request(subject, []byte{}, 2*time.Second)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list consumers: %w", err)
+	subject := fmt.Sprintf("%s.%s", constants.APIConsumerListPaged, streamName)
+
+	var allConsumers consumerListResponse
+	offset := 0
+	limit := 100
+
+	for {
+		reqBody, err := json.Marshal(map[string]int{"offset": offset, "limit": limit})
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal consumer list request: %w", err)
+		}
+
+		msg, err := natsutil.RequestWithTimeout(ctx, r.nc, subject, reqBody, constants.DefaultRequestTimeout)
+		if err != nil {
+			return nil, fmt.Errorf("failed to list consumers: %w", err)
+		}
+
+		var response consumerListResponse
+		if err := json.Unmarshal(msg.Data, &response); err != nil {
+			return nil, fmt.Errorf("failed to parse consumer list: %w", err)
+		}
+
+		allConsumers.Consumers = append(allConsumers.Consumers, response.Consumers...)
+		allConsumers.Total = response.Total
+
+		if offset+len(response.Consumers) >= response.Total {
+			break
+		}
+		offset += len(response.Consumers)
 	}
 
-	var response consumerListResponse
-	if err := json.Unmarshal(msg.Data, &response); err != nil {
-		return nil, fmt.Errorf("failed to parse consumer list: %w", err)
-	}
-
-	consumers := make([]*models.Consumer, len(response.Consumers))
-	for i, c := range response.Consumers {
+	consumers := make([]*models.Consumer, len(allConsumers.Consumers))
+	for i, c := range allConsumers.Consumers {
 		key := fmt.Sprintf("%s.%s", streamName, c.Name)
 		paused := c.Config.MaxDeliver == constants.PauseSentinel || r.isPaused(key)
 		consumers[i] = &models.Consumer{
@@ -138,14 +162,17 @@ func (r *NATSConsumerRepository) ResetLag(ctx context.Context, req *models.LagRe
 		info.Config.OptStartSeq = req.Sequence
 	} else {
 		streamInfo, err := r.js.StreamInfo(req.StreamName)
-		if err == nil {
-			info.Config.OptStartSeq = streamInfo.State.LastSeq + 1
+		if err != nil {
+			return fmt.Errorf("failed to get stream info for reset: %w", err)
 		}
+		info.Config.OptStartSeq = streamInfo.State.LastSeq + 1
 	}
 
 	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {
-		r.js.AddConsumer(req.StreamName, &originalConfig)
+		if _, rollbackErr := r.js.AddConsumer(req.StreamName, &originalConfig); rollbackErr != nil {
+			return fmt.Errorf("failed to recreate consumer: %w (rollback also failed: %v)", err, rollbackErr)
+		}
 		return fmt.Errorf("failed to recreate consumer: %w", err)
 	}
 
@@ -198,7 +225,9 @@ func (r *NATSConsumerRepository) Pause(ctx context.Context, req *models.PauseReq
 
 	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {
-		r.js.AddConsumer(req.StreamName, &originalConfig)
+		if _, rollbackErr := r.js.AddConsumer(req.StreamName, &originalConfig); rollbackErr != nil {
+			return fmt.Errorf("failed to recreate paused consumer: %w (rollback also failed: %v)", err, rollbackErr)
+		}
 		return fmt.Errorf("failed to recreate paused consumer: %w", err)
 	}
 
@@ -257,7 +286,9 @@ func (r *NATSConsumerRepository) Resume(ctx context.Context, req *models.ResumeR
 
 	_, err = r.js.AddConsumer(req.StreamName, &info.Config)
 	if err != nil {
-		r.js.AddConsumer(req.StreamName, &originalConfigForRecovery)
+		if _, rollbackErr := r.js.AddConsumer(req.StreamName, &originalConfigForRecovery); rollbackErr != nil {
+			return fmt.Errorf("failed to recreate resumed consumer: %w (rollback also failed: %v)", err, rollbackErr)
+		}
 		return fmt.Errorf("failed to recreate resumed consumer: %w", err)
 	}
 
@@ -405,29 +436,84 @@ func (r *NATSConsumerRepository) GetPendingMessages(ctx context.Context, streamN
 		return nil, fmt.Errorf("failed to get consumer info: %w", err)
 	}
 
-	if limit <= 0 || limit > 100 {
-		limit = 100
+	if limit <= 0 || limit > constants.MaxFetchCount {
+		limit = constants.MaxFetchCount
 	}
 
 	startSeq := info.AckFloor.Stream + 1
 	lastSeq := info.NumPending + info.AckFloor.Stream
+	if lastSeq < startSeq {
+		return []*models.Message{}, nil
+	}
 
-	messages := make([]*models.Message, 0, limit)
-	for seq := startSeq; seq <= lastSeq && len(messages) < limit; seq++ {
-		raw, err := r.js.GetMsg(streamName, seq)
-		if err != nil {
-			continue
+	type result struct {
+		seq uint64
+		msg *models.Message
+	}
+
+	const maxWorkers = 8
+	seqCh := make(chan uint64, limit)
+	resCh := make(chan result, limit)
+
+	for seq := startSeq; seq <= lastSeq && len(resCh) < limit; seq++ {
+		seqCh <- seq
+	}
+	close(seqCh)
+
+	var wg sync.WaitGroup
+	workers := maxWorkers
+	if int(lastSeq-startSeq+1) < workers {
+		workers = int(lastSeq - startSeq + 1)
+	}
+	for w := 0; w < workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for seq := range seqCh {
+				if ctx.Err() != nil {
+					return
+				}
+				raw, err := r.js.GetMsg(streamName, seq)
+				if err != nil {
+					continue
+				}
+				headers := copyHeaders(raw.Header)
+				resCh <- result{
+					seq: seq,
+					msg: &models.Message{
+						Subject:   raw.Subject,
+						Sequence:  raw.Sequence,
+						Data:      raw.Data,
+						Headers:   headers,
+						Timestamp: raw.Time,
+					},
+				}
+			}
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(resCh)
+	}()
+
+	resultMap := make(map[uint64]*models.Message, limit)
+	for r := range resCh {
+		resultMap[r.seq] = r.msg
+		if len(resultMap) >= limit {
+			break
 		}
+	}
 
-		headers := copyHeaders(raw.Header)
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 
-		messages = append(messages, &models.Message{
-			Subject:   raw.Subject,
-			Sequence:  raw.Sequence,
-			Data:      raw.Data,
-			Headers:   headers,
-			Timestamp: raw.Time,
-		})
+	messages := make([]*models.Message, 0, len(resultMap))
+	for seq := startSeq; seq <= lastSeq && len(messages) < limit; seq++ {
+		if m, ok := resultMap[seq]; ok {
+			messages = append(messages, m)
+		}
 	}
 
 	return messages, nil

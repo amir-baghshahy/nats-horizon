@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ClusterPlacementResponse = {
-    cluster?: string;
-    tags?: Array<string>;
+  cluster?: string;
+  tags?: Array<string>;
 };
-

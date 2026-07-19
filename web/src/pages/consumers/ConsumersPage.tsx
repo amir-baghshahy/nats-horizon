@@ -71,20 +71,20 @@ export default function ConsumersPage() {
       {/* Filters & List Section */}
       <section className="flex-1 min-h-0 flex flex-col gap-4 animate-slide-up animate-delay-100">
         <div className="shrink-0">
-        <ConsumersFilters
-          searchQuery={searchQuery}
-          selectedStream={selectedStream}
-          filterStatus={filterStatus}
-          showMoreFilters={showMoreFilters}
-          streamOptions={streamOptions}
-          activeFilterCount={activeFilterCount}
-          onSearchChange={setSearchQuery}
-          onStreamChange={setSelectedStream}
-          onStatusChange={setFilterStatus}
-          onShowMoreFiltersToggle={() => setShowMoreFilters(!showMoreFilters)}
-          onClear={clearFilters}
-          getStatusLabel={getStatusLabel}
-        />
+          <ConsumersFilters
+            searchQuery={searchQuery}
+            selectedStream={selectedStream}
+            filterStatus={filterStatus}
+            showMoreFilters={showMoreFilters}
+            streamOptions={streamOptions}
+            activeFilterCount={activeFilterCount}
+            onSearchChange={setSearchQuery}
+            onStreamChange={setSelectedStream}
+            onStatusChange={setFilterStatus}
+            onShowMoreFiltersToggle={() => setShowMoreFilters(!showMoreFilters)}
+            onClear={clearFilters}
+            getStatusLabel={getStatusLabel}
+          />
         </div>
 
         <ConsumersList
@@ -97,7 +97,9 @@ export default function ConsumersPage() {
           onToggleExpansion={toggleExpand}
           isConsumerExpanded={isConsumerExpanded}
           onTogglePauseResume={handleTogglePauseResume}
-          onViewDetails={(name) => navigate(`/consumers/${encodeURIComponent(name)}`)}
+          onViewDetails={(name) =>
+            navigate(`/consumers/${encodeURIComponent(name)}`)
+          }
           onResetLag={handleResetLag}
           onDelete={handleDeleteConsumer}
           getStatusIcon={getStatusIcon}
@@ -107,7 +109,10 @@ export default function ConsumersPage() {
 
         <div className="shrink-0 flex items-center justify-between text-display-sm text-content-tertiary">
           <span>
-            {t('consumers.showingConsumers', { filtered: filteredConsumers.length, total: totalConsumers })}
+            {t("consumers.showingConsumers", {
+              filtered: filteredConsumers.length,
+              total: totalConsumers,
+            })}
           </span>
         </div>
       </section>

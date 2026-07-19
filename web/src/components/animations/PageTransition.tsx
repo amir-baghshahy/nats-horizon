@@ -20,8 +20,6 @@ export default function PageTransition({
   className = "",
 }: PageTransitionProps) {
   return (
-    <div className={`${ANIMATION_CLASSES[type]} ${className}`}>
-      {children}
-    </div>
+    <div className={`${ANIMATION_CLASSES[type]} ${className}`}>{children}</div>
   );
 }

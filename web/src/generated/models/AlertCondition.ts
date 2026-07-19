@@ -3,25 +3,24 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AlertCondition = {
-    /**
-     * Optional consumer filter
-     */
-    consumer?: string;
-    /**
-     * ">", "<", "=", ">=", "<="
-     */
-    operator?: string;
-    /**
-     * Optional stream filter
-     */
-    stream?: string;
-    /**
-     * Threshold value
-     */
-    threshold?: number;
-    /**
-     * "lag", "latency", "messages", "consumer_lag", "storage"
-     */
-    type?: string;
+  /**
+   * Optional consumer filter
+   */
+  consumer?: string;
+  /**
+   * ">", "<", "=", ">=", "<="
+   */
+  operator?: string;
+  /**
+   * Optional stream filter
+   */
+  stream?: string;
+  /**
+   * Threshold value
+   */
+  threshold?: number;
+  /**
+   * "lag", "latency", "messages", "consumer_lag", "storage"
+   */
+  type?: string;
 };
-

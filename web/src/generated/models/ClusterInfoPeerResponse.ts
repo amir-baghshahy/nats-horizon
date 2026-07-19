@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ClusterInfoPeerResponse = {
-    active?: number;
-    current?: boolean;
-    lag?: number;
-    name?: string;
-    offline?: boolean;
+  active?: number;
+  current?: boolean;
+  lag?: number;
+  name?: string;
+  offline?: boolean;
 };
-

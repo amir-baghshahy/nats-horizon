@@ -70,58 +70,96 @@ export default function ConsumerDetailPage() {
 
   const StatusIcon = (() => {
     switch (consumerData.status) {
-      case "active": return CheckCircle;
-      case "paused": return Pause;
-      case "stuck": return AlertTriangle;
-      default: return TrendingUp;
+      case "active":
+        return CheckCircle;
+      case "paused":
+        return Pause;
+      case "stuck":
+        return AlertTriangle;
+      default:
+        return TrendingUp;
     }
   })();
 
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
       <div className="shrink-0 flex items-center gap-4">
-        <Link to="/consumers" className="p-2 hover:bg-surface-primary rounded-lg transition-colors">
+        <Link
+          to="/consumers"
+          className="p-2 hover:bg-surface-primary rounded-lg transition-colors"
+        >
           <ArrowLeft className="icon-md" />
         </Link>
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h1 className="text-display-xl font-bold">{name}</h1>
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${
-              consumerData.status === "active"
-                ? "bg-status-success/20 text-status-success"
-                : consumerData.status === "stuck"
-                  ? "bg-status-error/20 text-status-error"
-                  : "bg-status-warning/20 text-status-warning"
-            }`}>
+            <div
+              className={`flex items-center gap-2 px-3 py-1 rounded-full ${
+                consumerData.status === "active"
+                  ? "bg-status-success/20 text-status-success"
+                  : consumerData.status === "stuck"
+                    ? "bg-status-error/20 text-status-error"
+                    : "bg-status-warning/20 text-status-warning"
+              }`}
+            >
               <StatusIcon className="icon-base" />
-              <span className="text-display-sm font-medium capitalize">{consumerData.status}</span>
+              <span className="text-display-sm font-medium capitalize">
+                {consumerData.status}
+              </span>
             </div>
             {consumerData.config?.durable && (
-              <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-display-sm">{t("consumers.durable", { defaultValue: "Durable" })}</span>
+              <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-display-sm">
+                {t("consumers.durable", { defaultValue: "Durable" })}
+              </span>
             )}
           </div>
           <p className="text-content-tertiary mt-1">
             {t("consumers.stream")}:{" "}
-            <Link to={`/streams/${encodeURIComponent(consumerData.stream ?? "")}`} className="text-primary-400 hover:underline">
+            <Link
+              to={`/streams/${encodeURIComponent(consumerData.stream ?? "")}`}
+              className="text-primary-400 hover:underline"
+            >
               {consumerData.stream}
             </Link>
           </p>
         </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              onClick={handlePauseResume}
-              disabled={loadingAction !== null}
-              icon={loadingAction === "pause-resume" ? <Loader2 className="icon-base animate-spin" /> : consumerData.status === "stuck" || consumerData.status === "paused" || isPaused ? <Play className="icon-base" /> : <Pause className="icon-base" />}
-            />
-           <Button variant="secondary" icon={<RefreshCw className="icon-base" />} onClick={() => refetch()} />
-           <Button variant="secondary" icon={<Eye className="icon-base" />} onClick={() => setActiveTab("messages")}>
-             {t("consumers.peekMessages")}
-           </Button>
-           <Button variant="primary" icon={<Settings className="icon-base" />} onClick={() => setActiveTab("config")}>
-             {t("consumers.configure")}
-           </Button>
-         </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            onClick={handlePauseResume}
+            disabled={loadingAction !== null}
+            icon={
+              loadingAction === "pause-resume" ? (
+                <Loader2 className="icon-base animate-spin" />
+              ) : consumerData.status === "stuck" ||
+                consumerData.status === "paused" ||
+                isPaused ? (
+                <Play className="icon-base" />
+              ) : (
+                <Pause className="icon-base" />
+              )
+            }
+          />
+          <Button
+            variant="secondary"
+            icon={<RefreshCw className="icon-base" />}
+            onClick={() => refetch()}
+          />
+          <Button
+            variant="secondary"
+            icon={<Eye className="icon-base" />}
+            onClick={() => setActiveTab("messages")}
+          >
+            {t("consumers.peekMessages")}
+          </Button>
+          <Button
+            variant="primary"
+            icon={<Settings className="icon-base" />}
+            onClick={() => setActiveTab("config")}
+          >
+            {t("consumers.configure")}
+          </Button>
+        </div>
       </div>
 
       <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -143,7 +181,10 @@ export default function ConsumerDetailPage() {
         />
         <StatCard
           icon={FastForward}
-          value={(consumerData as any).num_delivered?.toLocaleString() ?? t("common.na")}
+          value={
+            (consumerData as any).num_delivered?.toLocaleString() ??
+            t("common.na")
+          }
           label={t("consumers.delivered")}
           iconBg="bg-purple-500/20"
           iconColor="text-purple-400"
@@ -159,226 +200,348 @@ export default function ConsumerDetailPage() {
         />
         <StatCard
           icon={TrendingUp}
-          value={(consumerData as any).paused ? t("streams.paused") : t("consumers.active")}
+          value={
+            (consumerData as any).paused
+              ? t("streams.paused")
+              : t("consumers.active")
+          }
           label={t("consumers.state")}
           formatValue={false}
         />
       </div>
 
       <div className="shrink-0">
-      <Tabs
-        tabs={[
-          { id: "overview", label: t("consumers.overview", { defaultValue: "Overview" }), icon: BarChart3 },
-          { id: "messages", label: t("consumers.messages", { defaultValue: "Messages" }), icon: MessageSquare },
-          { id: "config", label: t("consumers.configuration", { defaultValue: "Configuration" }), icon: Settings },
-        ]}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
+        <Tabs
+          tabs={[
+            {
+              id: "overview",
+              label: t("consumers.overview", { defaultValue: "Overview" }),
+              icon: BarChart3,
+            },
+            {
+              id: "messages",
+              label: t("consumers.messages", { defaultValue: "Messages" }),
+              icon: MessageSquare,
+            },
+            {
+              id: "config",
+              label: t("consumers.configuration", {
+                defaultValue: "Configuration",
+              }),
+              icon: Settings,
+            },
+          ]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin flex flex-col">
-      {activeTab === "overview" && (
-        <div className="space-y-6">
-          <PanelCard title={t("consumers.quickActions")}>
-             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-               <Button
-                 variant="secondary"
-                 onClick={handleResetLag}
-                 disabled={loadingAction === "reset-lag"}
-                 icon={loadingAction === "reset-lag" ? <Loader2 className="icon-base animate-spin" /> : <SkipBack className="icon-base" />}
-               >
-                 {t("consumers.resetLag")}
-               </Button>
-               <Button
-                 variant="secondary"
-                 onClick={handleReplayMessages}
-                 disabled={loadingAction === "replay"}
-                 icon={loadingAction === "replay" ? <Loader2 className="icon-base animate-spin" /> : <SkipForward className="icon-base" />}
-               >
-                 {t("consumers.replayMessages")}
-               </Button>
-               <Button variant="secondary" icon={<Eye className="icon-base" />} onClick={() => setActiveTab("messages")}>
-                 {t("consumers.peekMessages")}
-               </Button>
-               <Button
-                 variant="secondary"
-                 onClick={handleDeleteConsumer}
-                 disabled={loadingAction === "delete"}
-                 className="text-status-error"
-                 icon={loadingAction === "delete" ? <Loader2 className="icon-base animate-spin" /> : <Trash2 className="icon-base" />}
-               >
-                 {t("common.delete")}
-               </Button>
-             </div>
-          </PanelCard>
-        </div>
-      )}
-
-      {activeTab === "messages" && (
-        <PanelCard
-          className="flex-1 min-h-0"
-          header={
-            <div className="flex items-center justify-between w-full">
-              <h3 className="text-display-lg font-semibold flex items-center gap-2">
-                <MessageSquare className="icon-md" />
-                {t("consumers.pendingMessages", { count: pendingMessages?.messages?.length || 0 })}
-              </h3>
-               <Button variant="secondary" icon={<RefreshCw className="icon-base" />} onClick={() => refetchPending()}>
-                 {t("common.refresh")}
-               </Button>
-            </div>
-          }
-        >
-
-          {!pendingMessages || !pendingMessages.messages || pendingMessages.messages.length === 0 ? (
-            <div className="text-center py-12">
-              <MessageSquare className="w-16 h-16 mx-auto mb-4 text-content-tertiary opacity-50" />
-              <h3 className="text-display-lg font-semibold mb-2">{t("consumers.noPendingMessages")}</h3>
-              <p className="text-content-tertiary">
-                {consumerData.num_pending && consumerData.num_pending > 0
-                  ? t("consumers.noPendingMessagesDescription", { count: consumerData.num_pending })
-                  : t("consumers.noPendingMessagesDescriptionEmpty")}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {pendingMessages.messages.map((msg: any) => (
-                <div key={msg.sequence} className="p-4 bg-surface-primary rounded-lg">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="font-mono text-display-sm text-primary-400">#{msg.sequence}</span>
-                        <span className="text-display-sm font-mono text-content-tertiary">{msg.subject}</span>
-                        <span className="text-display-xs text-content-tertiary flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {new Date(msg.timestamp).toLocaleString()}
-                        </span>
-                        <span className="text-display-xs text-content-tertiary">{t("consumers.deliveredCount", { count: msg.num_delivered })}</span>
-                      </div>
-                      <pre className="text-display-sm p-3 bg-surface-primary rounded overflow-x-auto max-h-32">
-                        <code className="text-green-400">{msg.data}</code>
-                      </pre>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleAck(msg.sequence)}
-                        disabled={ackPending}
-                        className="p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30"
-                        title={t("consumers.ack")}
-                      >
-                        <Check className="icon-base" />
-                      </button>
-                      <button
-                        onClick={() => handleNack(msg.sequence)}
-                        disabled={nackPending}
-                        className="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/30"
-                        title={t("consumers.nack")}
-                      >
-                        <X className="icon-base" />
-                      </button>
-                      <button
-                        onClick={() => handleTerm(msg.sequence)}
-                        disabled={termPending}
-                        className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
-                        title={t("consumers.ackTerm")}
-                      >
-                        <FastForward className="icon-base" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </PanelCard>
-      )}
-
-      {activeTab === "config" && (
-        <div className="space-y-6">
-          <PanelCard title={t("consumers.consumerConfiguration")}>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
-                  <span className="text-content-tertiary">{t("consumers.durable", { defaultValue: "Durable" })}</span>
-                  <span className={`px-2 py-1 rounded text-display-xs ${consumerData.config?.durable ? "bg-green-500/20 text-green-400" : "bg-border-default"}`}>
-                    {consumerData.config?.durable ? t("consumers.yes") : t("consumers.no")}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
-                  <span className="text-content-tertiary">{t("consumers.deliveryPolicy")}</span>
-                  <span className="font-medium capitalize">{consumerData.config?.deliver_policy || "all"}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
-                  <span className="text-content-tertiary">{t("consumers.ackPolicy")}</span>
-                  <span className="font-medium capitalize">{consumerData.config?.ack_policy || "explicit"}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
-                  <span className="text-content-tertiary">{t("consumers.replayPolicy")}</span>
-                  <span className="font-medium capitalize">{consumerData.config?.replay_policy || "instant"}</span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
-                  <span className="text-content-tertiary">{t("consumers.maxDeliveries")}</span>
-                  <span className="font-medium">
-                    {consumerData.config?.max_deliver === -1 ? t("common.unlimited") : consumerData.config?.max_deliver || 3}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
-                  <span className="text-content-tertiary">{t("consumers.ackWait")}</span>
-                  <span className="font-medium">{(consumerData.config as any)?.ack_wait ?? t("common.na")}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
-                  <span className="text-content-tertiary">{t("consumers.maxWaiting")}</span>
-                  <span className="font-medium">{(consumerData.config as any)?.max_waiting ?? t("common.na")}</span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
-                  <span className="text-content-tertiary">{t("consumers.maxBatch")}</span>
-                  <span className="font-medium">{(consumerData.config as any)?.max_batch ?? t("common.na")}</span>
-                </div>
-              </div>
-            </div>
-          </PanelCard>
-
-          {(consumerData.config as any)?.filter_subject && (
-            <PanelCard title={t("consumers.filterSubject")}>
-              <div className="p-3 bg-surface-primary/50 rounded-lg">
-                <p className="font-mono text-display-sm">{(consumerData.config as any).filter_subject}</p>
-                <p className="text-display-xs text-content-tertiary mt-1">{t("consumers.filterSubjectHelp")}</p>
+        {activeTab === "overview" && (
+          <div className="space-y-6">
+            <PanelCard title={t("consumers.quickActions")}>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Button
+                  variant="secondary"
+                  onClick={handleResetLag}
+                  disabled={loadingAction === "reset-lag"}
+                  icon={
+                    loadingAction === "reset-lag" ? (
+                      <Loader2 className="icon-base animate-spin" />
+                    ) : (
+                      <SkipBack className="icon-base" />
+                    )
+                  }
+                >
+                  {t("consumers.resetLag")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleReplayMessages}
+                  disabled={loadingAction === "replay"}
+                  icon={
+                    loadingAction === "replay" ? (
+                      <Loader2 className="icon-base animate-spin" />
+                    ) : (
+                      <SkipForward className="icon-base" />
+                    )
+                  }
+                >
+                  {t("consumers.replayMessages")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  icon={<Eye className="icon-base" />}
+                  onClick={() => setActiveTab("messages")}
+                >
+                  {t("consumers.peekMessages")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleDeleteConsumer}
+                  disabled={loadingAction === "delete"}
+                  className="text-status-error"
+                  icon={
+                    loadingAction === "delete" ? (
+                      <Loader2 className="icon-base animate-spin" />
+                    ) : (
+                      <Trash2 className="icon-base" />
+                    )
+                  }
+                >
+                  {t("common.delete")}
+                </Button>
               </div>
             </PanelCard>
-          )}
+          </div>
+        )}
 
-           <PanelCard title={t("consumers.consumerActions")}>
-             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-               <Button variant="secondary" icon={<Settings className="icon-base" />} onClick={handleOpenEdit}>
-                 {t("consumers.editConsumer")}
-               </Button>
-               <Button
-                 variant="secondary"
-                 onClick={handleResetLag}
-                 disabled={loadingAction === "reset-lag"}
-                 icon={loadingAction === "reset-lag" ? <Loader2 className="icon-base animate-spin" /> : <SkipBack className="icon-base" />}
-               >
-                 {t("consumers.resetLag")}
-               </Button>
-               <Button variant="secondary" icon={<Copy className="icon-base" />} onClick={handleOpenClone}>
-                 {t("consumers.cloneConsumer")}
-               </Button>
-               <Button
-                 variant="secondary"
-                 onClick={handleDeleteConsumer}
-                 disabled={loadingAction === "delete"}
-                 className="text-status-error"
-                 icon={loadingAction === "delete" ? <Loader2 className="icon-base animate-spin" /> : <Trash2 className="icon-base" />}
-               >
-                 {t("common.delete")}
-               </Button>
-             </div>
-           </PanelCard>
-        </div>
-      )}
+        {activeTab === "messages" && (
+          <PanelCard
+            className="flex-1 min-h-0"
+            header={
+              <div className="flex items-center justify-between w-full">
+                <h3 className="text-display-lg font-semibold flex items-center gap-2">
+                  <MessageSquare className="icon-md" />
+                  {t("consumers.pendingMessages", {
+                    count: pendingMessages?.messages?.length || 0,
+                  })}
+                </h3>
+                <Button
+                  variant="secondary"
+                  icon={<RefreshCw className="icon-base" />}
+                  onClick={() => refetchPending()}
+                >
+                  {t("common.refresh")}
+                </Button>
+              </div>
+            }
+          >
+            {!pendingMessages ||
+            !pendingMessages.messages ||
+            pendingMessages.messages.length === 0 ? (
+              <div className="text-center py-12">
+                <MessageSquare className="w-16 h-16 mx-auto mb-4 text-content-tertiary opacity-50" />
+                <h3 className="text-display-lg font-semibold mb-2">
+                  {t("consumers.noPendingMessages")}
+                </h3>
+                <p className="text-content-tertiary">
+                  {consumerData.num_pending && consumerData.num_pending > 0
+                    ? t("consumers.noPendingMessagesDescription", {
+                        count: consumerData.num_pending,
+                      })
+                    : t("consumers.noPendingMessagesDescriptionEmpty")}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {pendingMessages.messages.map((msg: any) => (
+                  <div
+                    key={msg.sequence}
+                    className="p-4 bg-surface-primary rounded-lg"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="font-mono text-display-sm text-primary-400">
+                            #{msg.sequence}
+                          </span>
+                          <span className="text-display-sm font-mono text-content-tertiary">
+                            {msg.subject}
+                          </span>
+                          <span className="text-display-xs text-content-tertiary flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {new Date(msg.timestamp).toLocaleString()}
+                          </span>
+                          <span className="text-display-xs text-content-tertiary">
+                            {t("consumers.deliveredCount", {
+                              count: msg.num_delivered,
+                            })}
+                          </span>
+                        </div>
+                        <pre className="text-display-sm p-3 bg-surface-primary rounded overflow-x-auto max-h-32">
+                          <code className="text-green-400">{msg.data}</code>
+                        </pre>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleAck(msg.sequence)}
+                          disabled={ackPending}
+                          className="p-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30"
+                          title={t("consumers.ack")}
+                        >
+                          <Check className="icon-base" />
+                        </button>
+                        <button
+                          onClick={() => handleNack(msg.sequence)}
+                          disabled={nackPending}
+                          className="p-2 bg-yellow-500/20 text-yellow-400 rounded-lg hover:bg-yellow-500/30"
+                          title={t("consumers.nack")}
+                        >
+                          <X className="icon-base" />
+                        </button>
+                        <button
+                          onClick={() => handleTerm(msg.sequence)}
+                          disabled={termPending}
+                          className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30"
+                          title={t("consumers.ackTerm")}
+                        >
+                          <FastForward className="icon-base" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </PanelCard>
+        )}
+
+        {activeTab === "config" && (
+          <div className="space-y-6">
+            <PanelCard title={t("consumers.consumerConfiguration")}>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                    <span className="text-content-tertiary">
+                      {t("consumers.durable", { defaultValue: "Durable" })}
+                    </span>
+                    <span
+                      className={`px-2 py-1 rounded text-display-xs ${consumerData.config?.durable ? "bg-green-500/20 text-green-400" : "bg-border-default"}`}
+                    >
+                      {consumerData.config?.durable
+                        ? t("consumers.yes")
+                        : t("consumers.no")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                    <span className="text-content-tertiary">
+                      {t("consumers.deliveryPolicy")}
+                    </span>
+                    <span className="font-medium capitalize">
+                      {consumerData.config?.deliver_policy || "all"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                    <span className="text-content-tertiary">
+                      {t("consumers.ackPolicy")}
+                    </span>
+                    <span className="font-medium capitalize">
+                      {consumerData.config?.ack_policy || "explicit"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                    <span className="text-content-tertiary">
+                      {t("consumers.replayPolicy")}
+                    </span>
+                    <span className="font-medium capitalize">
+                      {consumerData.config?.replay_policy || "instant"}
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                    <span className="text-content-tertiary">
+                      {t("consumers.maxDeliveries")}
+                    </span>
+                    <span className="font-medium">
+                      {consumerData.config?.max_deliver === -1
+                        ? t("common.unlimited")
+                        : consumerData.config?.max_deliver || 3}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                    <span className="text-content-tertiary">
+                      {t("consumers.ackWait")}
+                    </span>
+                    <span className="font-medium">
+                      {(consumerData.config as any)?.ack_wait ?? t("common.na")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                    <span className="text-content-tertiary">
+                      {t("consumers.maxWaiting")}
+                    </span>
+                    <span className="font-medium">
+                      {(consumerData.config as any)?.max_waiting ??
+                        t("common.na")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-surface-primary/50 rounded-lg">
+                    <span className="text-content-tertiary">
+                      {t("consumers.maxBatch")}
+                    </span>
+                    <span className="font-medium">
+                      {(consumerData.config as any)?.max_batch ??
+                        t("common.na")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </PanelCard>
+
+            {(consumerData.config as any)?.filter_subject && (
+              <PanelCard title={t("consumers.filterSubject")}>
+                <div className="p-3 bg-surface-primary/50 rounded-lg">
+                  <p className="font-mono text-display-sm">
+                    {(consumerData.config as any).filter_subject}
+                  </p>
+                  <p className="text-display-xs text-content-tertiary mt-1">
+                    {t("consumers.filterSubjectHelp")}
+                  </p>
+                </div>
+              </PanelCard>
+            )}
+
+            <PanelCard title={t("consumers.consumerActions")}>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Button
+                  variant="secondary"
+                  icon={<Settings className="icon-base" />}
+                  onClick={handleOpenEdit}
+                >
+                  {t("consumers.editConsumer")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleResetLag}
+                  disabled={loadingAction === "reset-lag"}
+                  icon={
+                    loadingAction === "reset-lag" ? (
+                      <Loader2 className="icon-base animate-spin" />
+                    ) : (
+                      <SkipBack className="icon-base" />
+                    )
+                  }
+                >
+                  {t("consumers.resetLag")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  icon={<Copy className="icon-base" />}
+                  onClick={handleOpenClone}
+                >
+                  {t("consumers.cloneConsumer")}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleDeleteConsumer}
+                  disabled={loadingAction === "delete"}
+                  className="text-status-error"
+                  icon={
+                    loadingAction === "delete" ? (
+                      <Loader2 className="icon-base animate-spin" />
+                    ) : (
+                      <Trash2 className="icon-base" />
+                    )
+                  }
+                >
+                  {t("common.delete")}
+                </Button>
+              </div>
+            </PanelCard>
+          </div>
+        )}
       </div>
 
       {showEditModal && (

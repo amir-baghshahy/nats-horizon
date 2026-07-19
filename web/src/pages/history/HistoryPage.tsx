@@ -1,19 +1,35 @@
 import { UseHistoryReturn } from "./hooks/useHistory";
 import { useTranslation } from "react-i18next";
-import { BarChart3, History as HistoryIcon, RefreshCw, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import {
+  BarChart3,
+  History as HistoryIcon,
+  RefreshCw,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+} from "lucide-react";
 import EmptyState from "../../components/ui/EmptyState";
 import Select from "../../components/ui/Select";
 import { PageHeader } from "../../components/ui";
 import { Button } from "../../components/ui";
 import { formatBytes } from "../../utils/formatters";
 import {
-  AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid,
+  AreaChart,
+  Area,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
 } from "recharts";
 
 const DURATIONS = ["1h", "6h", "24h", "7d"];
 
 function formatTime(ts: number) {
-  return new Date(ts * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return new Date(ts * 1000).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function HistoryPage({
@@ -28,7 +44,10 @@ export default function HistoryPage({
 }: UseHistoryReturn) {
   const { t } = useTranslation();
 
-  const maxMessages = Math.max(...historyStreams.map((s: any) => s.messages || 0), 1);
+  const maxMessages = Math.max(
+    ...historyStreams.map((s: any) => s.messages || 0),
+    1,
+  );
 
   const chartData = streamHistoryPoints.map((p: any) => ({
     t: p.timestamp,
@@ -39,21 +58,21 @@ export default function HistoryPage({
   return (
     <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
       <div className="shrink-0">
-      <PageHeader
-        title={t("history.title")}
-        subtitle={t("history.subtitle")}
-        icon={HistoryIcon}
-        actions={
-          <Button
-            variant="secondary"
-            size="sm"
-            icon={<RefreshCw className="h-3.5 w-3.5" />}
-            onClick={() => refetch()}
-          >
-            {t("common.refresh")}
-          </Button>
-        }
-      />
+        <PageHeader
+          title={t("history.title")}
+          subtitle={t("history.subtitle")}
+          icon={HistoryIcon}
+          actions={
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<RefreshCw className="h-3.5 w-3.5" />}
+              onClick={() => refetch()}
+            >
+              {t("common.refresh")}
+            </Button>
+          }
+        />
       </div>
 
       {/* Filters */}
@@ -93,7 +112,9 @@ export default function HistoryPage({
         <div className="lg:col-span-2 card flex flex-col min-h-0">
           <div className="flex items-center gap-2 mb-3 shrink-0">
             <HistoryIcon className="h-4 w-4 text-primary-400" />
-            <h3 className="text-display-sm font-semibold">{t("history.streamSummary")}</h3>
+            <h3 className="text-display-sm font-semibold">
+              {t("history.streamSummary")}
+            </h3>
             <span className="ml-auto text-display-xs text-content-tertiary">
               {historyStreams.length} {t("common.streams")}
             </span>
@@ -108,16 +129,22 @@ export default function HistoryPage({
           ) : (
             <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin space-y-2 pe-0.5">
               {historyStreams.map((stream: any, idx: number) => {
-                const pct = Math.round(((stream.messages || 0) / maxMessages) * 100);
+                const pct = Math.round(
+                  ((stream.messages || 0) / maxMessages) * 100,
+                );
                 const trend = stream.trend;
                 const TrendIcon =
-                  trend === "up" ? TrendingUp
-                  : trend === "down" ? TrendingDown
-                  : Minus;
+                  trend === "up"
+                    ? TrendingUp
+                    : trend === "down"
+                      ? TrendingDown
+                      : Minus;
                 const trendColor =
-                  trend === "up" ? "text-green-400"
-                  : trend === "down" ? "text-red-400"
-                  : "text-content-tertiary";
+                  trend === "up"
+                    ? "text-green-400"
+                    : trend === "down"
+                      ? "text-red-400"
+                      : "text-content-tertiary";
 
                 return (
                   <div
@@ -126,7 +153,10 @@ export default function HistoryPage({
                     onClick={() => setSelectedStream(stream.name || "all")}
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-display-xs font-medium truncate max-w-[120px]" title={stream.name}>
+                      <span
+                        className="text-display-xs font-medium truncate max-w-[120px]"
+                        title={stream.name}
+                      >
                         {stream.name}
                       </span>
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -144,8 +174,12 @@ export default function HistoryPage({
                       />
                     </div>
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-display-xs text-content-tertiary/70">{formatBytes(stream.bytes || 0)}</span>
-                      <span className="text-display-xs text-content-tertiary/70">{pct}%</span>
+                      <span className="text-display-xs text-content-tertiary/70">
+                        {formatBytes(stream.bytes || 0)}
+                      </span>
+                      <span className="text-display-xs text-content-tertiary/70">
+                        {pct}%
+                      </span>
                     </div>
                   </div>
                 );
@@ -158,7 +192,9 @@ export default function HistoryPage({
         <div className="lg:col-span-3 card flex flex-col min-h-0 overflow-y-auto scrollbar-thin">
           <div className="flex items-center gap-2 mb-3">
             <BarChart3 className="h-4 w-4 text-primary-400" />
-            <h3 className="text-display-sm font-semibold">{t("history.messagesTrend")}</h3>
+            <h3 className="text-display-sm font-semibold">
+              {t("history.messagesTrend")}
+            </h3>
             {selectedStream !== "all" && (
               <span className="ml-1 text-display-xs px-2 py-0.5 rounded-full bg-primary-500/15 text-primary-400">
                 {selectedStream}
@@ -170,20 +206,29 @@ export default function HistoryPage({
           </div>
 
           {chartData.length < 2 ? (
-              <EmptyState
-                icon={BarChart3}
-                title={t("history.noStreamTrend")}
-                description={selectedStream === "all"
+            <EmptyState
+              icon={BarChart3}
+              title={t("history.noStreamTrend")}
+              description={
+                selectedStream === "all"
                   ? t("history.selectStreamForTrend")
-                  : t("history.noStreamTrendDescription")}
-              />
+                  : t("history.noStreamTrendDescription")
+              }
+            />
           ) : (
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <AreaChart
+                  data={chartData}
+                  margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                >
                   <defs>
                     <linearGradient id="histGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.25} />
+                      <stop
+                        offset="5%"
+                        stopColor="#38bdf8"
+                        stopOpacity={0.25}
+                      />
                       <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
                     </linearGradient>
                   </defs>
@@ -204,7 +249,9 @@ export default function HistoryPage({
                     tickLine={false}
                     axisLine={false}
                     width={40}
-                    tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}
+                    tickFormatter={(v) =>
+                      v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v
+                    }
                   />
                   <Tooltip
                     content={({ active, payload, label }) => {
@@ -213,7 +260,8 @@ export default function HistoryPage({
                         <div className="rounded-lg border border-border-default bg-surface-secondary/95 px-3 py-2 text-display-xs shadow-lg backdrop-blur">
                           <p className="text-content-tertiary mb-1">{label}</p>
                           <p className="font-semibold text-primary-400 tabular-nums">
-                            {(payload[0].value as number).toLocaleString()} {t("common.messages")}
+                            {(payload[0].value as number).toLocaleString()}{" "}
+                            {t("common.messages")}
                           </p>
                         </div>
                       );
@@ -235,28 +283,48 @@ export default function HistoryPage({
           )}
 
           {/* Summary row under chart */}
-          {chartData.length >= 2 && (() => {
-            const values = chartData.map((p: any) => p.v);
-            const min = Math.min(...values);
-            const max = Math.max(...values);
-            const avg = Math.round(values.reduce((s: number, v: number) => s + v, 0) / values.length);
-            const last = values[values.length - 1];
-            return (
-              <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-border-default/40">
-                {[
-                  { label: t("history.min", { defaultValue: "Min" }), value: min.toLocaleString() },
-                  { label: t("history.max", { defaultValue: "Max" }), value: max.toLocaleString() },
-                  { label: t("history.avg", { defaultValue: "Avg" }), value: avg.toLocaleString() },
-                  { label: t("history.latest", { defaultValue: "Latest" }), value: last.toLocaleString() },
-                ].map(({ label, value }) => (
-                  <div key={label} className="text-center">
-                    <p className="text-display-xs text-content-tertiary">{label}</p>
-                    <p className="text-display-xs font-semibold tabular-nums mt-0.5">{value}</p>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
+          {chartData.length >= 2 &&
+            (() => {
+              const values = chartData.map((p: any) => p.v);
+              const min = Math.min(...values);
+              const max = Math.max(...values);
+              const avg = Math.round(
+                values.reduce((s: number, v: number) => s + v, 0) /
+                  values.length,
+              );
+              const last = values[values.length - 1];
+              return (
+                <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-border-default/40">
+                  {[
+                    {
+                      label: t("history.min", { defaultValue: "Min" }),
+                      value: min.toLocaleString(),
+                    },
+                    {
+                      label: t("history.max", { defaultValue: "Max" }),
+                      value: max.toLocaleString(),
+                    },
+                    {
+                      label: t("history.avg", { defaultValue: "Avg" }),
+                      value: avg.toLocaleString(),
+                    },
+                    {
+                      label: t("history.latest", { defaultValue: "Latest" }),
+                      value: last.toLocaleString(),
+                    },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="text-center">
+                      <p className="text-display-xs text-content-tertiary">
+                        {label}
+                      </p>
+                      <p className="text-display-xs font-semibold tabular-nums mt-0.5">
+                        {value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
         </div>
       </div>
     </div>

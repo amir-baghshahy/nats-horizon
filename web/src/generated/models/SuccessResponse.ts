@@ -3,6 +3,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export type SuccessResponse = {
-    message?: string;
+  message?: string;
 };
-

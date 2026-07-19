@@ -84,16 +84,22 @@ export default function StatCard({
             containerSize,
             "rounded-lg",
             iconBg,
-            "flex items-center justify-center shrink-0"
+            "flex items-center justify-center shrink-0",
           )}
         >
           <Icon className={cn(iconSize, iconColor)} />
         </div>
         <div className="min-w-0">
-          <p className={cn(valueSize, "font-bold leading-tight truncate")}>{displayValue}</p>
-          <p className={cn(labelSize, "text-content-secondary truncate")}>{label}</p>
+          <p className={cn(valueSize, "font-bold leading-tight truncate")}>
+            {displayValue}
+          </p>
+          <p className={cn(labelSize, "text-content-secondary truncate")}>
+            {label}
+          </p>
           {sub && (
-            <p className="text-display-xs text-content-tertiary truncate mt-0.5">{sub}</p>
+            <p className="text-display-xs text-content-tertiary truncate mt-0.5">
+              {sub}
+            </p>
           )}
         </div>
       </div>

@@ -42,7 +42,11 @@ export default function PanelCard({
               )}
               <div>
                 <h3 className="text-display-xs font-semibold">{title}</h3>
-                {subtitle && <p className="text-display-xs text-content-tertiary">{subtitle}</p>}
+                {subtitle && (
+                  <p className="text-display-xs text-content-tertiary">
+                    {subtitle}
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -59,7 +63,9 @@ export default function PanelCard({
           {emptyState}
         </div>
       ) : (
-        <div className="overflow-y-auto scrollbar-thin flex-1 p-3">{children}</div>
+        <div className="overflow-y-auto scrollbar-thin flex-1 p-3">
+          {children}
+        </div>
       )}
 
       {/* Footer */}

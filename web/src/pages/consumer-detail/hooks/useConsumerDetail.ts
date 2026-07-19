@@ -9,7 +9,12 @@ import type {
   NackMessageRequest,
 } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
-import { deleteConsumer, resetConsumerLag, replayMessages, setConsumerState } from "../../../utils/natsOperations";
+import {
+  deleteConsumer,
+  resetConsumerLag,
+  replayMessages,
+  setConsumerState,
+} from "../../../utils/natsOperations";
 import { REFRESH_INTERVALS } from "../../../utils/constants";
 
 export interface ConsumerEditForm {
@@ -37,7 +42,7 @@ export interface UseConsumerDetailReturn {
   updatePending: boolean;
   clonePending: boolean;
   setActiveTab: (tab: "overview" | "messages" | "config") => void;
-    setShowEditModal: (value: boolean) => void;
+  setShowEditModal: (value: boolean) => void;
   setShowCloneModal: (value: boolean) => void;
   setCloneName: (value: string) => void;
   setEditForm: (form: ConsumerEditForm) => void;
@@ -63,8 +68,10 @@ export function useConsumerDetail(): UseConsumerDetailReturn {
   const { confirm } = useConfirm();
   const { t } = useTranslation();
 
-  const [activeTab, setActiveTab] = useState<"overview" | "messages" | "config">("overview");
-    const [isTabHidden, setIsTabHidden] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "messages" | "config"
+  >("overview");
+  const [isTabHidden, setIsTabHidden] = useState(false);
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCloneModal, setShowCloneModal] = useState(false);
@@ -79,7 +86,8 @@ export function useConsumerDetail(): UseConsumerDetailReturn {
   useEffect(() => {
     const handleVisibilityChange = () => setIsTabHidden(document.hidden);
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   const { data: consumer, refetch } = useQuery({
@@ -104,12 +112,22 @@ export function useConsumerDetail(): UseConsumerDetailReturn {
     status: "unknown",
     lag: 0,
     num_pending: 0,
-    config: { durable: false, ack_policy: "explicit", deliver_policy: "all", replay_policy: "instant", max_deliver: -1 },
+    config: {
+      durable: false,
+      ack_policy: "explicit",
+      deliver_policy: "all",
+      replay_policy: "instant",
+      max_deliver: -1,
+    },
   };
 
   const { data: pendingMessages, refetch: refetchPending } = useQuery({
     queryKey: ["pendingMessages", consumerData.stream, name],
-    queryFn: () => ConsumersService.getStreamsConsumersPending(consumerData.stream ?? "", name || ""),
+    queryFn: () =>
+      ConsumersService.getStreamsConsumersPending(
+        consumerData.stream ?? "",
+        name || "",
+      ),
     enabled: !!consumerData.stream && !!name && activeTab === "messages",
     refetchInterval: REFRESH_INTERVALS.FAST,
   });
@@ -117,30 +135,60 @@ export function useConsumerDetail(): UseConsumerDetailReturn {
   const ackMutation = useMutation({
     mutationFn: (sequence: number) => {
       const payload: AckMessageRequest = { sequence };
-      return ConsumersService.postStreamsConsumersAck(consumerData.stream ?? "", name || "", payload);
+      return ConsumersService.postStreamsConsumersAck(
+        consumerData.stream ?? "",
+        name || "",
+        payload,
+      );
     },
-    onSuccess: () => { refetchPending(); refetch(); },
+    onSuccess: () => {
+      refetchPending();
+      refetch();
+    },
   });
 
   const nackMutation = useMutation({
     mutationFn: ({ sequence }: { sequence: number }) => {
       const payload: NackMessageRequest = { sequence };
-      return ConsumersService.postStreamsConsumersNack(consumerData.stream ?? "", name || "", payload);
+      return ConsumersService.postStreamsConsumersNack(
+        consumerData.stream ?? "",
+        name || "",
+        payload,
+      );
     },
-    onSuccess: () => { refetchPending(); refetch(); },
+    onSuccess: () => {
+      refetchPending();
+      refetch();
+    },
   });
 
   const termMutation = useMutation({
     mutationFn: (sequence: number) => {
       const payload: AckTermMessageRequest = { sequence };
-      return ConsumersService.postStreamsConsumersTerm(consumerData.stream ?? "", name || "", payload);
+      return ConsumersService.postStreamsConsumersTerm(
+        consumerData.stream ?? "",
+        name || "",
+        payload,
+      );
     },
-    onSuccess: () => { refetchPending(); refetch(); },
+    onSuccess: () => {
+      refetchPending();
+      refetch();
+    },
   });
 
   const updateMutation = useMutation({
-    mutationFn: (payload: { ack_policy?: string; deliver_policy?: string; replay_policy?: string; max_deliver?: number }) =>
-      ConsumersService.putStreamsConsumers(consumerData.stream ?? "", name || "", payload as any),
+    mutationFn: (payload: {
+      ack_policy?: string;
+      deliver_policy?: string;
+      replay_policy?: string;
+      max_deliver?: number;
+    }) =>
+      ConsumersService.putStreamsConsumers(
+        consumerData.stream ?? "",
+        name || "",
+        payload as any,
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["consumer", name] });
       refetch();
@@ -192,9 +240,9 @@ export function useConsumerDetail(): UseConsumerDetailReturn {
   const handleDeleteConsumer = async () => {
     if (!name || !consumerData.stream) return;
     const ok = await confirm({
-      title: t('consumers.deleteConsumer'),
-      message: t('consumers.deleteConsumerConfirm', { name }),
-      confirmLabel: t('common.delete'),
+      title: t("consumers.deleteConsumer"),
+      message: t("consumers.deleteConsumerConfirm", { name }),
+      confirmLabel: t("common.delete"),
       variant: "danger",
     });
     if (!ok) return;

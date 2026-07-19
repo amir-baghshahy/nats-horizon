@@ -3,28 +3,27 @@
 /* tslint:disable */
 /* eslint-disable */
 export type CreateConsumerRequest = {
-    ack_policy?: CreateConsumerRequest.ack_policy;
-    deliver_policy?: CreateConsumerRequest.deliver_policy;
-    durable?: string;
-    filter_subject?: string;
-    max_deliver?: number;
-    name: string;
-    replay_policy?: CreateConsumerRequest.replay_policy;
+  ack_policy?: CreateConsumerRequest.ack_policy;
+  deliver_policy?: CreateConsumerRequest.deliver_policy;
+  durable?: string;
+  filter_subject?: string;
+  max_deliver?: number;
+  name: string;
+  replay_policy?: CreateConsumerRequest.replay_policy;
 };
 export namespace CreateConsumerRequest {
-    export enum ack_policy {
-        NONE = 'none',
-        ALL = 'all',
-        EXPLICIT = 'explicit',
-    }
-    export enum deliver_policy {
-        ALL = 'all',
-        LAST = 'last',
-        NEW = 'new',
-    }
-    export enum replay_policy {
-        INSTANT = 'instant',
-        ORIGINAL = 'original',
-    }
+  export enum ack_policy {
+    NONE = "none",
+    ALL = "all",
+    EXPLICIT = "explicit",
+  }
+  export enum deliver_policy {
+    ALL = "all",
+    LAST = "last",
+    NEW = "new",
+  }
+  export enum replay_policy {
+    INSTANT = "instant",
+    ORIGINAL = "original",
+  }
 }
-

@@ -1,32 +1,9 @@
 import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SecurityService } from "../../../types";
+import { SecurityService, User, AuditEvent } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { formatBytes } from "../../../utils/formatters";
 import { REFRESH_INTERVALS } from "../../../utils/constants";
-
-export interface User {
-  name: string;
-  account: string;
-  permissions: {
-    publish: Record<string, string>;
-    subscribe: Record<string, string>;
-  };
-  enabled: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-interface AuditLog {
-  timestamp: string;
-  action: string;
-  user: string;
-  resource: string;
-  details: string;
-  ip_address?: string;
-  user_agent?: string;
-  metadata?: { stream_name?: string; consumer_name?: string; operation_type?: string; status?: string };
-}
 
 export interface UseSecurityReturn {
   activeTab: "overview" | "users" | "audit";
@@ -39,7 +16,7 @@ export interface UseSecurityReturn {
   setSelectedUser: React.Dispatch<React.SetStateAction<User | null>>;
   securityInfo: any;
   users: User[] | undefined;
-  auditLogs: AuditLog[] | undefined;
+  auditLogs: AuditEvent[] | undefined;
   infoLoading: boolean;
   usersLoading: boolean;
   auditLoading: boolean;
@@ -52,17 +29,17 @@ export interface UseSecurityReturn {
   updateUserMutation: any;
   deleteUserMutation: any;
   formatBytes: (bytes: number) => string;
-  formatTimestamp: (timestamp: string) => string;
   confirm: any;
 }
 
 export function useSecurity(): UseSecurityReturn {
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "users" | "audit"
-  >("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "users" | "audit">(
+    "overview",
+  );
   const [showUserModal, setShowUserModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const queryClient = useQueryClient();
+
   const { confirm } = useConfirm();
 
   const getErrorMessage = useCallback((error: unknown) => {
@@ -87,7 +64,7 @@ export function useSecurity(): UseSecurityReturn {
     error: usersError,
   } = useQuery({
     queryKey: ["securityUsers"],
-    queryFn: () => SecurityService.getSecurityUsers() as Promise<User[]>,
+    queryFn: () => SecurityService.getSecurityUsers(),
     enabled: activeTab === "users",
   });
 
@@ -97,8 +74,7 @@ export function useSecurity(): UseSecurityReturn {
     error: auditError,
   } = useQuery({
     queryKey: ["auditLogs"],
-    queryFn: () =>
-      SecurityService.getSecurityAudit() as unknown as Promise<AuditLog[]>,
+    queryFn: () => SecurityService.getSecurityAudit(),
     enabled: activeTab === "audit",
   });
 
@@ -138,10 +114,6 @@ export function useSecurity(): UseSecurityReturn {
     },
   });
 
-  const formatTimestamp = useCallback((timestamp: string) => {
-    return new Date(timestamp).toLocaleString();
-  }, []);
-
   return {
     activeTab,
     setActiveTab,
@@ -164,7 +136,6 @@ export function useSecurity(): UseSecurityReturn {
     updateUserMutation,
     deleteUserMutation,
     formatBytes,
-    formatTimestamp,
     confirm,
   };
 }

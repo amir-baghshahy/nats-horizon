@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       fontFamily: {
@@ -38,82 +35,82 @@ export default {
       colors: {
         // Inspired by Grafana/Linear/Redpanda Console
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          200: "#bae6fd",
+          300: "#7dd3fc",
+          400: "#38bdf8",
+          500: "#0ea5e9",
+          600: "#0284c7",
+          700: "#0369a1",
+          800: "#075985",
+          900: "#0c4a6e",
+          950: "#082f49",
         },
 
         // Legacy dark theme colors (kept for backward compatibility)
         dark: {
-          bg: '#0f172a',
-          card: '#1e293b',
-          border: '#334155',
-          text: '#f1f5f9',
-          muted: '#94a3b8',
+          bg: "#0f172a",
+          card: "#1e293b",
+          border: "#334155",
+          text: "#f1f5f9",
+          muted: "#94a3b8",
         },
 
         // Status colors
         status: {
-          success: '#22c55e',
-          warning: '#f59e0b',
-          error: '#ef4444',
-          info: '#3b82f6',
+          success: "#22c55e",
+          warning: "#f59e0b",
+          error: "#ef4444",
+          info: "#3b82f6",
         },
 
         // Semantic surface colors (backgrounds)
         surface: {
-          primary: '#0f172a',      // Main background
-          secondary: '#1e293b',    // Cards, panels
-          tertiary: '#334155',     // Nested elements
-          elevated: '#1e293b',     // Elevated surfaces (modals, dropdowns)
-          overlay: 'rgba(15, 23, 42, 0.8)',  // Backdrop overlays
+          primary: "#0f172a", // Main background
+          secondary: "#1e293b", // Cards, panels
+          tertiary: "#334155", // Nested elements
+          elevated: "#1e293b", // Elevated surfaces (modals, dropdowns)
+          overlay: "rgba(15, 23, 42, 0.8)", // Backdrop overlays
         },
 
         // Semantic content colors (text)
         content: {
-          primary: '#f1f5f9',      // Main text, headings
-          secondary: '#cbd5e1',    // Secondary text, descriptions
-          tertiary: '#94a3b8',     // Muted text, labels
-          disabled: '#64748b',     // Disabled text
-          inverse: '#0f172a',      // Text on colored backgrounds
+          primary: "#f1f5f9", // Main text, headings
+          secondary: "#cbd5e1", // Secondary text, descriptions
+          tertiary: "#94a3b8", // Muted text, labels
+          disabled: "#64748b", // Disabled text
+          inverse: "#0f172a", // Text on colored backgrounds
         },
 
         // Semantic border colors
         border: {
-          default: '#334155',      // Default borders
-          subtle: '#1e293b',       // Subtle borders
-          strong: '#475569',       // Strong borders
-          focus: '#0ea5e9',        // Focus rings
-          interactive: '#0ea5e9',  // Interactive elements
+          default: "#334155", // Default borders
+          subtle: "#1e293b", // Subtle borders
+          strong: "#475569", // Strong borders
+          focus: "#0ea5e9", // Focus rings
+          interactive: "#0ea5e9", // Interactive elements
         },
 
         // Interactive state colors
         interactive: {
-          hover: 'rgba(14, 165, 233, 0.1)',       // Hover background
-          active: 'rgba(14, 165, 233, 0.15)',      // Active background
-          focus: 'rgba(14, 165, 233, 0.2)',        // Focus background
-          disabled: 'rgba(100, 116, 139, 0.5)',    // Disabled state
-          highlight: 'rgba(56, 189, 248, 0.3)',     // Selection highlight
+          hover: "rgba(14, 165, 233, 0.1)", // Hover background
+          active: "rgba(14, 165, 233, 0.15)", // Active background
+          focus: "rgba(14, 165, 233, 0.2)", // Focus background
+          disabled: "rgba(100, 116, 139, 0.5)", // Disabled state
+          highlight: "rgba(56, 189, 248, 0.3)", // Selection highlight
         },
 
         // Glow effects (for status indicators, active states)
         glow: {
-          success: 'rgba(34, 197, 94, 0.28)',
-          warning: 'rgba(245, 158, 11, 0.28)',
-          error: 'rgba(239, 68, 68, 0.28)',
-          info: 'rgba(56, 189, 248, 0.28)',
-          primary: 'rgba(14, 165, 233, 0.28)',
+          success: "rgba(34, 197, 94, 0.28)",
+          warning: "rgba(245, 158, 11, 0.28)",
+          error: "rgba(239, 68, 68, 0.28)",
+          info: "rgba(56, 189, 248, 0.28)",
+          primary: "rgba(14, 165, 233, 0.28)",
         },
       },
     },
   },
   plugins: [],
-}
+};

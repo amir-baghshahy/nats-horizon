@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/amir-baghshahy/nats-horizon/internal/services"
 	"github.com/amir-baghshahy/nats-horizon/internal/utils"
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,10 +32,7 @@ func NewStreamHandler(useCase *services.StreamUseCase) *StreamHandler {
 func (h *StreamHandler) ListStreams(c *gin.Context) {
 	streams, err := h.useCase.ListStreams(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to list streams",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to list streams")
 		return
 	}
 	c.JSON(http.StatusOK, utils.StreamsToResponse(streams))
@@ -56,10 +53,7 @@ func (h *StreamHandler) GetStream(c *gin.Context) {
 	name := c.Param("name")
 	stream, err := h.useCase.GetStream(c.Request.Context(), name)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{
-			Error:   "Stream not found",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Stream not found")
 		return
 	}
 	c.JSON(http.StatusOK, utils.StreamToResponse(stream))
@@ -79,10 +73,7 @@ func (h *StreamHandler) GetStream(c *gin.Context) {
 func (h *StreamHandler) CreateStream(c *gin.Context) {
 	var req dto.CreateStreamRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONBadRequest(c, "Invalid request: "+err.Error())
 		return
 	}
 
@@ -96,16 +87,13 @@ func (h *StreamHandler) CreateStream(c *gin.Context) {
 		MaxBytes:  req.MaxBytes,
 	}
 
-	result, err := h.useCase.CreateStream(c.Request.Context(), stream)
+	streamName, err := h.useCase.CreateStream(c.Request.Context(), stream)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
-			Error:   "Failed to create stream",
-			Details: err.Error(),
-		})
+		apihttp.JSONInternalError(c, err, "Failed to create stream")
 		return
 	}
 
-	c.JSON(http.StatusCreated, utils.StreamToResponse(result))
+	c.JSON(http.StatusCreated, utils.StreamToResponse(streamName))
 }
 
 // UpdateStream handles PUT /streams/:name
@@ -118,16 +106,14 @@ func (h *StreamHandler) CreateStream(c *gin.Context) {
 //	@Param		request	body		dto.UpdateStreamRequest	true	"Stream update request"
 //	@Success	200		{object}	dto.StreamResponse
 //	@Failure	400		{object}	dto.ErrorResponse
+//	@Failure	404		{object}	dto.ErrorResponse
 //	@Failure	500		{object}	dto.ErrorResponse
 //	@Router		/streams/{name} [put]
 func (h *StreamHandler) UpdateStream(c *gin.Context) {
 	name := c.Param("name")
 	var req dto.UpdateStreamRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONBadRequest(c, "Invalid request: "+err.Error())
 		return
 	}
 
@@ -141,11 +127,7 @@ func (h *StreamHandler) UpdateStream(c *gin.Context) {
 
 	result, err := h.useCase.UpdateStream(c.Request.Context(), stream)
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "does not exist") {
-			c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "Stream not found", Details: err.Error()})
-		} else {
-			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Failed to update stream", Details: err.Error()})
-		}
+		apihttp.JSONInternalError(c, err, "Failed to update stream")
 		return
 	}
 
@@ -160,16 +142,13 @@ func (h *StreamHandler) UpdateStream(c *gin.Context) {
 //	@Produce	json
 //	@Param		name	path		string	true	"Stream name"
 //	@Success	200		{object}	dto.SuccessResponse
+//	@Failure	404		{object}	dto.ErrorResponse
 //	@Failure	500		{object}	dto.ErrorResponse
 //	@Router		/streams/{name} [delete]
 func (h *StreamHandler) DeleteStream(c *gin.Context) {
 	name := c.Param("name")
 	if err := h.useCase.DeleteStream(c.Request.Context(), name); err != nil {
-		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "does not exist") {
-			c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "Stream not found", Details: err.Error()})
-		} else {
-			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Failed to delete stream", Details: err.Error()})
-		}
+		apihttp.JSONInternalError(c, err, "Failed to delete stream")
 		return
 	}
 	c.JSON(http.StatusOK, dto.SuccessResponse{Message: "Stream deleted successfully"})
@@ -184,26 +163,21 @@ func (h *StreamHandler) DeleteStream(c *gin.Context) {
 //	@Param		name	path		string					true	"Stream name"
 //	@Param		request	body		dto.PurgeStreamRequest	false	"Purge options"
 //	@Success	200		{object}	dto.PurgeStreamResponse
+//	@Failure	400		{object}	dto.ErrorResponse
+//	@Failure	404		{object}	dto.ErrorResponse
 //	@Failure	500		{object}	dto.ErrorResponse
 //	@Router		/streams/{name}/purge [post]
 func (h *StreamHandler) PurgeStream(c *gin.Context) {
 	name := c.Param("name")
 	var req dto.PurgeStreamRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, dto.ErrorResponse{
-			Error:   "Invalid request",
-			Details: err.Error(),
-		})
+		apihttp.JSONBadRequest(c, "Invalid request: "+err.Error())
 		return
 	}
 
 	remaining, err := h.useCase.PurgeStream(c.Request.Context(), name, req.Subject, req.Sequence)
 	if err != nil {
-		if strings.Contains(err.Error(), "not found") || strings.Contains(err.Error(), "does not exist") {
-			c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "Stream not found", Details: err.Error()})
-		} else {
-			c.JSON(http.StatusInternalServerError, dto.ErrorResponse{Error: "Failed to purge stream", Details: err.Error()})
-		}
+		apihttp.JSONInternalError(c, err, "Failed to purge stream")
 		return
 	}
 

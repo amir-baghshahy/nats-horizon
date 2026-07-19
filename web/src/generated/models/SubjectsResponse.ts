@@ -2,9 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { SubjectInfo } from './SubjectInfo';
+import type { SubjectInfo } from "./SubjectInfo";
 export type SubjectsResponse = {
-    subjects?: Array<SubjectInfo>;
-    total?: number;
+  subjects?: Array<SubjectInfo>;
+  total?: number;
 };
-

@@ -79,54 +79,51 @@ export function useNATSSubscription(
   }, []);
 
   // Subscribe to a subject
-  const subscribe = useCallback(
-    (subject: string) => {
-      if (subscriptionsRef.current.has(subject)) {
-        return; // Already subscribed
-      }
+  const subscribe = useCallback((subject: string) => {
+    if (subscriptionsRef.current.has(subject)) {
+      return; // Already subscribed
+    }
 
-      try {
-        const eventSource = new EventSource(
-          `/api/core/subscribe?subject=${encodeURIComponent(subject)}`,
-        );
+    try {
+      const eventSource = new EventSource(
+        `/api/core/subscribe?subject=${encodeURIComponent(subject)}`,
+      );
 
-        eventSource.onopen = () => {
-          onStatusChangeRef.current?.(true);
-        };
+      eventSource.onopen = () => {
+        onStatusChangeRef.current?.(true);
+      };
 
-        eventSource.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
 
-            // Skip connection messages
-            if (data.type === "connected") {
-              return;
-            }
-
-            const message: Message = data;
-            onMessageRef.current?.(message);
-          } catch (err) {
-            console.error("Failed to parse SSE message:", err);
+          // Skip connection messages
+          if (data.type === "connected") {
+            return;
           }
-        };
 
-        eventSource.onerror = (error) => {
-          onStatusChangeRef.current?.(false);
-          onErrorRef.current?.(error);
-          eventSource.close();
-          subscriptionsRef.current.delete(subject);
-          eventSourcesRef.current.delete(subject);
-        };
+          const message: Message = data;
+          onMessageRef.current?.(message);
+        } catch (err) {
+          console.error("Failed to parse SSE message:", err);
+        }
+      };
 
-        eventSourcesRef.current.set(subject, eventSource);
-        subscriptionsRef.current.add(subject);
-      } catch (err) {
-        console.error("Failed to create EventSource:", err);
-        onErrorRef.current?.(err as Event);
-      }
-    },
-    [],
-  );
+      eventSource.onerror = (error) => {
+        onStatusChangeRef.current?.(false);
+        onErrorRef.current?.(error);
+        eventSource.close();
+        subscriptionsRef.current.delete(subject);
+        eventSourcesRef.current.delete(subject);
+      };
+
+      eventSourcesRef.current.set(subject, eventSource);
+      subscriptionsRef.current.add(subject);
+    } catch (err) {
+      console.error("Failed to create EventSource:", err);
+      onErrorRef.current?.(err as Event);
+    }
+  }, []);
 
   // Unsubscribe from a subject
   const unsubscribe = useCallback((subject: string) => {

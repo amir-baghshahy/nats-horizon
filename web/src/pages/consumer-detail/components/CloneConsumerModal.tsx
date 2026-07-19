@@ -29,27 +29,52 @@ export default function CloneConsumerModal({
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
         <div className="card w-full max-w-md">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-display-xl font-bold">{t("consumers.cloneConsumerTitle")}</h2>
-            <button type="button" onClick={onClose} className="p-1.5 hover:bg-surface-primary rounded-lg">
+            <h2 className="text-display-xl font-bold">
+              {t("consumers.cloneConsumerTitle")}
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 hover:bg-surface-primary rounded-lg"
+            >
               <span className="text-content-tertiary">✕</span>
             </button>
           </div>
           <div>
-            <label className="block text-display-sm text-content-tertiary mb-1">{t("consumers.newConsumerName")}</label>
-            <input type="text" className="input w-full" value={cloneName} onChange={(e) => setCloneName(e.target.value)} placeholder={t("consumers.newConsumerNamePlaceholder")} />
+            <label className="block text-display-sm text-content-tertiary mb-1">
+              {t("consumers.newConsumerName")}
+            </label>
+            <input
+              type="text"
+              className="input w-full"
+              value={cloneName}
+              onChange={(e) => setCloneName(e.target.value)}
+              placeholder={t("consumers.newConsumerNamePlaceholder")}
+            />
             <p className="text-display-xs text-content-tertiary mt-2">
               {t("consumers.cloneConsumerHelp", { stream })}
             </p>
           </div>
-           <div className="flex justify-end gap-3 pt-6">
-             <Button variant="secondary" onClick={onClose}>{t("common.cancel")}</Button>
-             <Button variant="primary" onClick={onClone} disabled={clonePending || !cloneName.trim()} icon={clonePending ? <Loader2 className="icon-base animate-spin" /> : undefined}>
-               {t("consumers.clone")}
-             </Button>
-           </div>
+          <div className="flex justify-end gap-3 pt-6">
+            <Button variant="secondary" onClick={onClose}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={onClone}
+              disabled={clonePending || !cloneName.trim()}
+              icon={
+                clonePending ? (
+                  <Loader2 className="icon-base animate-spin" />
+                ) : undefined
+              }
+            >
+              {t("consumers.clone")}
+            </Button>
+          </div>
         </div>
       </div>
     </ModalWrapper>,
-    document.body
+    document.body,
   );
 }

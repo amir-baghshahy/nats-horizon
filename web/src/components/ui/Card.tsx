@@ -11,14 +11,20 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 const baseStyles = "relative overflow-hidden backdrop-blur-xl";
 
 const variantStyles: Record<CardVariant, string> = {
-  default: "rounded-xl border border-border-default/60 bg-surface-secondary/75 p-3 shadow-lg shadow-black/10",
+  default:
+    "rounded-xl border border-border-default/60 bg-surface-secondary/75 p-3 shadow-lg shadow-black/10",
   stat: "rounded-lg border border-border-default/70 bg-surface-primary/45 px-3 py-2 shadow-sm",
-  panel: "rounded-2xl border border-border-subtle bg-surface-elevated/80 p-6 shadow-xl shadow-black/20",
-  inline: "rounded-lg border border-border-default/60 bg-surface-primary/50 px-3 py-2 shadow-md",
+  panel:
+    "rounded-2xl border border-border-subtle bg-surface-elevated/80 p-6 shadow-xl shadow-black/20",
+  inline:
+    "rounded-lg border border-border-default/60 bg-surface-primary/50 px-3 py-2 shadow-md",
 };
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = "default", noPadding = false, children, ...props }, ref) => {
+  (
+    { className, variant = "default", noPadding = false, children, ...props },
+    ref,
+  ) => {
     return (
       <div
         ref={ref}
@@ -26,7 +32,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
           baseStyles,
           variantStyles[variant],
           noPadding && "[&>div]:p-0",
-          className
+          className,
         )}
         {...props}
       >
@@ -35,7 +41,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         <div className="relative">{children}</div>
       </div>
     );
-  }
+  },
 );
 
 Card.displayName = "Card";

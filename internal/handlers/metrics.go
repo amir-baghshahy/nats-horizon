@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
 	"sync"
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
-	"github.com/amir-baghshahy/nats-horizon/internal/dto"
+
+	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
@@ -477,7 +479,7 @@ func (h *MetricsHandler) GetConsumerMetrics(c *gin.Context) {
 	// Get consumer info
 	info, err := h.js.ConsumerInfo(streamName, consumerName)
 	if err != nil {
-		c.JSON(http.StatusNotFound, dto.ErrorResponse{Error: "consumer not found"})
+		apihttp.JSONNotFound(c, "consumer", consumerName)
 		return
 	}
 

@@ -3,6 +3,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AckTermMessageRequest = {
-    sequence: number;
+  sequence: number;
 };
-

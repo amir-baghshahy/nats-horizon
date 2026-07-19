@@ -65,7 +65,9 @@ export default function AlertFormModal({
     <ModalWrapper isOpen={true} onClose={onClose}>
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
-        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose();
+        }}
       >
         <div
           className="card w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"

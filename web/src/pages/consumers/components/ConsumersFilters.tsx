@@ -56,7 +56,9 @@ export default function ConsumersFilters({
             />
             <Select
               value={filterStatus}
-              onChange={(value) => onStatusChange(value as ConsumerFilterStatus)}
+              onChange={(value) =>
+                onStatusChange(value as ConsumerFilterStatus)
+              }
               options={[
                 { value: "all", label: t("consumers.allStatus") },
                 { value: "active", label: t("consumers.active") },
@@ -69,11 +71,10 @@ export default function ConsumersFilters({
         }
         onClearFilters={activeFilterCount > 0 ? onClear : undefined}
         actions={
-          <Button
-            onClick={onShowMoreFiltersToggle}
-            variant="secondary"
-          >
-            {showMoreFilters ? t("consumers.lessFilters") : t("consumers.moreFilters")}
+          <Button onClick={onShowMoreFiltersToggle} variant="secondary">
+            {showMoreFilters
+              ? t("consumers.lessFilters")
+              : t("consumers.moreFilters")}
           </Button>
         }
       />
@@ -96,7 +97,9 @@ export default function ConsumersFilters({
                         : "bg-surface-secondary text-content-tertiary ring-border-default hover:bg-border-default hover:text-content-primary"
                     }`}
                   >
-                    {status === "all" ? t("common.all") : getStatusLabel(status)}
+                    {status === "all"
+                      ? t("common.all")
+                      : getStatusLabel(status)}
                   </button>
                 ))}
               </div>

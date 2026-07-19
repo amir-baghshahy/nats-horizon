@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type KVKeyDeleteResponse = {
-    key?: string;
-    message?: string;
+  key?: string;
+  message?: string;
 };
-

@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ActiveSubscription = {
-    count?: number;
-    subject?: string;
+  count?: number;
+  subject?: string;
 };
-

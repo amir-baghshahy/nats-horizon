@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import {
   Copy,
   Code,
@@ -58,19 +58,21 @@ export default function MessageItem({
 
   const nextViewModeLabel =
     viewMode === "pretty"
-      ? t('messages.raw')
+      ? t("messages.raw")
       : viewMode === "raw"
-        ? t('messages.hex')
-        : t('messages.pretty');
+        ? t("messages.hex")
+        : t("messages.pretty");
 
-    return (
+  return (
     <div className="border-l-2 border-l-transparent hover:border-l-primary-500 transition-colors">
       <div className="p-4 hover:bg-surface-primary/50 transition-colors">
         <div className="flex items-start gap-4">
           <button
             onClick={onToggleExpand}
             className="p-1 hover:bg-surface-primary rounded transition-colors mt-0.5"
-            aria-label={isExpanded ? t('messages.collapse') : t('messages.expand')}
+            aria-label={
+              isExpanded ? t("messages.collapse") : t("messages.expand")
+            }
           >
             {isExpanded ? (
               <ChevronDown className="icon-base text-content-tertiary" />
@@ -102,7 +104,7 @@ export default function MessageItem({
 
               {message.reply && (
                 <span className="text-display-xs text-primary-400">
-                  {t('messages.replyLabel')} {message.reply}
+                  {t("messages.replyLabel")} {message.reply}
                 </span>
               )}
             </div>
@@ -116,19 +118,19 @@ export default function MessageItem({
             <button
               onClick={onCycleViewMode}
               className="p-2 hover:bg-surface-primary rounded-lg transition-colors text-display-xs"
-              title={`${t('messages.viewMode')}: ${viewMode}`}
+              title={`${t("messages.viewMode")}: ${viewMode}`}
             >
               {viewMode === "pretty"
-                ? t('messages.pretty')
+                ? t("messages.pretty")
                 : viewMode === "raw"
-                  ? t('messages.raw')
-                  : t('messages.hex')}
+                  ? t("messages.raw")
+                  : t("messages.hex")}
             </button>
 
             <button
               onClick={onCopy}
               className="p-2 hover:bg-surface-primary rounded-lg transition-colors"
-              title={t('messages.copyMessage')}
+              title={t("messages.copyMessage")}
             >
               <Copy className="icon-base text-content-tertiary" />
             </button>
@@ -141,16 +143,18 @@ export default function MessageItem({
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-display-sm font-medium flex items-center gap-2">
                   <Code className="icon-base" />
-                  {t('messages.payload')} ({format.toUpperCase()})
+                  {t("messages.payload")} ({format.toUpperCase()})
                 </h4>
                 <button
                   onClick={onCycleViewMode}
                   className="text-display-xs text-primary-400 hover:underline"
                 >
-                  {t('messages.switchTo')} {nextViewModeLabel}
+                  {t("messages.switchTo")} {nextViewModeLabel}
                 </button>
               </div>
-              <pre className={`text-display-sm p-3 rounded overflow-x-auto bg-surface-primary`}>
+              <pre
+                className={`text-display-sm p-3 rounded overflow-x-auto bg-surface-primary`}
+              >
                 <code
                   className={
                     format === "json"
@@ -169,7 +173,7 @@ export default function MessageItem({
               <div className="bg-surface-primary/50 rounded-lg p-4">
                 <h4 className="text-display-sm font-medium mb-3 flex items-center gap-2">
                   <FileText className="icon-base" />
-                  {t('messages.headers')}
+                  {t("messages.headers")}
                 </h4>
                 <div className="grid grid-cols-2 gap-2 text-display-sm">
                   {Object.entries(message.headers).map(([key, values]) => (
@@ -186,21 +190,35 @@ export default function MessageItem({
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-surface-primary/50 rounded-lg p-3">
-                <p className="text-display-xs text-content-tertiary">{t('messages.subject')}</p>
-                <p className="font-mono text-display-sm truncate">{message.subject}</p>
+                <p className="text-display-xs text-content-tertiary">
+                  {t("messages.subject")}
+                </p>
+                <p className="font-mono text-display-sm truncate">
+                  {message.subject}
+                </p>
               </div>
               <div className="bg-surface-primary/50 rounded-lg p-3">
-                <p className="text-display-xs text-content-tertiary">{t('common.size')}</p>
+                <p className="text-display-xs text-content-tertiary">
+                  {t("common.size")}
+                </p>
                 <p className="text-display-sm">{formatBytes(message.size)}</p>
               </div>
               <div className="bg-surface-primary/50 rounded-lg p-3">
-                <p className="text-display-xs text-content-tertiary">{t('messages.timestamp')}</p>
-                <p className="text-display-sm">{formatTimestamp(message.timestamp)}</p>
+                <p className="text-display-xs text-content-tertiary">
+                  {t("messages.timestamp")}
+                </p>
+                <p className="text-display-sm">
+                  {formatTimestamp(message.timestamp)}
+                </p>
               </div>
               {message.reply && (
                 <div className="bg-surface-primary/50 rounded-lg p-3">
-                  <p className="text-display-xs text-content-tertiary">{t('messages.replyTo')}</p>
-                  <p className="font-mono text-display-sm truncate">{message.reply}</p>
+                  <p className="text-display-xs text-content-tertiary">
+                    {t("messages.replyTo")}
+                  </p>
+                  <p className="font-mono text-display-sm truncate">
+                    {message.reply}
+                  </p>
                 </div>
               )}
             </div>

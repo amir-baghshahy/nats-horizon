@@ -16,6 +16,11 @@ func AuditMiddleware(auditSvc *services.AuditService) gin.HandlerFunc {
 		// Process request first
 		c.Next()
 
+		// Audit service may be nil in setup mode (no NATS connection yet).
+		if auditSvc == nil {
+			return
+		}
+
 		// Only log successful requests (status < 400)
 		if c.Writer.Status() >= 400 {
 			return
@@ -193,6 +198,9 @@ func AuditCleanupMiddleware(auditSvc *services.AuditService, ctx context.Context
 			log.Println("Audit cleanup middleware stopped")
 			return
 		case <-ticker.C:
+			if auditSvc == nil {
+				continue
+			}
 			if err := auditSvc.Cleanup(); err != nil {
 				log.Printf("Failed to cleanup audit logs: %v", err)
 			} else {

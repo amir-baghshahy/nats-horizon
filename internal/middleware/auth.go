@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"crypto/subtle"
 	"net/http"
 	"strings"
 
@@ -37,7 +38,7 @@ func BasicAuth(config BasicAuthConfig) gin.HandlerFunc {
 		}
 
 		expectedPassword, exists := config.Users[username]
-		if !exists || password != expectedPassword {
+		if !exists || subtle.ConstantTimeCompare([]byte(password), []byte(expectedPassword)) != 1 {
 			c.Header("WWW-Authenticate", "Basic realm=\""+realm+"\"")
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 			c.Abort()
@@ -49,7 +50,9 @@ func BasicAuth(config BasicAuthConfig) gin.HandlerFunc {
 	}
 }
 
-// APIKeyAuth creates an API key authentication middleware
+// APIKeyAuth creates an API key authentication middleware. The key is only
+// accepted via the configured request header, never as a query parameter, to
+// avoid leaking it through logs, proxies, and browser history.
 func APIKeyAuth(headerName, apiKey string) gin.HandlerFunc {
 	if apiKey == "" {
 		return func(c *gin.Context) {
@@ -57,13 +60,10 @@ func APIKeyAuth(headerName, apiKey string) gin.HandlerFunc {
 		}
 	}
 
+	expected := []byte(apiKey)
 	return func(c *gin.Context) {
 		key := c.GetHeader(headerName)
-		if key == "" {
-			key = c.Query("api_key")
-		}
-
-		if key != apiKey {
+		if key == "" || subtle.ConstantTimeCompare([]byte(key), expected) != 1 {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid API key"})
 			c.Abort()
 			return

@@ -6,6 +6,7 @@ import Select from "../../../components/ui/Select";
 import Button from "../../../components/ui/Button";
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import { getString, getNumber, getBoolean } from "../../../utils/formData";
 
 interface AlertFormModalProps {
   isOpen: boolean;
@@ -36,26 +37,26 @@ export default function AlertFormModal({
     const formData = new FormData(e.target as HTMLFormElement);
 
     const channels: string[] = [];
-    if (formData.get("channel_email") === "on") channels.push("email");
-    if (formData.get("channel_webhook") === "on") channels.push("webhook");
-    if (formData.get("channel_slack") === "on") channels.push("slack");
+    if (getBoolean(formData, "channel_email")) channels.push("email");
+    if (getBoolean(formData, "channel_webhook")) channels.push("webhook");
+    if (getBoolean(formData, "channel_slack")) channels.push("slack");
 
     const data: Partial<Alert> = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
+      name: getString(formData, "name"),
+      description: getString(formData, "description"),
       severity: severity as Alert["severity"],
-      enabled: formData.get("enabled") === "true",
+      enabled: getBoolean(formData, "enabled"),
       condition: {
         type: conditionType as string,
-        stream: formData.get("stream") as string,
-        consumer: formData.get("consumer") as string,
-        threshold: parseInt(formData.get("threshold") as string),
+        stream: getString(formData, "stream"),
+        consumer: getString(formData, "consumer"),
+        threshold: getNumber(formData, "threshold", 1000),
         operator: operator as string,
       },
       channels,
-      email_address: formData.get("email_address") as string,
-      webhook_url: formData.get("webhook_url") as string,
-      slack_webhook_url: formData.get("slack_webhook_url") as string,
+      email_address: getString(formData, "email_address"),
+      webhook_url: getString(formData, "webhook_url"),
+      slack_webhook_url: getString(formData, "slack_webhook_url"),
       cooldown: 300000000000,
     };
     onSubmit(data);

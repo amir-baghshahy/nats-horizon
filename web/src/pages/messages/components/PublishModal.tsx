@@ -5,6 +5,7 @@ import { ModalWrapper } from "../../../components/ui/Modal";
 import { useState } from "react";
 import Select from "../../../components/ui/Select";
 import Button from "../../../components/ui/Button";
+import { getString } from "../../../utils/formData";
 
 interface PublishModalProps {
   streams: any[];
@@ -29,10 +30,9 @@ export default function PublishModal({
     const form = e.target as HTMLFormElement;
     const formData = new FormData(form);
     onSubmit({
-      stream:
-        selectedStream || (formData.get("stream") as string) || defaultStream,
-      subject: formData.get("subject") as string,
-      data: formData.get("payload") as string,
+      stream: selectedStream || getString(formData, "stream", defaultStream),
+      subject: getString(formData, "subject"),
+      data: getString(formData, "payload"),
     });
   };
 

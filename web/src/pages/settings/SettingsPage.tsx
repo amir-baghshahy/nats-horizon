@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Settings as SettingsIcon,
@@ -35,6 +35,52 @@ interface TestResult {
 
 const RESTART_KEY = "nats-setup-restarting";
 
+// Helper: Poll health endpoint until server is ready
+async function pollServerHealth(maxAttempts: number = 30): Promise<boolean> {
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await HealthService.getHealth();
+      if (response) {
+        localStorage.removeItem(RESTART_KEY);
+        return true;
+      }
+    } catch {
+      // Server not ready yet
+    }
+  }
+  localStorage.removeItem(RESTART_KEY);
+  return false;
+}
+
+// Helper: Default config values
+function getDefaultConfig(): ConfigData {
+  return {
+    nats_url: "nats://localhost:4222",
+    gin_mode: "release",
+    smtp_host: "",
+    smtp_port: 587,
+    smtp_username: "",
+    smtp_password: "",
+    smtp_from: "",
+    cors_allowed_origins: "*",
+  };
+}
+
+// Helper: Transform API config data to local state
+function transformConfigData(data: any): ConfigData {
+  return {
+    nats_url: data.nats_url ?? "nats://localhost:4222",
+    gin_mode: data.gin_mode ?? "release",
+    smtp_host: data.smtp_host ?? "",
+    smtp_port: data.smtp_port ?? 587,
+    smtp_username: data.smtp_username ?? "",
+    smtp_password: data.smtp_password ?? "",
+    smtp_from: data.smtp_from ?? "",
+    cors_allowed_origins: data.cors_allowed_origins ?? "*",
+  };
+}
+
 export default function SettingsPage() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
@@ -46,34 +92,16 @@ export default function SettingsPage() {
     return localStorage.getItem(RESTART_KEY) === "true";
   });
   const [originalNatsUrl, setOriginalNatsUrl] = useState("");
-  const [config, setConfig] = useState<ConfigData>({
-    nats_url: "nats://localhost:4222",
-    gin_mode: "release",
-    smtp_host: "",
-    smtp_port: 587,
-    smtp_username: "",
-    smtp_password: "",
-    smtp_from: "",
-    cors_allowed_origins: "*",
-  });
+  const [config, setConfig] = useState<ConfigData>(getDefaultConfig);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
 
   useEffect(() => {
     const loadConfig = async () => {
       try {
         const data = await ConfigService.getConfig();
-        const natsUrl = data.nats_url ?? "nats://localhost:4222";
-        setConfig({
-          nats_url: natsUrl,
-          gin_mode: data.gin_mode ?? "release",
-          smtp_host: data.smtp_host ?? "",
-          smtp_port: data.smtp_port ?? 587,
-          smtp_username: data.smtp_username ?? "",
-          smtp_password: data.smtp_password ?? "",
-          smtp_from: data.smtp_from ?? "",
-          cors_allowed_origins: data.cors_allowed_origins ?? "*",
-        });
-        setOriginalNatsUrl(natsUrl);
+        const transformedConfig = transformConfigData(data);
+        setConfig(transformedConfig);
+        setOriginalNatsUrl(transformedConfig.nats_url);
       } catch {
         setError(t("settings.loadError"));
       } finally {
@@ -85,36 +113,25 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (restarting) {
-      const pollHealth = async () => {
-        for (let i = 0; i < 30; i++) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          try {
-            const response = await HealthService.getHealth();
-            if (response) {
-              localStorage.removeItem(RESTART_KEY);
-              window.location.reload();
-              return;
-            }
-          } catch {
-            // Server not ready yet
-          }
+      pollServerHealth().then((success) => {
+        if (success) {
+          window.location.reload();
+        } else {
+          setRestarting(false);
+          setError("settings.restartTimeout");
         }
-        setRestarting(false);
-        localStorage.removeItem(RESTART_KEY);
-        setError("settings.restartTimeout");
-      };
-      pollHealth();
+      });
     }
   }, [restarting]);
 
-  const updateField = (field: keyof ConfigData, value: string | number) => {
+  const updateField = useCallback((field: keyof ConfigData, value: string | number) => {
     setConfig((prev) => ({ ...prev, [field]: value }));
     if (field === "nats_url") {
       setTestResult(null);
     }
-  };
+  }, []);
 
-  const handleTestConnection = async () => {
+  const handleTestConnection = useCallback(async () => {
     setTesting(true);
     setTestResult(null);
     setError("");
@@ -137,9 +154,9 @@ export default function SettingsPage() {
     } finally {
       setTesting(false);
     }
-  };
+  }, [config.nats_url, t]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     const natsUrlChanged = config.nats_url !== originalNatsUrl;
 
     if (natsUrlChanged) {
@@ -170,7 +187,7 @@ export default function SettingsPage() {
     } finally {
       setSaving(false);
     }
-  };
+  }, [config.nats_url, originalNatsUrl, testResult]);
 
   if (restarting) {
     return (

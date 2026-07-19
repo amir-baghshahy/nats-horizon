@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { X, Send } from "lucide-react";
@@ -32,6 +32,32 @@ import type { Message } from "../hooks/useMessageList";
 import type { PublishForm as PublishFormType } from "../components/messaging/PublishForm";
 import type { RequestForm as RequestFormType } from "../components/messaging/RequestForm";
 import { PublishForm, RequestForm } from "../components/messaging";
+
+// Helper: Parse headers JSON with validation
+function parseHeadersJson(headersText: string, toast: any, t: any): Record<string, string[]> {
+  if (!headersText || headersText.trim() === "{}") {
+    return {};
+  }
+
+  try {
+    const headers = JSON.parse(headersText);
+    return Object.fromEntries(
+      Object.entries(headers).map(([key, value]) => [
+        key,
+        Array.isArray(value) ? value : [String(value)],
+      ]),
+    );
+  } catch (err) {
+    console.error("Failed to parse headers JSON:", err);
+    toast("error", t("messages.invalidHeadersJson"));
+    return {};
+  }
+}
+
+// Helper: Reset publish form to default values
+function resetPublishForm(): PublishFormType {
+  return { subject: "", payload: "", replyTo: "", headers: "{}" };
+}
 
 interface CoreMessagingContentProps {
   activeTab?: MessagingTab;
@@ -114,26 +140,6 @@ export function CoreMessagingContent({
     setSubscriptions(new Set(getSubscriptions()));
   }, [getSubscriptions]);
 
-  const parseHeaders = (headersText: string) => {
-    if (!headersText || headersText.trim() === "{}") {
-      return {};
-    }
-
-    try {
-      const headers = JSON.parse(headersText);
-      return Object.fromEntries(
-        Object.entries(headers).map(([key, value]) => [
-          key,
-          Array.isArray(value) ? value : [String(value)],
-        ]),
-      );
-    } catch (err) {
-      console.error("Failed to parse headers JSON:", err);
-      toast("error", t("messages.invalidHeadersJson"));
-      return {};
-    }
-  };
-
   const {
     data: serviceInfo,
     isLoading: serviceInfoLoading,
@@ -145,24 +151,24 @@ export function CoreMessagingContent({
     refetchInterval: REFRESH_INTERVALS.NORMAL,
   });
 
-  const handleSubscribe = (subject: string) => {
+  const handleSubscribe = useCallback((subject: string) => {
     if (isSubscribed(subject)) {
       unsubscribeFromSubject(subject);
     } else {
       subscribeToSubject(subject);
     }
-  };
+  }, [isSubscribed, subscribeToSubject, unsubscribeFromSubject]);
 
-  const handlePublish = async () => {
+  const handlePublish = useCallback(async () => {
     try {
       const request: PublishMessageRequest = {
         subject: publishForm.subject,
         payload: publishForm.payload,
-        headers: parseHeaders(publishForm.headers),
+        headers: parseHeadersJson(publishForm.headers, toast, t),
         reply_to: publishForm.replyTo,
       };
       await CoreNatsService.postCorePublish(request);
-      setPublishForm({ subject: "", payload: "", replyTo: "", headers: "{}" });
+      setPublishForm(resetPublishForm());
       setShowPublishModal(false);
       toast("success", t("messages.messagePublished"));
     } catch (err: any) {
@@ -173,9 +179,9 @@ export function CoreMessagingContent({
         }),
       );
     }
-  };
+  }, [publishForm, toast, t, setShowPublishModal]);
 
-  const handleRequest = async () => {
+  const handleRequest = useCallback(async () => {
     try {
       const request: RequestMessageRequest = {
         subject: requestForm.subject,
@@ -193,7 +199,7 @@ export function CoreMessagingContent({
           t("messages.requestFailed"),
       });
     }
-  };
+  }, [requestForm, t]);
 
   const handleCopyMessage = async (message: Message) => {
     try {

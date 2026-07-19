@@ -4,6 +4,7 @@ import type { ConnectionConfig, ConnectionStatus } from "../../../types";
 import { TenancyService } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { REFRESH_INTERVALS } from "../../../utils/constants";
+import { getString } from "../../../utils/formData";
 
 type ConnectionTestResult = {
   healthy?: boolean;
@@ -152,9 +153,9 @@ export function useTenancy(): UseTenancyReturn {
       e.preventDefault();
       const formData = new FormData(e.target as HTMLFormElement);
       const data = {
-        name: (formData.get("name") as string) || "",
-        url: (formData.get("url") as string) || "",
-        description: (formData.get("description") as string) || "",
+        name: getString(formData, "name"),
+        url: getString(formData, "url"),
+        description: getString(formData, "description"),
       };
       if (editingConnection) {
         updateMutation.mutate({ id: editingConnection.id ?? "", data });

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
@@ -27,6 +27,82 @@ export interface ConsumerStats {
   idle: number;
   totalLag: number;
   avgAckRate: number;
+}
+
+// Helper: Check if consumer matches filter criteria
+function matchesConsumerFilters(
+  consumer: Consumer,
+  searchQuery: string,
+  selectedStream: string,
+  filterStatus: ConsumerFilterStatus,
+): boolean {
+  const matchesSearch =
+    (consumer.name || "")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase()) ||
+    (consumer.stream || "")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+  const matchesStream =
+    selectedStream === "all" || consumer.stream === selectedStream;
+
+  let matchesStatus = true;
+  if (filterStatus === "active") {
+    matchesStatus = consumer.status === "active";
+  } else if (filterStatus === "stuck") {
+    matchesStatus = consumer.status === "stuck";
+  } else if (filterStatus === "idle") {
+    matchesStatus = consumer.status === "idle";
+  }
+
+  return matchesSearch && matchesStream && matchesStatus;
+}
+
+// Helper: Calculate consumer statistics
+function calculateConsumerStats(consumers: Consumer[]): ConsumerStats {
+  return {
+    total: consumers.length,
+    active: consumers.filter((c) => c.status === "active").length,
+    stuck: consumers.filter((c) => c.status === "stuck").length,
+    idle: consumers.filter((c) => c.status === "idle").length,
+    totalLag: consumers.reduce((acc, c) => acc + (c.lag || 0), 0),
+    avgAckRate:
+      consumers.length > 0
+        ? consumers.reduce(
+            (acc, c) =>
+              acc +
+              parseFloat(String(c.ack_rate || "0").replace(/[^0-9.]/g, "")) ||
+              0,
+            0,
+          ) / consumers.length
+        : 0,
+  };
+}
+
+// Helper: Execute bulk operation with confirmation
+async function executeBulkOperation<T, R = void>(
+  items: T[],
+  selectedItems: Set<string>,
+  operation: (item: T) => Promise<R>,
+  predicate: (item: T) => boolean,
+): Promise<number> {
+  const itemsToProcess = items.filter(
+    (item) =>
+      (item as any).name &&
+      selectedItems.has((item as any).name) &&
+      predicate(item),
+  );
+
+  if (itemsToProcess.length === 0) {
+    return 0;
+  }
+
+  await Promise.allSettled(
+    itemsToProcess.map((item) => operation(item)),
+  );
+
+  return itemsToProcess.length;
 }
 
 export interface UseConsumersPageReturn {
@@ -114,58 +190,14 @@ export function useConsumersPage(): UseConsumersPageReturn {
 
   const filteredConsumers = useMemo(
     () =>
-      (consumers ?? []).filter((consumer) => {
-        const matchesSearch =
-          (consumer.name || "")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          (consumer.stream || "")
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase());
-
-        const matchesStream =
-          selectedStream === "all" || consumer.stream === selectedStream;
-
-        let matchesStatus = true;
-        if (filterStatus === "active") {
-          matchesStatus = consumer.status === "active";
-        } else if (filterStatus === "stuck") {
-          matchesStatus = consumer.status === "stuck";
-        } else if (filterStatus === "idle") {
-          matchesStatus = consumer.status === "idle";
-        }
-
-        return matchesSearch && matchesStream && matchesStatus;
-      }),
+      (consumers ?? []).filter((consumer) =>
+        matchesConsumerFilters(consumer, searchQuery, selectedStream, filterStatus),
+      ),
     [consumers, filterStatus, searchQuery, selectedStream],
   );
 
   const stats = useMemo<ConsumerStats>(
-    () => ({
-      total: filteredConsumers.length,
-      active: filteredConsumers.filter(
-        (consumer) => consumer.status === "active",
-      ).length,
-      stuck: filteredConsumers.filter((consumer) => consumer.status === "stuck")
-        .length,
-      idle: filteredConsumers.filter((consumer) => consumer.status === "idle")
-        .length,
-      totalLag: filteredConsumers.reduce(
-        (acc, consumer) => acc + (consumer.lag || 0),
-        0,
-      ),
-      avgAckRate:
-        filteredConsumers.length > 0
-          ? filteredConsumers.reduce(
-              (acc, consumer) =>
-                acc +
-                  parseFloat(
-                    String(consumer.ack_rate || "0").replace(/[^0-9.]/g, ""),
-                  ) || 0,
-              0,
-            ) / filteredConsumers.length
-          : 0,
-    }),
+    () => calculateConsumerStats(filteredConsumers),
     [filteredConsumers],
   );
 
@@ -206,7 +238,7 @@ export function useConsumersPage(): UseConsumersPageReturn {
     onError: () => toast("error", t("consumers.lagResetFailed")),
   });
 
-  const handleBulkResume = async () => {
+  const handleBulkResume = useCallback(async () => {
     const ok = await confirm({
       title: t("consumers.resumeConsumers"),
       message: t("consumers.resumeConsumersConfirm", {
@@ -215,40 +247,30 @@ export function useConsumersPage(): UseConsumersPageReturn {
       confirmLabel: t("consumers.resumeConsumers").split(" ")[0],
       variant: "info",
     });
-    if (ok) {
-      const consumersToResume = filteredConsumers.filter(
-        (consumer) =>
-          consumer.name &&
-          consumer.stream &&
-          selectedConsumers.has(consumer.name) &&
-          consumer.paused,
-      );
+    if (!ok) return;
 
-      if (consumersToResume.length === 0) {
-        toast("info", t("consumers.noConsumersToResume"));
-        return;
-      }
+    const count = await executeBulkOperation(
+      filteredConsumers,
+      selectedConsumers,
+      (consumer) =>
+        pauseResumeMutation.mutateAsync({
+          stream: consumer.stream!,
+          name: consumer.name!,
+          paused: false,
+        }),
+      (consumer) => consumer.paused === true,
+    );
 
-      // Execute all mutations in parallel and wait for all to complete
-      await Promise.allSettled(
-        consumersToResume.map((consumer) =>
-          pauseResumeMutation.mutateAsync({
-            stream: consumer.stream!,
-            name: consumer.name!,
-            paused: false,
-          }),
-        ),
-      );
-
-      toast(
-        "success",
-        t("consumers.bulkResumeSuccess", { count: consumersToResume.length }),
-      );
-      clearConsumerSelection();
+    if (count === 0) {
+      toast("info", t("consumers.noConsumersToResume"));
+      return;
     }
-  };
 
-  const handleBulkPause = async () => {
+    toast("success", t("consumers.bulkResumeSuccess", { count }));
+    clearConsumerSelection();
+  }, [confirm, t, filteredConsumers, selectedConsumers, pauseResumeMutation, toast, clearConsumerSelection]);
+
+  const handleBulkPause = useCallback(async () => {
     const ok = await confirm({
       title: t("consumers.pauseConsumers"),
       message: t("consumers.pauseConsumersConfirm", {
@@ -257,40 +279,30 @@ export function useConsumersPage(): UseConsumersPageReturn {
       confirmLabel: t("consumers.pauseConsumers").split(" ")[0],
       variant: "warning",
     });
-    if (ok) {
-      const consumersToPause = filteredConsumers.filter(
-        (consumer) =>
-          consumer.name &&
-          consumer.stream &&
-          selectedConsumers.has(consumer.name) &&
-          !consumer.paused,
-      );
+    if (!ok) return;
 
-      if (consumersToPause.length === 0) {
-        toast("info", t("consumers.noConsumersToPause"));
-        return;
-      }
+    const count = await executeBulkOperation(
+      filteredConsumers,
+      selectedConsumers,
+      (consumer) =>
+        pauseResumeMutation.mutateAsync({
+          stream: consumer.stream!,
+          name: consumer.name!,
+          paused: true,
+        }),
+      (consumer) => consumer.paused !== true,
+    );
 
-      // Execute all mutations in parallel and wait for all to complete
-      await Promise.allSettled(
-        consumersToPause.map((consumer) =>
-          pauseResumeMutation.mutateAsync({
-            stream: consumer.stream!,
-            name: consumer.name!,
-            paused: true,
-          }),
-        ),
-      );
-
-      toast(
-        "success",
-        t("consumers.bulkPauseSuccess", { count: consumersToPause.length }),
-      );
-      clearConsumerSelection();
+    if (count === 0) {
+      toast("info", t("consumers.noConsumersToPause"));
+      return;
     }
-  };
 
-  const handleBulkDelete = async () => {
+    toast("success", t("consumers.bulkPauseSuccess", { count }));
+    clearConsumerSelection();
+  }, [confirm, t, filteredConsumers, selectedConsumers, pauseResumeMutation, toast, clearConsumerSelection]);
+
+  const handleBulkDelete = useCallback(async () => {
     const ok = await confirm({
       title: t("consumers.deleteConsumers"),
       message: t("consumers.deleteConsumersConfirm", {
@@ -299,47 +311,36 @@ export function useConsumersPage(): UseConsumersPageReturn {
       confirmLabel: t("common.delete"),
       variant: "danger",
     });
-    if (ok) {
-      const consumersToDelete = filteredConsumers.filter(
-        (consumer) =>
-          consumer.name &&
-          consumer.stream &&
-          selectedConsumers.has(consumer.name),
-      );
+    if (!ok) return;
 
-      if (consumersToDelete.length === 0) {
-        toast("info", t("consumers.noConsumersToDelete"));
-        return;
-      }
-
-      const results = await Promise.allSettled(
-        consumersToDelete.map((consumer) =>
+    const results = await Promise.allSettled(
+      filteredConsumers
+        .filter(
+          (consumer) =>
+            consumer.name &&
+            consumer.stream &&
+            selectedConsumers.has(consumer.name),
+        )
+        .map((consumer) =>
           deleteMutation.mutateAsync({
             stream: consumer.stream!,
             name: consumer.name!,
           }),
         ),
-      );
+    );
 
-      const succeeded = results.filter((r) => r.status === "fulfilled").length;
-      const failed = results.filter((r) => r.status === "rejected").length;
+    const succeeded = results.filter((r) => r.status === "fulfilled").length;
+    const failed = results.filter((r) => r.status === "rejected").length;
 
-      if (failed > 0) {
-        toast(
-          "warning",
-          t("consumers.partialDeleteSuccess", { succeeded, failed }),
-        );
-      } else {
-        toast(
-          "success",
-          t("consumers.bulkDeleteSuccess", { count: succeeded }),
-        );
-      }
-      clearConsumerSelection();
+    if (failed > 0) {
+      toast("warning", t("consumers.partialDeleteSuccess", { succeeded, failed }));
+    } else {
+      toast("success", t("consumers.bulkDeleteSuccess", { count: succeeded }));
     }
-  };
+    clearConsumerSelection();
+  }, [confirm, t, filteredConsumers, selectedConsumers, deleteMutation, toast, clearConsumerSelection]);
 
-  const handleTogglePauseResume = (consumer: Consumer) => {
+  const handleTogglePauseResume = useCallback((consumer: Consumer) => {
     if (!consumer.name || !consumer.stream) return;
     const isPaused = consumer.paused;
     pauseResumeMutation.mutate({
@@ -347,17 +348,17 @@ export function useConsumersPage(): UseConsumersPageReturn {
       name: consumer.name,
       paused: !isPaused,
     });
-  };
+  }, [pauseResumeMutation]);
 
-  const handleResetLag = (consumer: Consumer) => {
+  const handleResetLag = useCallback((consumer: Consumer) => {
     if (!consumer.name || !consumer.stream) return;
     resetLagMutation.mutate({
       stream: consumer.stream,
       name: consumer.name,
     });
-  };
+  }, [resetLagMutation]);
 
-  const handleDeleteConsumer = async (consumer: Consumer) => {
+  const handleDeleteConsumer = useCallback(async (consumer: Consumer) => {
     const ok = await confirm({
       title: t("consumers.deleteConsumer"),
       message: t("consumers.deleteConsumerConfirm", { name: consumer.name }),
@@ -367,9 +368,9 @@ export function useConsumersPage(): UseConsumersPageReturn {
     if (ok && consumer.name && consumer.stream) {
       deleteMutation.mutate({ stream: consumer.stream, name: consumer.name });
     }
-  };
+  }, [confirm, t, deleteMutation]);
 
-  const getStatusIcon = (consumer: Consumer) => {
+  const getStatusIcon = useCallback((consumer: Consumer) => {
     switch (consumer.status) {
       case "active":
         return <CheckCircle className="icon-base status-success" />;
@@ -380,9 +381,9 @@ export function useConsumersPage(): UseConsumersPageReturn {
       default:
         return <Activity className="icon-base status-info" />;
     }
-  };
+  }, []);
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = useCallback((status: string) => {
     switch (status) {
       case "active":
         return t("consumers.active");
@@ -393,7 +394,7 @@ export function useConsumersPage(): UseConsumersPageReturn {
       default:
         return t("consumers.unknown");
     }
-  };
+  }, [t]);
 
   const streamOptions = useMemo(
     () =>
@@ -408,14 +409,14 @@ export function useConsumersPage(): UseConsumersPageReturn {
     (selectedStream !== "all" ? 1 : 0) +
     (filterStatus !== "all" ? 1 : 0);
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchQuery("");
     setSelectedStream("all");
     setFilterStatus("all");
     setShowMoreFilters(false);
-  };
+  }, [setSearchQuery, setSelectedStream, setFilterStatus, setShowMoreFilters]);
 
-  const toggleAll = () => {
+  const toggleAll = useCallback(() => {
     if (selectedConsumers.size === filteredConsumers.length) {
       clearConsumerSelection();
     } else {
@@ -425,7 +426,7 @@ export function useConsumersPage(): UseConsumersPageReturn {
           .filter((name): name is string => Boolean(name)),
       );
     }
-  };
+  }, [selectedConsumers, filteredConsumers, clearConsumerSelection, selectAllConsumers]);
 
   return {
     searchQuery,

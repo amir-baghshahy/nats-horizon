@@ -25,6 +25,7 @@ import {
 } from "../../components/ui";
 import { Button } from "../../components/ui";
 import { formatBytes, formatDateTime } from "../../utils/formatters";
+import { getString, getNumber, getBoolean } from "../../utils/formData";
 
 export default function KVStorePage() {
   const { t } = useTranslation();
@@ -360,11 +361,11 @@ export default function KVStorePage() {
                     e.preventDefault();
                     const fd = new FormData(e.target as HTMLFormElement);
                     store.handleCreateBucket({
-                      name: fd.get("name"),
-                      history: parseInt(fd.get("history") as string) || 1,
+                      name: getString(fd, "name"),
+                      history: getNumber(fd, "history", 1),
                       storage: "file",
-                      max_bytes: parseInt(fd.get("max_bytes") as string) || 0,
-                      compression: fd.get("compression") === "true",
+                      max_bytes: getNumber(fd, "max_bytes", 0),
+                      compression: getBoolean(fd, "compression"),
                     });
                   }}
                   className="space-y-3"
@@ -489,8 +490,8 @@ export default function KVStorePage() {
                     e.preventDefault();
                     const fd = new FormData(e.target as HTMLFormElement);
                     store.handlePutKey({
-                      key: fd.get("key") as string,
-                      value: fd.get("value") as string,
+                      key: getString(fd, "key"),
+                      value: getString(fd, "value"),
                     });
                   }}
                   className="space-y-3"

@@ -16,6 +16,7 @@ import { PageError, PageLoading } from "../../components/ui/PageState";
 import { PageHeader, PanelCard, ModalWrapper, Tabs } from "../../components/ui";
 import { Button } from "../../components/ui";
 import { formatDateTime } from "../../utils/formatters";
+import { getString, getBoolean } from "../../utils/formData";
 
 export default function SecurityPage({
   activeTab,
@@ -465,18 +466,17 @@ export default function SecurityPage({
                   };
 
                   const data = {
-                    name: formData.get("name") as string,
+                    name: getString(formData, "name"),
                     account: "default",
                     permissions: {
                       publish: parsePermissions(
-                        (formData.get("publish_permissions") as string) || ">",
+                        getString(formData, "publish_permissions", ">"),
                       ),
                       subscribe: parsePermissions(
-                        (formData.get("subscribe_permissions") as string) ||
-                          ">",
+                        getString(formData, "subscribe_permissions", ">"),
                       ),
                     },
-                    enabled: formData.get("enabled") === "on",
+                    enabled: getBoolean(formData, "enabled"),
                   };
                   if (selectedUser) {
                     updateUserMutation.mutate({

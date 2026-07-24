@@ -168,7 +168,7 @@ Full documentation in [`helm/README.md`](helm/nats-horizon/README.md).
 
 ### Configuration
 
-Configuration is stored in `nats-horizon.json` next to the binary:
+Configuration is stored in the user config directory (`<user config dir>/nats-horizon/config.json`, e.g. `~/.config/nats-horizon/config.json` on Linux, `~/Library/Application Support/nats-horizon/config.json` on macOS), which is writable even when the binary is installed read-only. A config left next to the binary from a previous version is migrated automatically on first run.
 
 | Variable | Default | Description |
 |---|---|---|
@@ -427,8 +427,8 @@ Modern Next.js 16 + shadcn/ui stack. Object Store support, command palette, dark
 │  │  │  Dashboard  │ │   Streams    │ │  Consumers  │ │   │
 │  │  └─────────────┘ └──────────────┘ └─────────────┘ │   │
 │  └─────────────────────────────────────────────────────┘   │
-│                            │                                │
-│                    Wails Runtime Bridge                     │
+│                            │  same-origin /api/*            │
+│            Wails asset middleware → embedded Gin engine     │
 │                            │                                │
 │  ┌─────────────────────────────────────────────────────┐   │
 │  │              Go Backend (Gin + NATS)                 │   │

@@ -1,6 +1,6 @@
 # Binaries
-nats-ui
-server
+/nats-ui
+/server
 *.exe
 *.dll
 *.so

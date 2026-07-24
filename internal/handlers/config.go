@@ -12,12 +12,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RestartMode controls how the /config/restart endpoint behaves.
+type RestartMode int
+
+const (
+	// RestartModeExec re-executes the binary via syscall.Exec (standalone server).
+	RestartModeExec RestartMode = iota
+	// RestartModeDisabled does not re-exec; used when embedded in the desktop app,
+	// where syscall.Exec would kill the Wails window.
+	RestartModeDisabled
+)
+
 // ConfigHandler handles configuration endpoints
-type ConfigHandler struct{}
+type ConfigHandler struct {
+	// RestartMode selects the restart strategy used by RestartServer. Defaults to
+	// RestartModeExec for the standalone server; the desktop app sets Disabled.
+	RestartMode RestartMode
+}
 
 // NewConfigHandler creates a new config handler
 func NewConfigHandler() *ConfigHandler {
-	return &ConfigHandler{}
+	return &ConfigHandler{RestartMode: RestartModeExec}
 }
 
 // RestartServer triggers a server restart by re-executing the binary
@@ -30,6 +45,16 @@ func NewConfigHandler() *ConfigHandler {
 //	@Router		/config/restart [post]
 func (h *ConfigHandler) RestartServer(c *gin.Context) {
 	cfg := config.Get()
+
+	if h.RestartMode == RestartModeDisabled {
+		// Embedded inside the desktop app: re-executing the binary would kill the
+		// Wails window. The user should restart the app manually.
+		c.JSON(http.StatusOK, gin.H{
+			"message":  "Please restart the application to apply changes.",
+			"nats_url": cfg.NATSURL,
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "Server restart initiated. Please wait...",

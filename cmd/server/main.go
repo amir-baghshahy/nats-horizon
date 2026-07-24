@@ -14,13 +14,9 @@ import (
 
 	"github.com/amir-baghshahy/nats-horizon/internal/config"
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
-	"github.com/amir-baghshahy/nats-horizon/internal/handlers"
-	"github.com/amir-baghshahy/nats-horizon/internal/middleware"
-	"github.com/amir-baghshahy/nats-horizon/internal/repositories"
-	servicespkg "github.com/amir-baghshahy/nats-horizon/internal/services"
+	"github.com/amir-baghshahy/nats-horizon/internal/server"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nats-io/nats.go"
 )
 
 //	@title			NATS Horizon API
@@ -36,38 +32,6 @@ import (
 
 //	@BasePath	/api
 //	@schemes	http https
-
-// NATSConnection manages the NATS connection
-type NATSConnection struct {
-	nc *nats.Conn
-	js nats.JetStreamContext
-}
-
-func NewNATSConnection(url string) (*NATSConnection, error) {
-	nc, err := nats.Connect(url,
-		nats.ReconnectWait(2*time.Second),
-		nats.MaxReconnects(10),
-		nats.Timeout(5*time.Second),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to NATS: %w", err)
-	}
-
-	js, err := nc.JetStream()
-	if err != nil {
-		nc.Close()
-		return nil, fmt.Errorf("failed to create JetStream context: %w", err)
-	}
-
-	return &NATSConnection{nc: nc, js: js}, nil
-
-}
-
-func (c *NATSConnection) Close() {
-	if c.nc != nil {
-		c.nc.Close()
-	}
-}
 
 func main() {
 	// Parse environment variables and command line flags
@@ -89,236 +53,14 @@ func main() {
 		cfg.ServerPort = port
 	}
 
-	gin.SetMode(cfg.GinMode)
+	// Build the Gin backend (NATS connect, repos, services, handlers, routes).
+	// Standalone server keeps the syscall.Exec restart behavior.
+	ctx, cancel := context.WithCancel(context.Background())
+	r, cleanup := server.Engine(ctx)
+	defer cancel()
 
-	var natsConn *NATSConnection
-	var err error
-
-	// Only connect to NATS if setup has been completed
-	if cfg.SetupCompleted {
-		log.Printf("Connecting to NATS at %s...", cfg.NATSURL)
-		natsConn, err = NewNATSConnection(cfg.NATSURL)
-		if err != nil {
-			log.Fatalf("Failed to connect to NATS: %v\n\n"+
-				"Please ensure:\n"+
-				"1. NATS server is running and accessible\n"+
-				"2. Configuration is correct\n"+
-				"Run setup again to reconfigure", err)
-		}
-		log.Println("Connected to NATS")
-		defer natsConn.Close()
-	} else {
-		log.Println("Setup not completed. Starting server in setup mode (no NATS connection required).")
-		natsConn = &NATSConnection{nc: nil, js: nil}
-	}
-
-	// Initialize services that require NATS connection (only if connected)
-	var streamRepo *repositories.NATSStreamRepository
-	var consumerRepo *repositories.NATSConsumerRepository
-	var messageRepo *repositories.NATSMessageRepository
-	var streamUseCase *servicespkg.StreamUseCase
-	var consumerUseCase *servicespkg.ConsumerUseCase
-	var messageUseCase *servicespkg.MessageUseCase
-	var serverUseCase *servicespkg.ServerUseCase
-	var auditService *servicespkg.AuditService
-	var streamHandler *handlers.StreamHandler
-	var consumerHandler *handlers.ConsumerHandler
-	var serverHandler *handlers.ServerHandler
-	var coreNATSHandler *handlers.CoreNATShandler
-	var kvHandler *handlers.KVHandler
-	var clusterHandler *handlers.ClusterHandler
-	var alertsHandler *handlers.AlertsHandler
-	var metricsHandler *handlers.MetricsHandler
-	var exportHandler *handlers.ExportHandler
-	var securityHandler *handlers.SecurityHandler
-	var historyHandler *handlers.HistoryHandler
-	var sseHub *handlers.SSEHub
-	notificationService := servicespkg.NewNotificationService()
-
-	if natsConn != nil && natsConn.nc != nil {
-		streamRepo = repositories.NewNATSStreamRepository(natsConn.nc, natsConn.js)
-		consumerRepo = repositories.NewNATSConsumerRepository(natsConn.nc, natsConn.js)
-		messageRepo = repositories.NewNATSMessageRepository(natsConn.nc, natsConn.js)
-
-		streamUseCase = servicespkg.NewStreamUseCase(streamRepo)
-		consumerUseCase = servicespkg.NewConsumerUseCase(consumerRepo)
-		messageUseCase = servicespkg.NewMessageUseCase(messageRepo)
-		serverUseCase = servicespkg.NewServerUseCase(natsConn.nc, natsConn.js)
-
-		// Initialize audit service
-		auditService = servicespkg.NewAuditService(natsConn.nc, natsConn.js)
-		if err := auditService.Initialize(); err != nil {
-			log.Printf("Failed to initialize audit service: %v", err)
-		}
-
-		streamHandler = handlers.NewStreamHandler(streamUseCase)
-		consumerHandler = handlers.NewConsumerHandler(consumerUseCase, messageUseCase, natsConn.nc, natsConn.js)
-		serverHandler = handlers.NewServerHandler(serverUseCase, messageUseCase, streamUseCase)
-		coreNATSHandler = handlers.NewCoreNATShandler(natsConn.nc)
-		kvHandler = handlers.NewKVHandler(natsConn.nc, natsConn.js)
-		clusterHandler = handlers.NewClusterHandler(natsConn.nc, natsConn.js)
-		alertsHandler = handlers.NewAlertsHandler(natsConn.nc, natsConn.js, notificationService)
-		metricsHandler = handlers.NewMetricsHandler(natsConn.nc, natsConn.js)
-		exportHandler = handlers.NewExportHandler(natsConn.nc, natsConn.js)
-		securityHandler = handlers.NewSecurityHandler(natsConn.nc, natsConn.js, auditService)
-		historyHandler = handlers.NewHistoryHandler(natsConn.nc, natsConn.js)
-
-		sseHub = handlers.NewSSEHub(natsConn.nc)
-		go sseHub.MonitorStreams()
-		go sseHub.MonitorConsumers()
-		defer metricsHandler.Stop()
-		defer historyHandler.Stop()
-		defer alertsHandler.Stop()
-		defer sseHub.Close()
-	}
-
-	// Initialize config handler (works without NATS)
-	configHandler := handlers.NewConfigHandler()
-	tenancyHandler := handlers.NewTenancyHandler(cfg.NATSURL, natsConn.nc)
-
-	r := gin.New()
-	r.Use(gin.Logger())
-	r.Use(middleware.PanicRecovery())
-	r.Use(middleware.SecurityHeaders())
-	r.Use(middleware.RequestID())
-	r.Use(middleware.LoggingMiddleware())
-	r.Use(middleware.RequestSizeLimitMiddleware())
-	r.Use(middleware.RateLimitMiddleware(middleware.NewRateLimiter(100, time.Minute, 5*time.Minute)))
-	r.Use(middleware.CORSMiddlewareWithValidation(cfg.CORSAllowedOrigins))
-	r.Use(middleware.AuditMiddleware(auditService))
-
-	// Start audit cleanup goroutine
-	auditCtx, auditCancel := context.WithCancel(context.Background())
-	go middleware.AuditCleanupMiddleware(auditService, auditCtx)
-
-	apiGroup := r.Group("/api")
-	{
-		apiGroup.GET("/health", handlers.HealthCheck(serverUseCase))
-		apiGroup.GET("/healthz/live", handlers.LivenessCheck())
-		apiGroup.GET("/healthz/ready", handlers.ReadinessCheck(serverUseCase))
-		apiGroup.GET("/server/info", serverHandler.GetServerInfo)
-		apiGroup.GET("/account/info", serverHandler.GetAccountInfo)
-		apiGroup.GET("/dashboard/stats", serverHandler.GetDashboardStats)
-		apiGroup.GET("/events", sseHub.HandleSSE)
-
-		apiGroup.GET("/consumers/:name", consumerHandler.GetConsumerByName)
-		apiGroup.GET("/consumers", consumerHandler.ListAll)
-
-		apiGroup.GET("/connections", serverHandler.GetConnections)
-		apiGroup.DELETE("/connections/:id", serverHandler.TerminateConnection)
-
-		// Core NATS Pub/Sub
-		apiGroup.POST("/core/publish", coreNATSHandler.PublishMessage)
-		apiGroup.POST("/core/request", coreNATSHandler.Request)
-		apiGroup.GET("/core/subscribe", coreNATSHandler.Subscribe)
-		apiGroup.GET("/core/subscriptions", coreNATSHandler.GetActiveSubscriptions)
-		apiGroup.GET("/core/services", coreNATSHandler.GetServiceDiscovery)
-		apiGroup.GET("/core/monitor", coreNATSHandler.MonitorTraffic)
-
-		apiGroup.GET("/subjects", serverHandler.GetSubjects)
-		apiGroup.GET("/metrics/system", serverHandler.GetSystemMetrics)
-		apiGroup.GET("/metrics/rates", serverHandler.GetRateMetrics)
-
-		apiGroup.GET("/messages", serverHandler.GetMessages)
-		apiGroup.GET("/messages/page", serverHandler.GetStreamMessagesByPage)
-
-		apiGroup.GET("/streams", streamHandler.ListStreams)
-		apiGroup.POST("/streams", streamHandler.CreateStream)
-
-		apiGroup.GET("/streams/:name/consumers/:consumer", consumerHandler.GetConsumer)
-		apiGroup.GET("/streams/:name/consumers", consumerHandler.ListConsumers)
-		apiGroup.POST("/streams/:name/consumers", consumerHandler.CreateConsumer)
-		apiGroup.PUT("/streams/:name/consumers/:consumer", consumerHandler.UpdateConsumer)
-		apiGroup.DELETE("/streams/:name/consumers/:consumer", consumerHandler.DeleteConsumer)
-		apiGroup.POST("/streams/:name/consumers/:consumer/lag-reset", consumerHandler.ResetLag)
-		apiGroup.POST("/streams/:name/consumers/:consumer/replay", consumerHandler.Replay)
-		apiGroup.POST("/streams/:name/consumers/:consumer/pause", consumerHandler.Pause)
-		apiGroup.POST("/streams/:name/consumers/:consumer/resume", consumerHandler.Resume)
-
-		apiGroup.GET("/streams/:name", streamHandler.GetStream)
-		apiGroup.PUT("/streams/:name", streamHandler.UpdateStream)
-		apiGroup.DELETE("/streams/:name", streamHandler.DeleteStream)
-		apiGroup.POST("/streams/:name/purge", streamHandler.PurgeStream)
-
-		apiGroup.DELETE("/streams/:name/messages/:sequence", consumerHandler.DeleteStreamMessage)
-		apiGroup.POST("/streams/:name/messages/publish", consumerHandler.PublishMessage)
-
-		// KV Store routes
-		apiGroup.GET("/kv/buckets", kvHandler.ListBuckets)
-		apiGroup.POST("/kv/buckets", kvHandler.CreateBucket)
-		apiGroup.GET("/kv/buckets/:name", kvHandler.GetBucket)
-		apiGroup.DELETE("/kv/buckets/:name", kvHandler.DeleteBucket)
-		apiGroup.GET("/kv/buckets/:name/keys", kvHandler.ListKeys)
-		apiGroup.GET("/kv/buckets/:name/key", kvHandler.GetKey)
-		apiGroup.GET("/kv/buckets/:name/history", kvHandler.GetKeyHistory)
-		apiGroup.PUT("/kv/buckets/:name/key", kvHandler.PutKey)
-		apiGroup.DELETE("/kv/buckets/:name/key", kvHandler.DeleteKey)
-		apiGroup.POST("/kv/buckets/:name/purge", kvHandler.PurgeBucket)
-
-		// Consumer Ack Management routes
-		apiGroup.GET("/streams/:name/consumers/:consumer/pending", consumerHandler.GetPendingMessages)
-		apiGroup.POST("/streams/:name/consumers/:consumer/ack", consumerHandler.AckMessage)
-		apiGroup.POST("/streams/:name/consumers/:consumer/nack", consumerHandler.NackMessage)
-		apiGroup.POST("/streams/:name/consumers/:consumer/term", consumerHandler.AckTermMessage)
-
-		// Cluster Monitoring routes
-		apiGroup.GET("/cluster/info", clusterHandler.GetClusterInfo)
-		apiGroup.GET("/cluster/nodes", clusterHandler.GetClusterNodes)
-		apiGroup.GET("/cluster/health", clusterHandler.GetClusterHealth)
-		apiGroup.GET("/cluster/streams/:name/replicas", clusterHandler.GetStreamReplicas)
-
-		// Metrics routes
-		apiGroup.GET("/metrics", metricsHandler.GetMetrics)
-		apiGroup.GET("/metrics/streams/:name", metricsHandler.GetStreamMetrics)
-		apiGroup.GET("/metrics/streams/:name/consumers/:consumer", metricsHandler.GetConsumerMetrics)
-
-		// Alerts routes
-		apiGroup.GET("/alerts", alertsHandler.ListAlerts)
-		apiGroup.POST("/alerts", alertsHandler.CreateAlert)
-		apiGroup.GET("/alerts/:id", alertsHandler.GetAlert)
-		apiGroup.PUT("/alerts/:id", alertsHandler.UpdateAlert)
-		apiGroup.DELETE("/alerts/:id", alertsHandler.DeleteAlert)
-		apiGroup.POST("/alerts/check", alertsHandler.CheckAlertsNow)
-		apiGroup.GET("/alerts/triggers", alertsHandler.ListTriggers)
-		apiGroup.POST("/alerts/triggers/:id/ack", alertsHandler.AckTrigger)
-
-		// Config routes (for setup wizard)
-		apiGroup.GET("/config", configHandler.GetConfig)
-		apiGroup.PUT("/config", configHandler.UpdateConfig)
-		apiGroup.GET("/config/setup", configHandler.CheckSetup)
-		apiGroup.POST("/config/setup/complete", configHandler.CompleteSetup)
-		apiGroup.POST("/config/restart", configHandler.RestartServer)
-
-		// Export routes
-		apiGroup.GET("/export/streams", exportHandler.ExportAllStreams)
-		apiGroup.GET("/export/streams/:name", exportHandler.ExportStream)
-		apiGroup.POST("/export/streams/:name/messages", exportHandler.ExportMessages)
-		apiGroup.GET("/export/streams/:name/consumers/:consumer", exportHandler.ExportConsumer)
-
-		// Security routes
-		apiGroup.GET("/security/info", securityHandler.GetSecurityInfo)
-		apiGroup.GET("/security/users", securityHandler.GetUsers)
-		apiGroup.POST("/security/users", securityHandler.CreateUser)
-		apiGroup.PUT("/security/users/:name", securityHandler.UpdateUser)
-		apiGroup.DELETE("/security/users/:name", securityHandler.DeleteUser)
-		apiGroup.GET("/security/audit", securityHandler.GetAuditLogs)
-		apiGroup.GET("/security/connections", securityHandler.GetConnectionStatus)
-
-		// Tenancy routes
-		apiGroup.GET("/tenancy/connections", tenancyHandler.ListConnections)
-		apiGroup.POST("/tenancy/connections", tenancyHandler.CreateConnection)
-		apiGroup.GET("/tenancy/connections/:id", tenancyHandler.GetConnection)
-		apiGroup.PUT("/tenancy/connections/:id", tenancyHandler.UpdateConnection)
-		apiGroup.DELETE("/tenancy/connections/:id", tenancyHandler.DeleteConnection)
-		apiGroup.POST("/tenancy/connections/test", tenancyHandler.TestConnection)
-		apiGroup.PUT("/tenancy/connections/:id/default", tenancyHandler.SetDefaultConnection)
-		apiGroup.GET("/tenancy/status", tenancyHandler.GetConnectionStatus)
-		// History routes
-		apiGroup.GET("/history/streams/:name", historyHandler.GetStreamHistory)
-		apiGroup.GET("/history/streams/:name/analysis", historyHandler.GetAnalysis)
-		apiGroup.GET("/history/report", historyHandler.GetReport)
-	}
-
+	// Static file serving is only needed for the standalone HTTP server; the
+	// desktop app serves assets itself via the Wails asset server.
 	r.Static("/assets", "./web/dist/assets")
 	r.NoRoute(func(c *gin.Context) {
 		c.File("./web/dist/index.html")
@@ -345,18 +87,15 @@ func main() {
 	<-quit
 
 	log.Println("Shutting down server...")
-	auditCancel()
 
-	ctx, cancel := context.WithTimeout(context.Background(), constants.ShutdownTimeout)
-	defer cancel()
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), constants.ShutdownTimeout)
+	defer shutdownCancel()
 
-	if err := srv.Shutdown(ctx); err != nil {
+	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Printf("Server shutdown error: %v", err)
 	}
 
-	if natsConn != nil {
-		natsConn.Close()
-	}
+	cleanup()
 
 	log.Println("Server exited")
 }

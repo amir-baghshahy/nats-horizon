@@ -195,21 +195,63 @@ func Get() *AppConfig {
 	return instance
 }
 
-// configPath returns the path to the config file
+// configPath returns the path to the config file.
+//
+// The config lives in a user-writable, platform-appropriate location so that
+// settings can be persisted even when the binary is installed in a read-only
+// directory (e.g. /usr/bin, /Applications/.../MacOS). On first load, a config
+// left next to the executable (legacy behaviour) is migrated to the new path.
 func configPath() string {
-	// Use the project directory for config (next to the binary)
-	execPath, err := os.Executable()
-	if err == nil {
-		execDir := filepath.Dir(execPath)
-		return filepath.Join(execDir, "nats-horizon.json")
+	if dir, err := os.UserConfigDir(); err == nil && dir != "" {
+		return filepath.Join(dir, "nats-horizon", "config.json")
 	}
 
-	// Fallback to current directory
+	// Fallback: current working directory if the user config dir is unavailable.
 	if cwd, err := os.Getwd(); err == nil {
 		return filepath.Join(cwd, "nats-horizon.json")
 	}
 
 	return "nats-horizon.json"
+}
+
+// legacyConfigPath returns the pre-relocation config location (next to the
+// executable), used only for one-time migration.
+func legacyConfigPath() string {
+	if execPath, err := os.Executable(); err == nil {
+		return filepath.Join(filepath.Dir(execPath), "nats-horizon.json")
+	}
+	if cwd, err := os.Getwd(); err == nil {
+		return filepath.Join(cwd, "nats-horizon.json")
+	}
+	return "nats-horizon.json"
+}
+
+// migrateLegacyConfig copies a config left next to the binary (old behaviour)
+// into the new user-config location, once. Failures are non-fatal: a missing or
+// unreadable legacy file simply means the new default config is used.
+func migrateLegacyConfig() {
+	newPath := configPath()
+	if _, err := os.Stat(newPath); err == nil {
+		return // new config already exists, nothing to migrate
+	} else if !os.IsNotExist(err) {
+		return
+	}
+
+	legacyPath := legacyConfigPath()
+	if legacyPath == newPath {
+		return
+	}
+	data, err := os.ReadFile(legacyPath)
+	if err != nil {
+		return // no legacy config to migrate
+	}
+
+	if err := ensureDir(); err != nil {
+		return
+	}
+	if err := os.WriteFile(newPath, data, 0600); err == nil {
+		fmt.Printf("migrated config from %s to %s\n", legacyPath, newPath)
+	}
 }
 
 // ensureDir ensures the config directory exists
@@ -220,6 +262,8 @@ func ensureDir() error {
 
 // load reads config from file
 func (c *AppConfig) load() error {
+	migrateLegacyConfig()
+
 	path := configPath()
 	data, err := os.ReadFile(path)
 	if err != nil {

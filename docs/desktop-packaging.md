@@ -87,9 +87,9 @@ go get github.com/wailsapp/wails/v2
 
 ### 3. Create desktop app package
 
-`desktop/app.go` — App struct with StartUp/ShutDown lifecycle, NATS connection management, and Go bindings for all features (streams, consumers, messages, KV, dashboard, cluster, metrics, connections, security, subjects, history).
+`desktop/app.go` — thin lifecycle launcher. It builds the shared Gin engine via [`internal/server.Engine`](../internal/server/engine.go) (with desktop-mode restart disabled), holds the `*gin.Engine` + cleanup function, and routes same-origin `/api/*` requests from the Wails webview to that engine through an assetserver `Middleware`. All features are served by the same HTTP handlers as web mode — there are no separate Go bindings to maintain.
 
-`desktop/converters.go` — Model→DTO converters.
+`internal/server/engine.go` — single authoritative definition of the backend (NATS wiring, repositories, services, handlers, middleware, and route table), shared by both the standalone server (`cmd/server`) and the desktop app.
 
 ### 4. Configure Wails
 

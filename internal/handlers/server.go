@@ -418,6 +418,13 @@ func (h *ServerHandler) TerminateConnection(c *gin.Context) {
 //	@Router		/health [get]
 func HealthCheck(useCase *services.ServerUseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if useCase == nil {
+			c.JSON(http.StatusServiceUnavailable, dto.HealthResponse{
+				Status: "unhealthy",
+				NATS:   "disconnected",
+			})
+			return
+		}
 		conns, err := useCase.GetConnections(c.Request.Context())
 		if err != nil || !conns.Connected {
 			c.JSON(http.StatusServiceUnavailable, dto.HealthResponse{
@@ -462,6 +469,14 @@ func LivenessCheck() gin.HandlerFunc {
 //	@Router		/healthz/ready [get]
 func ReadinessCheck(useCase *services.ServerUseCase) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if useCase == nil {
+			c.JSON(http.StatusServiceUnavailable, dto.HealthResponse{
+				Status:    "not ready",
+				NATS:      "disconnected",
+				Timestamp: time.Now().Format(time.RFC3339),
+			})
+			return
+		}
 		conns, err := useCase.GetConnections(c.Request.Context())
 		if err != nil || !conns.Connected {
 			c.JSON(http.StatusServiceUnavailable, dto.HealthResponse{

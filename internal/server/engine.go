@@ -172,7 +172,6 @@ func Engine(parent context.Context, opts ...Option) (*gin.Engine, func()) {
 	r.Use(middleware.RequestID())
 	r.Use(middleware.LoggingMiddleware())
 	r.Use(middleware.RequestSizeLimitMiddleware())
-	r.Use(middleware.RateLimitMiddleware(middleware.NewRateLimiter(100, 2*time.Second, 5*time.Second)))
 	r.Use(middleware.CORSMiddlewareWithValidation(cfg.CORSAllowedOrigins))
 	r.Use(middleware.AuditMiddleware(auditService))
 

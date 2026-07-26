@@ -3,7 +3,7 @@ module github.com/amir-baghshahy/nats-horizon
 go 1.25.0
 
 require (
-	github.com/getkin/kin-openapi v0.140.0
+	github.com/getkin/kin-openapi v0.144.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/nats-io/nats.go v1.52.0
 	github.com/stretchr/testify v1.10.0
@@ -54,8 +54,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nats-io/nkeys v0.4.15 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/oasdiff/yaml v0.1.0 // indirect
-	github.com/oasdiff/yaml3 v0.0.13 // indirect
+	github.com/oasdiff/yaml v0.1.1 // indirect
+	github.com/oasdiff/yaml3 v0.0.14 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pkg/errors v0.9.1 // indirect

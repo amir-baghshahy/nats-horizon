@@ -1,1 +1,1 @@
-export { default } from "./stream-detail/StreamDetailPage";
+export { default } from "./streamDetail/StreamDetailPage";

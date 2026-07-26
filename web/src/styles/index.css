@@ -56,7 +56,7 @@
 
 @layer components {
   .card {
-    @apply relative overflow-hidden rounded-xl border border-border-default/60 bg-surface-secondary/75 p-4 shadow-lg shadow-black/10 backdrop-blur-xl;
+    @apply relative overflow-hidden rounded-xl border border-border-default/60 bg-surface-secondary/75 p-4 shadow-lg shadow-black/10;
   }
 
   .card::before {
@@ -834,4 +834,20 @@
   to {
     stroke-dashoffset: 0;
   }
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Limit repaint scope for list items */
+.list-item {
+  contain: layout style paint;
 }

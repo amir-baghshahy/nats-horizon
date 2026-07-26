@@ -8,10 +8,11 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
+import { memo } from "react";
 import { useTranslation } from "react-i18next";
 import { StatusBadge } from "../../../components/ui";
 import { formatBytes } from "../../../utils/formatters";
-import type { Stream } from "../hooks/useStreamsPage";
+import type { StreamResponse as Stream } from "../../../types";
 
 interface StreamRowProps {
   stream: Stream;
@@ -28,7 +29,7 @@ interface StreamRowProps {
   onExportMessages: (streamName: string, subject?: string) => void;
 }
 
-export default function StreamRow({
+const StreamRow = memo(function StreamRow({
   stream,
   streamName,
   healthStatus,
@@ -176,7 +177,7 @@ export default function StreamRow({
                 {t("streams.subjects")}
               </p>
               <div className="space-y-1">
-                {stream.config?.subjects?.map((subject: string) => (
+                {stream.config?.subjects?.map((subject) => (
                   <code
                     key={subject}
                     className="text-display-xs text-primary-400"
@@ -224,4 +225,6 @@ export default function StreamRow({
       </div>
     </div>
   );
-}
+});
+
+export default StreamRow;

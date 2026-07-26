@@ -1,3 +1,6 @@
+import React from "react";
+import { useTranslation } from "react-i18next";
+
 interface BulkAction {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -19,6 +22,8 @@ export default function BulkActions({
   actions,
   onClearSelection,
 }: BulkActionsProps) {
+  const { t } = useTranslation();
+
   if (selectedCount === 0) {
     return null;
   }
@@ -34,9 +39,11 @@ export default function BulkActions({
     <div className="flex items-center justify-between p-4 bg-primary-500/10 border border-primary-500/30 rounded-lg mb-4">
       <div className="text-display-sm">
         <span className="font-medium">{selectedCount}</span>
-        <span className="text-content-tertiary mx-2">of</span>
+        <span className="text-content-tertiary mx-2">{t("common.of")}</span>
         <span className="text-content-tertiary">{totalCount}</span>
-        <span className="text-content-tertiary mx-2">selected</span>
+        <span className="text-content-tertiary mx-2">
+          {t("common.selected")}
+        </span>
       </div>
 
       <div className="flex items-center gap-3">
@@ -57,7 +64,7 @@ export default function BulkActions({
           onClick={onClearSelection}
           className="text-display-sm text-content-tertiary hover:text-content-primary transition-colors"
         >
-          Clear selection
+          {t("common.clearSelection")}
         </button>
       </div>
     </div>

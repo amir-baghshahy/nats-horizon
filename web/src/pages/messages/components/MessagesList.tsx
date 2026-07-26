@@ -156,20 +156,15 @@ export default function MessagesList({
     >
       {/* Messages */}
       <div className="overflow-y-auto scrollbar-thin flex-1 min-h-0 divide-y divide-border-default">
-        {messages.map((message, index) => {
+        {messages.map((message) => {
           const sequence = message.sequence ?? 0;
           const isExpanded = expanded.has(sequence);
           const isSelected = selected.has(sequence);
           const messageData = parseMessageData(message.data);
           const headers = message.headers || {};
-          const delayClass =
-            index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
 
           return (
-            <div
-              key={sequence}
-              className={`border-l-2 border-l-transparent hover:border-l-primary-500 transition-colors animate-slide-in animate-duration-200 ${delayClass}`}
-            >
+            <div key={sequence}>
               <div className="p-4 hover:bg-surface-primary/50 transition-colors">
                 <div className="flex items-start gap-4">
                   {/* Checkbox */}
@@ -229,7 +224,7 @@ export default function MessagesList({
                       title={t("messages.copyMessage")}
                     >
                       {copiedMessage === sequence ? (
-                        <Check className="icon-base text-green-400 animate-bounce-in" />
+                        <Check className="icon-base text-green-400" />
                       ) : (
                         <CopyIcon className="icon-base text-content-tertiary" />
                       )}

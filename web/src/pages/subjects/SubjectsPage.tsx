@@ -133,7 +133,7 @@ export default function SubjectsPage({
       </div>
 
       {/* Summary Stats Section */}
-      <section className="shrink-0 animate-slide-up">
+      <section className="shrink-0">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <StatCard
             icon={Hash}
@@ -161,7 +161,7 @@ export default function SubjectsPage({
       </section>
 
       {/* Subject Browser Section */}
-      <section className="flex-1 min-h-0 flex flex-col gap-3 animate-slide-up animate-delay-100">
+      <section className="flex-1 min-h-0 flex flex-col gap-3">
         <FilterBar
           searchValue={searchQuery}
           onSearchChange={setSearchQuery}

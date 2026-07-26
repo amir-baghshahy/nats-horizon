@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   useMutation,
@@ -7,9 +7,12 @@ import {
   type UseMutationResult,
 } from "@tanstack/react-query";
 import type {
+  ApiError,
   CreateStreamRequest,
   StreamResponse as Stream,
-  StreamResponse,
+  StreamFilters,
+  StreamStats,
+  StreamHealthStatus,
 } from "../../../types";
 import { ExportService, StreamsService } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
@@ -21,28 +24,9 @@ import {
   useSelection,
 } from "../../../hooks";
 import { useSSE } from "../../../hooks/useSSE";
+import { downloadBlob } from "../../../utils/download";
+import { streamFilterFn, defaultFilters } from "../../../utils/streamFilters";
 import { getStreamHealthStatus as getStreamHealthStatusByLag } from "../../../constants/thresholds";
-
-export type StreamHealthStatus = "all" | "healthy" | "warning" | "critical";
-
-export interface StreamFilters {
-  search: string;
-  storage: "file" | "memory" | "all";
-  status: StreamHealthStatus;
-  minMessages: number;
-  maxMessages: number;
-  minConsumers: number;
-  subjectPattern: string;
-}
-
-export interface StreamStats {
-  total: number;
-  fileStorage: number;
-  memoryStorage: number;
-  totalMessages: number;
-  totalBytes: number;
-  totalConsumers: number;
-}
 
 export interface UseStreamsPageReturn {
   streams: Stream[];
@@ -78,7 +62,7 @@ export interface UseStreamsPageReturn {
   refetch: () => void;
   setShowCreateModal: (value: boolean) => void;
   createMutation: UseMutationResult<
-    StreamResponse,
+    Stream,
     unknown,
     CreateStreamRequest,
     unknown
@@ -97,52 +81,22 @@ export interface UseStreamsPageReturn {
   getStreamName: (stream: Stream) => string;
 }
 
-function downloadBlob(data: Blob | string | object, filename: string) {
-  let blob: Blob;
-  if (typeof data === "string") {
-    blob = new Blob([data], { type: "application/octet-stream" });
-  } else if (data instanceof Blob) {
-    blob = data;
-  } else {
-    blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
-  }
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-}
-
-const defaultFilters: StreamFilters = {
-  search: "",
-  storage: "all",
-  status: "all",
-  minMessages: 0,
-  maxMessages: 0,
-  minConsumers: 0,
-  subjectPattern: "",
-};
-
-export function getStreamHealthStatus(stream: Stream): StreamHealthStatus {
-  const lag = stream.state?.num_pending || 0;
-  return getStreamHealthStatusByLag(lag);
-}
-
-export function getStreamName(stream: Stream): string {
-  return stream.config?.name || "";
-}
-
 export function useStreamsPage(): UseStreamsPageReturn {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const { toast } = useToast();
   const { confirm } = useConfirm();
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  const getStreamHealthStatus = (stream: Stream): StreamHealthStatus => {
+    const lag = stream.state?.num_pending || 0;
+    return getStreamHealthStatusByLag(lag);
+  };
+
+  const getStreamName = (stream: Stream): string => {
+    return stream.config?.name || "";
+  };
+
   const { connected: sseConnected } = useSSE("streams");
 
   const {
@@ -153,53 +107,6 @@ export function useStreamsPage(): UseStreamsPageReturn {
     queryKey: ["streams"],
     queryFn: () => StreamsService.getStreams(),
   });
-
-  const streamFilterFn = useCallback(
-    (stream: Stream, filters: StreamFilters) => {
-      const streamName = stream.config?.name || "";
-      const matchesSearch =
-        streamName.toLowerCase().includes(filters.search.toLowerCase()) ||
-        (stream.config?.subjects || []).some((subject) =>
-          subject.toLowerCase().includes(filters.search.toLowerCase()),
-        );
-
-      const matchesStorage =
-        filters.storage === "all" || stream.config?.storage === filters.storage;
-
-      const lag = stream.state?.num_pending || 0;
-      let matchesStatus = true;
-      if (filters.status === "healthy") {
-        matchesStatus = lag < 1000;
-      } else if (filters.status === "warning") {
-        matchesStatus = lag >= 1000 && lag < 10000;
-      } else if (filters.status === "critical") {
-        matchesStatus = lag >= 10000;
-      }
-
-      const messages = stream.state?.messages || 0;
-      const matchesMinMessages = messages >= filters.minMessages;
-      const matchesMaxMessages =
-        filters.maxMessages === 0 || messages <= filters.maxMessages;
-      const matchesMinConsumers =
-        (stream.state?.consumers || 0) >= filters.minConsumers;
-      const matchesSubjectPattern =
-        filters.subjectPattern === "" ||
-        (stream.config?.subjects || []).some((subject) =>
-          subject.includes(filters.subjectPattern),
-        );
-
-      return (
-        matchesSearch &&
-        matchesStorage &&
-        matchesStatus &&
-        matchesMinMessages &&
-        matchesMaxMessages &&
-        matchesMinConsumers &&
-        matchesSubjectPattern
-      );
-    },
-    [],
-  );
 
   const {
     filters,
@@ -253,7 +160,7 @@ export function useStreamsPage(): UseStreamsPageReturn {
       );
       toast("success", t("streams.exportDownloaded"));
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast("error", error?.body?.error || t("streams.exportFailed"));
     },
   });
@@ -272,7 +179,7 @@ export function useStreamsPage(): UseStreamsPageReturn {
       downloadBlob(blob, `${variables.name}.${variables.format}`);
       toast("success", t("streams.streamExportDownloaded"));
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast("error", error?.body?.error || t("streams.streamExportFailed"));
     },
   });
@@ -298,10 +205,10 @@ export function useStreamsPage(): UseStreamsPageReturn {
       downloadBlob(blob, `${variables.name}-${suffix}.json`);
       toast("success", t("streams.messagesExportDownloaded"));
     },
-    onError: (error: any) => {
+    onError: (error: ApiError) => {
       toast(
         "error",
-        error?.response?.data?.error || t("streams.messagesExportFailed"),
+        error?.body?.error || t("streams.messagesExportFailed"),
       );
     },
   });
@@ -312,8 +219,8 @@ export function useStreamsPage(): UseStreamsPageReturn {
       queryClient.invalidateQueries({ queryKey: ["streams"] });
       setShowCreateModal(false);
     },
-    onError: (error: any) => {
-      toast("error", error?.response?.data?.error || t("streams.createFailed"));
+    onError: (error: ApiError) => {
+      toast("error", error.body?.error || t("streams.createFailed"));
     },
   });
 
@@ -437,5 +344,3 @@ export function useStreamsPage(): UseStreamsPageReturn {
     getStreamName,
   };
 }
-
-export type { Stream };

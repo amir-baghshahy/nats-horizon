@@ -1,19 +1,32 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface SSEEvent {
   type: string;
   timestamp: number;
-  data: any;
+  data: Record<string, unknown>;
 }
+
+const RECONNECT_BASE_DELAY = 1000;
+const RECONNECT_MAX_DELAY = 30000;
 
 export function useSSE(channel: string) {
   const [connected, setConnected] = useState(false);
-  const [lastEvent, setLastEvent] = useState<SSEEvent | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectAttempts = useRef(0);
   const queryClient = useQueryClient();
 
-  useEffect(() => {
+  const connect = () => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+
     const url = `/api/events?channel=${channel}`;
     const eventSource = new EventSource(url);
 
@@ -24,9 +37,7 @@ export function useSSE(channel: string) {
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data) as SSEEvent;
-        setLastEvent(data);
 
-        // Invalidate relevant queries based on event type
         switch (data.type) {
           case "stream:update":
             queryClient.invalidateQueries({ queryKey: ["streams"] });
@@ -49,17 +60,36 @@ export function useSSE(channel: string) {
       }
     };
 
-    eventSource.onerror = (error) => {
-      console.error("SSE error:", error);
+    eventSource.onerror = () => {
+      console.error("SSE error, reconnecting...");
       setConnected(false);
+      eventSource.close();
+      eventSourceRef.current = null;
+      const delay = Math.min(
+        RECONNECT_BASE_DELAY * Math.pow(2, reconnectAttempts.current),
+        RECONNECT_MAX_DELAY,
+      );
+      reconnectAttempts.current++;
+      reconnectTimerRef.current = setTimeout(connect, delay);
     };
 
     eventSourceRef.current = eventSource;
+  };
+
+  useEffect(() => {
+    connect();
 
     return () => {
-      eventSource.close();
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
     };
-  }, [channel, queryClient]);
+  }, [channel]);
 
-  return { connected, lastEvent };
+  return { connected };
 }

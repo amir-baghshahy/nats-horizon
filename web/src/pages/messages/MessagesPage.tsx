@@ -91,7 +91,7 @@ export default function MessagesPage() {
       </section>
 
       {activeMessageTab === "stream" && (
-        <section className="flex-1 min-h-0 flex flex-col gap-4 animate-slide-up">
+        <section className="flex-1 min-h-0 flex flex-col gap-4">
           <div className="shrink-0">
             <StreamSelector
               streams={streams}
@@ -145,7 +145,7 @@ export default function MessagesPage() {
       )}
 
       {activeMessageTab === "core" && (
-        <section className="flex-1 min-h-0 animate-slide-up">
+        <section className="flex-1 min-h-0">
           <CoreMessagingContent />
         </section>
       )}

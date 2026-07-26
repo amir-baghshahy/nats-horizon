@@ -15,7 +15,8 @@ import Button from "../../components/ui/Button";
 import Select from "../../components/ui/Select";
 import PageHeader from "../../components/ui/PageHeader";
 import { PageLoading } from "../../components/ui/PageState";
-import { ConfigService, TenancyService, HealthService } from "../../types";
+import { ConfigService, TenancyService } from "../../types";
+import { useServerRestart } from "../../hooks/useServerRestart";
 
 interface ConfigData {
   nats_url: string;
@@ -31,26 +32,6 @@ interface ConfigData {
 interface TestResult {
   healthy?: boolean;
   error?: string;
-}
-
-const RESTART_KEY = "nats-setup-restarting";
-
-// Helper: Poll health endpoint until server is ready
-async function pollServerHealth(maxAttempts: number = 30): Promise<boolean> {
-  for (let i = 0; i < maxAttempts; i++) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    try {
-      const response = await HealthService.getHealth();
-      if (response) {
-        localStorage.removeItem(RESTART_KEY);
-        return true;
-      }
-    } catch {
-      // Server not ready yet
-    }
-  }
-  localStorage.removeItem(RESTART_KEY);
-  return false;
 }
 
 // Helper: Default config values
@@ -88,12 +69,12 @@ export default function SettingsPage() {
   const [testing, setTesting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [restarting, setRestarting] = useState(() => {
-    return localStorage.getItem(RESTART_KEY) === "true";
-  });
   const [originalNatsUrl, setOriginalNatsUrl] = useState("");
   const [config, setConfig] = useState<ConfigData>(getDefaultConfig);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
+  const { restarting, triggerRestart } = useServerRestart({
+    onTimeout: () => setError("settings.restartTimeout"),
+  });
 
   useEffect(() => {
     const loadConfig = async () => {
@@ -111,25 +92,15 @@ export default function SettingsPage() {
     loadConfig();
   }, [t]);
 
-  useEffect(() => {
-    if (restarting) {
-      pollServerHealth().then((success) => {
-        if (success) {
-          window.location.reload();
-        } else {
-          setRestarting(false);
-          setError("settings.restartTimeout");
-        }
-      });
-    }
-  }, [restarting]);
-
-  const updateField = useCallback((field: keyof ConfigData, value: string | number) => {
-    setConfig((prev) => ({ ...prev, [field]: value }));
-    if (field === "nats_url") {
-      setTestResult(null);
-    }
-  }, []);
+  const updateField = useCallback(
+    (field: keyof ConfigData, value: string | number) => {
+      setConfig((prev) => ({ ...prev, [field]: value }));
+      if (field === "nats_url") {
+        setTestResult(null);
+      }
+    },
+    [],
+  );
 
   const handleTestConnection = useCallback(async () => {
     setTesting(true);
@@ -173,15 +144,9 @@ export default function SettingsPage() {
     try {
       await ConfigService.putConfig(config);
 
-      setSuccess("settings.saved");
+      triggerRestart();
 
-      setRestarting(true);
-      localStorage.setItem(RESTART_KEY, "true");
-      try {
-        await ConfigService.postConfigRestart();
-      } catch {
-        // Ignore - connection will drop during restart
-      }
+      setSuccess("settings.saved");
     } catch {
       setError("settings.saveFailed");
     } finally {

@@ -70,7 +70,7 @@ export const LIMITS = {
   MAX_PAYLOAD_SIZE: 10 * 1024 * 1024, // 10MB
   MAX_MESSAGES_IN_LIST: 1000,
   MAX_DISPLAYED_MESSAGES: 50,
-  MAX_CONSUMER_LAG_WARNING: 1000,
-  MAX_CONSUMER_LAG_CRITICAL: 10000,
 } as const;
 
+// Consumer lag thresholds (imported from single source of truth in constants/thresholds)
+export { LAG_THRESHOLDS } from "../constants/thresholds";

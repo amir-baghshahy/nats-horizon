@@ -334,7 +334,9 @@ func (h *TenancyHandler) TestConnection(c *gin.Context) {
 	msg, err := nc.Request(constants.SysServerPing, []byte("{}"), 2*time.Second)
 	serverInfo := make(map[string]interface{})
 	if err == nil {
-		json.Unmarshal(msg.Data, &serverInfo)
+		if unmarshalErr := json.Unmarshal(msg.Data, &serverInfo); unmarshalErr != nil {
+			log.Printf("Failed to unmarshal server info: %v", unmarshalErr)
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{

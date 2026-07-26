@@ -45,7 +45,9 @@ export function useDashboard(): UseDashboardReturn {
   } = useQuery({
     queryKey: ["dashboardStats"],
     queryFn: () => HealthService.getDashboardStats(),
-    refetchInterval: sseConnected ? false : 5000,
+    refetchInterval: 15000,
+    refetchIntervalInBackground: false,
+    staleTime: 10000,
   });
 
   const {
@@ -55,7 +57,9 @@ export function useDashboard(): UseDashboardReturn {
   } = useQuery({
     queryKey: ["accountInfo"],
     queryFn: () => HealthService.getAccountInfo(),
-    refetchInterval: sseConnected ? false : 5000,
+    refetchInterval: 30000,
+    refetchIntervalInBackground: false,
+    staleTime: 15000,
   });
 
   const {
@@ -65,7 +69,9 @@ export function useDashboard(): UseDashboardReturn {
   } = useQuery({
     queryKey: ["connections"],
     queryFn: () => HealthService.getConnections(),
-    refetchInterval: sseConnected ? false : 10000,
+    refetchInterval: 30000,
+    refetchIntervalInBackground: false,
+    staleTime: 15000,
   });
 
   const {
@@ -75,14 +81,17 @@ export function useDashboard(): UseDashboardReturn {
   } = useQuery({
     queryKey: ["consumers"],
     queryFn: () => ConsumersService.getConsumers(),
-    refetchInterval: sseConnected ? false : 5000,
+    refetchInterval: 15000,
+    refetchIntervalInBackground: false,
+    staleTime: 10000,
   });
 
   const { data: clusterHealth } = useQuery({
     queryKey: ["clusterHealth"],
     queryFn: () => ClusterService.getClusterHealth(),
-    refetchInterval: sseConnected ? false : 10000,
+    refetchInterval: sseConnected ? false : 15000,
     retry: 1,
+    staleTime: 10000,
   });
 
   const isLoading =

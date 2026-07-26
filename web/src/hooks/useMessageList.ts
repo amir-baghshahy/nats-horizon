@@ -131,6 +131,8 @@ export function useMessageList(
   const clearMessages = useCallback(() => {
     setMessages([]);
     setExpandedMessages(new Set());
+    setMessageFormats(new Map());
+    setViewModes(new Map());
   }, []);
 
   // Toggle message expansion

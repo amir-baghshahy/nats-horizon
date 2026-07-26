@@ -2,6 +2,7 @@ import type { ConsumerResponse } from "../../types";
 import { getConsumerStatus } from "../../utils/validators";
 import { useTranslation } from "react-i18next";
 import { Database } from "lucide-react";
+import { useMemo } from "react";
 
 interface ConsumerHealthProps {
   consumers: ConsumerResponse[];
@@ -9,6 +10,15 @@ interface ConsumerHealthProps {
 
 export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
   const { t } = useTranslation();
+
+  const topLagging = useMemo(() => {
+    return [...consumers]
+      .sort(
+        (a, b) =>
+          (b.lag || b.num_pending || 0) - (a.lag || a.num_pending || 0),
+      )
+      .slice(0, 5);
+  }, [consumers]);
 
   if (!consumers || consumers.length === 0) {
     return (
@@ -25,12 +35,6 @@ export default function ConsumerHealth({ consumers }: ConsumerHealthProps) {
       </div>
     );
   }
-
-  const topLagging = [...consumers]
-    .sort(
-      (a, b) => (b.lag || b.num_pending || 0) - (a.lag || a.num_pending || 0),
-    )
-    .slice(0, 5);
 
   return (
     <div className="card overflow-hidden flex flex-col h-full min-h-0">

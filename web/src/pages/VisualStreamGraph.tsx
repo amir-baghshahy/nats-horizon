@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useVisualStreamData } from "./visual-stream-graph/hooks/useVisualStreamData";
-import { StreamGraph } from "./visual-stream-graph/components/StreamGraph";
-import { NodeDetailsPanel } from "./visual-stream-graph/components/details/NodeDetailsPanel";
+import { useVisualStreamData } from "./visualStreamGraph/hooks/useVisualStreamData";
+import { StreamGraph } from "./visualStreamGraph/components/StreamGraph";
+import { NodeDetailsPanel } from "./visualStreamGraph/components/details/NodeDetailsPanel";
 import { useTranslation } from "react-i18next";
 import { Database, Network, RefreshCw } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";

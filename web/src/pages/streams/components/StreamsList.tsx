@@ -6,6 +6,7 @@ import { EmptyState } from "../../../components/ui";
 import type { StreamResponse as Stream } from "../../../types";
 import StreamRow from "./StreamRow";
 import { useTranslation } from "react-i18next";
+import { useMemo } from "react";
 
 interface StreamsListProps {
   streams: Stream[];
@@ -59,24 +60,27 @@ export default function StreamsList({
   getStreamName,
 }: StreamsListProps) {
   const { t } = useTranslation();
-  const actions = [
-    {
-      label: t("streams.exportAll"),
-      icon: Download as LucideIcon,
-      onClick: onExportAll,
-    },
-    {
-      label: t("streams.delete"),
-      icon: Trash2 as LucideIcon,
-      onClick: onBulkDelete,
-      variant: "danger" as const,
-    },
-  ];
+  const actions = useMemo(
+    () => [
+      {
+        label: t("streams.exportAll"),
+        icon: Download as LucideIcon,
+        onClick: onExportAll,
+      },
+      {
+        label: t("streams.delete"),
+        icon: Trash2 as LucideIcon,
+        onClick: onBulkDelete,
+        variant: "danger" as const,
+      },
+    ],
+    [t, onExportAll, onBulkDelete],
+  );
 
   if (isLoading) {
     return (
       <div className="p-8 flex items-center justify-center min-h-[400px]">
-        <RefreshCw className="avatar animate-spin text-primary-400" />
+        <RefreshCw className="animate-spin text-primary-400" />
       </div>
     );
   }
@@ -106,40 +110,34 @@ export default function StreamsList({
       />
 
       <div className="card overflow-hidden flex flex-col flex-1 min-h-0">
-        <div className="overflow-y-auto scrollbar-thin flex-1 min-h-0 divide-y divide-border-default animate-fade-in">
-          {streams.map((stream, index) => {
+        <div className="overflow-y-auto scrollbar-thin flex-1 min-h-0 divide-y divide-border-default">
+          {streams.map((stream) => {
             const streamName = getStreamName(stream);
             const healthStatus = getStreamHealthStatus(stream);
             const isItemSelected = isSelected(streamName);
             const isItemExpanded = isExpanded(streamName);
-            const delayClass =
-              index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
 
             return (
-              <div
+              <StreamRow
                 key={streamName}
-                className={`animate-slide-in animate-duration-200 ${delayClass}`}
-              >
-                <StreamRow
-                  stream={stream}
-                  streamName={streamName}
-                  healthStatus={healthStatus}
-                  isItemSelected={isItemSelected}
-                  isItemExpanded={isItemExpanded}
-                  toggleSelection={toggleSelection}
-                  toggleExpansion={toggleExpansion}
-                  onViewDetails={onViewDetails}
-                  onDelete={onDelete}
-                  onPurge={onPurge}
-                  onExportStream={onExportStream}
-                  onExportMessages={onExportMessages}
-                />
-              </div>
+                stream={stream}
+                streamName={streamName}
+                healthStatus={healthStatus}
+                isItemSelected={isItemSelected}
+                isItemExpanded={isItemExpanded}
+                toggleSelection={toggleSelection}
+                toggleExpansion={toggleExpansion}
+                onViewDetails={onViewDetails}
+                onDelete={onDelete}
+                onPurge={onPurge}
+                onExportStream={onExportStream}
+                onExportMessages={onExportMessages}
+              />
             );
           })}
         </div>
         <div className="p-3 border-t border-border-default bg-surface-primary/50 text-center text-display-sm text-content-tertiary flex-shrink-0">
-          {t("streams.streamCount", { count: streams.length })}
+          {t("streams.streamCount", { count: filteredStreams.length })}
         </div>
       </div>
 

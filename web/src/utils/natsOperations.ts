@@ -69,10 +69,6 @@ export async function replayMessages(
 
     if (options.startSequence) payload.start_seq = options.startSequence;
     if (options.endSequence) payload.end_seq = options.endSequence;
-    if (options.startTime)
-      payload.start_seq = Math.floor(options.startTime.getTime() / 1000);
-    if (options.endTime)
-      payload.end_seq = Math.floor(options.endTime.getTime() / 1000);
     if (options.filter) payload.filter_subject = options.filter;
 
     const response = await ConsumersService.postStreamsConsumersReplay(

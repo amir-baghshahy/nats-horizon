@@ -56,13 +56,11 @@ export default function AlertsList({
       footer={<span>{t("alerts.alertCount", { count: alerts.length })}</span>}
     >
       <div className="space-y-4">
-        {alerts.map((alert: Alert, index: number) => {
-          const delayClass =
-            index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
+        {alerts.map((alert: Alert) => {
           return (
             <div
               key={alert.id}
-              className={`card hover:border-border-default/50 transition-colors animate-fade-in hover-lift ${delayClass}`}
+              className="card hover:border-border-default/50 transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
@@ -72,7 +70,7 @@ export default function AlertsList({
                     disabled={isTogglePending}
                   >
                     {alert.enabled ? (
-                      <ToggleRight className="icon-md text-green-400 animate-bounce-in" />
+                      <ToggleRight className="icon-md text-green-400" />
                     ) : (
                       <ToggleLeft className="icon-md text-content-tertiary" />
                     )}

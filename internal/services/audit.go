@@ -129,12 +129,9 @@ func (s *AuditService) GetLogs(offset int64, limit int64) ([]AuditEvent, error) 
 	}
 
 	// Calculate end sequence based on limit
-	endSeq := startSeq
+	endSeq := streamInfo.State.FirstSeq
 	if startSeq > uint64(limit) {
-		endSeq = startSeq - uint64(limit)
-	}
-	if endSeq < streamInfo.State.FirstSeq {
-		endSeq = streamInfo.State.FirstSeq
+		endSeq = max(startSeq-uint64(limit), streamInfo.State.FirstSeq)
 	}
 
 	var events []AuditEvent

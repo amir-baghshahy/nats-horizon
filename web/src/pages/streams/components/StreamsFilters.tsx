@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { FilterBar } from "../../../components/ui";
-import Select from "../../../components/ui/Select";
-import type { StreamFilters } from "../hooks/useStreamsPage";
+import { FilterBar, Select } from "../../../components/ui";
+import type { StreamFilters } from "../../../types";
 
 interface StreamsFiltersProps {
   filters: StreamFilters;

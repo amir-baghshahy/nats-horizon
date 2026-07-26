@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
@@ -155,9 +156,18 @@ func (r *NATSStreamRepository) List(ctx context.Context) ([]*models.Stream, erro
 
 	streams := make([]*models.Stream, 0, len(allStreams))
 	for _, s := range allStreams {
-		firstTs, _ := time.Parse(time.RFC3339Nano, s.State.FirstTs)
-		lastTs, _ := time.Parse(time.RFC3339Nano, s.State.LastTs)
-		createdAt, _ := time.Parse(time.RFC3339Nano, s.Created)
+		firstTs, err := time.Parse(time.RFC3339Nano, s.State.FirstTs)
+		if err != nil {
+			log.Printf("Failed to parse first_ts for stream %s: %v", s.Config.Name, err)
+		}
+		lastTs, err := time.Parse(time.RFC3339Nano, s.State.LastTs)
+		if err != nil {
+			log.Printf("Failed to parse last_ts for stream %s: %v", s.Config.Name, err)
+		}
+		createdAt, err := time.Parse(time.RFC3339Nano, s.Created)
+		if err != nil {
+			log.Printf("Failed to parse created_at for stream %s: %v", s.Config.Name, err)
+		}
 		stream := &models.Stream{
 			Name:      s.Config.Name,
 			Subjects:  s.Config.Subjects,
@@ -231,7 +241,7 @@ func (r *NATSStreamRepository) Purge(ctx context.Context, name string, subject s
 
 	info, err := r.js.StreamInfo(name)
 	if err != nil {
-		return 0, nil
+		return 0, fmt.Errorf("failed to get stream info after purge: %w", err)
 	}
 
 	return info.State.Msgs, nil

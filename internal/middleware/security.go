@@ -1,12 +1,12 @@
 package middleware
 
 import (
+	"crypto/rand"
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
-
-const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 
 // RequestID adds a request ID to the context and response headers
 func RequestID() gin.HandlerFunc {
@@ -23,18 +23,10 @@ func RequestID() gin.HandlerFunc {
 
 func generateRequestID() string {
 	b := make([]byte, 16)
-	for i := range b {
-		b[i] = charset[time.Now().UnixNano()%int64(len(charset))]
+	if _, err := rand.Read(b); err != nil {
+		return fmt.Sprintf("req-%d", time.Now().UnixNano())
 	}
-	return "req-" + string(b)
-}
-
-func randomString(n int) string {
-	b := make([]byte, n)
-	for i := range b {
-		b[i] = charset[i%len(charset)]
-	}
-	return string(b)
+	return "req-" + fmt.Sprintf("%x", b)
 }
 
 func SecurityHeaders() gin.HandlerFunc {

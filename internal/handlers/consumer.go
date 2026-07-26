@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -425,11 +426,13 @@ func (h *ConsumerHandler) ListAll(c *gin.Context) {
 			subject := fmt.Sprintf("%s.%s", constants.APIConsumerList, name)
 			msg, err := h.nc.Request(subject, []byte{}, constants.DefaultRequestTimeout)
 			if err != nil {
+				log.Printf("Failed to list consumers for stream %s: %v", name, err)
 				return
 			}
 
 			var response consumerListResponse
 			if err := json.Unmarshal(msg.Data, &response); err != nil {
+				log.Printf("Failed to parse consumer list for stream %s: %v", name, err)
 				return
 			}
 

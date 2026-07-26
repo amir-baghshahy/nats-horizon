@@ -220,11 +220,13 @@ func (h *SSEHub) MonitorStreams() {
 		case <-ticker.C:
 			msg, err := h.nc.Request(constants.APIStreamList, []byte{}, 2*time.Second)
 			if err != nil {
+				log.Printf("Failed to fetch stream list for monitoring: %v", err)
 				continue
 			}
 
 			var response sseStreamListResponse
 			if err := json.Unmarshal(msg.Data, &response); err != nil {
+				log.Printf("Failed to parse stream list for monitoring: %v", err)
 				continue
 			}
 
@@ -285,11 +287,13 @@ func (h *SSEHub) MonitorConsumers() {
 		case <-ticker.C:
 			msg, err := h.nc.Request(constants.APIStreamList, []byte{}, 2*time.Second)
 			if err != nil {
+				log.Printf("Failed to fetch stream list for consumer monitoring: %v", err)
 				continue
 			}
 
 			var streamResponse sseStreamListResponse
 			if err := json.Unmarshal(msg.Data, &streamResponse); err != nil {
+				log.Printf("Failed to parse stream list for consumer monitoring: %v", err)
 				continue
 			}
 
@@ -471,12 +475,14 @@ func (h *SSEHub) BroadcastDashboardStats() {
 	streamCount = len(response.Streams)
 	for _, stream := range response.Streams {
 		totalMessages += stream.State.Messages
-		newCount := consumerCount + int(stream.State.Consumers)
-		if newCount < consumerCount {
-			// Integer overflow detected - cap at MaxInt to prevent overflow
+		consumerCountUint := uint64(consumerCount)
+		newCount := consumerCountUint + stream.State.Consumers
+		if newCount < consumerCountUint {
+			consumerCount = math.MaxInt
+		} else if newCount > uint64(math.MaxInt) {
 			consumerCount = math.MaxInt
 		} else {
-			consumerCount = newCount
+			consumerCount = int(newCount)
 		}
 	}
 

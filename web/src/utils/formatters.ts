@@ -124,5 +124,3 @@ export const formatJSON = (data: string): string => {
     return data;
   }
 };
-
-

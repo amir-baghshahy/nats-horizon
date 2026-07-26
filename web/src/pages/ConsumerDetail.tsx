@@ -1,1 +1,1 @@
-export { default } from "./consumer-detail/ConsumerDetailPage";
+export { default } from "./consumerDetail/ConsumerDetailPage";

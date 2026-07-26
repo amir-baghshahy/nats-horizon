@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { HealthService, MetricsService } from "../types";
@@ -9,17 +9,12 @@ import {
   HardDrive,
   Cpu,
 } from "lucide-react";
-import { AreaChart, Area, ResponsiveContainer, Tooltip, YAxis } from "recharts";
+import { AreaChart, Area, Tooltip, YAxis } from "recharts";
 import { formatBytes } from "../utils/formatters";
 
 interface DataPoint {
   timestamp: number;
   value: number;
-}
-
-interface ChartPoint {
-  t: number;
-  v: number;
 }
 
 interface MetricsGraphProps {
@@ -35,7 +30,35 @@ interface MetricsGraphProps {
 
 const DEFAULT_FORMAT = (v: number) => v.toLocaleString();
 
-export function MetricsGraph({
+const TOOLTIP_STYLE: React.CSSProperties = {
+  borderRadius: "0.5rem",
+  border: "1px solid var(--tw-colors-border-default, #334155)",
+  backgroundColor: "rgba(30, 41, 59, 0.95)",
+  padding: "0.25rem 0.5rem",
+  fontSize: "0.75rem",
+  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+};
+
+function ChartTooltip({
+  active,
+  payload,
+  formatValue,
+}: {
+  active?: boolean;
+  payload?: Array<{ value: number }>;
+  formatValue: (v: number) => string;
+}) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={TOOLTIP_STYLE}>
+      <span className="font-mono" style={{ color: "var(--tw-colors-primary-400, #38bdf8)" }}>
+        {formatValue(payload[0].value as number)}
+      </span>
+    </div>
+  );
+}
+
+const MetricsGraph = memo(function MetricsGraph({
   title,
   icon,
   color,
@@ -48,14 +71,14 @@ export function MetricsGraph({
   const { t } = useTranslation();
   const [dataPoints, setDataPoints] = useState<DataPoint[]>([]);
 
-  // Store getValue in a ref to avoid re-creating useEffect when it changes
   const getValueRef = useRef(getValue);
   getValueRef.current = getValue;
 
   const { data } = useQuery({
     queryKey,
     queryFn,
-    refetchInterval: 2000,
+    refetchInterval: 10000,
+    staleTime: 5000,
   });
 
   useEffect(() => {
@@ -71,6 +94,16 @@ export function MetricsGraph({
       console.error("Failed to extract value for metrics graph:", err);
     }
   }, [data, maxPoints]);
+
+  const chartData = useMemo(
+    () => dataPoints.map((p) => ({ t: p.timestamp, v: p.value })),
+    [dataPoints],
+  );
+
+  const hexColor = useMemo(
+    () => (color.startsWith("rgb") ? rgbToHex(color) : color),
+    [color],
+  );
 
   const currentValue =
     dataPoints.length > 0 ? dataPoints[dataPoints.length - 1].value : 0;
@@ -95,12 +128,7 @@ export function MetricsGraph({
           : "text-green-400"
         : "text-content-tertiary";
 
-  const chartData: ChartPoint[] = dataPoints.map((p) => ({
-    t: p.timestamp,
-    v: p.value,
-  }));
-
-  const hexColor = color.startsWith("rgb") ? rgbToHex(color) : color;
+  const gradientId = useMemo(() => `grad-${hexColor}`, [hexColor]);
 
   return (
     <div className="card flex flex-col gap-2">
@@ -140,50 +168,39 @@ export function MetricsGraph({
         </div>
       </div>
 
-      <div className="h-14 w-full">
+      <div className="h-16 w-full">
         {chartData.length >= 2 ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={chartData}
-              margin={{ top: 2, right: 2, left: 2, bottom: 2 }}
-            >
-              <defs>
-                <linearGradient
-                  id={`grad-${hexColor}`}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
-                  <stop offset="5%" stopColor={hexColor} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={hexColor} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <YAxis domain={["dataMin", "dataMax"]} hide />
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null;
-                  return (
-                    <div className="rounded-lg border border-border-default bg-surface-secondary/95 px-2 py-1 text-display-xs shadow-lg">
-                      <span className="font-mono" style={{ color: hexColor }}>
-                        {formatValue(payload[0].value as number)}
-                      </span>
-                    </div>
-                  );
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="v"
-                stroke={hexColor}
-                strokeWidth={1.5}
-                fill={`url(#grad-${hexColor})`}
-                dot={false}
-                activeDot={{ r: 3, strokeWidth: 0 }}
-                isAnimationActive={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          <AreaChart
+            data={chartData}
+            margin={{ top: 2, right: 2, left: 2, bottom: 2 }}
+            width={400}
+            height={64}
+          >
+            <defs>
+              <linearGradient
+                id={gradientId}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="5%" stopColor={hexColor} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={hexColor} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <YAxis domain={["dataMin", "dataMax"]} hide />
+            <Tooltip content={<ChartTooltip formatValue={formatValue} />} />
+            <Area
+              type="monotone"
+              dataKey="v"
+              stroke={hexColor}
+              strokeWidth={1.5}
+              fill={`url(#${gradientId})`}
+              dot={false}
+              activeDot={{ r: 3, strokeWidth: 0 }}
+              isAnimationActive={false}
+            />
+          </AreaChart>
         ) : (
           <div className="flex h-full items-center justify-center text-display-xs text-content-tertiary/60">
             {t("common.collectingData") || "Collecting data…"}
@@ -192,7 +209,7 @@ export function MetricsGraph({
       </div>
     </div>
   );
-}
+});
 
 function rgbToHex(rgb: string): string {
   const match = rgb.match(/\d+/g);

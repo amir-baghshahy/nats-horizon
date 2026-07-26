@@ -72,33 +72,27 @@ export default function ConsumersList({
           </div>
         </div>
       }
-      renderItem={(consumer, index) => {
+      renderItem={(consumer) => {
         const consumerName = consumer.name || "";
         if (!consumerName) return null;
-        const delayClass =
-          index === 0 ? "" : `animate-delay-${Math.min(index * 50, 500)}`;
 
         return (
-          <div
+          <ConsumerRow
             key={consumerName}
-            className={`animate-slide-in animate-duration-200 ${delayClass}`}
-          >
-            <ConsumerRow
-              consumer={consumer}
-              isSelected={selectedConsumers.has(consumerName)}
-              isExpanded={isConsumerExpanded(consumerName)}
-              resetLagPending={resetLagPending}
-              onToggleSelection={onToggleSelection}
-              onToggleExpansion={onToggleExpansion}
-              onTogglePauseResume={onTogglePauseResume}
-              onViewDetails={onViewDetails}
-              onResetLag={onResetLag}
-              onDelete={onDelete}
-              getStatusIcon={getStatusIcon}
-              getStatusLabel={getStatusLabel}
-              getLagColor={getLagColor}
-            />
-          </div>
+            consumer={consumer}
+            isSelected={selectedConsumers.has(consumerName)}
+            isExpanded={isConsumerExpanded(consumerName)}
+            resetLagPending={resetLagPending}
+            onToggleSelection={onToggleSelection}
+            onToggleExpansion={onToggleExpansion}
+            onTogglePauseResume={onTogglePauseResume}
+            onViewDetails={onViewDetails}
+            onResetLag={onResetLag}
+            onDelete={onDelete}
+            getStatusIcon={getStatusIcon}
+            getStatusLabel={getStatusLabel}
+            getLagColor={getLagColor}
+          />
         );
       }}
       footer={

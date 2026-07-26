@@ -51,7 +51,7 @@ export default function DashboardPage({
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 md:p-6 animate-fade-in md:h-full md:overflow-hidden">
+    <div className="flex flex-col gap-4 p-4 md:p-6 md:h-full md:overflow-hidden">
       <div className="shrink-0">
         <DashboardHeader
           sseConnected={sseConnected}
@@ -59,26 +59,22 @@ export default function DashboardPage({
         />
       </div>
 
-      {/* Primary Stats Section */}
-      <section className="shrink-0 animate-slide-up">
+      <section className="shrink-0">
         <StatsGrid stats={stats} limits={accountInfo?.limits} />
       </section>
 
-      {/* Secondary Stats Section */}
-      <section className="shrink-0 animate-slide-up animate-delay-100">
+      <section className="shrink-0">
         <SecondaryStatsGrid account={accountInfo} />
       </section>
 
-      {/* Real-time Metrics Section */}
-      <section className="shrink-0 animate-slide-up animate-delay-200">
+      <section className="shrink-0">
         <h2 className="text-display-sm font-semibold mb-2 text-content-primary">
           {t("dashboard.realTimeMetrics")}
         </h2>
         <SystemMetrics />
       </section>
 
-      {/* Cluster / Connection / Consumer Health — stretches to the bottom of the viewport */}
-      <section className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-4 animate-slide-up animate-delay-300">
+      <section className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-5 gap-4">
         <div className="lg:col-span-3 flex flex-col min-h-0 gap-3">
           <div className="shrink-0">
             <ClusterHealthCard health={clusterHealth} />

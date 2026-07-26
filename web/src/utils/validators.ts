@@ -68,10 +68,13 @@ export const validateTimeout = (
 /**
  * Get consumer health status from lag
  */
+
+import { LAG_THRESHOLDS } from "../constants/thresholds";
+
 export const getConsumerStatus = (
   lag: number,
 ): "success" | "warning" | "error" => {
-  if (lag > 10000) return "error";
-  if (lag > 1000) return "warning";
+  if (lag > LAG_THRESHOLDS.CRITICAL) return "error";
+  if (lag > LAG_THRESHOLDS.WARNING) return "warning";
   return "success";
 };

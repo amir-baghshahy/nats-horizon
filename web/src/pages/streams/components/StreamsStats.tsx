@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { StreamStats } from "../hooks/useStreamsPage";
+import type { StreamStats } from "../../../types";
 import { Database, HardDrive, MessageSquare, Save, Users } from "lucide-react";
 import { StatCard } from "../../../components/ui";
 import { formatBytes } from "../../../utils/formatters";

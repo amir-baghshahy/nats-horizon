@@ -1,1 +1,1 @@
-export { default } from "./kv-store/KVStorePage";
+export { default } from "./kvStore/KVStorePage";

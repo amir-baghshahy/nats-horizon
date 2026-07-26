@@ -8,7 +8,7 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   noPadding?: boolean;
 }
 
-const baseStyles = "relative overflow-hidden backdrop-blur-xl";
+const baseStyles = "relative overflow-hidden";
 
 const variantStyles: Record<CardVariant, string> = {
   default:

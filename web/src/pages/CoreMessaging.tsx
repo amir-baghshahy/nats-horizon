@@ -34,7 +34,11 @@ import type { RequestForm as RequestFormType } from "../components/messaging/Req
 import { PublishForm, RequestForm } from "../components/messaging";
 
 // Helper: Parse headers JSON with validation
-function parseHeadersJson(headersText: string, toast: any, t: any): Record<string, string[]> {
+function parseHeadersJson(
+  headersText: string,
+  toast: any,
+  t: any,
+): Record<string, string[]> {
   if (!headersText || headersText.trim() === "{}") {
     return {};
   }
@@ -151,13 +155,16 @@ export function CoreMessagingContent({
     refetchInterval: REFRESH_INTERVALS.NORMAL,
   });
 
-  const handleSubscribe = useCallback((subject: string) => {
-    if (isSubscribed(subject)) {
-      unsubscribeFromSubject(subject);
-    } else {
-      subscribeToSubject(subject);
-    }
-  }, [isSubscribed, subscribeToSubject, unsubscribeFromSubject]);
+  const handleSubscribe = useCallback(
+    (subject: string) => {
+      if (isSubscribed(subject)) {
+        unsubscribeFromSubject(subject);
+      } else {
+        subscribeToSubject(subject);
+      }
+    },
+    [isSubscribed, subscribeToSubject, unsubscribeFromSubject],
+  );
 
   const handlePublish = useCallback(async () => {
     try {

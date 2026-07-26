@@ -34,7 +34,7 @@ export default function DataList<T>({
   className = "",
   renderItem,
   getKey,
-  animate = true,
+  animate = false,
 }: DataListProps<T>) {
   return (
     <div

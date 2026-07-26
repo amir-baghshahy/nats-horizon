@@ -64,12 +64,12 @@ export default function ConsumersPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="shrink-0 animate-slide-up">
+      <section className="shrink-0">
         <ConsumersStats stats={stats} />
       </section>
 
       {/* Filters & List Section */}
-      <section className="flex-1 min-h-0 flex flex-col gap-4 animate-slide-up animate-delay-100">
+      <section className="flex-1 min-h-0 flex flex-col gap-4">
         <div className="shrink-0">
           <ConsumersFilters
             searchQuery={searchQuery}

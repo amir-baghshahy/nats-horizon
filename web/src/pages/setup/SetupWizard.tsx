@@ -1,8 +1,9 @@
-import PanelCard from "../../components/ui/PanelCard";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Database, Mail, Globe, Check, AlertCircle } from "lucide-react";
-import { ConfigService, HealthService } from "../../types";
+import { ConfigService } from "../../types";
+import { useServerRestart } from "../../hooks/useServerRestart";
+import PanelCard from "../../components/ui/PanelCard";
 
 interface SetupData {
   nats_url: string;
@@ -14,15 +15,15 @@ interface SetupData {
   smtp_from: string;
 }
 
-const RESTART_KEY = "nats-setup-restarting";
-
 export default function SetupWizard() {
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [restarting, setRestarting] = useState(() => {
-    return localStorage.getItem(RESTART_KEY) === "true";
+  const { restarting, triggerRestart } = useServerRestart({
+    onTimeout: () => {
+      setError("Server restart timed out. Please refresh the page.");
+    },
   });
 
   const [data, setData] = useState<SetupData>({
@@ -54,64 +55,12 @@ export default function SetupWizard() {
       await ConfigService.postConfigSetupComplete();
 
       setLoading(false);
-      setRestarting(true);
-      localStorage.setItem(RESTART_KEY, "true");
-      await handleServerRestart();
+      triggerRestart();
     } catch (err) {
       setError(getErrorMessage(err));
       setLoading(false);
     }
   };
-
-  const handleServerRestart = async () => {
-    try {
-      await ConfigService.postConfigRestart();
-    } catch {
-      // Ignore - connection will drop during restart
-    }
-
-    for (let i = 0; i < 30; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      try {
-        const response = await HealthService.getHealth();
-        if (response) {
-          localStorage.removeItem(RESTART_KEY);
-          window.location.reload();
-          return;
-        }
-      } catch {
-        // Server not ready yet
-      }
-    }
-    setRestarting(false);
-    localStorage.removeItem(RESTART_KEY);
-    setError("Server restart timed out. Please refresh the page.");
-  };
-
-  // Poll for server health when in restart mode (e.g., after page reload)
-  useEffect(() => {
-    if (restarting) {
-      const pollHealth = async () => {
-        for (let i = 0; i < 30; i++) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          try {
-            const response = await HealthService.getHealth();
-            if (response) {
-              localStorage.removeItem(RESTART_KEY);
-              window.location.reload();
-              return;
-            }
-          } catch {
-            // Server not ready yet
-          }
-        }
-        setRestarting(false);
-        localStorage.removeItem(RESTART_KEY);
-        setError("Server restart timed out. Please refresh the page.");
-      };
-      pollHealth();
-    }
-  }, [restarting]);
 
   if (restarting) {
     return (

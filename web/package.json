@@ -26,7 +26,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^17.0.8",
-    "react-router-dom": "^7.11.0",
+    "react-router-dom": "^7.18.2",
     "reactflow": "^11.11.4",
     "recharts": "^3.8.1",
     "tailwind-merge": "^3.6.0"

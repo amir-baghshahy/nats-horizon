@@ -45,8 +45,6 @@ export function useDashboard(): UseDashboardReturn {
   } = useQuery({
     queryKey: ["dashboardStats"],
     queryFn: () => HealthService.getDashboardStats(),
-    refetchInterval: 15000,
-    refetchIntervalInBackground: false,
     staleTime: 10000,
   });
 
@@ -81,8 +79,6 @@ export function useDashboard(): UseDashboardReturn {
   } = useQuery({
     queryKey: ["consumers"],
     queryFn: () => ConsumersService.getConsumers(),
-    refetchInterval: 15000,
-    refetchIntervalInBackground: false,
     staleTime: 10000,
   });
 

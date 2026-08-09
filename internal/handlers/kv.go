@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
@@ -349,18 +350,45 @@ func (h *KVHandler) ListKeys(c *gin.Context) {
 	}
 Done:
 
-	keys := []dto.KVKeyEntry{}
+	type keyResult struct {
+		key   string
+		entry nats.KeyValueEntry
+		err   error
+	}
+
+	results := make(chan keyResult, len(keysList))
+	var wg sync.WaitGroup
+
+	const maxConcurrent = 20
+	sem := make(chan struct{}, maxConcurrent)
+
 	for _, key := range keysList {
-		entry, err := kv.Get(key)
-		if err != nil {
+		wg.Add(1)
+		go func(k string) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+
+			entry, err := kv.Get(k)
+			results <- keyResult{key: k, entry: entry, err: err}
+		}(key)
+	}
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	keys := []dto.KVKeyEntry{}
+	for res := range results {
+		if res.err != nil {
 			continue
 		}
-
 		keys = append(keys, dto.KVKeyEntry{
-			Key:      key,
-			Value:    string(entry.Value()),
-			Revision: entry.Revision(),
-			Created:  entry.Created(),
+			Key:      res.key,
+			Value:    string(res.entry.Value()),
+			Revision: res.entry.Revision(),
+			Created:  res.entry.Created(),
 		})
 	}
 

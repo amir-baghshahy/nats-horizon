@@ -2,43 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AuditEvent } from "../models/AuditEvent";
 import type { SuccessResponse } from "../models/SuccessResponse";
 import type { User } from "../models/User";
 import type { CancelablePromise } from "../core/CancelablePromise";
 import { OpenAPI } from "../core/OpenAPI";
 import { request as __request } from "../core/request";
 export class SecurityService {
-  /**
-   * Get audit logs
-   * Returns audit log entries from the NATS audit stream
-   * @param offset Offset for pagination
-   * @param limit Maximum number of logs to return
-   * @param action Filter by action type
-   * @param user Filter by user
-   * @returns AuditEvent OK
-   * @throws ApiError
-   */
-  public static getSecurityAudit(
-    offset?: number,
-    limit: number = 100,
-    action?: string,
-    user?: string,
-  ): CancelablePromise<Array<AuditEvent>> {
-    return __request(OpenAPI, {
-      method: "GET",
-      url: "/security/audit",
-      query: {
-        offset: offset,
-        limit: limit,
-        action: action,
-        user: user,
-      },
-      errors: {
-        500: `Internal Server Error`,
-      },
-    });
-  }
   /**
    * Get connection security status
    * Returns server details and connection security (auth/TLS) status

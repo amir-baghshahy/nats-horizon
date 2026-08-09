@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -35,11 +35,20 @@ export default function ConnectionStatus({
   const visible = expanded ? list : list.slice(0, INITIAL_VISIBLE);
   const hasMore = list.length > INITIAL_VISIBLE;
 
-  const totalSubs = list.reduce((s, c) => s + (c.subs_count || 0), 0);
-  const totalPending = list.reduce((s, c) => s + (c.pending_bytes || 0), 0);
-  const serverCount = new Set(
-    list.map((c) => c.server || c.server_id || "unknown"),
-  ).size;
+  const totalSubs = useMemo(
+    () => list.reduce((s, c) => s + (c.subs_count || 0), 0),
+    [list],
+  );
+  const totalPending = useMemo(
+    () => list.reduce((s, c) => s + (c.pending_bytes || 0), 0),
+    [list],
+  );
+  const serverCount = useMemo(() => {
+    const servers = new Set(
+      list.map((c) => c.server || c.server_id || "unknown"),
+    );
+    return servers.size;
+  }, [list]);
 
   return (
     <div className="card h-full flex flex-col min-h-0">

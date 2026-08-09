@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
-	"github.com/amir-baghshahy/nats-horizon/internal/services"
 	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
 	"github.com/gin-gonic/gin"
 	"github.com/nats-io/nats.go"
@@ -16,14 +14,13 @@ import (
 
 // SecurityHandler handles security-related operations
 type SecurityHandler struct {
-	nc       *nats.Conn
-	js       nats.JetStreamContext
-	auditSvc *services.AuditService
+	nc *nats.Conn
+	js nats.JetStreamContext
 }
 
 // NewSecurityHandler creates a new security handler
-func NewSecurityHandler(nc *nats.Conn, js nats.JetStreamContext, auditSvc *services.AuditService) *SecurityHandler {
-	return &SecurityHandler{nc: nc, js: js, auditSvc: auditSvc}
+func NewSecurityHandler(nc *nats.Conn, js nats.JetStreamContext) *SecurityHandler {
+	return &SecurityHandler{nc: nc, js: js}
 }
 
 // AccountInfo represents NATS account information
@@ -205,98 +202,6 @@ func (h *SecurityHandler) UpdateUser(c *gin.Context) {
 //	@Router			/security/users/{name} [delete]
 func (h *SecurityHandler) DeleteUser(c *gin.Context) {
 	apihttp.JSONError(c, http.StatusNotImplemented, "user management is not implemented; configure users via the NATS operator tooling (nsc/nk)", "")
-}
-
-// GetAuditLogs returns audit logs from the audit stream
-//
-//	@Summary		Get audit logs
-//	@Description	Returns audit log entries from the NATS audit stream
-//	@Tags			security
-//	@Produce		json
-//	@Param			offset	query		int		false	"Offset for pagination"				default(0)
-//	@Param			limit	query		int		false	"Maximum number of logs to return"	default(100)
-//	@Param			action	query		string	false	"Filter by action type"
-//	@Param			user		query		string	false	"Filter by user"
-//	@Success		200		{array}		services.AuditEvent
-//	@Failure		500		{object}	dto.ErrorResponse
-//	@Router			/security/audit [get]
-func (h *SecurityHandler) GetAuditLogs(c *gin.Context) {
-	// Get query parameters
-	offset := int64(0)
-	if o := c.Query("offset"); o != "" {
-		if parsed, err := strconv.ParseInt(o, 10, 64); err == nil {
-			offset = parsed
-		}
-	}
-
-	limit := int64(100)
-	if l := c.Query("limit"); l != "" {
-		if parsed, err := strconv.ParseInt(l, 10, 64); err == nil && parsed > 0 {
-			limit = parsed
-		}
-	}
-
-	// Limit maximum results
-	if limit > 1000 {
-		limit = 1000
-	}
-
-	var events []interface{}
-
-	// Apply filters if specified
-	action := c.Query("action")
-	user := c.Query("user")
-
-	if action != "" && user != "" {
-		// Both filters - not directly supported, get all and filter
-		allEvents, getErr := h.auditSvc.GetLogs(offset, limit*2)
-		if getErr != nil {
-			apihttp.JSONInternalError(c, getErr, "Failed to get audit logs")
-			return
-		}
-		for _, event := range allEvents {
-			if event.Action == action && event.User == user {
-				events = append(events, event)
-				if int64(len(events)) >= limit {
-					break
-				}
-			}
-		}
-	} else if action != "" {
-		actionEvents, err := h.auditSvc.GetLogsByAction(action, limit)
-		if err != nil {
-			apihttp.JSONInternalError(c, err, "Failed to get audit logs by action")
-			return
-		}
-		for _, event := range actionEvents {
-			events = append(events, event)
-		}
-	} else if user != "" {
-		userEvents, err := h.auditSvc.GetLogsByUser(user, limit)
-		if err != nil {
-			apihttp.JSONInternalError(c, err, "Failed to get audit logs by user")
-			return
-		}
-		for _, event := range userEvents {
-			events = append(events, event)
-		}
-	} else {
-		allLogs, err := h.auditSvc.GetLogs(offset, limit)
-		if err != nil {
-			apihttp.JSONInternalError(c, err, "Failed to get audit logs")
-			return
-		}
-		for _, event := range allLogs {
-			events = append(events, event)
-		}
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"logs":   events,
-		"offset": offset,
-		"limit":  limit,
-		"total":  len(events),
-	})
 }
 
 // GetConnectionStatus returns connection security status

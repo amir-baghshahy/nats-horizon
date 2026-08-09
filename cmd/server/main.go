@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -67,14 +67,14 @@ func main() {
 	})
 
 	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", cfg.ServerPort),
+		Addr:         net.JoinHostPort(cfg.GetServerBindAddress(), strconv.Itoa(cfg.GetServerPort())),
 		Handler:      r,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 30 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 
-	log.Printf("Server starting on http://localhost:%d", cfg.ServerPort)
+	log.Printf("Server starting on http://%s:%d", cfg.GetServerBindAddress(), cfg.GetServerPort())
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {

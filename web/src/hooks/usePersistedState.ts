@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export function usePersistedState<T>(
   key: string,
@@ -13,12 +13,25 @@ export function usePersistedState<T>(
     }
   });
 
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
-    try {
-      localStorage.setItem(`nats-horizon:${key}`, JSON.stringify(state));
-    } catch {
-      // Ignore storage errors
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
+    timeoutRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(`nats-horizon:${key}`, JSON.stringify(state));
+      } catch {
+        // Ignore storage errors
+      }
+    }, 0);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [key, state]);
 
   return [state, setState];

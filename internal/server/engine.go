@@ -6,6 +6,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/config"
@@ -82,18 +84,22 @@ func Engine(parent context.Context, opts ...Option) (*gin.Engine, func()) {
 	gin.SetMode(cfg.GinMode)
 
 	var conn *natsConnection
+	natsAvailable := false
 	if cfg.SetupCompleted {
 		log.Printf("Connecting to NATS at %s...", cfg.NATSURL)
 		c, err := newNATSConnection(cfg.NATSURL)
 		if err != nil {
-			log.Fatalf("Failed to connect to NATS: %v\n\n"+
+			log.Printf("WARNING: Failed to connect to NATS: %v\n"+
+				"The application will start but most features will be unavailable.\n"+
 				"Please ensure:\n"+
 				"1. NATS server is running and accessible\n"+
 				"2. Configuration is correct\n"+
-				"Run setup again to reconfigure", err)
+				"You can fix this in Settings after the app loads.", err)
+		} else {
+			log.Println("Connected to NATS")
+			conn = c
+			natsAvailable = true
 		}
-		log.Println("Connected to NATS")
-		conn = c
 	} else {
 		log.Println("Setup not completed. Starting server in setup mode (no NATS connection required).")
 	}
@@ -105,7 +111,6 @@ func Engine(parent context.Context, opts ...Option) (*gin.Engine, func()) {
 	var consumerUseCase *servicespkg.ConsumerUseCase
 	var messageUseCase *servicespkg.MessageUseCase
 	var serverUseCase *servicespkg.ServerUseCase
-	var auditService *servicespkg.AuditService
 	var streamHandler *handlers.StreamHandler
 	var consumerHandler *handlers.ConsumerHandler
 	var serverHandler *handlers.ServerHandler
@@ -116,7 +121,6 @@ func Engine(parent context.Context, opts ...Option) (*gin.Engine, func()) {
 	var metricsHandler *handlers.MetricsHandler
 	var exportHandler *handlers.ExportHandler
 	var securityHandler *handlers.SecurityHandler
-	var historyHandler *handlers.HistoryHandler
 	var sseHub *handlers.SSEHub
 	notificationService := servicespkg.NewNotificationService()
 
@@ -130,11 +134,6 @@ func Engine(parent context.Context, opts ...Option) (*gin.Engine, func()) {
 		messageUseCase = servicespkg.NewMessageUseCase(messageRepo)
 		serverUseCase = servicespkg.NewServerUseCase(conn.nc, conn.js)
 
-		auditService = servicespkg.NewAuditService(conn.nc, conn.js)
-		if err := auditService.Initialize(); err != nil {
-			log.Printf("Failed to initialize audit service: %v", err)
-		}
-
 		streamHandler = handlers.NewStreamHandler(streamUseCase)
 		consumerHandler = handlers.NewConsumerHandler(consumerUseCase, messageUseCase, conn.nc, conn.js)
 		serverHandler = handlers.NewServerHandler(serverUseCase, messageUseCase, streamUseCase)
@@ -144,8 +143,7 @@ func Engine(parent context.Context, opts ...Option) (*gin.Engine, func()) {
 		alertsHandler = handlers.NewAlertsHandler(conn.nc, conn.js, notificationService)
 		metricsHandler = handlers.NewMetricsHandler(conn.nc, conn.js)
 		exportHandler = handlers.NewExportHandler(conn.nc, conn.js)
-		securityHandler = handlers.NewSecurityHandler(conn.nc, conn.js, auditService)
-		historyHandler = handlers.NewHistoryHandler(conn.nc, conn.js)
+		securityHandler = handlers.NewSecurityHandler(conn.nc, conn.js)
 
 		sseHub = handlers.NewSSEHub(conn.nc)
 		go sseHub.MonitorStreams()
@@ -173,10 +171,20 @@ func Engine(parent context.Context, opts ...Option) (*gin.Engine, func()) {
 	r.Use(middleware.LoggingMiddleware())
 	r.Use(middleware.RequestSizeLimitMiddleware())
 	r.Use(middleware.CORSMiddlewareWithValidation(cfg.CORSAllowedOrigins))
-	r.Use(middleware.AuditMiddleware(auditService))
-
-	auditCtx, auditCancel := context.WithCancel(parent)
-	go middleware.AuditCleanupMiddleware(auditService, auditCtx)
+	if !natsAvailable {
+		r.Use(func(c *gin.Context) {
+			path := c.Request.URL.Path
+			if strings.HasPrefix(path, "/api/health") ||
+				strings.HasPrefix(path, "/api/config") {
+				c.Next()
+				return
+			}
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"error": "service unavailable: NATS not connected",
+			})
+			c.Abort()
+		})
+	}
 
 	apiGroup := r.Group("/api")
 	{
@@ -288,7 +296,6 @@ func Engine(parent context.Context, opts ...Option) (*gin.Engine, func()) {
 		apiGroup.POST("/security/users", securityHandler.CreateUser)
 		apiGroup.PUT("/security/users/:name", securityHandler.UpdateUser)
 		apiGroup.DELETE("/security/users/:name", securityHandler.DeleteUser)
-		apiGroup.GET("/security/audit", securityHandler.GetAuditLogs)
 		apiGroup.GET("/security/connections", securityHandler.GetConnectionStatus)
 
 		// Tenancy routes
@@ -300,22 +307,14 @@ func Engine(parent context.Context, opts ...Option) (*gin.Engine, func()) {
 		apiGroup.POST("/tenancy/connections/test", tenancyHandler.TestConnection)
 		apiGroup.PUT("/tenancy/connections/:id/default", tenancyHandler.SetDefaultConnection)
 		apiGroup.GET("/tenancy/status", tenancyHandler.GetConnectionStatus)
-		// History routes
-		apiGroup.GET("/history/streams/:name", historyHandler.GetStreamHistory)
-		apiGroup.GET("/history/streams/:name/analysis", historyHandler.GetAnalysis)
-		apiGroup.GET("/history/report", historyHandler.GetReport)
 	}
 
 	cleanup := func() {
-		auditCancel()
 		if sseHub != nil {
 			sseHub.Close()
 		}
 		if metricsHandler != nil {
 			metricsHandler.Stop()
-		}
-		if historyHandler != nil {
-			historyHandler.Stop()
 		}
 		if alertsHandler != nil {
 			alertsHandler.Stop()

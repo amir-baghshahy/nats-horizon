@@ -101,7 +101,15 @@ export function useMessageList(
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (autoScroll && messagesEndRef.current) {
+    if (!autoScroll || !messagesEndRef.current) return;
+
+    const container = messagesEndRef.current.parentElement;
+    if (!container) return;
+
+    const isNearBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+
+    if (isNearBottom) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, autoScroll]);

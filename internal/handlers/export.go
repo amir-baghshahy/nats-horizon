@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -361,10 +362,10 @@ func (h *ExportHandler) ExportMessages(c *gin.Context) {
 		apihttp.JSONInternalError(c, err, "Failed to create consumer")
 		return
 	}
-	defer h.js.DeleteConsumer(streamName, consumerName)
 
 	msgInfo, err := h.js.ConsumerInfo(streamName, consumerName)
 	if err != nil {
+		_ = h.js.DeleteConsumer(streamName, consumerName)
 		apihttp.JSONInternalError(c, err, "Failed to get consumer info")
 		return
 	}
@@ -375,10 +376,10 @@ func (h *ExportHandler) ExportMessages(c *gin.Context) {
 	messages := []gin.H{}
 	sub, err := h.js.PullSubscribe(streamName, consumerName, nil)
 	if err != nil {
+		_ = h.js.DeleteConsumer(streamName, consumerName)
 		apihttp.JSONInternalError(c, err, "Failed to subscribe")
 		return
 	}
-	defer sub.Unsubscribe()
 
 	for i := 0; i < int(msgInfo.NumPending) && len(messages) < limit; i++ {
 		msg, err := sub.NextMsg(2 * time.Second)
@@ -396,6 +397,11 @@ func (h *ExportHandler) ExportMessages(c *gin.Context) {
 			"data":      string(msg.Data),
 			"timestamp": meta.Timestamp.Format(time.RFC3339),
 		})
+	}
+
+	_ = sub.Unsubscribe()
+	if err := h.js.DeleteConsumer(streamName, consumerName); err != nil {
+		log.Printf("Failed to delete export consumer %s for stream %s: %v", consumerName, streamName, err)
 	}
 
 	json.NewEncoder(c.Writer).Encode(gin.H{

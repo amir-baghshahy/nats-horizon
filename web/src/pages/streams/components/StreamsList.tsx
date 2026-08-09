@@ -6,7 +6,7 @@ import { EmptyState } from "../../../components/ui";
 import type { StreamResponse as Stream } from "../../../types";
 import StreamRow from "./StreamRow";
 import { useTranslation } from "react-i18next";
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 
 interface StreamsListProps {
   streams: Stream[];
@@ -35,7 +35,7 @@ interface StreamsListProps {
   getStreamName: (stream: Stream) => string;
 }
 
-export default function StreamsList({
+const StreamsListInner = memo(function StreamsListInner({
   streams,
   filteredStreams,
   isLoading,
@@ -151,4 +151,8 @@ export default function StreamsList({
       </div>
     </>
   );
-}
+});
+
+export default memo(function StreamsList(props: StreamsListProps) {
+  return <StreamsListInner {...props} />;
+});

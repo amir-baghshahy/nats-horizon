@@ -175,6 +175,7 @@ export function useConsumersPage(): UseConsumersPageReturn {
   } = useQuery({
     queryKey: ["consumers"],
     queryFn: () => ConsumersService.getConsumers(),
+    staleTime: 10000,
   });
 
   const { data: streams } = useQuery({

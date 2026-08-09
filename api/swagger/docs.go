@@ -1289,121 +1289,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/history/report": {
-            "get": {
-                "description": "Returns a summary report of all streams with latest metric values",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "history"
-                ],
-                "summary": "Get history report",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "default": "24h",
-                        "description": "Time window",
-                        "name": "duration",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "history report",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/history/streams/{name}": {
-            "get": {
-                "description": "Returns historical metric data points for a stream",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "history"
-                ],
-                "summary": "Get stream history",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stream name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "messages",
-                        "description": "Metric type (messages, bytes)",
-                        "name": "type",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "24h",
-                        "description": "Time window (1h, 6h, 24h, 7d)",
-                        "name": "duration",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "stream history",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/history/streams/{name}/analysis": {
-            "get": {
-                "description": "Returns statistical analysis (min/max/avg/trend) of a stream metric",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "history"
-                ],
-                "summary": "Get stream metric analysis",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Stream name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "default": "messages",
-                        "description": "Metric type (messages, bytes)",
-                        "name": "type",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "default": "24h",
-                        "description": "Time window (1h, 6h, 24h, 7d)",
-                        "name": "duration",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "metric analysis",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
         "/kv/buckets": {
             "get": {
                 "description": "Returns all JetStream Key-Value store buckets",
@@ -2131,63 +2016,6 @@ const docTemplate = `{
                         "description": "System metrics",
                         "schema": {
                             "type": "object"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/security/audit": {
-            "get": {
-                "description": "Returns audit log entries from the NATS audit stream",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "security"
-                ],
-                "summary": "Get audit logs",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "default": 0,
-                        "description": "Offset for pagination",
-                        "name": "offset",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "default": 100,
-                        "description": "Maximum number of logs to return",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by action type",
-                        "name": "action",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by user",
-                        "name": "user",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/AuditEvent"
-                            }
                         }
                     },
                     "500": {
@@ -3974,35 +3802,6 @@ const docTemplate = `{
                 }
             }
         },
-        "AuditEvent": {
-            "type": "object",
-            "properties": {
-                "action": {
-                    "type": "string"
-                },
-                "details": {
-                    "type": "string"
-                },
-                "ip_address": {
-                    "type": "string"
-                },
-                "metadata": {
-                    "$ref": "#/definitions/Metadata"
-                },
-                "resource": {
-                    "type": "string"
-                },
-                "timestamp": {
-                    "type": "string"
-                },
-                "user": {
-                    "type": "string"
-                },
-                "user_agent": {
-                    "type": "string"
-                }
-            }
-        },
         "CheckAlertsResponse": {
             "type": "object",
             "properties": {
@@ -4672,23 +4471,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "Metadata": {
-            "type": "object",
-            "properties": {
-                "consumer_name": {
-                    "type": "string"
-                },
-                "operation_type": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "stream_name": {
                     "type": "string"
                 }
             }

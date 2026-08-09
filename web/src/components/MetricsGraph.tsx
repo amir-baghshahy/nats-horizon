@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo, memo } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { HealthService, MetricsService } from "../types";
@@ -51,7 +51,10 @@ function ChartTooltip({
   if (!active || !payload?.length) return null;
   return (
     <div style={TOOLTIP_STYLE}>
-      <span className="font-mono" style={{ color: "var(--tw-colors-primary-400, #38bdf8)" }}>
+      <span
+        className="font-mono"
+        style={{ color: "var(--tw-colors-primary-400, #38bdf8)" }}
+      >
         {formatValue(payload[0].value as number)}
       </span>
     </div>
@@ -177,13 +180,7 @@ const MetricsGraph = memo(function MetricsGraph({
             height={64}
           >
             <defs>
-              <linearGradient
-                id={gradientId}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
+              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={hexColor} stopOpacity={0.3} />
                 <stop offset="95%" stopColor={hexColor} stopOpacity={0} />
               </linearGradient>
@@ -221,23 +218,70 @@ function rgbToHex(rgb: string): string {
 export function SystemMetrics() {
   const { t } = useTranslation();
 
+  const getDashboardStats = useCallback(
+    () => HealthService.getDashboardStats(),
+    [],
+  );
+  const getMessagesValue = useCallback((data: any) => data?.messages || 0, []);
+  const getMemoryValue = useCallback(
+    (data: any) => data?.memory?.used || 0,
+    [],
+  );
+  const getStorageValue = useCallback(
+    (data: any) => data?.storage?.used || 0,
+    [],
+  );
+  const getSystemMetrics = useCallback(
+    () => MetricsService.getMetricsSystem(),
+    [],
+  );
+  const getRateMetrics = useCallback(
+    () => MetricsService.getMetricsRates(),
+    [],
+  );
+  const getRateValue = useCallback(
+    (data: any) =>
+      data?.streams?.reduce(
+        (sum: number, s: any) => sum + (s?.messages_per_sec || 0),
+        0,
+      ) || 0,
+    [],
+  );
+
+  const messagesIcon = useMemo(
+    () => <Activity className="icon-base text-green-400" />,
+    [],
+  );
+  const memoryIcon = useMemo(
+    () => <Cpu className="icon-base text-orange-400" />,
+    [],
+  );
+  const storageIcon = useMemo(
+    () => <HardDrive className="icon-base text-purple-400" />,
+    [],
+  );
+  const rateIcon = useMemo(
+    () => <TrendingUp className="icon-base text-cyan-400" />,
+    [],
+  );
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       <MetricsGraph
         title={t("messages.messagesLabel")}
-        icon={<Activity className="icon-base text-green-400" />}
+        icon={messagesIcon}
         color="rgb(74, 222, 128)"
         queryKey={["dashboardStats"]}
-        queryFn={() => HealthService.getDashboardStats()}
-        getValue={(data) => data?.messages || 0}
+        queryFn={getDashboardStats}
+        getValue={getMessagesValue}
       />
       <MetricsGraph
         title={t("common.memory")}
-        icon={<Cpu className="icon-base text-orange-400" />}
+        icon={memoryIcon}
         color="rgb(251, 146, 60)"
         queryKey={["systemMetrics"]}
-        queryFn={() => MetricsService.getMetricsSystem()}
-        getValue={(data) => data?.memory?.used || 0}
+        queryFn={getSystemMetrics}
+        getValue={getMemoryValue}
         formatValue={(v) =>
           v >= 1048576
             ? `${(v / 1048576).toFixed(1)}MB`
@@ -248,11 +292,11 @@ export function SystemMetrics() {
       />
       <MetricsGraph
         title={t("common.storage")}
-        icon={<HardDrive className="icon-base text-purple-400" />}
+        icon={storageIcon}
         color="rgb(192, 132, 252)"
         queryKey={["systemMetrics-storage"]}
-        queryFn={() => MetricsService.getMetricsSystem()}
-        getValue={(data) => data?.storage?.used || 0}
+        queryFn={getSystemMetrics}
+        getValue={getStorageValue}
         formatValue={(v) =>
           v >= 1048576
             ? `${(v / 1048576).toFixed(1)}MB`
@@ -263,16 +307,11 @@ export function SystemMetrics() {
       />
       <MetricsGraph
         title={t("messages.messageRate")}
-        icon={<TrendingUp className="icon-base text-cyan-400" />}
+        icon={rateIcon}
         color="rgb(34, 211, 238)"
         queryKey={["rateMetrics"]}
-        queryFn={() => MetricsService.getMetricsRates()}
-        getValue={(data) =>
-          data?.streams?.reduce(
-            (sum: number, s: any) => sum + (s?.messages_per_sec || 0),
-            0,
-          ) || 0
-        }
+        queryFn={getRateMetrics}
+        getValue={getRateValue}
         formatValue={(v) => `${v.toFixed(1)} msg/s`}
       />
     </div>

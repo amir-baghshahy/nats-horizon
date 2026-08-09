@@ -88,14 +88,23 @@ func (s *AlertStore) load() error {
 	return json.Unmarshal(data, &s.alerts)
 }
 
-// save writes alerts to file
+// save writes alerts to file atomically
 func (s *AlertStore) save() error {
 	data, err := json.MarshalIndent(s.alerts, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal alerts: %w", err)
 	}
 
-	return os.WriteFile(s.filePath, data, 0600)
+	tmpPath := s.filePath + ".tmp"
+	if err := os.WriteFile(tmpPath, data, 0600); err != nil {
+		return fmt.Errorf("failed to write temp alerts file: %w", err)
+	}
+
+	if err := os.Rename(tmpPath, s.filePath); err != nil {
+		return fmt.Errorf("failed to rename temp alerts file: %w", err)
+	}
+
+	return nil
 }
 
 // GetAll returns all alerts

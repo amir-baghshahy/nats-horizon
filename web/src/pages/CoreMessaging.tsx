@@ -68,6 +68,7 @@ interface CoreMessagingContentProps {
   onTabChange?: (tab: MessagingTab) => void;
   showPublishModal?: boolean;
   onPublishModalChange?: (show: boolean) => void;
+  sseConnected?: boolean;
 }
 
 export function CoreMessagingContent({
@@ -75,7 +76,8 @@ export function CoreMessagingContent({
   onTabChange: setControlledTab,
   showPublishModal: controlledShowPublishModal,
   onPublishModalChange: setControlledShowPublishModal,
-}: CoreMessagingContentProps = {}) {
+  sseConnected,
+}: CoreMessagingContentProps) {
   const { t } = useTranslation();
   const [uncontrolledTab, setUncontrolledTab] = usePersistedState<MessagingTab>(
     "core:tab",
@@ -111,7 +113,6 @@ export function CoreMessagingContent({
   const [isMonitoring, setIsMonitoring] = useState(false);
   const monitorSourceRef = useRef<EventSource | null>(null);
 
-  const { connected: sseConnected } = useSSE("core-messaging");
   const { toast } = useToast();
 
   const {
@@ -326,7 +327,7 @@ export function CoreMessagingContent({
               expandedMessages={expandedMessages}
               viewModes={viewModes}
               messageFormats={messageFormats}
-              sseConnected={sseConnected}
+              sseConnected={sseConnected ?? false}
               autoScroll={autoScroll}
               messagesEndRef={messagesEndRef}
               onToggleExpand={toggleExpand}
@@ -427,6 +428,7 @@ export default function CoreMessaging() {
           onTabChange={setActiveTab}
           showPublishModal={showPublishModal}
           onPublishModalChange={setShowPublishModal}
+          sseConnected={sseConnected}
         />
       </div>
     </div>

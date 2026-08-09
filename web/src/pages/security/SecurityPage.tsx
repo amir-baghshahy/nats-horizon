@@ -7,8 +7,6 @@ import {
   Edit,
   Trash2,
   X,
-  Clock,
-  FileText,
   ToggleLeft,
   ToggleRight,
 } from "lucide-react";
@@ -27,13 +25,10 @@ export default function SecurityPage({
   setSelectedUser,
   securityInfo,
   users,
-  auditLogs,
   infoLoading,
   usersLoading,
-  auditLoading,
   infoError,
   usersError,
-  auditError,
   getErrorMessage,
   refetchInfo,
   createUserMutation,
@@ -45,13 +40,11 @@ export default function SecurityPage({
   const { t } = useTranslation();
   const activeLoading =
     infoLoading ||
-    (activeTab === "users" && usersLoading) ||
-    (activeTab === "audit" && auditLoading);
+    (activeTab === "users" && usersLoading);
 
   const activeError =
     infoError ||
-    (activeTab === "users" && usersError) ||
-    (activeTab === "audit" && auditError);
+    (activeTab === "users" && usersError);
 
   if (activeLoading) {
     return <PageLoading text={t("security.loading")} />;
@@ -85,7 +78,6 @@ export default function SecurityPage({
           tabs={[
             { id: "overview", label: t("security.overview"), icon: Shield },
             { id: "users", label: t("security.users"), icon: Users },
-            { id: "audit", label: t("security.auditLog"), icon: FileText },
           ]}
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -354,47 +346,6 @@ export default function SecurityPage({
                       >
                         <Trash2 className="icon-base" />
                       </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </PanelCard>
-        )}
-
-        {activeTab === "audit" && (
-          <PanelCard
-            title={t("security.auditLogTitle")}
-            footer={
-              <span>
-                {t("security.entriesCount", { count: auditLogs?.length || 0 })}
-              </span>
-            }
-          >
-            <div className="space-y-3">
-              {auditLogs?.map((log: any, index: number) => (
-                <div
-                  key={index}
-                  className="p-4 bg-surface-primary/50 rounded-lg"
-                >
-                  <div className="flex items-start gap-4">
-                    <Clock className="icon-base text-content-tertiary mt-1" />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <span className="font-mono text-display-sm">
-                          {log.action}
-                        </span>
-                        <span className="text-display-sm text-content-tertiary">
-                          {t("security.byUser", { name: log.user })}
-                        </span>
-                      </div>
-                      <p className="text-display-sm text-content-tertiary">
-                        {t("security.resource", { name: log.resource })}
-                      </p>
-                      <p className="text-display-sm mt-1">{log.details}</p>
-                      <p className="text-display-xs text-content-tertiary mt-1">
-                        {formatDateTime(log.timestamp)}
-                      </p>
                     </div>
                   </div>
                 </div>

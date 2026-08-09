@@ -156,28 +156,6 @@ func TestSecurityInfo(t *testing.T) {
 	assert.NotNil(t, body["server_security"])
 }
 
-func TestAuditLogs(t *testing.T) {
-	resp := doRequest(t, http.MethodGet, apiURL("/security/audit"), nil)
-	requireStatus(t, resp, http.StatusOK)
-
-	var body struct {
-		Logs   []map[string]interface{} `json:"logs"`
-		Offset int                      `json:"offset"`
-		Limit  int                      `json:"limit"`
-		Total  int                      `json:"total"`
-	}
-	decodeBody(t, resp, &body)
-
-	assert.GreaterOrEqual(t, body.Total, 0)
-	if len(body.Logs) > 0 {
-		first := body.Logs[0]
-		assert.NotEmpty(t, first["action"])
-		assert.NotEmpty(t, first["timestamp"])
-		assert.NotEmpty(t, first["user"])
-		assert.NotEmpty(t, first["resource"])
-	}
-}
-
 func TestConnectionStatus(t *testing.T) {
 	resp := doRequest(t, http.MethodGet, apiURL("/security/connections"), nil)
 	requireStatus(t, resp, http.StatusOK)

@@ -97,7 +97,8 @@ export function useStreamsPage(): UseStreamsPageReturn {
     return stream.config?.name || "";
   };
 
-  const { connected: sseConnected } = useSSE("streams");
+  const {
+    connected: sseConnected } = useSSE("streams");
 
   const {
     data: streams = [],
@@ -106,6 +107,7 @@ export function useStreamsPage(): UseStreamsPageReturn {
   } = useQuery({
     queryKey: ["streams"],
     queryFn: () => StreamsService.getStreams(),
+    staleTime: 10000,
   });
 
   const {

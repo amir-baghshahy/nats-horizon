@@ -13,6 +13,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useMemo } from "react";
 import EmptyState from "../../../components/ui/EmptyState";
 import PanelCard from "../../../components/ui/PanelCard";
 import { Button } from "../../../components/ui";
@@ -81,6 +82,23 @@ export default function MessagesList({
   setViewMode,
 }: MessagesListProps) {
   const { t } = useTranslation();
+
+  const parsedMessages = useMemo(() => {
+    const map = new Map<number, string>();
+    messages.forEach((message) => {
+      map.set(message.sequence ?? 0, parseMessageData(message.data));
+    });
+    return map;
+  }, [messages]);
+
+  const formattedTimestamps = useMemo(() => {
+    const map = new Map<number, string>();
+    messages.forEach((message) => {
+      map.set(message.sequence ?? 0, formatTimestamp(message.timestamp ?? "", t));
+    });
+    return map;
+  }, [messages, t]);
+
   if (isLoading) {
     return (
       <PanelCard>
@@ -160,7 +178,7 @@ export default function MessagesList({
           const sequence = message.sequence ?? 0;
           const isExpanded = expanded.has(sequence);
           const isSelected = selected.has(sequence);
-          const messageData = parseMessageData(message.data);
+          const messageData = parsedMessages.get(sequence) || "";
           const headers = message.headers || {};
 
           return (
@@ -200,8 +218,8 @@ export default function MessagesList({
                         {formatBytes(message.size || 0)}
                       </span>
                       <span className="text-display-xs text-content-tertiary flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {formatTimestamp(message.timestamp ?? "", t)}
+                        <Clock className="w-3 h-3 shrink-0" />
+                        {formattedTimestamps.get(sequence)}
                       </span>
                     </div>
                     <div className="text-display-sm text-content-tertiary truncate">

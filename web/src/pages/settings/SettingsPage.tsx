@@ -152,7 +152,7 @@ export default function SettingsPage() {
     } finally {
       setSaving(false);
     }
-  }, [config.nats_url, originalNatsUrl, testResult]);
+  }, [config, originalNatsUrl, testResult]);
 
   if (restarting) {
     return (

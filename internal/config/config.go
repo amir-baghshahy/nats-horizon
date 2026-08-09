@@ -31,6 +31,15 @@ func (c *AppConfig) Validate() error {
 		})
 	}
 
+	if c.ServerBindAddress != "" {
+		if _, err := net.ResolveIPAddr("ip", c.ServerBindAddress); err != nil {
+			errors = append(errors, &ValidationError{
+				Field:   "server_bind_address",
+				Message: fmt.Sprintf("invalid bind address: %v", err),
+			})
+		}
+	}
+
 	if c.GinMode != "" {
 		switch c.GinMode {
 		case "debug", "release", "test":
@@ -155,8 +164,9 @@ type AppConfig struct {
 	mu sync.RWMutex `json:"-"`
 
 	// Server settings
-	ServerPort int    `json:"server_port"`
-	GinMode    string `json:"gin_mode"`
+	ServerPort      int    `json:"server_port"`
+	ServerBindAddress string `json:"server_bind_address"`
+	GinMode          string `json:"gin_mode"`
 
 	// NATS settings
 	NATSURL string `json:"nats_url"`
@@ -184,7 +194,8 @@ var (
 func Get() *AppConfig {
 	once.Do(func() {
 		instance = &AppConfig{
-			ServerPort:         3000,
+			ServerPort:        3000,
+			ServerBindAddress: "127.0.0.1",
 			GinMode:            "release",
 			NATSURL:            "nats://localhost:4222",
 			SMTPPort:           587,
@@ -197,28 +208,21 @@ func Get() *AppConfig {
 
 // configPath returns the path to the config file.
 //
-// The config lives in a user-writable, platform-appropriate location so that
-// settings can be persisted even when the binary is installed in a read-only
-// directory (e.g. /usr/bin, /Applications/.../MacOS). On first load, a config
-// left next to the executable (legacy behaviour) is migrated to the new path.
+// During development, the config lives in a local tmp directory inside the
+// project so it does not pollute the system or binary install paths. The
+// legacy path is the executable directory + nats-horizon.json.
 func configPath() string {
-	if dir, err := os.UserConfigDir(); err == nil && dir != "" {
-		return filepath.Join(dir, "nats-horizon", "config.json")
-	}
-
-	// Fallback: current working directory if the user config dir is unavailable.
-	if cwd, err := os.Getwd(); err == nil {
-		return filepath.Join(cwd, "nats-horizon.json")
-	}
-
-	return "nats-horizon.json"
+	return filepath.Join(".", "tmp", "config.json")
 }
 
 // legacyConfigPath returns the pre-relocation config location (next to the
 // executable), used only for one-time migration.
 func legacyConfigPath() string {
 	if execPath, err := os.Executable(); err == nil {
-		return filepath.Join(filepath.Dir(execPath), "nats-horizon.json")
+		legacyPath := filepath.Join(filepath.Dir(execPath), "nats-horizon.json")
+		if _, statErr := os.Stat(legacyPath); statErr == nil {
+			return legacyPath
+		}
 	}
 	if cwd, err := os.Getwd(); err == nil {
 		return filepath.Join(cwd, "nats-horizon.json")
@@ -308,6 +312,11 @@ func (c *AppConfig) Update(updates map[string]interface{}) error {
 	if v, ok := updates["server_port"]; ok {
 		if n, ok := toInt(v); ok {
 			c.ServerPort = n
+		}
+	}
+	if v, ok := updates["server_bind_address"]; ok {
+		if s, ok := v.(string); ok {
+			c.ServerBindAddress = s
 		}
 	}
 	if v, ok := updates["gin_mode"]; ok {
@@ -404,6 +413,13 @@ func (c *AppConfig) GetServerPort() int {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.ServerPort
+}
+
+// GetServerBindAddress returns the server bind address
+func (c *AppConfig) GetServerBindAddress() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.ServerBindAddress
 }
 
 // IsSetupCompleted returns whether setup has been completed

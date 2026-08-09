@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { ConfigService, HealthService } from "../types";
 
 const RESTART_KEY = "nats-setup-restarting";
@@ -9,6 +9,9 @@ export function useServerRestart(options?: { onTimeout?: () => void }) {
       ? localStorage.getItem(RESTART_KEY) === "true"
       : false;
   });
+
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
   const pollServerHealth = useCallback(async (maxAttempts = 30) => {
     for (let i = 0; i < maxAttempts; i++) {
@@ -44,11 +47,11 @@ export function useServerRestart(options?: { onTimeout?: () => void }) {
           window.location.reload();
         } else {
           setRestarting(false);
-          options?.onTimeout?.();
+          optionsRef.current?.onTimeout?.();
         }
       });
     }
-  }, [restarting, pollServerHealth, options]);
+  }, [restarting, pollServerHealth]);
 
   return { restarting, setRestarting, triggerRestart };
 }

@@ -61,7 +61,7 @@ export function useStreamDetail(): UseStreamDetailReturn {
   const { data: stream, refetch } = useQuery({
     queryKey: ["stream", name],
     queryFn: () => StreamsService.getStreams1(name || ""),
-    refetchInterval: isPaused ? false : 3000,
+    refetchInterval: isPaused ? false : 10000,
   });
 
   const { data: consumers } = useQuery({

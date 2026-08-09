@@ -1,14 +1,14 @@
 import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { SecurityService, User, AuditEvent } from "../../../types";
+import { SecurityService, User } from "../../../types";
 import { useConfirm } from "../../../components/ConfirmDialog";
 import { formatBytes } from "../../../utils/formatters";
 import { REFRESH_INTERVALS } from "../../../utils/constants";
 
 export interface UseSecurityReturn {
-  activeTab: "overview" | "users" | "audit";
+  activeTab: "overview" | "users";
   setActiveTab: React.Dispatch<
-    React.SetStateAction<"overview" | "users" | "audit">
+    React.SetStateAction<"overview" | "users">
   >;
   showUserModal: boolean;
   setShowUserModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,13 +16,10 @@ export interface UseSecurityReturn {
   setSelectedUser: React.Dispatch<React.SetStateAction<User | null>>;
   securityInfo: any;
   users: User[] | undefined;
-  auditLogs: AuditEvent[] | undefined;
   infoLoading: boolean;
   usersLoading: boolean;
-  auditLoading: boolean;
   infoError: unknown;
   usersError: unknown;
-  auditError: unknown;
   getErrorMessage: (error: unknown) => string;
   refetchInfo: () => void;
   createUserMutation: any;
@@ -33,7 +30,7 @@ export interface UseSecurityReturn {
 }
 
 export function useSecurity(): UseSecurityReturn {
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "audit">(
+  const [activeTab, setActiveTab] = useState<"overview" | "users">(
     "overview",
   );
   const [showUserModal, setShowUserModal] = useState(false);
@@ -66,16 +63,6 @@ export function useSecurity(): UseSecurityReturn {
     queryKey: ["securityUsers"],
     queryFn: () => SecurityService.getSecurityUsers(),
     enabled: activeTab === "users",
-  });
-
-  const {
-    data: auditLogs,
-    isLoading: auditLoading,
-    error: auditError,
-  } = useQuery({
-    queryKey: ["auditLogs"],
-    queryFn: () => SecurityService.getSecurityAudit(),
-    enabled: activeTab === "audit",
   });
 
   const createUserMutation = useMutation({
@@ -123,13 +110,10 @@ export function useSecurity(): UseSecurityReturn {
     setSelectedUser,
     securityInfo,
     users,
-    auditLogs,
     infoLoading,
     usersLoading,
-    auditLoading,
     infoError,
     usersError,
-    auditError,
     getErrorMessage,
     refetchInfo,
     createUserMutation,

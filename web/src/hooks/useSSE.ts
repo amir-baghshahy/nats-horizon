@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface SSEEvent {
@@ -17,7 +17,7 @@ export function useSSE(channel: string) {
   const reconnectAttempts = useRef(0);
   const queryClient = useQueryClient();
 
-  const connect = () => {
+  const connect = useCallback(() => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
@@ -32,6 +32,7 @@ export function useSSE(channel: string) {
 
     eventSource.onopen = () => {
       setConnected(true);
+      reconnectAttempts.current = 0;
     };
 
     eventSource.onmessage = (event) => {
@@ -39,21 +40,60 @@ export function useSSE(channel: string) {
         const data = JSON.parse(event.data) as SSEEvent;
 
         switch (data.type) {
-          case "stream:update":
-            queryClient.invalidateQueries({ queryKey: ["streams"] });
-            queryClient.invalidateQueries({
-              queryKey: ["stream", data.data.name],
+          case "stream:update": {
+            const { name, messages, consumers } = data.data as Record<string, any>;
+            queryClient.setQueryData(["streams"], (old: any) => {
+              if (!Array.isArray(old)) return old;
+              return old.map((stream: any) =>
+                stream.config?.name === name
+                  ? {
+                      ...stream,
+                      state: {
+                        ...stream.state,
+                        messages: messages ?? stream.state?.messages,
+                        consumers: consumers ?? stream.state?.consumers,
+                      },
+                    }
+                  : stream,
+              );
+            });
+            queryClient.setQueryData(["stream", name], (old: any) => {
+              if (!old) return old;
+              return {
+                ...old,
+                state: {
+                  ...old.state,
+                  messages: messages ?? old.state?.messages,
+                  consumers: consumers ?? old.state?.consumers,
+                },
+              };
             });
             break;
-          case "consumer:update":
-            queryClient.invalidateQueries({ queryKey: ["consumers"] });
-            queryClient.invalidateQueries({
-              queryKey: ["consumer", data.data.name],
+          }
+          case "consumer:update": {
+            const { name, stream, lag, num_pending } = data.data as Record<string, any>;
+            queryClient.setQueryData(["consumers"], (old: any) => {
+              if (!Array.isArray(old)) return old;
+              return old.map((consumer: any) =>
+                consumer.name === name
+                  ? { ...consumer, lag, num_pending, stream: stream ?? consumer.stream }
+                  : consumer,
+              );
+            });
+            queryClient.setQueryData(["consumer", name], (old: any) => {
+              if (!old) return old;
+              return { ...old, lag, num_pending, stream: stream ?? old.stream };
             });
             break;
-          case "dashboard:update":
-            queryClient.invalidateQueries({ queryKey: ["dashboardStats"] });
+          }
+          case "dashboard:update": {
+            const update = data.data as Record<string, any>;
+            queryClient.setQueryData(["dashboardStats"], (old: any) => {
+              if (!old) return old;
+              return { ...old, ...update };
+            });
             break;
+          }
         }
       } catch (err) {
         console.error("Failed to parse SSE event:", err);
@@ -74,7 +114,7 @@ export function useSSE(channel: string) {
     };
 
     eventSourceRef.current = eventSource;
-  };
+  }, [channel, queryClient]);
 
   useEffect(() => {
     connect();
@@ -89,7 +129,7 @@ export function useSSE(channel: string) {
         reconnectTimerRef.current = null;
       }
     };
-  }, [channel]);
+  }, [channel, connect]);
 
   return { connected };
 }

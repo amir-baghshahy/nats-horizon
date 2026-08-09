@@ -314,11 +314,8 @@ func formatConditionData(condition AlertCondition, data map[string]interface{}) 
 	}
 }
 
-// triggerAlertByID triggers an alert using its ID (thread-safe for concurrent checks)
+// triggerAlertByID triggers an alert using its ID
 func (h *AlertsHandler) triggerAlertByID(id, name string, severity AlertSeverity, message string, data map[string]interface{}, channels []string, email, webhook, slack string) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
-
 	now := time.Now()
 	trigger := &AlertTrigger{
 		AlertID:     id,
@@ -330,20 +327,20 @@ func (h *AlertsHandler) triggerAlertByID(id, name string, severity AlertSeverity
 		Acked:       false,
 	}
 
+	// Update state under lock only
+	h.mu.Lock()
 	h.triggers = append(h.triggers, trigger)
-
-	// Update the original alert's trigger state
 	if original, ok := h.alerts[id]; ok {
 		original.LastTrigger = now
 		original.TriggerCount++
 		original.UpdatedAt = now
 	}
-
 	if len(h.triggers) > 1000 {
 		h.triggers = h.triggers[len(h.triggers)-1000:]
 	}
+	h.mu.Unlock()
 
-	// Create a temporary alert for notification purposes
+	// Send notifications outside the lock to avoid blocking other operations
 	tempAlert := &Alert{
 		ID:              id,
 		Name:            name,

@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
-	"strings"
 	"sync"
 	"time"
 
+	"github.com/amir-baghshahy/nats-horizon/internal/config"
 	"github.com/amir-baghshahy/nats-horizon/internal/constants"
 	"github.com/amir-baghshahy/nats-horizon/internal/dto"
 	"github.com/amir-baghshahy/nats-horizon/internal/utils/apihttp"
@@ -17,20 +16,9 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-// validateNATSURL rejects schemes other than nats:// and tls:// to prevent SSRF.
+// validateNATSURL validates a NATS URL using the shared config validator.
 func validateNATSURL(raw string) error {
-	u, err := url.Parse(raw)
-	if err != nil {
-		return fmt.Errorf("invalid URL: %w", err)
-	}
-	scheme := strings.ToLower(u.Scheme)
-	if scheme != "nats" && scheme != "tls" && scheme != "ws" && scheme != "wss" {
-		return fmt.Errorf("URL scheme %q is not allowed; only nats://, tls://, ws://, and wss:// are permitted", u.Scheme)
-	}
-	if u.Host == "" {
-		return fmt.Errorf("URL must include a host")
-	}
-	return nil
+	return config.ValidateNATSURL(raw)
 }
 
 // ConnectionConfig represents a NATS connection configuration

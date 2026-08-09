@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
+	"strings"
 	"sync"
 	"time"
 
@@ -39,25 +39,27 @@ type serverPingResponse struct {
 }
 
 type consumerListMetricsResponse struct {
-	Consumers []struct {
-		Name   string `json:"name"`
-		Config struct {
-			Durable string `json:"durable"`
-		} `json:"config"`
-		State struct {
-			NumPending     uint64 `json:"num_pending"`
-			NumAckPending  uint64 `json:"num_ack_pending"`
-			NumRedelivered uint64 `json:"num_redelivered"`
-			Delivered      struct {
-				Stream   uint64 `json:"stream"`
-				Consumer uint64 `json:"consumer"`
-			} `json:"delivered"`
-			AckFloor struct {
-				Stream   uint64 `json:"stream"`
-				Consumer uint64 `json:"consumer"`
-			} `json:"ack_floor"`
-		} `json:"state"`
-	} `json:"consumers"`
+	Consumers []ConsumerMetric `json:"consumers"`
+}
+
+type ConsumerMetric struct {
+	Name   string `json:"name"`
+	Config struct {
+		Durable string `json:"durable"`
+	} `json:"config"`
+	State struct {
+		NumPending     uint64 `json:"num_pending"`
+		NumAckPending  uint64 `json:"num_ack_pending"`
+		NumRedelivered uint64 `json:"num_redelivered"`
+		Delivered      struct {
+			Stream   uint64 `json:"stream"`
+			Consumer uint64 `json:"consumer"`
+		} `json:"delivered"`
+		AckFloor struct {
+			Stream   uint64 `json:"stream"`
+			Consumer uint64 `json:"consumer"`
+		} `json:"ack_floor"`
+	} `json:"state"`
 }
 
 type connzMetricsResponse struct {
@@ -221,6 +223,29 @@ func (h *MetricsHandler) collectMetrics() {
 	h.buildConsumerMetrics(tmp, now, streamNames)
 	h.buildServerMetrics(tmp, now)
 
+	// Clean up obsolete series for deleted streams/consumers
+	activeStreamSet := make(map[string]bool, len(streamNames))
+	for name := range streamNames {
+		activeStreamSet[name] = true
+	}
+
+	filteredStreams := make([]MetricSeries, 0, len(tmp.Streams))
+	for _, s := range tmp.Streams {
+		if activeStreamSet[s.Name] {
+			filteredStreams = append(filteredStreams, s)
+		}
+	}
+	tmp.Streams = filteredStreams
+
+	filteredConsumers := make([]MetricSeries, 0, len(tmp.Consumers))
+	for _, s := range tmp.Consumers {
+		parts := strings.SplitN(s.Name, "/", 2)
+		if len(parts) == 2 && activeStreamSet[parts[0]] {
+			filteredConsumers = append(filteredConsumers, s)
+		}
+	}
+	tmp.Consumers = filteredConsumers
+
 	// --- Write phase: lock only for the pointer swap ---
 	h.mu.Lock()
 	h.metricsCache = tmp
@@ -247,18 +272,51 @@ func appendDataPoint(series []MetricSeries, name, label string, t time.Time, val
 }
 
 func (h *MetricsHandler) buildConsumerMetrics(cache *MetricsResponse, now time.Time, streamNames map[string]bool) {
+	const maxConcurrent = 10
+	sem := make(chan struct{}, maxConcurrent)
+
+	type consumerResult struct {
+		streamName string
+		consumers  []ConsumerMetric
+	}
+
+	results := make(chan consumerResult, len(streamNames))
+	var wg sync.WaitGroup
+
 	for streamName := range streamNames {
-		msg, err := h.nc.Request(fmt.Sprintf(constants.APIConsumerListPaged+"%s", streamName), []byte("{}"), constants.LongRequestTimeout)
-		if err != nil {
-			continue
-		}
+		wg.Add(1)
+		go func(sn string) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
 
-		var response consumerListMetricsResponse
-		if err := json.Unmarshal(msg.Data, &response); err != nil {
-			continue
-		}
+			select {
+			case <-h.stopChan:
+				return
+			default:
+			}
 
-		for _, consumer := range response.Consumers {
+			msg, err := h.nc.Request(fmt.Sprintf(constants.APIConsumerListPaged+"%s", sn), []byte("{}"), constants.LongRequestTimeout)
+			if err != nil {
+				return
+			}
+
+			var response consumerListMetricsResponse
+			if err := json.Unmarshal(msg.Data, &response); err != nil {
+				return
+			}
+
+			results <- consumerResult{streamName: sn, consumers: response.Consumers}
+		}(streamName)
+	}
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	for res := range results {
+		for _, consumer := range res.consumers {
 			consumerName := consumer.Name
 			if consumerName == "" {
 				consumerName = consumer.Config.Durable
@@ -267,7 +325,7 @@ func (h *MetricsHandler) buildConsumerMetrics(cache *MetricsResponse, now time.T
 				continue
 			}
 
-			name := fmt.Sprintf("%s/%s", streamName, consumerName)
+			name := fmt.Sprintf("%s/%s", res.streamName, consumerName)
 			h.appendMetric(&cache.Consumers, name, "lag", float64(consumer.State.NumPending), now)
 			h.appendMetric(&cache.Consumers, name, "pending", float64(consumer.State.NumPending), now)
 			h.appendMetric(&cache.Consumers, name, "ack_pending", float64(consumer.State.NumAckPending), now)

@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"net/smtp"
+	"strings"
 	"time"
 
 	"github.com/amir-baghshahy/nats-horizon/internal/config"
@@ -344,7 +345,7 @@ body { font-family: Arial, sans-serif; margin: 20px; }
 
 	// Create message with proper MIME headers
 	message := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n%s",
-		config.From, config.To, config.Subject, body)
+		sanitizeHeader(config.From), sanitizeHeader(config.To), sanitizeHeader(config.Subject), body)
 
 	// Connect to SMTP server
 	addr := fmt.Sprintf("%s:%d", config.SMTPHost, config.SMTPPort)
@@ -438,4 +439,11 @@ func getBoolConfig(config map[string]interface{}, key string, defaultValue bool)
 		}
 	}
 	return defaultValue
+}
+
+// sanitizeHeader removes CR and LF characters from a header value to prevent header injection.
+func sanitizeHeader(value string) string {
+	value = strings.ReplaceAll(value, "\r", "")
+	value = strings.ReplaceAll(value, "\n", "")
+	return value
 }

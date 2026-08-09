@@ -1,17 +1,27 @@
-import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
+import i18n from "../i18n";
 import { rtlLanguages, type SupportedLanguage } from "../i18n";
 
 export function useDirection() {
-  const { i18n } = useTranslation();
+  const [language, setLanguage] = useState(i18n.language);
 
-  const isRTL = rtlLanguages.includes(i18n.language as SupportedLanguage);
+  useEffect(() => {
+    const handleLanguageChange = (lng: string) => {
+      setLanguage(lng);
+    };
+
+    i18n.on("languageChanged", handleLanguageChange);
+    return () => {
+      i18n.off("languageChanged", handleLanguageChange);
+    };
+  }, []);
+
+  const isRTL = rtlLanguages.includes(language as SupportedLanguage);
 
   useEffect(() => {
     document.documentElement.dir = isRTL ? "rtl" : "ltr";
-    document.documentElement.lang = i18n.language;
+    document.documentElement.lang = language;
 
-    // Add/remove RTL class on body for global styling
     if (isRTL) {
       document.body.classList.add("rtl");
       document.body.classList.remove("ltr");
@@ -19,7 +29,7 @@ export function useDirection() {
       document.body.classList.add("ltr");
       document.body.classList.remove("rtl");
     }
-  }, [isRTL, i18n.language]);
+  }, [isRTL, language]);
 
   return { isRTL };
 }

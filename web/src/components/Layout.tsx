@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { HealthService } from "../types";
-import { useState } from "react";
+import { useState, memo } from "react";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Card from "./ui/Card";
 
@@ -19,7 +19,6 @@ import {
   Bell,
   BarChart3,
   CloudOff,
-  History,
   Menu,
   X,
   Network,
@@ -76,7 +75,6 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { key: "cluster", href: "/cluster", icon: Activity },
       { key: "connections", href: "/connections", icon: Cable },
-      { key: "history", href: "/history", icon: History },
     ],
   },
   {
@@ -91,14 +89,8 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ] as const;
 
-export default function Layout({ children }: { children: ReactNode }) {
-  const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
-    new Set(),
-  );
+const SidebarFooter = memo(function SidebarFooter() {
   const { t } = useTranslation();
-
   const { data: health } = useQuery({
     queryKey: ["health"],
     queryFn: () => HealthService.getHealth(),
@@ -107,27 +99,46 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   const connected = health?.nats === "connected";
 
-  const toggleGroup = (groupTitleKey: string) => {
-    setCollapsedGroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(groupTitleKey)) {
-        next.delete(groupTitleKey);
-      } else {
-        next.add(groupTitleKey);
-      }
-      return next;
-    });
-  };
+  return (
+    <div className="space-y-2 border-t border-border-default/70 p-3">
+      <LanguageSwitcher />
+      <Card variant="stat" className="flex items-center gap-2">
+        <span
+          className={`h-2 w-2 shrink-0 rounded-full ${
+            connected
+              ? "animate-pulse-glow bg-status-success text-status-success"
+              : "bg-status-error"
+          }`}
+        />
+        <span className="truncate text-display-xs text-content-tertiary">
+          {connected ? t("common.connected") : t("common.disconnected")}
+        </span>
+        {!connected && (
+          <CloudOff className="ms-auto h-3.5 w-3.5 shrink-0 text-status-error" />
+        )}
+      </Card>
+    </div>
+  );
+});
 
-  const isGroupActive = (group: NavGroup) =>
-    group.items.some(
-      (item) =>
-        location.pathname === item.href ||
-        location.pathname.startsWith(item.href + "/"),
-    );
+const LayoutContent = memo(function LayoutContent({
+  children,
+  sidebarOpen,
+  setSidebarOpen,
+  collapsedGroups,
+  toggleGroup,
+}: {
+  children: ReactNode;
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+  collapsedGroups: Set<string>;
+  toggleGroup: (titleKey: string) => void;
+}) {
+  const location = useLocation();
+  const { t } = useTranslation();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-surface-primary">
+    <>
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:start-3 focus:top-3 focus:z-[60] focus:rounded-lg focus:bg-primary-600 focus:px-4 focus:py-2 focus:text-display-sm focus:font-semibold focus:text-white focus:shadow-lg"
@@ -182,7 +193,12 @@ export default function Layout({ children }: { children: ReactNode }) {
         <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-3 scrollbar-thin">
           {NAV_GROUPS.map((group) => {
             const isCollapsed = collapsedGroups.has(group.titleKey);
-            const groupActive = isGroupActive(group);
+            const groupActive = location.pathname === group.items[0].href ||
+              group.items.some(
+                (item) =>
+                  location.pathname === item.href ||
+                  location.pathname.startsWith(item.href + "/"),
+              );
 
             return (
               <div key={group.titleKey} className="space-y-0.5">
@@ -260,24 +276,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         </nav>
 
         {/* Footer */}
-        <div className="space-y-2 border-t border-border-default/70 p-3">
-          <LanguageSwitcher />
-          <Card variant="stat" className="flex items-center gap-2">
-            <span
-              className={`h-2 w-2 shrink-0 rounded-full ${
-                connected
-                  ? "animate-pulse-glow bg-status-success text-status-success"
-                  : "bg-status-error"
-              }`}
-            />
-            <span className="truncate text-display-xs text-content-tertiary">
-              {connected ? t("common.connected") : t("common.disconnected")}
-            </span>
-            {!connected && (
-              <CloudOff className="ms-auto h-3.5 w-3.5 shrink-0 text-status-error" />
-            )}
-          </Card>
-        </div>
+        <SidebarFooter />
       </aside>
 
       {/* Main content */}
@@ -289,6 +288,37 @@ export default function Layout({ children }: { children: ReactNode }) {
           {children}
         </div>
       </main>
+    </>
+  );
+});
+
+export default function Layout({ children }: { children: ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const toggleGroup = (groupTitleKey: string) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupTitleKey)) {
+        next.delete(groupTitleKey);
+      } else {
+        next.add(groupTitleKey);
+      }
+      return next;
+    });
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-surface-primary">
+      <LayoutContent
+        children={children}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        collapsedGroups={collapsedGroups}
+        toggleGroup={toggleGroup}
+      />
     </div>
   );
 }

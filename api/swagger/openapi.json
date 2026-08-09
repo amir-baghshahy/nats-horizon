@@ -161,35 +161,6 @@
         },
         "type": "object"
       },
-      "AuditEvent": {
-        "properties": {
-          "action": {
-            "type": "string"
-          },
-          "details": {
-            "type": "string"
-          },
-          "ip_address": {
-            "type": "string"
-          },
-          "metadata": {
-            "$ref": "#/components/schemas/Metadata"
-          },
-          "resource": {
-            "type": "string"
-          },
-          "timestamp": {
-            "type": "string"
-          },
-          "user": {
-            "type": "string"
-          },
-          "user_agent": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
       "CheckAlertsResponse": {
         "properties": {
           "evaluated": {
@@ -858,23 +829,6 @@
             "type": "string"
           },
           "timestamp": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "Metadata": {
-        "properties": {
-          "consumer_name": {
-            "type": "string"
-          },
-          "operation_type": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          },
-          "stream_name": {
             "type": "string"
           }
         },
@@ -2964,138 +2918,6 @@
         ]
       }
     },
-    "/history/report": {
-      "get": {
-        "description": "Returns a summary report of all streams with latest metric values",
-        "parameters": [
-          {
-            "description": "Time window",
-            "in": "query",
-            "name": "duration",
-            "schema": {
-              "default": "24h",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "history report"
-          }
-        },
-        "summary": "Get history report",
-        "tags": [
-          "history"
-        ]
-      }
-    },
-    "/history/streams/{name}": {
-      "get": {
-        "description": "Returns historical metric data points for a stream",
-        "parameters": [
-          {
-            "description": "Stream name",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Metric type (messages, bytes)",
-            "in": "query",
-            "name": "type",
-            "schema": {
-              "default": "messages",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Time window (1h, 6h, 24h, 7d)",
-            "in": "query",
-            "name": "duration",
-            "schema": {
-              "default": "24h",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "stream history"
-          }
-        },
-        "summary": "Get stream history",
-        "tags": [
-          "history"
-        ]
-      }
-    },
-    "/history/streams/{name}/analysis": {
-      "get": {
-        "description": "Returns statistical analysis (min/max/avg/trend) of a stream metric",
-        "parameters": [
-          {
-            "description": "Stream name",
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Metric type (messages, bytes)",
-            "in": "query",
-            "name": "type",
-            "schema": {
-              "default": "messages",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Time window (1h, 6h, 24h, 7d)",
-            "in": "query",
-            "name": "duration",
-            "schema": {
-              "default": "24h",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "metric analysis"
-          }
-        },
-        "summary": "Get stream metric analysis",
-        "tags": [
-          "history"
-        ]
-      }
-    },
     "/kv/buckets": {
       "get": {
         "description": "Returns all JetStream Key-Value store buckets",
@@ -4006,76 +3828,6 @@
         "summary": "Get system metrics",
         "tags": [
           "metrics"
-        ]
-      }
-    },
-    "/security/audit": {
-      "get": {
-        "description": "Returns audit log entries from the NATS audit stream",
-        "parameters": [
-          {
-            "description": "Offset for pagination",
-            "in": "query",
-            "name": "offset",
-            "schema": {
-              "default": 0,
-              "type": "integer"
-            }
-          },
-          {
-            "description": "Maximum number of logs to return",
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "default": 100,
-              "type": "integer"
-            }
-          },
-          {
-            "description": "Filter by action type",
-            "in": "query",
-            "name": "action",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Filter by user",
-            "in": "query",
-            "name": "user",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/AuditEvent"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "OK"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Internal Server Error"
-          }
-        },
-        "summary": "Get audit logs",
-        "tags": [
-          "security"
         ]
       }
     },

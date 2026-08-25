@@ -1,0 +1,33 @@
+# Maintainer: nats-horizon maintainers
+# This PKGBUILD is generated/updated by CI (see packaging/arch/publish-aur.sh).
+# Hand-edits are fine but will be overwritten on the next tagged release.
+
+pkgname=nats-horizon-bin
+pkgver=0.0.0
+pkgrel=1
+pkgdesc="NATS JetStream monitoring and management platform — desktop client (prebuilt binary)"
+arch=('x86_64')
+url="https://github.com/amir-baghshahy/nats-horizon"
+license=('MIT')
+depends=(
+  'glibc'
+  'webkit2gtk-4.1'
+  'gtk3'
+  'libayatana-appindicator'
+)
+provides=('nats-horizon')
+conflicts=('nats-horizon')
+source_x86_64=("https://github.com/amir-baghshahy/nats-horizon/releases/download/v${pkgver}/nats-horizon-${pkgver}-x86_64-unknown-linux-gnu.tar.gz")
+# Checksum is injected by CI from the built tarball (real b2sum, not SKIP).
+b2sums_x86_64=('PLACEHOLDER')
+
+package() {
+  cd nats-horizon
+  install -Dm755 nats-horizon "$pkgdir/usr/bin/nats-horizon"
+  if [ -f LICENSE ]; then
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  fi
+  if [ -f .env.example ]; then
+    install -Dm644 .env.example "$pkgdir/usr/share/nats-horizon/.env.example"
+  fi
+}
